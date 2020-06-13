@@ -1,5 +1,5 @@
 {
-  "name": "with-styled-components",
+  "name": "emp-tools",
   "version": "1.0.0",
   "scripts": {
     "dev": "next",
@@ -7,13 +7,23 @@
     "start": "next start"
   },
   "dependencies": {
+    "ethers": "^5.0.1",
     "next": "^9.4.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "styled-components": "^5.1.1"
   },
   "devDependencies": {
-    "babel-plugin-styled-components": "^1.10.7"
+    "@types/node": "^14.0.13",
+    "@types/react": "^16.9.36",
+    "@types/styled-components": "^5.1.0",
+    "babel-plugin-styled-components": "^1.10.7",
+    "typescript": "^3.9.5"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "semi": true,
+    "singleQuote": false
   },
   "license": "ISC"
 }
