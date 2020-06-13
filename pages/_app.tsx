@@ -1,13 +1,25 @@
 import App, { Container } from "next/app";
 import Head from "next/head";
-import { ThemeProvider } from "styled-components";
+import { ThemeProvider as SCThemeProvider } from "styled-components";
+import {
+  createMuiTheme,
+  ThemeProvider as MuiThemeProvider,
+} from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
-const theme = {
-  colors: {
-    primary: "#0070f3",
-  },
+const scTheme = {
+  // colors: {
+  //   primary: "#fab127",
+  // },
 };
+
+const muiTheme = createMuiTheme({
+  palette: {
+    type: "dark",
+    primary: { main: "#333333" },
+    secondary: { main: "#cccccc" },
+  },
+});
 
 export default class MyApp extends App {
   componentDidMount() {
@@ -33,10 +45,12 @@ export default class MyApp extends App {
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
         </Head>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Component {...pageProps} />
-        </ThemeProvider>
+        <SCThemeProvider theme={scTheme}>
+          <MuiThemeProvider theme={muiTheme}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </MuiThemeProvider>
+        </SCThemeProvider>
       </Container>
     );
   }
