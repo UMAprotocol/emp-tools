@@ -21,10 +21,17 @@ interface Block {
   extraData: string;
 }
 
+interface Network {
+  name: string;
+  chainId: number;
+  ensAddress?: string;
+  _defaultProvider?: (providers: any, options?: any) => any;
+}
+
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
-  const [network, setNetwork] = useState<unknown>(null);
+  const [network, setNetwork] = useState<Network | null>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [block$, setBlock$] = useState<Observable<Block> | null>(null);
@@ -77,7 +84,7 @@ function useConnection() {
         });
       });
       // debounce at 2 sec to prevent making unnecessary calls
-      setBlock$(observable.pipe(debounceTime(2000)));
+      setBlock$(observable.pipe(debounceTime(1000)));
     }
   }, [provider]);
 

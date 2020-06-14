@@ -59,7 +59,7 @@ const ConnectionStatus = () => {
   }, [block$]);
 
   // render null state
-  if (!signer || !network || !address || !time) {
+  if (!signer || !network || !address) {
     return (
       <>
         <Emphasis state="#fab127">Please connect to MetaMask</Emphasis>
@@ -71,20 +71,24 @@ const ConnectionStatus = () => {
 
   // rename homestead to mainnet for mainstream understanding
   const networkName = network.name === "homestead" ? "Mainnet" : network.name;
-  const timeStr = new Date(time * 1000).toLocaleTimeString();
+  const timeStr = time && new Date(time * 1000).toLocaleTimeString();
 
   return (
     <>
-      <Emphasis state="#28f71d">
-        Updated @ block {blockNum}{" "}
-        <Tooltip
-          title={`This info is based on the timestamp inside each block that is mined (as opposed to the time that your browser updated).`}
-        >
-          <span>
-            ({timeStr}) {timeAgo}
-          </span>
-        </Tooltip>
-      </Emphasis>
+      {timeStr ? (
+        <Emphasis state="#28f71d">
+          Updated @ block {blockNum}{" "}
+          <Tooltip
+            title={`This info is based on the timestamp inside each block that is mined (as opposed to the time that your browser updated).`}
+          >
+            <span>
+              ({timeStr}) {timeAgo}
+            </span>
+          </Tooltip>
+        </Emphasis>
+      ) : (
+        <Emphasis state="#28f71d">Updating...</Emphasis>
+      )}
 
       <Status>
         Network: <Cap>{networkName}</Cap>({network.chainId})
