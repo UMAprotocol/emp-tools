@@ -56,7 +56,7 @@ const Manager = () => {
     setMethod(e.target.value as string);
 
   return (
-    <Box my={2}>
+    <Box my={5}>
       <Typography variant="h5">Manage Position</Typography>
       <FormControl className={classes.formControl}>
         <InputLabel id="demo-simple-select-label">Actions</InputLabel>

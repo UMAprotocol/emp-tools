@@ -55,8 +55,8 @@ const ContractState = () => {
 
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
   return (
-    <Box>
-      <Box pt={2}>
+    <Box py={4}>
+      <Box>
         <Typography variant="h5">General Params</Typography>
         <Status>
           <Label>Expiry Date: </Label>

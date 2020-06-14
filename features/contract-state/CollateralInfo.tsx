@@ -51,7 +51,7 @@ const CollateralInfo = () => {
   }, [collAddress]);
 
   return (
-    <Box pt={2}>
+    <Box pt={3}>
       {symbol ? (
         <Typography variant="h5">Collateral ({symbol})</Typography>
       ) : (

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Container, Box } from "@material-ui/core";
+import { Container, Box, Divider } from "@material-ui/core";
 
 import Header from "../features/core/Header";
 import ConnectionStatus from "../features/core/ConnectionStatus";
@@ -15,6 +15,7 @@ export default function Index() {
         <ConnectionStatus />
         <EmpAddressInput />
         <ContractState />
+        <Divider variant="middle"/>
         <Manager />
       </Box>
     </Container>

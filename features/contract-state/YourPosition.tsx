@@ -59,7 +59,7 @@ const YourPosition = () => {
   }, [address, signer, contract]);
 
   return (
-    <Box pt={2}>
+    <Box pt={3}>
       <Typography variant="h5">Your Position</Typography>
       <Status>
         <Label>Tokens outstanding: </Label>
