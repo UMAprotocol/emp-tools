@@ -5,7 +5,7 @@ import useEmpList from "./useEmpList";
 import Connection from "../../containers/Connection";
 import EmpListDialog from "./EmpListDialog";
 
-const EmpList = () => {
+const EmpListButton = () => {
   const { signer } = Connection.useContainer();
   const [dialogOpen, setDialogOpen] = useState(false);
   const closeDialog = () => setDialogOpen(false);
@@ -37,4 +37,4 @@ const EmpList = () => {
   );
 };
 
-export default EmpList;
+export default EmpListButton;
