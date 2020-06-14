@@ -9,7 +9,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 
 import ListItemText from "@material-ui/core/ListItemText";
-import { Method } from "./Manager";
+import { Method } from "./ManagePosition";
 
 const BootstrapInput = withStyles((theme) => ({
   root: {

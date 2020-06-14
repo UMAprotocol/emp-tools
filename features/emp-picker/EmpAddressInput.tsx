@@ -1,6 +1,11 @@
+import styled from "styled-components";
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import EmpAddress from "../../containers/EmpAddress";
+
+const Container = styled(Box)`
+  width: 500px;
+`;
 
 const EmpAddressInput = () => {
   const { empAddress, setEmpAddress, isValid } = EmpAddress.useContainer();
@@ -9,7 +14,7 @@ const EmpAddressInput = () => {
     setEmpAddress(e.target.value);
 
   return (
-    <Box py={2}>
+    <Container py={2}>
       <TextField
         label="EMP Address"
         placeholder="0x1234567890abcdef..."
@@ -21,7 +26,7 @@ const EmpAddressInput = () => {
         error={!isValid}
         fullWidth
       />
-    </Box>
+    </Container>
   );
 };
 

@@ -1,12 +1,10 @@
-import styled from "styled-components";
 import { Container, Box, Divider } from "@material-ui/core";
 
 import Header from "../features/core/Header";
 import ConnectionStatus from "../features/core/ConnectionStatus";
-import EmpAddressInput from "../features/emp-picker/EmpAddressInput";
-import EmpListButton from "../features/emp-picker/EmpListButton";
+import EmpPicker from "../features/emp-picker/EmpPicker";
 import ContractState from "../features/contract-state/ContractState";
-import Manager from "../features/manage-position/Manager";
+import ManagePosition from "../features/manage-position/ManagePosition";
 
 export default function Index() {
   return (
@@ -14,11 +12,10 @@ export default function Index() {
       <Box py={4}>
         <Header />
         <ConnectionStatus />
-        <EmpListButton />
-        <EmpAddressInput />
+        <EmpPicker />
         <ContractState />
         <Divider variant="middle" />
-        <Manager />
+        <ManagePosition />
       </Box>
     </Container>
   );

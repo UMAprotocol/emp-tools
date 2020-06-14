@@ -1,6 +1,6 @@
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import MethodSelector from "./MethodSelector";
 import Create from "./Create";

@@ -18,14 +18,14 @@ const EmpListButton = () => {
   }, [dialogOpen]);
 
   return (
-    <Box pt={3}>
+    <Box pt={3} pl={3}>
       <Button
         variant="contained"
         color="primary"
         onClick={openDialog}
         disabled={!signer}
       >
-        {signer ? "Select an EMP" : "Please connect to select an EMP"}
+        {signer ? "Select EMP" : "Please connect"}
       </Button>
 
       <EmpListDialog
