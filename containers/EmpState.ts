@@ -82,9 +82,15 @@ const useContractState = () => {
     }
   };
 
+  // get state on setting of contract
+  useEffect(() => {
+    queryState();
+  }, [emp]);
+
   useEffect(() => {
     if (block$ && emp) {
-      block$.subscribe(() => queryState());
+      const sub = block$.subscribe(() => queryState());
+      return () => sub.unsubscribe();
     }
   }, [block$, emp]);
 
