@@ -52,7 +52,8 @@ const Manager = () => {
   const [method, setMethod] = useState("create");
   const classes = useStyles();
 
-  const handleChange = (e) => setMethod(e.target.value);
+  const handleChange = (e: React.ChangeEvent<{ value: unknown }>) =>
+    setMethod(e.target.value as string);
 
   return (
     <Box my={2}>
