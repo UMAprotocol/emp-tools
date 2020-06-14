@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { ethers } from "ethers";
-import { Typography, Box } from "@material-ui/core";
+import { ethers, BigNumberish } from "ethers";
+import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
 import YourPosition from "./YourPosition";
@@ -19,6 +19,7 @@ const Status = styled(Typography)`
 `;
 
 const fromWei = ethers.utils.formatUnits;
+const weiToNum = (x: BigNumberish) => parseFloat(fromWei(x));
 
 const ContractState = () => {
   const { empState } = EmpState.useContainer();
@@ -28,57 +29,60 @@ const ContractState = () => {
     priceIdentifier: priceId,
     collateralRequirement: collReq,
     minSponsorTokens,
-    cumulativeFeeMultiplier,
-    rawTotalPositionCollateral,
-    totalTokensOutstanding,
+    cumulativeFeeMultiplier: multiplier,
+    rawTotalPositionCollateral: rawColl,
+    totalTokensOutstanding: totalTokensWei,
   } = empState;
 
-  const getGCR = () => {
-    if (
-      cumulativeFeeMultiplier &&
-      rawTotalPositionCollateral &&
-      totalTokensOutstanding
-    ) {
-      // calc collateral after multipler
-      const multiplier = parseFloat(fromWei(cumulativeFeeMultiplier));
-      const totalCollateralRaw = parseFloat(
-        fromWei(rawTotalPositionCollateral)
-      );
-      const totalCollateral = totalCollateralRaw * multiplier;
-
-      // div collateral by total outstanding tokens
-      const totalTokens = parseFloat(fromWei(totalTokensOutstanding));
-      return totalCollateral / totalTokens;
-    }
-    return null;
-  };
+  const totalColl =
+    multiplier && rawColl ? weiToNum(multiplier) * weiToNum(rawColl) : null;
+  const totalTokens = totalTokensWei ? weiToNum(totalTokensWei) : null;
+  const gcr = totalColl && totalTokens ? totalColl / totalTokens : null;
 
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
   return (
     <Box py={4}>
       <Box>
-        <Typography variant="h5">General Params</Typography>
+        <Typography variant="h5">General Info</Typography>
         <Status>
           <Label>Expiry Date: </Label>
           <span title={expiry ? expiry.toString() : undefined}>
             {expiryDate.toString()}
           </span>
         </Status>
+
         <Status>
           <Label>Price Feed Identifier: </Label>
           {priceId ? ethers.utils.parseBytes32String(priceId) : "N/A"}
         </Status>
+
         <Status>
           <Label>Collateral Requirement: </Label>
           {collReq ? `${parseFloat(fromWei(collReq)) * 100}%` : "N/A"}
         </Status>
+
         <Status>
           <Label>Minimum Sponsor Tokens: </Label>
           {minSponsorTokens ? fromWei(minSponsorTokens) : "N/A"}
         </Status>
+
         <Status>
-          <Label>GCR: </Label>
-          {getGCR() ? getGCR() : "N/A"}
+          <Label>Total Collateral: </Label>
+          {totalColl ? totalColl : "N/A"}
+        </Status>
+
+        <Status>
+          <Label>Total Tokens: </Label>
+          {totalTokens ? totalTokens : "N/A"}
+        </Status>
+
+        <Status>
+          <Label>GCR (collateral / tokens): </Label>
+          <Tooltip
+            title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
+          >
+            <span>{gcr ? gcr : "N/A"}</span>
+          </Tooltip>
         </Status>
       </Box>
 

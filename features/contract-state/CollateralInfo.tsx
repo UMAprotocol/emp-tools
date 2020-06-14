@@ -57,10 +57,12 @@ const CollateralInfo = () => {
       ) : (
         <Typography variant="h5">Collateral</Typography>
       )}
+
       <Status>
         <Label>Address: </Label>
         {collAddress || "N/A"}
       </Status>
+
       <Status>
         <Label>Wallet balance: </Label>
         {balance || "N/A"}

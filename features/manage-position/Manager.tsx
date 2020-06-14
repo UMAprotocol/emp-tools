@@ -28,82 +28,70 @@ const BootstrapInput = withStyles((theme) => ({
   },
   input: {
     display: "flex",
-    // paddingTop: theme.spacing(3),
     paddingLeft: "16px",
     alignItems: "center",
   },
 }))(InputBase);
 
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    // margin: theme.spacing(1),
-    // minWidth: 360,
-    width: "100%",
-  },
-  itemDesc: {
-    // width: 420,
-    "& > p": {
-      whiteSpace: "normal",
-    },
-  },
-}));
+const FormWrapper = styled(FormControl)`
+  width: 100%;
+`;
 
 const Manager = () => {
   const [method, setMethod] = useState("create");
-  const classes = useStyles();
 
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) =>
     setMethod(e.target.value as string);
 
   return (
-    <Box my={5}>
+    <Box my={4}>
       <Typography variant="h5">Manage Position</Typography>
-      <FormControl className={classes.formControl}>
-        <InputLabel id="demo-simple-select-label">Actions</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={method}
-          onChange={handleChange}
-          input={<BootstrapInput />}
-        >
-          <MenuItem value={"create"}>
-            <ListItemText
-              primary="Create"
-              secondary="Mint new synthetic tokens."
-              className={classes.itemDesc}
-            />
-          </MenuItem>
-          <MenuItem value={"deposit"}>
-            <ListItemText
-              primary="Deposit"
-              secondary="Deposit additional collateral."
-              className={classes.itemDesc}
-            />
-          </MenuItem>
-          <MenuItem value={"withdraw"}>
-            <ListItemText
-              primary="Withdraw"
-              secondary="Withdraw excess collateral."
-              className={classes.itemDesc}
-            />
-          </MenuItem>
-          <MenuItem value={"redeem"}>
-            <ListItemText
-              primary="Redeem"
-              secondary="Withdraw excess collateral."
-              className={classes.itemDesc}
-            />
-          </MenuItem>
-          <MenuItem value={"transfer"}>
-            <ListItemText
-              primary="Transfer"
-              secondary="Transfer a token sponsor position."
-              className={classes.itemDesc}
-            />
-          </MenuItem>
-        </Select>
-      </FormControl>
+      <Box py={2}>
+        <FormWrapper>
+          <InputLabel id="demo-simple-select-label">Actions</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            value={method}
+            onChange={handleChange}
+            input={<BootstrapInput />}
+          >
+            <MenuItem value={"create"}>
+              <ListItemText
+                primary="Create"
+                secondary="Mint new synthetic tokens."
+              />
+            </MenuItem>
+            <MenuItem value={"deposit"}>
+              <ListItemText
+                primary="Deposit"
+                secondary="Deposit additional collateral."
+              />
+            </MenuItem>
+            <MenuItem value={"withdraw"}>
+              <ListItemText
+                primary="Withdraw"
+                secondary="Withdraw excess collateral."
+              />
+            </MenuItem>
+            <MenuItem value={"redeem"}>
+              <ListItemText
+                primary="Redeem"
+                secondary="Withdraw excess collateral."
+              />
+            </MenuItem>
+            <MenuItem value={"transfer"}>
+              <ListItemText
+                primary="Transfer"
+                secondary="Transfer a token sponsor position."
+              />
+            </MenuItem>
+          </Select>
+        </FormWrapper>
+      </Box>
+
+      <Box>
+        
+      </Box>
     </Box>
   );
 };
