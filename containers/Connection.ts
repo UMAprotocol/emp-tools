@@ -24,7 +24,7 @@ interface Block {
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
-  const [network, setNetwork] = useState<any>(null);
+  const [network, setNetwork] = useState<unknown>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [block$, setBlock$] = useState<Observable<Block> | null>(null);

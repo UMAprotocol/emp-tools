@@ -31,15 +31,6 @@ const ConnectionStatus = () => {
   const [time, setTime] = useState<number | null>(null);
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
 
-  // subscribe to block$ so we can update blockNum
-  useEffect(() => {
-    if (block$)
-      block$.subscribe((block) => {
-        setBlockNum(block.number);
-        setTime(block.timestamp);
-      });
-  }, [block$]);
-
   const updateTimeAgo = () => {
     if (time) {
       const timeAgoStr = formatDistanceToNowStrict(new Date(time * 1000), {
@@ -50,6 +41,7 @@ const ConnectionStatus = () => {
     }
   };
 
+  // call updateTimeAgo every second
   useEffect(() => {
     const interval = setInterval(() => {
       if (time) updateTimeAgo();
@@ -57,6 +49,16 @@ const ConnectionStatus = () => {
     return () => clearInterval(interval);
   }, [time]);
 
+  // subscribe to block$ so we can update blockNum
+  useEffect(() => {
+    if (block$)
+      block$.subscribe((block) => {
+        setBlockNum(block.number);
+        setTime(block.timestamp);
+      });
+  }, [block$]);
+
+  // render null state
   if (!signer || !network || !address || !time) {
     return (
       <>
@@ -83,9 +85,11 @@ const ConnectionStatus = () => {
           </span>
         </Tooltip>
       </Emphasis>
+
       <Status>
         Network: <Cap>{networkName}</Cap>({network.chainId})
       </Status>
+
       <Status>Account: {address}</Status>
     </>
   );
