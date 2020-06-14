@@ -84,7 +84,7 @@ function useConnection() {
         });
       });
       // debounce at 2 sec to prevent making unnecessary calls
-      setBlock$(observable.pipe(debounceTime(1000)));
+      setBlock$(observable.pipe(debounceTime(2000)));
     }
   }, [provider]);
 

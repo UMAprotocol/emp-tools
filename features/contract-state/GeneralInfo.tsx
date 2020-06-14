@@ -43,9 +43,13 @@ const GeneralInfo = () => {
       <Typography variant="h5">General Info</Typography>
       <Status>
         <Label>Expiry Date: </Label>
-        <span title={expiry ? expiry.toString() : undefined}>
-          {expiryDate.toString()}
-        </span>
+        {expiry ? (
+          <Tooltip title={`Timestamp: ${expiry.toString()}`} interactive>
+            <span>{expiryDate.toString()}</span>
+          </Tooltip>
+        ) : (
+          "N/A"
+        )}
       </Status>
 
       <Status>

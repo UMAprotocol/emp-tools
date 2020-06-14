@@ -5,15 +5,8 @@ import EmpAddress from "../../containers/EmpAddress";
 const EmpAddressInput = () => {
   const { empAddress, setEmpAddress, isValid } = EmpAddress.useContainer();
 
-  const handleChange = (e: {
-    target: HTMLInputElement | HTMLTextAreaElement;
-  }) => setEmpAddress(e.target.value);
-
-  // const getHelperText = () => {
-  //   if (!isValid) return "Please enter a valid address"
-  //   if (loading) return "Loading..."
-  //   return null
-  // }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setEmpAddress(e.target.value);
 
   return (
     <Box py={2}>
