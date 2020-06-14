@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { ethers } from "ethers";
 import erc20 from "@studydefi/money-legos/erc20";
-import { Typography, Box, Divider } from "@material-ui/core";
+import { Typography, Box } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
 import Connection from "../../containers/Connection";

@@ -45,7 +45,7 @@ const YourPosition = () => {
     }
   };
 
-  // get collateral info on each new block
+  // get position info on each new block
   useEffect(() => {
     if (block$) {
       const sub = block$.subscribe(() => getPositionInfo());
@@ -53,7 +53,7 @@ const YourPosition = () => {
     }
   }, [block$, address, signer, contract]);
 
-  // get collateral info on setting of collateral address
+  // get position info on setting of vars
   useEffect(() => {
     getPositionInfo();
   }, [address, signer, contract]);
