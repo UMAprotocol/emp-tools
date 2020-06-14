@@ -1,61 +1,22 @@
-import Container from "@material-ui/core/Container";
-import Typography from "@material-ui/core/Typography";
-import Box from "@material-ui/core/Box";
 import styled from "styled-components";
+import { Container, Box } from "@material-ui/core";
 
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
-
-const Title = styled.h1`
-  // color: ${({ theme }) => theme.colors.primary};
-  font-size: 50px;
-`;
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  title: {
-    flexGrow: 1,
-  },
-}));
+import Header from "../features/core/Header";
+import ConnectionStatus from "../features/core/ConnectionStatus";
+import EmpAddressInput from "../features/core/EmpAddressInput";
+import ContractState from "../features/contract-state/ContractState";
+import Manager from "../features/manage-position/Manager";
 
 export default function Index() {
-  const classes = useStyles();
-
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="menu"
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            EMP Tools
-          </Typography>
-          <Button color="inherit">Connect</Button>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="sm">
-        <Title>EMP Tools</Title>
-        <Box my={4}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Next.js v4-beta example
-          </Typography>
-        </Box>
-      </Container>
-    </>
+    <Container maxWidth={"md"}>
+      <Box py={4}>
+        <Header />
+        <ConnectionStatus />
+        <EmpAddressInput />
+        <ContractState />
+        <Manager />
+      </Box>
+    </Container>
   );
 }
