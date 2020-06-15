@@ -77,7 +77,7 @@ const ConnectionStatus = () => {
     <>
       {timeStr ? (
         <Emphasis state="#28f71d">
-          Updated @ block {blockNum}{" "}
+          Currently @ block {blockNum}{" "}
           <Tooltip
             title={`This info is based on the timestamp inside each block that is mined (as opposed to the time that your browser updated).`}
           >
@@ -87,7 +87,7 @@ const ConnectionStatus = () => {
           </Tooltip>
         </Emphasis>
       ) : (
-        <Emphasis state="#28f71d">Updating...</Emphasis>
+        <Emphasis state="#28f71d">Loading...</Emphasis>
       )}
 
       <Status>

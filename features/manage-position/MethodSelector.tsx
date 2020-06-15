@@ -21,6 +21,7 @@ const BootstrapInput = withStyles((theme) => ({
     backgroundColor: "rgba(255, 255, 255, 0.09)",
     borderTopLeftRadius: "4px",
     borderTopRightRadius: "4px",
+    maxWidth: `500px`,
   },
   input: {
     display: "flex",
@@ -70,7 +71,7 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
           <MenuItem value={"redeem"}>
             <ListItemText
               primary="Redeem"
-              secondary="Withdraw excess collateral."
+              secondary="Redeem synthetic tokens."
             />
           </MenuItem>
           <MenuItem value={"transfer"}>

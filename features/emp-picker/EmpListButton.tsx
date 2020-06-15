@@ -24,6 +24,7 @@ const EmpListButton = () => {
         color="primary"
         onClick={openDialog}
         disabled={!signer}
+        style={{ whiteSpace: `nowrap` }}
       >
         {signer ? "Select EMP" : "Please connect"}
       </Button>
