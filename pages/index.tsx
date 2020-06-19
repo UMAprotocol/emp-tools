@@ -14,8 +14,8 @@ export default function Index() {
         <ConnectionStatus />
         <EmpPicker />
         <ContractState />
-        <Divider variant="middle" />
-        <ManagePosition />
+        {/* <Divider variant="middle" />
+        <ManagePosition /> */}
       </Box>
     </Container>
   );
