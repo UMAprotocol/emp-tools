@@ -17,27 +17,22 @@ const Status = styled(Typography)`
 `;
 
 const fromWei = ethers.utils.formatUnits;
-const weiToNum = (x: BigNumberish) => parseFloat(fromWei(x));
 
 const GeneralInfo = () => {
-  const { empState } = EmpState.useContainer();
+  const {
+    empState,
+    totalCollateral,
+    totalTokens,
+    gcr,
+  } = EmpState.useContainer();
   const {
     expirationTimestamp: expiry,
     priceIdentifier: priceId,
     collateralRequirement: collReq,
     minSponsorTokens,
-    cumulativeFeeMultiplier: multiplier,
-    rawTotalPositionCollateral: rawColl,
-    totalTokensOutstanding: totalTokensWei,
   } = empState;
   const { symbol: collSymbol } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
-
-  // do some calc
-  const totalColl =
-    multiplier && rawColl ? weiToNum(multiplier) * weiToNum(rawColl) : null;
-  const totalTokens = totalTokensWei ? weiToNum(totalTokensWei) : null;
-  const gcr = totalColl && totalTokens ? totalColl / totalTokens : null;
 
   // format nice date
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
@@ -75,7 +70,7 @@ const GeneralInfo = () => {
 
       <Status>
         <Label>Total Collateral: </Label>
-        {totalColl ? `${totalColl} ${collSymbol}` : "N/A"}
+        {totalCollateral ? `${totalCollateral} ${collSymbol}` : "N/A"}
       </Status>
 
       <Status>

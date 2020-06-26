@@ -5,6 +5,9 @@ import { Box, Button, TextField, Typography } from "@material-ui/core";
 import Contract from "../../containers/Contract";
 import { useState } from "react";
 import useApproveCollateral from "./useApproveCollateral";
+import Collateral from "../../containers/Collateral";
+import Token from "../../containers/Token";
+import EmpState from "../../containers/EmpState";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -16,6 +19,9 @@ const Red = styled(Typography)`
 
 const Create = () => {
   const { contract: emp } = Contract.useContainer();
+  const { symbol: collSymbol } = Collateral.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
+  const { gcr } = EmpState.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
@@ -50,23 +56,27 @@ const Create = () => {
 
   const handleCreateClick = () => mintTokens();
 
+  const computedCR = parseFloat(collateral) / parseFloat(tokens);
+
   return (
     <Container>
       <Box py={2}>
         <Typography>
-          <i>Mint new synthetic tokens via this EMP contract.</i>
+          <i>
+            Mint new synthetic tokens ({tokenSymbol}) via this EMP contract.
+          </i>
         </Typography>
       </Box>
 
       <Box pb={2}>
-        <Box py={2}>
-          <Typography variant="h6">1. Prerequisite</Typography>
-        </Box>
+        {/* <Box py={2}>
+          <Typography variant="h6">Prerequisite</Typography>
+        </Box> */}
         <Box py={2}>
           <Typography>
-            The EMP needs approval to transfer the collateral currency on your
-            behalf. Your current allowance for this EMP is:{" "}
-            <span>{allowance || "N/A"}</span>
+            The EMP needs approval to transfer the collateral currency (
+            {collSymbol}) on your behalf. Your current allowance for this EMP
+            is: <span>{allowance || "N/A"}</span>
             <br />
             <br />
             <Button variant={"outlined"} onClick={setMaxAllowance}>
@@ -78,9 +88,6 @@ const Create = () => {
 
       <Box pb={2}>
         <Box py={2}>
-          <Typography variant="h6">2. Important Info</Typography>
-        </Box>
-        <Box py={2}>
           <Red>
             <i>Please read this carefully or you may lose money.</i>
           </Red>
@@ -88,9 +95,9 @@ const Create = () => {
         <Box pt={2}>
           <Typography>
             <strong>If this is your first time minting</strong>, ensure that
-            your ratio of collateral to tokens is above the GCR (noted above)
-            and that you are minting at least the "minimum sponsor tokens"
-            amount indicated above.
+            your ratio of collateral to tokens is above the GCR and that you are
+            minting at least the "minimum sponsor tokens" amount indicated
+            above.
           </Typography>
         </Box>
         <Box py={2}>
@@ -101,27 +108,18 @@ const Create = () => {
             liquidated.
           </Typography>
         </Box>
+        <Box py={2}>
+          <Typography>
+            When you're ready, fill in the desired amount of collateral and
+            tokens below and click the "Create" button.
+          </Typography>
+        </Box>
       </Box>
 
       <Box py={2}>
-        <Typography variant="h6">3. Perform Action</Typography>
-      </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>Collateral: </strong> Denominated in terms of whole numbers
-          (not in Wei). Check above to see the collateral token for this EMP.
-        </Typography>
-      </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>Tokens: </strong> Denominated in terms of whole numbers (not
-          in Wei). Check above to see the synthetic token for this EMP.
-        </Typography>
-      </Box>
-      <Box py={2}>
         <TextField
           type="number"
-          label="Collateral"
+          label={`Collateral (${collSymbol})`}
           placeholder="1234"
           value={collateral}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -132,7 +130,7 @@ const Create = () => {
       <Box py={2}>
         <TextField
           type="number"
-          label="Tokens"
+          label={`Tokens (${tokenSymbol})`}
           placeholder="1234"
           value={tokens}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -145,13 +143,28 @@ const Create = () => {
           <Button
             variant="outlined"
             onClick={handleCreateClick}
-          >{`Create ${tokens} tokens with ${collateral} collateral`}</Button>
+          >{`Create ${tokens} ${tokenSymbol} with ${collateral} ${collSymbol}`}</Button>
         ) : (
           <Button variant="outlined" disabled>
             Create
           </Button>
         )}
       </Box>
+
+      <Box py={2}>
+        {tokens && collateral && gcr ? (
+          <Typography>
+            CR (collater/tokens):{" "}
+            <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
+              {computedCR}
+            </span>
+          </Typography>
+        ) : (
+          <Typography>CR (collater/tokens): N/A</Typography>
+        )}
+        <Typography>Current GCR: {gcr || "N/A"}</Typography>
+      </Box>
+
       {hash && (
         <Box py={2}>
           <Typography>

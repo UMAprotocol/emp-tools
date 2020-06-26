@@ -1,6 +1,6 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { BigNumber, Bytes } from "ethers";
+import { BigNumber, Bytes, ethers, BigNumberish } from "ethers";
 
 import Connection from "./Connection";
 import Contract from "./Contract";
@@ -37,12 +37,19 @@ const initState = {
   totalTokensOutstanding: null,
 };
 
+const fromWei = ethers.utils.formatUnits;
+const weiToNum = (x: BigNumberish) => parseFloat(fromWei(x));
+
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
   const { contract: emp } = Contract.useContainer();
 
   const [state, setState] = useState<ContractState>(initState);
+  const [totalCollateral, setTotalCollateral] = useState<number | null>(null);
+  const [totalTokens, setTotalTokens] = useState<number | null>(null);
+  const [gcr, setGCR] = useState<number | null>(null);
 
+  // get state from EMP
   const queryState = async () => {
     if (emp) {
       // have to do this ugly thing because we want call in parallel
@@ -82,11 +89,30 @@ const useContractState = () => {
     }
   };
 
+  // set GCR when state updates
+  useEffect(() => {
+    const {
+      cumulativeFeeMultiplier: multiplier,
+      rawTotalPositionCollateral: rawColl,
+      totalTokensOutstanding: totalTokensWei,
+    } = state;
+
+    const totalColl =
+      multiplier && rawColl ? weiToNum(multiplier) * weiToNum(rawColl) : null;
+    const totalTokens = totalTokensWei ? weiToNum(totalTokensWei) : null;
+    const gcr = totalColl && totalTokens ? totalColl / totalTokens : null;
+
+    setTotalCollateral(totalColl);
+    setTotalTokens(totalTokens);
+    setGCR(gcr);
+  }, [state]);
+
   // get state on setting of contract
   useEffect(() => {
     queryState();
   }, [emp]);
 
+  // get state on each block
   useEffect(() => {
     if (block$ && emp) {
       const sub = block$.subscribe(() => queryState());
@@ -94,7 +120,7 @@ const useContractState = () => {
     }
   }, [block$, emp]);
 
-  return { empState: state };
+  return { empState: state, totalCollateral, totalTokens, gcr };
 };
 
 const EmpState = createContainer(useContractState);
