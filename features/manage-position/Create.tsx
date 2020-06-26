@@ -17,9 +17,15 @@ const Red = styled(Typography)`
   color: red;
 `;
 
+const fromWei = ethers.utils.formatUnits;
+
 const Create = () => {
   const { contract: emp } = Contract.useContainer();
-  const { symbol: collSymbol } = Collateral.useContainer();
+  const { empState } = EmpState.useContainer();
+  const {
+    symbol: collSymbol,
+    decimals: collDecimals,
+  } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
   const { gcr } = EmpState.useContainer();
 
@@ -28,6 +34,9 @@ const Create = () => {
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
+
+  const { collateralRequirement: collReq } = empState;
+  const collReqPct = collReq ? `${parseFloat(fromWei(collReq)) * 100}%` : "N/A";
 
   const { allowance, setMaxAllowance } = useApproveCollateral();
 
@@ -102,10 +111,8 @@ const Create = () => {
         </Box>
         <Box py={2}>
           <Typography>
-            <strong>If you have an existing position</strong>, ensure that your
-            collateralization ratio will continue to satisfy the collateral
-            requirement percentage indicated above, otherwise you may get
-            liquidated.
+            Ensure that you maintain {collReqPct} collateralization or else you
+            will get liquidated.
           </Typography>
         </Box>
         <Box py={2}>
