@@ -3,6 +3,8 @@ import { ethers, BigNumberish } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
+import Collateral from "../../containers/Collateral";
+import Token from "../../containers/Token";
 
 const Label = styled.span`
   color: #999999;
@@ -28,6 +30,8 @@ const GeneralInfo = () => {
     rawTotalPositionCollateral: rawColl,
     totalTokensOutstanding: totalTokensWei,
   } = empState;
+  const { symbol: collSymbol } = Collateral.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   // do some calc
   const totalColl =
@@ -64,17 +68,19 @@ const GeneralInfo = () => {
 
       <Status>
         <Label>Minimum Sponsor Tokens: </Label>
-        {minSponsorTokens ? fromWei(minSponsorTokens) : "N/A"}
+        {minSponsorTokens
+          ? `${fromWei(minSponsorTokens)} ${tokenSymbol}`
+          : "N/A"}
       </Status>
 
       <Status>
         <Label>Total Collateral: </Label>
-        {totalColl ? totalColl : "N/A"}
+        {totalColl ? `${totalColl} ${collSymbol}` : "N/A"}
       </Status>
 
       <Status>
         <Label>Total Tokens: </Label>
-        {totalTokens ? totalTokens : "N/A"}
+        {totalTokens ? `${totalTokens} ${tokenSymbol}` : "N/A"}
       </Status>
 
       <Status>

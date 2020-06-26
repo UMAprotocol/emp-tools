@@ -45,7 +45,7 @@ const CollateralInfo = () => {
 
       <Status>
         <Label>Wallet balance: </Label>
-        {balance || "N/A"}
+        {balance ? `${balance} ${symbol}` : "N/A"}
       </Status>
     </Box>
   );
