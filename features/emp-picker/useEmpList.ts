@@ -50,7 +50,6 @@ const useEmpList = () => {
       // set state w/ data
       const emps = await Promise.all(promises);
       setEmps(emps);
-      console.log(emps);
     }
   };
 

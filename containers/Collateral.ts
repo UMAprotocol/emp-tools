@@ -3,14 +3,12 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import erc20 from "@studydefi/money-legos/erc20";
 
-import EmpAddress from "./EmpAddress";
 import Connection from "./Connection";
 import EmpState from "./EmpState";
 
 function useCollateral() {
   const { signer, address, block$ } = Connection.useContainer();
   const { empState } = EmpState.useContainer();
-  const { empAddress, isValid } = EmpAddress.useContainer();
   const collAddress = empState.collateralCurrency;
 
   const [contract, setContract] = useState<ethers.Contract | null>(null);
@@ -34,6 +32,11 @@ function useCollateral() {
     }
   };
 
+  // get collateral info contract changes
+  useEffect(() => {
+    getCollateralInfo();
+  }, [contract]);
+
   // get collateral info on each new block
   useEffect(() => {
     if (block$) {
@@ -42,25 +45,22 @@ function useCollateral() {
     }
   }, [block$, collAddress, signer]);
 
-  // get collateral info on setting of collateral address
+  // set contract when collateral address changes
   useEffect(() => {
-    if (collAddress) getCollateralInfo();
-  }, [collAddress]);
-
-  // fetch data when contract changes
-  useEffect(() => {
-    getCollateralInfo();
-  }, [contract]);
-
-  // set contract when address changes
-  useEffect(() => {
-    if (empAddress && isValid && signer && collAddress) {
+    if (signer && collAddress) {
       const instance = new ethers.Contract(collAddress, erc20.abi, signer);
       setContract(instance);
     }
-  }, [empAddress, isValid, signer, collAddress]);
+  }, [signer, collAddress]);
 
-  return { contract, name, symbol, decimals, balance, address: collAddress };
+  return {
+    contract,
+    name,
+    symbol,
+    decimals,
+    balance,
+    address: collAddress,
+  };
 }
 
 const Collateral = createContainer(useCollateral);
