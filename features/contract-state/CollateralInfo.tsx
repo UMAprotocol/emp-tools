@@ -12,6 +12,11 @@ const Status = styled(Typography)`
   text-overflow: ellipsis;
 `;
 
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
+`;
+
 const CollateralInfo = () => {
   const {
     name,
@@ -23,7 +28,16 @@ const CollateralInfo = () => {
   return (
     <Box pt={3}>
       {symbol ? (
-        <Typography variant="h5">Collateral ({symbol})</Typography>
+        <Typography variant="h5">
+          Collateral ({symbol}){" "}
+          <Link
+            href={`https://etherscan.io/address/${address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            etherscan
+          </Link>
+        </Typography>
       ) : (
         <Typography variant="h5">Collateral</Typography>
       )}

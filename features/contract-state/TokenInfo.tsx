@@ -13,15 +13,30 @@ const Status = styled(Typography)`
   text-overflow: ellipsis;
 `;
 
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
+`;
+
 const TokenInfo = () => {
   const { name, symbol, decimals, balance, address } = Token.useContainer();
   return (
     <Box pt={3}>
       {symbol ? (
-        <Typography variant="h5">Token ({symbol})</Typography>
+        <Typography variant="h5">
+          Token ({symbol}){" "}
+          <Link
+            href={`https://etherscan.io/address/${address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            etherscan
+          </Link>
+        </Typography>
       ) : (
         <Typography variant="h5">Token</Typography>
       )}
+
       <Status>
         <Label>Address: </Label>
         {address || "N/A"}

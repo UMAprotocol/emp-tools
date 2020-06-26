@@ -5,6 +5,7 @@ import { Typography, Box, Tooltip } from "@material-ui/core";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
+import Contract from "../../containers/Contract";
 
 const Label = styled.span`
   color: #999999;
@@ -16,9 +17,15 @@ const Status = styled(Typography)`
   text-overflow: ellipsis;
 `;
 
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
+`;
+
 const fromWei = ethers.utils.formatUnits;
 
 const GeneralInfo = () => {
+  const { contract } = Contract.useContainer();
   const {
     empState,
     totalCollateral,
@@ -39,7 +46,18 @@ const GeneralInfo = () => {
 
   return (
     <Box>
-      <Typography variant="h5">General Info</Typography>
+      <Typography variant="h5">
+        General Info{" "}
+        {contract && (
+          <Link
+            href={`https://etherscan.io/address/${contract.address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            etherscan
+          </Link>
+        )}
+      </Typography>
       <Status>
         <Label>Expiry Date: </Label>
         {expiry ? (
