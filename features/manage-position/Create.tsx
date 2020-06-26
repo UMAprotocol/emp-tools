@@ -79,7 +79,7 @@ const Create = () => {
             is: <span>{allowance || "N/A"}</span>
             <br />
             <br />
-            <Button variant={"outlined"} onClick={setMaxAllowance}>
+            <Button variant="contained" onClick={setMaxAllowance}>
               Approve Max
             </Button>
           </Typography>
@@ -141,11 +141,11 @@ const Create = () => {
       <Box py={2}>
         {tokens && collateral ? (
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={handleCreateClick}
           >{`Create ${tokens} ${tokenSymbol} with ${collateral} ${collSymbol}`}</Button>
         ) : (
-          <Button variant="outlined" disabled>
+          <Button variant="contained" disabled>
             Create
           </Button>
         )}
@@ -154,13 +154,13 @@ const Create = () => {
       <Box py={2}>
         {tokens && collateral && gcr ? (
           <Typography>
-            CR (collater/tokens):{" "}
+            Resulting CR:{" "}
             <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
               {computedCR}
             </span>
           </Typography>
         ) : (
-          <Typography>CR (collater/tokens): N/A</Typography>
+          <Typography>Resulting CR: N/A</Typography>
         )}
         <Typography>Current GCR: {gcr || "N/A"}</Typography>
       </Box>
