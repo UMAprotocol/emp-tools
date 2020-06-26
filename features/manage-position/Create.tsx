@@ -1,11 +1,17 @@
+import { ethers } from "ethers";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
-import { ethers } from "ethers";
+
 import Contract from "../../containers/Contract";
 import { useState } from "react";
+import useApproveCollateral from "./useApproveCollateral";
 
 const Container = styled(Box)`
-  max-width: 500px;
+  max-width: 720px;
+`;
+
+const Red = styled(Typography)`
+  color: red;
 `;
 
 const Create = () => {
@@ -16,6 +22,8 @@ const Create = () => {
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
+
+  const { allowance, setMaxAllowance } = useApproveCollateral();
 
   const mintTokens = async () => {
     if (collateral && tokens && emp) {
@@ -49,21 +57,54 @@ const Create = () => {
           <i>Mint new synthetic tokens via this EMP contract.</i>
         </Typography>
       </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>If this is your first time minting</strong>, ensure that your
-          ratio of collateral to tokens is above the GCR (noted above) and that
-          you are minting at least the "minimum sponsor tokens" amount indicated
-          above.
-        </Typography>
+
+      <Box pb={2}>
+        <Box py={2}>
+          <Typography variant="h6">1. Prerequisite</Typography>
+        </Box>
+        <Box py={2}>
+          <Typography>
+            The EMP needs approval to transfer the collateral currency on your
+            behalf. Your current allowance for this EMP is:{" "}
+            <span>{allowance || "N/A"}</span>
+            <br />
+            <br />
+            <Button variant={"outlined"} onClick={setMaxAllowance}>
+              Approve Max
+            </Button>
+          </Typography>
+        </Box>
+      </Box>
+
+      <Box pb={2}>
+        <Box py={2}>
+          <Typography variant="h6">2. Important Info</Typography>
+        </Box>
+        <Box py={2}>
+          <Red>
+            <i>Please read this carefully or you may lose money.</i>
+          </Red>
+        </Box>
+        <Box pt={2}>
+          <Typography>
+            <strong>If this is your first time minting</strong>, ensure that
+            your ratio of collateral to tokens is above the GCR (noted above)
+            and that you are minting at least the "minimum sponsor tokens"
+            amount indicated above.
+          </Typography>
+        </Box>
+        <Box py={2}>
+          <Typography>
+            <strong>If you have an existing position</strong>, ensure that your
+            collateralization ratio will continue to satisfy the collateral
+            requirement percentage indicated above, otherwise you may get
+            liquidated.
+          </Typography>
+        </Box>
       </Box>
 
       <Box py={2}>
-        <Typography>
-          <strong>If you have an existing position</strong>, ensure that your
-          collateralization ratio will continue to satisfy the collateral
-          requirement percentage indicated above.
-        </Typography>
+        <Typography variant="h6">3. Perform Action</Typography>
       </Box>
       <Box py={2}>
         <Typography>
