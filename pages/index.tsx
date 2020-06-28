@@ -15,7 +15,7 @@ const StyledTabs = styled(Tabs)`
   & .Mui-selected {
     font-weight: bold;
   }
-`
+`;
 
 export default function Index() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -31,11 +31,18 @@ export default function Index() {
         </StyledTabs>
         {tabIndex === 0 && (
           <>
-            <Box pt={3} pl={2} maxWidth={800}>
+            <Box pt={3} m={"auto"} maxWidth={800}>
               <Typography>
                 <i>
-                  The Expiring Multi Party (EMP) smart contract is UMA's most
-                  current financial contract template. This UI is a
+                  The Expiring Multi Party (EMP) smart contract is{" "}
+                  <a
+                    href="https://umaproject.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    UMA
+                  </a>
+                  's most current financial contract template. This UI is a
                   community-made tool to make interfacing with the protocol
                   easier, please use at your own risk.
                 </i>

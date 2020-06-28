@@ -1,6 +1,8 @@
 import App from "next/app";
 import Head from "next/head";
 
+import "../utils/global.css";
+
 import { WithStylingProviders } from "../utils/styling";
 import Connection from "../containers/Connection";
 import Contract from "../containers/Contract";
