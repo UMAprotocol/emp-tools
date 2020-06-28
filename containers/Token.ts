@@ -32,8 +32,12 @@ function useToken() {
     }
   };
 
-  // get token info contract changes
+  // get token info when contract changes
   useEffect(() => {
+    setSymbol(null);
+    setName(null);
+    setDecimals(null);
+    setBalance(null);
     getTokenInfo();
   }, [contract]);
 

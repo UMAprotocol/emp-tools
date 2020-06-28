@@ -32,8 +32,12 @@ function useCollateral() {
     }
   };
 
-  // get collateral info contract changes
+  // get collateral info when contract changes
   useEffect(() => {
+    setSymbol(null);
+    setName(null);
+    setDecimals(null);
+    setBalance(null);
     getCollateralInfo();
   }, [contract]);
 
