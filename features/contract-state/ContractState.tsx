@@ -4,7 +4,6 @@ import GeneralInfo from "./GeneralInfo";
 import CollateralInfo from "./CollateralInfo";
 import TokenInfo from "./TokenInfo";
 import DisputeParams from "./DisputeParams";
-import YourPosition from "./YourPosition";
 
 const ContractState = () => {
   return (
@@ -13,7 +12,6 @@ const ContractState = () => {
       <CollateralInfo />
       <TokenInfo />
       <DisputeParams />
-      <YourPosition />
     </Box>
   );
 };
