@@ -1,32 +1,14 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import { Observable } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 
 type Provider = ethers.providers.Provider;
+type Block = ethers.providers.Block;
+type Network = ethers.providers.Network;
 type ExternalProvider = ethers.providers.ExternalProvider;
 type Signer = ethers.Signer;
-
-interface Block {
-  hash: string;
-  parentHash: string;
-  number: number;
-  timestamp: number;
-  nonce: string;
-  difficulty: number;
-  gasLimit: BigNumber;
-  gasUsed: BigNumber;
-  miner: string;
-  extraData: string;
-}
-
-interface Network {
-  name: string;
-  chainId: number;
-  ensAddress?: string;
-  _defaultProvider?: (providers: any, options?: any) => any;
-}
 
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
