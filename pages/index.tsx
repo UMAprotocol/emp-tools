@@ -1,4 +1,5 @@
-import { Container, Box, Divider, Typography } from "@material-ui/core";
+import { useState } from "react";
+import { Container, Box, Typography, Tab, Tabs } from "@material-ui/core";
 
 import Header from "../features/core/Header";
 import ConnectionStatus from "../features/core/ConnectionStatus";
@@ -7,25 +8,34 @@ import ContractState from "../features/contract-state/ContractState";
 import ManagePosition from "../features/manage-position/ManagePosition";
 
 export default function Index() {
+  const [tabIndex, setTabIndex] = useState(0);
   return (
     <Container maxWidth={"md"}>
       <Box py={4}>
         <Header />
         <ConnectionStatus />
         <EmpPicker />
-        <Box pt={3} pl={2} maxWidth={800}>
-          <Typography>
-            <i>
-              The Expiring Multi Party (EMP) smart contract is UMA's most
-              current financial contract template. This UI is a community-made
-              tool to make interfacing with the protocol easier, please use at
-              your own risk.
-            </i>
-          </Typography>
-        </Box>
-        <ContractState />
-        <Divider variant="middle" />
-        <ManagePosition />
+        <Tabs value={tabIndex} onChange={(_, i) => setTabIndex(i)}>
+          <Tab label="General Info" />
+          <Tab label="Manage Position" />
+        </Tabs>
+        {tabIndex === 0 && (
+          <>
+            <Box pt={3} pl={2} maxWidth={800}>
+              <Typography>
+                <i>
+                  The Expiring Multi Party (EMP) smart contract is UMA's most
+                  current financial contract template. This UI is a
+                  community-made tool to make interfacing with the protocol
+                  easier, please use at your own risk.
+                </i>
+              </Typography>
+            </Box>
+            <ContractState />
+          </>
+        )}
+
+        {tabIndex === 1 && <ManagePosition />}
       </Box>
     </Container>
   );

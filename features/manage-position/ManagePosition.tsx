@@ -18,7 +18,6 @@ const Manager = () => {
 
   return (
     <Box my={4}>
-      <Typography variant="h5">Manage Position</Typography>
       <MethodSelector method={method} handleChange={handleChange} />
 
       {method === "create" && <Create />}
