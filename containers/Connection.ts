@@ -65,8 +65,9 @@ function useConnection() {
             .then((block) => subscriber.next(block));
         });
       });
-      // debounce at 2 sec to prevent making unnecessary calls
-      setBlock$(observable.pipe(debounceTime(2000)));
+      // debounce to prevent subscribers making unnecessary calls
+      const block$ = observable.pipe(debounceTime(2000))
+      setBlock$(block$);
     }
   }, [provider]);
 
