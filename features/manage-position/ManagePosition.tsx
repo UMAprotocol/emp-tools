@@ -18,7 +18,7 @@ const Manager = () => {
     setMethod(e.target.value as Method);
 
   return (
-    <Box my={4}>
+    <Box my={0}>
       <YourPosition />
       <Divider />
       <Box pt={3}>

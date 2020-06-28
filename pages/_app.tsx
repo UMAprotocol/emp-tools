@@ -10,6 +10,7 @@ import EmpAddress from "../containers/EmpAddress";
 import EmpState from "../containers/EmpState";
 import Collateral from "../containers/Collateral";
 import Token from "../containers/Token";
+import Position from "../containers/Position";
 
 interface IProps {
   children: React.ReactNode;
@@ -21,7 +22,9 @@ const WithStateContainerProviders = ({ children }: IProps) => (
       <Contract.Provider>
         <EmpState.Provider>
           <Collateral.Provider>
-            <Token.Provider>{children}</Token.Provider>
+            <Token.Provider>
+              <Position.Provider>{children}</Position.Provider>
+            </Token.Provider>
           </Collateral.Provider>
         </EmpState.Provider>
       </Contract.Provider>
