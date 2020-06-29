@@ -56,18 +56,18 @@ const EmpSelector = () => {
           {!signer ? (
             <MenuItem value={0}>
               <ListItemText
-                primary="Please connect"
+                primary="Not connected"
                 secondary="You must connect to MetaMask before selecting an EMP"
               />
             </MenuItem>
           ) : (
             <MenuItem value={0}>
               <ListItemText
-                primary={loading ? "Please wait" : "Click here"}
+                primary={loading ? "Please wait" : "Select an EMP"}
                 secondary={
                   loading
                     ? "Loading list of EMPs..."
-                    : "Select from a list of EMPs"
+                    : `${emps.length} EMPs found`
                 }
               />
             </MenuItem>
