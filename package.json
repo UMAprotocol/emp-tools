@@ -12,6 +12,7 @@
     "@studydefi/money-legos": "^2.3.2",
     "date-fns": "^2.14.0",
     "ethers": "^5.0.1",
+    "jazzicon": "^1.5.0",
     "next": "^9.4.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

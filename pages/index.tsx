@@ -23,7 +23,7 @@ export default function Index() {
     <Container maxWidth={"md"}>
       <Box py={4}>
         <Header />
-        <ConnectionStatus />
+        {/* <ConnectionStatus /> */}
         <EmpPicker />
         <StyledTabs value={tabIndex} onChange={(_, i) => setTabIndex(i)}>
           <Tab label="General Info" />

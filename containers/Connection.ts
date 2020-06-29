@@ -20,7 +20,7 @@ function useConnection() {
 
   const attemptConnection = async () => {
     if (window.ethereum === undefined) {
-      throw Error("MetaMask not found");
+      throw Error("MetaMask not found, please visit https://metamask.io/");
     }
 
     // get provider and signer
@@ -52,6 +52,7 @@ function useConnection() {
       await attemptConnection();
     } catch (error) {
       setError(error);
+      alert(error.message);
     }
   };
 
@@ -66,7 +67,7 @@ function useConnection() {
         });
       });
       // debounce to prevent subscribers making unnecessary calls
-      const block$ = observable.pipe(debounceTime(2000))
+      const block$ = observable.pipe(debounceTime(2000));
       setBlock$(block$);
     }
   }, [provider]);
