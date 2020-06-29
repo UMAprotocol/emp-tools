@@ -3,10 +3,9 @@ import styled from "styled-components";
 import { Container, Box, Typography, Tab, Tabs } from "@material-ui/core";
 
 import Header from "../features/core/Header";
-import ConnectionStatus from "../features/core/ConnectionStatus";
-import EmpPicker from "../features/emp-picker/EmpPicker";
 import ContractState from "../features/contract-state/ContractState";
 import ManagePosition from "../features/manage-position/ManagePosition";
+import EmpSelector from "../features/emp-selector/EmpSelector";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -23,11 +22,10 @@ export default function Index() {
     <Container maxWidth={"md"}>
       <Box py={4}>
         <Header />
-        {/* <ConnectionStatus /> */}
-        <EmpPicker />
+        <EmpSelector />
         <StyledTabs value={tabIndex} onChange={(_, i) => setTabIndex(i)}>
-          <Tab label="General Info" />
-          <Tab label="Manage Position" />
+          <Tab label="General Info" disableRipple />
+          <Tab label="Manage Position" disableRipple />
         </StyledTabs>
         {tabIndex === 0 && (
           <>

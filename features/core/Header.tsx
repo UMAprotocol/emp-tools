@@ -12,11 +12,15 @@ const Identicon = dynamic(() => import("./Identicon"), {
 });
 
 interface IProps {
-  pointerEvents: string;
+  styled: {
+    connected: boolean;
+  };
 }
 
 const ConnectButton = styled(Button)`
-  pointer-events: ${(p: IProps) => p.pointerEvents};
+  pointer-events: ${({ styled }: IProps) =>
+    styled.connected ? "none" : "unset"};
+  ${({ styled }: IProps) => styled.connected && "background-color: #303030;"}
 `;
 
 const AddressBox = styled.div`
@@ -31,6 +35,8 @@ const AddressBox = styled.div`
 
   display: flex;
   align-items: center;
+
+  background: #252525;
 `;
 
 const Header = () => {
@@ -38,41 +44,39 @@ const Header = () => {
   const connected = signer !== null;
 
   const networkName = network?.name === "homestead" ? "mainnet" : network?.name;
-  const shortAddress = `${address?.substr(0, 5)}...${address?.substr(-4)}`;
+  const shortAddress = `${address?.substr(0, 5)}…${address?.substr(-4)}`;
 
   return (
-    <>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Box>
-          <Typography variant="h4">
-            <i>EMP Tools</i>
-          </Typography>
-        </Box>
-        <Box display="flex" alignItems="center">
-          {address && (
-            <AddressBox title={address || undefined}>
-              <Identicon address={address} />
-              &nbsp;
-              <div>{shortAddress}</div>
-            </AddressBox>
-          )}
-          {connected ? (
-            <ConnectButton variant="outlined" pointerEvents="none">
-              <span style={{ color: "#8bc34a" }}>●</span>&nbsp;
-              {networkName}
-            </ConnectButton>
-          ) : (
-            <ConnectButton
-              variant="contained"
-              onClick={connect}
-              pointerEvents="unset"
-            >
-              🦊 Connect
-            </ConnectButton>
-          )}
-        </Box>
+    <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box>
+        <Typography variant="h4">
+          <i>EMP Tools</i>
+        </Typography>
       </Box>
-    </>
+      <Box display="flex" alignItems="center">
+        {address && (
+          <AddressBox title={address || undefined}>
+            <Identicon address={address} />
+            &nbsp;
+            <div>{shortAddress}</div>
+          </AddressBox>
+        )}
+        {connected ? (
+          <ConnectButton variant="outlined" styled={{ connected }}>
+            <span style={{ color: "#8bc34a" }}>●</span>&nbsp;
+            {networkName}
+          </ConnectButton>
+        ) : (
+          <ConnectButton
+            variant="contained"
+            onClick={connect}
+            styled={{ connected }}
+          >
+            🦊 Connect
+          </ConnectButton>
+        )}
+      </Box>
+    </Box>
   );
 };
 
