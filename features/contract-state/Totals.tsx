@@ -72,7 +72,9 @@ const Totals = () => {
               </SmallLink>
             </Tooltip>
           </Typography>
-          <Label>of synthetic tokens outstanding</Label>
+          <Tooltip title="This is the total number of tokens minted minus the total number of tokens redeemed.">
+            <Label>of synthetic tokens outstanding</Label>
+          </Tooltip>
         </DataBox>
       </Grid>
     </>
