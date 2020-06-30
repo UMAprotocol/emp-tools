@@ -6,6 +6,7 @@ import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import Contract from "../../containers/Contract";
+import Totals from "../../containers/Totals";
 
 const Label = styled.span`
   color: #999999;
@@ -26,12 +27,9 @@ const fromWei = ethers.utils.formatUnits;
 
 const GeneralInfo = () => {
   const { contract } = Contract.useContainer();
-  const {
-    empState,
-    totalCollateral,
-    totalTokens,
-    gcr,
-  } = EmpState.useContainer();
+  const { empState } = EmpState.useContainer();
+  const { gcr } = Totals.useContainer();
+
   const {
     expirationTimestamp: expiry,
     priceIdentifier: priceId,
@@ -84,16 +82,6 @@ const GeneralInfo = () => {
         {minSponsorTokens
           ? `${fromWei(minSponsorTokens)} ${tokenSymbol}`
           : "N/A"}
-      </Status>
-
-      <Status>
-        <Label>Total Collateral: </Label>
-        {totalCollateral ? `${totalCollateral} ${collSymbol}` : "N/A"}
-      </Status>
-
-      <Status>
-        <Label>Total Tokens: </Label>
-        {totalTokens ? `${totalTokens} ${tokenSymbol}` : "N/A"}
       </Status>
 
       <Status>

@@ -14,7 +14,7 @@ function useToken() {
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [symbol, setSymbol] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
-  const [decimals, setDecimals] = useState<string | null>(null);
+  const [decimals, setDecimals] = useState<number | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
 
   const getTokenInfo = async () => {
@@ -47,7 +47,7 @@ function useToken() {
       const sub = block$.subscribe(() => getTokenInfo());
       return () => sub.unsubscribe();
     }
-  }, [block$, tokenAddress, signer]);
+  }, [block$, tokenAddress, signer, contract]);
 
   // set contract when collateral address changes
   useEffect(() => {

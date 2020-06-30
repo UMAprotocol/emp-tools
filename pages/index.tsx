@@ -14,6 +14,12 @@ const StyledTabs = styled(Tabs)`
   & .Mui-selected {
     font-weight: bold;
   }
+  padding-bottom: 2rem;
+`;
+
+const Blurb = styled.div`
+  padding: 1rem;
+  border: 1px solid #434343;
 `;
 
 export default function Index() {
@@ -29,23 +35,30 @@ export default function Index() {
         </StyledTabs>
         {tabIndex === 0 && (
           <>
-            <Box pt={3} m={"auto"} maxWidth={800}>
+            <Blurb>
               <Typography>
-                <i>
-                  The Expiring Multi Party (EMP) smart contract is{" "}
-                  <a
-                    href="https://umaproject.org/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    UMA
-                  </a>
-                  's most current financial contract template. This UI is a
-                  community-made tool to make interfacing with the protocol
-                  easier, please use at your own risk.
-                </i>
+                The Expiring Multi Party (EMP) is{" "}
+                <a
+                  href="https://umaproject.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  UMA
+                </a> 
+                's most current financial smart contract template. This UI is a
+                community-made tool to make interfacing with the protocol
+                easier, please use at your own risk. The source code can be
+                viewed{" "}
+                <a
+                  href="https://github.com/adrianmcli/emp-tools"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  here
+                </a>
+                .
               </Typography>
-            </Box>
+            </Blurb>
             <ContractState />
           </>
         )}

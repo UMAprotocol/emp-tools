@@ -16,6 +16,11 @@ const Status = styled(Typography)`
   text-overflow: ellipsis;
 `;
 
+const Container = styled.div`
+  padding: 1rem;
+  border: 1px solid #434343;
+`;
+
 const fromWei = ethers.utils.formatUnits;
 
 const YourPosition = () => {
@@ -29,7 +34,7 @@ const YourPosition = () => {
   const { symbol: tokenSymbol } = Token.useContainer();
 
   return (
-    <Box py={2}>
+    <Container>
       <Typography variant="h5">Your Position</Typography>
       <Status>
         <Label>Tokens outstanding: </Label>
@@ -37,17 +42,21 @@ const YourPosition = () => {
       </Status>
       <Status>
         <Label>Collateral supplied: </Label>
-        {collateral && collSymbol ? `${fromWei(collateral)} ${collSymbol}` : "N/A"}
+        {collateral && collSymbol
+          ? `${fromWei(collateral)} ${collSymbol}`
+          : "N/A"}
       </Status>
       <Status>
         <Label>Collateral pending/available to withdraw: </Label>
-        {withdrawAmt && collSymbol ? `${fromWei(withdrawAmt)} ${collSymbol}` : "N/A"}
+        {withdrawAmt && collSymbol
+          ? `${fromWei(withdrawAmt)} ${collSymbol}`
+          : "N/A"}
       </Status>
       <Status>
         <Label>Pending transfer request: </Label>
         {pendingTransfer || "N/A"}
       </Status>
-    </Box>
+    </Container>
   );
 };
 

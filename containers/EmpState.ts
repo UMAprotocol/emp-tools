@@ -37,17 +37,11 @@ const initState = {
   totalTokensOutstanding: null,
 };
 
-const fromWei = ethers.utils.formatUnits;
-const weiToNum = (x: BigNumberish) => parseFloat(fromWei(x));
-
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
   const { contract: emp } = Contract.useContainer();
 
   const [state, setState] = useState<ContractState>(initState);
-  const [totalCollateral, setTotalCollateral] = useState<number | null>(null);
-  const [totalTokens, setTotalTokens] = useState<number | null>(null);
-  const [gcr, setGCR] = useState<number | null>(null);
 
   // get state from EMP
   const queryState = async () => {
@@ -89,24 +83,6 @@ const useContractState = () => {
     }
   };
 
-  // set GCR when state updates
-  useEffect(() => {
-    const {
-      cumulativeFeeMultiplier: multiplier,
-      rawTotalPositionCollateral: rawColl,
-      totalTokensOutstanding: totalTokensWei,
-    } = state;
-
-    const totalColl =
-      multiplier && rawColl ? weiToNum(multiplier) * weiToNum(rawColl) : null;
-    const totalTokens = totalTokensWei ? weiToNum(totalTokensWei) : null;
-    const gcr = totalColl && totalTokens ? totalColl / totalTokens : null;
-
-    setTotalCollateral(totalColl);
-    setTotalTokens(totalTokens);
-    setGCR(gcr);
-  }, [state]);
-
   // get state on setting of contract
   useEffect(() => {
     queryState();
@@ -120,7 +96,7 @@ const useContractState = () => {
     }
   }, [block$, emp]);
 
-  return { empState: state, totalCollateral, totalTokens, gcr };
+  return { empState: state };
 };
 
 const EmpState = createContainer(useContractState);

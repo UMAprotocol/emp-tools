@@ -11,6 +11,7 @@ import EmpState from "../containers/EmpState";
 import Collateral from "../containers/Collateral";
 import Token from "../containers/Token";
 import Position from "../containers/Position";
+import Totals from "../containers/Totals";
 
 interface IProps {
   children: React.ReactNode;
@@ -23,7 +24,9 @@ const WithStateContainerProviders = ({ children }: IProps) => (
         <EmpState.Provider>
           <Collateral.Provider>
             <Token.Provider>
-              <Position.Provider>{children}</Position.Provider>
+              <Totals.Provider>
+                <Position.Provider>{children}</Position.Provider>
+              </Totals.Provider>
             </Token.Provider>
           </Collateral.Provider>
         </EmpState.Provider>

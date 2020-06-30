@@ -1,4 +1,4 @@
-import { Box, Divider } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { useState } from "react";
 
@@ -20,10 +20,6 @@ const Manager = () => {
   return (
     <Box my={0}>
       <YourPosition />
-      <Divider />
-      <Box pt={3}>
-        <Typography variant="h5">Manage</Typography>
-      </Box>
       <MethodSelector method={method} handleChange={handleChange} />
 
       {method === "create" && <Create />}
