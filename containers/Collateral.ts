@@ -1,13 +1,17 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import erc20 from "@studydefi/money-legos/erc20";
 
 import Connection from "./Connection";
 import EmpState from "./EmpState";
+import EmpAddress from "./EmpAddress";
+
+const fromWei = ethers.utils.formatUnits;
 
 function useCollateral() {
   const { signer, address, block$ } = Connection.useContainer();
+  const { empAddress } = EmpAddress.useContainer();
   const { empState } = EmpState.useContainer();
   const collAddress = empState.collateralCurrency;
 
@@ -15,6 +19,7 @@ function useCollateral() {
   const [symbol, setSymbol] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
   const [decimals, setDecimals] = useState<number | null>(null);
+  const [allowance, setAllowance] = useState<number | "Infinity" | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
 
   const getCollateralInfo = async () => {
@@ -22,12 +27,17 @@ function useCollateral() {
       const symbol = await contract.symbol();
       const name = await contract.name();
       const decimals = await contract.decimals();
+      const allowanceRaw = await contract.allowance(address, empAddress);
+      const allowance = allowanceRaw.eq(ethers.constants.MaxUint256)
+        ? "Infinity"
+        : parseFloat(fromWei(allowanceRaw, decimals));
       const balanceRaw = await contract.balanceOf(address);
-      const balance = ethers.utils.formatUnits(balanceRaw, decimals);
+      const balance = fromWei(balanceRaw, decimals);
 
       setSymbol(symbol);
       setName(name);
       setDecimals(decimals);
+      setAllowance(allowance);
       setBalance(balance);
     }
   };
@@ -37,6 +47,7 @@ function useCollateral() {
     setSymbol(null);
     setName(null);
     setDecimals(null);
+    setAllowance(null);
     setBalance(null);
     getCollateralInfo();
   }, [contract]);
@@ -62,6 +73,7 @@ function useCollateral() {
     name,
     symbol,
     decimals,
+    allowance,
     balance,
     address: collAddress,
   };
