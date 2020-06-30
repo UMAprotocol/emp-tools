@@ -8,6 +8,7 @@ import useApproveCollateral from "./useApproveCollateral";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpState from "../../containers/EmpState";
+import Totals from "../../containers/Totals";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -27,7 +28,7 @@ const Create = () => {
     decimals: collDecimals,
   } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
-  const { gcr } = EmpState.useContainer();
+  const { gcr } = Totals.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
