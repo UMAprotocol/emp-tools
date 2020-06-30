@@ -41,6 +41,12 @@ function usePosition() {
 
   // get position info on setting of vars
   useEffect(() => {
+    if (contract === null) {
+      setCollateral(null);
+      setTokens(null);
+      setWithdrawAmt(null);
+      setPendingTransfer(null);
+    }
     getPositionInfo();
   }, [address, signer, contract]);
 

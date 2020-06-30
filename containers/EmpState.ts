@@ -45,6 +45,9 @@ const useContractState = () => {
 
   // get state from EMP
   const queryState = async () => {
+    if (emp === null) {
+      setState(initState);
+    }
     if (emp) {
       // have to do this ugly thing because we want call in parallel
       const res = await Promise.all([

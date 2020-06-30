@@ -14,15 +14,28 @@ const Label = styled.div`
   color: #999999;
 `;
 
-const SmallLink = styled.a`
+const Small = styled.span`
   font-size: 1rem;
+`;
+
+const LinksContainer = styled.div`
+  color: #999;
+`;
+
+const SmallLink = styled.a`
   color: white;
-  margin-left: 12px;
-  text-decoration: none;
+
+  &:not(:first-child) {
+    margin-left: 12px;
+  }
 
   &:hover {
     color: red;
   }
+`;
+
+const White = styled.span`
+  color: white;
 `;
 
 const Totals = () => {
@@ -43,16 +56,28 @@ const Totals = () => {
               {loading ? "N/A" : Number(totalCollateral).toLocaleString()}
             </strong>
             <Tooltip title="Etherscan Link">
-              <SmallLink
-                href={`https://etherscan.io/address/${collAddress}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {collSymbol}
-              </SmallLink>
+              <Small> {collSymbol}</Small>
             </Tooltip>
           </Typography>
-          <Label>of collateral supplied</Label>
+          <Label>
+            of <White>collateral</White> supplied
+          </Label>
+          <LinksContainer>
+            <SmallLink
+              href={`https://etherscan.io/address/${collAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </SmallLink>
+            <SmallLink
+              href={`https://uniswap.info/token/${collAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Uniswap
+            </SmallLink>
+          </LinksContainer>
         </DataBox>
       </Grid>
 
@@ -63,18 +88,30 @@ const Totals = () => {
               {loading ? "N/A" : Number(totalTokens).toLocaleString()}
             </strong>
             <Tooltip title="Etherscan Link">
-              <SmallLink
-                href={`https://etherscan.io/address/${tokenAddress}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {tokenSymbol}
-              </SmallLink>
+              <Small> {tokenSymbol}</Small>
             </Tooltip>
           </Typography>
           <Tooltip title="This is the total number of tokens minted minus the total number of tokens redeemed.">
-            <Label>of synthetic tokens outstanding</Label>
+            <Label>
+              of <White>synthetic tokens</White> outstanding
+            </Label>
           </Tooltip>
+          <LinksContainer>
+            <SmallLink
+              href={`https://etherscan.io/address/${tokenAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </SmallLink>
+            <SmallLink
+              href={`https://uniswap.info/token/${tokenAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Uniswap
+            </SmallLink>
+          </LinksContainer>
         </DataBox>
       </Grid>
     </>
