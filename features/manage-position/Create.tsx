@@ -14,8 +14,10 @@ const Container = styled(Box)`
   max-width: 720px;
 `;
 
-const Red = styled(Typography)`
+const Important = styled(Typography)`
   color: red;
+  background: black;
+  display: inline-block;
 `;
 
 const fromWei = ethers.utils.formatUnits;
@@ -36,7 +38,7 @@ const Create = () => {
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const { collateralRequirement: collReq } = empState;
+  const { collateralRequirement: collReq, minSponsorTokens } = empState;
   const collReqPct = collReq ? `${parseFloat(fromWei(collReq)) * 100}%` : "N/A";
 
   const { allowance, setMaxAllowance } = useApproveCollateral();
@@ -79,9 +81,6 @@ const Create = () => {
       </Box>
 
       <Box pb={2}>
-        {/* <Box py={2}>
-          <Typography variant="h6">Prerequisite</Typography>
-        </Box> */}
         <Box py={2}>
           <Typography>
             The EMP needs approval to transfer the collateral currency (
@@ -98,22 +97,22 @@ const Create = () => {
 
       <Box pb={2}>
         <Box py={2}>
-          <Red>
-            <i>Please read this carefully or you may lose money.</i>
-          </Red>
+          <Important>
+            IMPORTANT! Please read this carefully or you may lose money.
+          </Important>
         </Box>
         <Box pt={2}>
           <Typography>
-            <strong>If this is your first time minting</strong>, ensure that
-            your ratio of collateral to tokens is above the GCR and that you are
-            minting at least the "minimum sponsor tokens" amount indicated
-            above.
+            When minting, your resulting collateralization ratio (collateral /
+            tokens) must be above the GCR and you need to mint at least{" "}
+            {minSponsorTokens ? fromWei(minSponsorTokens) : "N/A"} token(s).
           </Typography>
         </Box>
         <Box py={2}>
           <Typography>
             Ensure that you maintain {collReqPct} collateralization or else you
-            will get liquidated.
+            will get liquidated. Remember to sell your tokens after you mint
+            them if you want to short the underlying.
           </Typography>
         </Box>
         <Box py={2}>
