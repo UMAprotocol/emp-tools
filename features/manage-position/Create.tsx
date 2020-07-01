@@ -4,7 +4,6 @@ import { Box, Button, TextField, Typography } from "@material-ui/core";
 
 import Contract from "../../containers/Contract";
 import { useState } from "react";
-import useApproveCollateral from "./useApproveCollateral";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpState from "../../containers/EmpState";
@@ -28,6 +27,8 @@ const Create = () => {
   const {
     symbol: collSymbol,
     decimals: collDecimals,
+    allowance: collAllowance,
+    setMaxAllowance,
   } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
   const { gcr } = Totals.useContainer();
@@ -40,8 +41,6 @@ const Create = () => {
 
   const { collateralRequirement: collReq, minSponsorTokens } = empState;
   const collReqPct = collReq ? `${parseFloat(fromWei(collReq)) * 100}%` : "N/A";
-
-  const { allowance, setMaxAllowance } = useApproveCollateral();
 
   const mintTokens = async () => {
     if (collateral && tokens && emp) {
@@ -85,7 +84,7 @@ const Create = () => {
           <Typography>
             The EMP needs approval to transfer the collateral currency (
             {collSymbol}) on your behalf. Your current allowance for this EMP
-            is: <span>{allowance || "N/A"}</span>
+            is: <span>{collAllowance || "N/A"}</span>
             <br />
             <br />
             <Button variant="contained" onClick={setMaxAllowance}>

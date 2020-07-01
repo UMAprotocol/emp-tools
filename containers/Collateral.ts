@@ -1,6 +1,6 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import erc20 from "@studydefi/money-legos/erc20";
 
 import Connection from "./Connection";
@@ -52,6 +52,16 @@ function useCollateral() {
     getCollateralInfo();
   }, [contract]);
 
+  const setMaxAllowance = async () => {
+    if (contract && empAddress) {
+      try {
+        await contract.approve(empAddress, ethers.constants.MaxUint256);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   // get collateral info on each new block
   useEffect(() => {
     if (block$) {
@@ -76,6 +86,7 @@ function useCollateral() {
     allowance,
     balance,
     address: collAddress,
+    setMaxAllowance,
   };
 }
 
