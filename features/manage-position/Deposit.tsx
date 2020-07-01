@@ -65,7 +65,7 @@ const Deposit = () => {
       : startingCR;
 
   // User does not have a position yet.
-  if (collateral == "0") {
+  if (collateral === "0") {
     return (
       <Container>
         <Box py={2}>
@@ -78,73 +78,71 @@ const Deposit = () => {
   }
 
   // User has a position so can deposit more collateral.
-  if (collateral != "0") {
-    return (
-      <Container>
-        <Box pb={2}>
-          <Box py={2}>
-            <Typography>
-              By depositing additional collateral into your position you will
-              increase your collateralization ratio.
-            </Typography>
-          </Box>
-        </Box>
-
+  return (
+    <Container>
+      <Box pb={2}>
         <Box py={2}>
-          <TextField
-            type="number"
-            inputProps={{ min: "0" }}
-            label={`Add collateral (${collSymbol})`}
-            placeholder="1234"
-            value={depositedCollateral}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setDepositedCollateral(e.target.value)
-            }
-          />
+          <Typography>
+            By depositing additional collateral into your position you will
+            increase your collateralization ratio.
+          </Typography>
         </Box>
-        {depositedCollateral}
-        <Box py={2}>
-          {depositedCollateral && depositedCollateral != "0" ? (
-            <Button
-              variant="contained"
-              onClick={handleDepositClick}
-            >{`Deposit ${depositedCollateral} ${collSymbol} into your position`}</Button>
-          ) : (
-            <Button variant="contained" disabled>
-              Deposit
-            </Button>
-          )}
-        </Box>
+      </Box>
 
-        <Box py={2}>
-          <Typography>Current CR: {startingCR || "N/A"}</Typography>
-          <Typography>Resulting CR: {resultingCR || "N/A"}</Typography>
-        </Box>
+      <Box py={2}>
+        <TextField
+          type="number"
+          inputProps={{ min: "0" }}
+          label={`Add collateral (${collSymbol})`}
+          placeholder="1234"
+          value={depositedCollateral}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setDepositedCollateral(e.target.value)
+          }
+        />
+      </Box>
+      {depositedCollateral}
+      <Box py={2}>
+        {depositedCollateral && depositedCollateral != "0" ? (
+          <Button
+            variant="contained"
+            onClick={handleDepositClick}
+          >{`Deposit ${depositedCollateral} ${collSymbol} into your position`}</Button>
+        ) : (
+          <Button variant="contained" disabled>
+            Deposit
+          </Button>
+        )}
+      </Box>
 
-        {hash && (
-          <Box py={2}>
-            <Typography>
-              <strong>Tx Hash: </strong> {hash}
-            </Typography>
-          </Box>
-        )}
-        {success && (
-          <Box py={2}>
-            <Typography>
-              <strong>Transaction successful!</strong>
-            </Typography>
-          </Box>
-        )}
-        {error && (
-          <Box py={2}>
-            <Typography>
-              <span style={{ color: "red" }}>{error.message}</span>
-            </Typography>
-          </Box>
-        )}
-      </Container>
-    );
-  }
+      <Box py={2}>
+        <Typography>Current CR: {startingCR || "N/A"}</Typography>
+        <Typography>Resulting CR: {resultingCR || "N/A"}</Typography>
+      </Box>
+
+      {hash && (
+        <Box py={2}>
+          <Typography>
+            <strong>Tx Hash: </strong> {hash}
+          </Typography>
+        </Box>
+      )}
+      {success && (
+        <Box py={2}>
+          <Typography>
+            <strong>Transaction successful!</strong>
+          </Typography>
+        </Box>
+      )}
+      {error && (
+        <Box py={2}>
+          <Typography>
+            <span style={{ color: "red" }}>{error.message}</span>
+          </Typography>
+        </Box>
+      )}
+    </Container>
+  );
 };
 
 export default Deposit;
