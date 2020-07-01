@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
 
-import Contract from "../../containers/Contract";
+import EmpContract from "../../containers/EmpContract";
 import { useState } from "react";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
@@ -23,7 +23,7 @@ const Important = styled(Typography)`
 const fromWei = ethers.utils.formatUnits;
 
 const Create = () => {
-  const { contract: emp } = Contract.useContainer();
+  const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const {
     symbol: collSymbol,

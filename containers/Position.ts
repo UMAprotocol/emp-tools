@@ -2,12 +2,12 @@ import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 
 import Connection from "./Connection";
-import Contract from "./Contract";
+import EmpContract from "./EmpContract";
 import { BigNumber } from "ethers";
 
 function usePosition() {
   const { block$, signer, address } = Connection.useContainer();
-  const { contract } = Contract.useContainer();
+  const { contract } = EmpContract.useContainer();
 
   const [collateral, setCollateral] = useState<BigNumber | null>(null);
   const [tokens, setTokens] = useState<BigNumber | null>(null);

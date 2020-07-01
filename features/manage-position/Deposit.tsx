@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
 
-import Contract from "../../containers/Contract";
+import EmpContract from "../../containers/EmpContract";
 import { useState } from "react";
 import Position from "../../containers/Position";
 import Collateral from "../../containers/Collateral";
@@ -15,7 +15,7 @@ const Container = styled(Box)`
 const fromWei = ethers.utils.formatUnits;
 
 const Deposit = () => {
-  const { contract: emp } = Contract.useContainer();
+  const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { tokens, collateral } = Position.useContainer();

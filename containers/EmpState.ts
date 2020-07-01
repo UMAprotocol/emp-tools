@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { BigNumber, Bytes, ethers, BigNumberish } from "ethers";
 
 import Connection from "./Connection";
-import Contract from "./Contract";
+import EmpContract from "./EmpContract";
 
 interface ContractState {
   expirationTimestamp: BigNumber | null;
@@ -39,7 +39,7 @@ const initState = {
 
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
-  const { contract: emp } = Contract.useContainer();
+  const { contract: emp } = EmpContract.useContainer();
 
   const [state, setState] = useState<ContractState>(initState);
 

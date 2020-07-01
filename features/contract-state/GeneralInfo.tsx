@@ -5,7 +5,7 @@ import { Typography, Box, Tooltip } from "@material-ui/core";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
-import Contract from "../../containers/Contract";
+import EmpContract from "../../containers/EmpContract";
 import Totals from "../../containers/Totals";
 
 const Label = styled.span`
@@ -26,7 +26,7 @@ const Link = styled.a`
 const fromWei = ethers.utils.formatUnits;
 
 const GeneralInfo = () => {
-  const { contract } = Contract.useContainer();
+  const { contract } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const { gcr } = Totals.useContainer();
 
