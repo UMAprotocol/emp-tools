@@ -1,40 +1,36 @@
-import { ethers } from "ethers";
+import { useState } from "react";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
+import { ethers } from "ethers";
 
-import Contract from "../../containers/Contract";
-import { useState } from "react";
-import Position from "../../containers/Position";
+import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
-import Token from "../../containers/Token";
+import Position from "../../containers/Position";
 
 const Container = styled(Box)`
   max-width: 720px;
 `;
 
-const fromWei = ethers.utils.formatUnits;
-
 const Deposit = () => {
-  const { contract: emp } = Contract.useContainer();
-  const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
-  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
+  const { contract: emp } = EmpContract.useContainer();
+  const { symbol: collSymbol } = Collateral.useContainer();
   const { tokens, collateral } = Position.useContainer();
 
-  const [depositedCollateral, setDepositedCollateral] = useState<string>("");
+  const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   const depositCollateral = async () => {
-    if (depositedCollateral && emp) {
+    if (collateralToDeposit && emp) {
       setHash(null);
       setSuccess(null);
       setError(null);
-      const depositedCollateralWei = ethers.utils.parseUnits(
-        depositedCollateral
+      const collateralToDepositWei = ethers.utils.parseUnits(
+        collateralToDeposit
       );
       try {
-        const tx = await emp.deposit([depositedCollateralWei], {
+        const tx = await emp.deposit([collateralToDepositWei], {
           gasLimit: 7000000,
         });
         setHash(tx.hash as string);
@@ -51,17 +47,11 @@ const Deposit = () => {
 
   const handleDepositClick = () => depositCollateral();
 
-  const startingCR =
-    collateral && tokens && collDec && tokenDec
-      ? parseFloat(fromWei(collateral, collDec)) /
-        parseFloat(fromWei(tokens, tokenDec))
-      : null;
+  const startingCR = collateral && tokens ? collateral / tokens : null;
 
   const resultingCR =
-    collateral && depositedCollateral && tokens && collDec && tokenDec
-      ? (parseFloat(fromWei(collateral, collDec)) +
-          parseFloat(depositedCollateral)) /
-        parseFloat(fromWei(tokens, tokenDec))
+    collateral && collateralToDeposit && tokens
+      ? collateral + parseFloat(collateralToDeposit) / tokens
       : startingCR;
 
   // User does not have a position yet.
@@ -93,19 +83,19 @@ const Deposit = () => {
           inputProps={{ min: "0" }}
           label={`Add collateral (${collSymbol})`}
           placeholder="1234"
-          value={depositedCollateral}
+          value={collateralToDeposit}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setDepositedCollateral(e.target.value)
+            setCollateralToDeposit(e.target.value)
           }
         />
       </Box>
-      {depositedCollateral}
+
       <Box py={2}>
-        {depositedCollateral && depositedCollateral != "0" ? (
+        {collateralToDeposit && collateralToDeposit != "0" ? (
           <Button
             variant="contained"
             onClick={handleDepositClick}
-          >{`Deposit ${depositedCollateral} ${collSymbol} into your position`}</Button>
+          >{`Deposit ${collateralToDeposit} ${collSymbol} into your position`}</Button>
         ) : (
           <Button variant="contained" disabled>
             Deposit

@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
 
-import Contract from "../../containers/Contract";
+import EmpContract from "../../containers/EmpContract";
 import { useState } from "react";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
@@ -23,11 +23,11 @@ const Important = styled(Typography)`
 const fromWei = ethers.utils.formatUnits;
 
 const Create = () => {
-  const { contract: emp } = Contract.useContainer();
+  const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const {
     symbol: collSymbol,
-    decimals: collDecimals,
+    decimals: collDec,
     allowance: collAllowance,
     setMaxAllowance,
   } = Collateral.useContainer();
@@ -45,7 +45,10 @@ const Create = () => {
   const [error, setError] = useState<Error | null>(null);
 
   const { collateralRequirement: collReq, minSponsorTokens } = empState;
-  const collReqPct = collReq ? `${parseFloat(fromWei(collReq)) * 100}%` : "N/A";
+  const collReqPct =
+    collReq && collDec
+      ? `${parseFloat(fromWei(collReq, collDec)) * 100}%`
+      : "N/A";
 
   const needAllowance = () => {
     if (collAllowance === null || collateral === null) return true;
@@ -96,19 +99,9 @@ const Create = () => {
   };
 
   const computeCR = () => {
-    if (
-      !collateral ||
-      !tokens ||
-      !posCollateral ||
-      !posTokens ||
-      !collDecimals ||
-      !tokenDec
-    )
-      return null;
-    const totalCollateral =
-      parseFloat(fromWei(posCollateral, collDecimals)) + parseFloat(collateral);
-    const totalTokens =
-      parseFloat(fromWei(posTokens, tokenDec)) + parseFloat(tokens);
+    if (!collateral || !tokens || !posCollateral || !posTokens) return null;
+    const totalCollateral = posCollateral + parseFloat(collateral);
+    const totalTokens = posTokens + parseFloat(tokens);
     return totalCollateral / totalTokens;
   };
 
@@ -133,7 +126,10 @@ const Create = () => {
           <Typography>
             When minting, your resulting collateralization ratio (collateral /
             tokens) must be above the GCR and you need to mint at least{" "}
-            {minSponsorTokens ? fromWei(minSponsorTokens) : "N/A"} token(s).
+            {minSponsorTokens && tokenDec
+              ? fromWei(minSponsorTokens, tokenDec)
+              : "N/A"}{" "}
+            token(s).
           </Typography>
         </Box>
         <Box py={2}>

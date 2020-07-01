@@ -60,7 +60,7 @@ function useConnection() {
   useEffect(() => {
     if (provider) {
       const observable = new Observable<Block>((subscriber) => {
-        provider.on("block", (blockNumber) => {
+        provider.on("block", (blockNumber: number) => {
           provider
             .getBlock(blockNumber)
             .then((block) => subscriber.next(block));
