@@ -8,6 +8,7 @@ import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpState from "../../containers/EmpState";
 import Totals from "../../containers/Totals";
+import Position from "../../containers/Position";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -30,9 +31,12 @@ const Create = () => {
     allowance: collAllowance,
     setMaxAllowance,
   } = Collateral.useContainer();
-  const { symbol: tokenSymbol } = Token.useContainer();
+  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { gcr } = Totals.useContainer();
-  // const { collateral, tokens } = Position.useContainer();
+  const {
+    collateral: posCollateral,
+    tokens: posTokens,
+  } = Position.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
@@ -74,7 +78,24 @@ const Create = () => {
 
   const handleCreateClick = () => mintTokens();
 
-  const computedCR = parseFloat(collateral) / parseFloat(tokens);
+  const computeCR = () => {
+    if (
+      !collateral ||
+      !tokens ||
+      !posCollateral ||
+      !posTokens ||
+      !collDecimals ||
+      !tokenDec
+    )
+      return null;
+    const totalCollateral =
+      parseFloat(fromWei(posCollateral, collDecimals)) + parseFloat(collateral);
+    const totalTokens =
+      parseFloat(fromWei(posTokens, tokenDec)) + parseFloat(tokens);
+    return totalCollateral / totalTokens;
+  };
+
+  const computedCR = computeCR() || 0;
 
   return (
     <Container>
@@ -145,7 +166,7 @@ const Create = () => {
             Approve
           </Button>
         )}
-        {tokens && collateral && !needAllowance() ? (
+        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr ? (
           <Button
             variant="contained"
             onClick={handleCreateClick}
