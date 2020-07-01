@@ -1,34 +1,47 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
+import { ethers, BigNumber, BigNumberish } from "ethers";
 
 import Connection from "./Connection";
 import EmpContract from "./EmpContract";
-import { BigNumber } from "ethers";
+import Collateral from "./Collateral";
+import Token from "./Token";
+
+const fromWei = ethers.utils.formatUnits;
+const weiToNum = (x: BigNumberish, u = 18) => parseFloat(fromWei(x, u));
 
 function usePosition() {
   const { block$, signer, address } = Connection.useContainer();
   const { contract } = EmpContract.useContainer();
+  const { decimals: collDec } = Collateral.useContainer();
+  const { decimals: tokenDec } = Token.useContainer();
 
-  const [collateral, setCollateral] = useState<BigNumber | null>(null);
-  const [tokens, setTokens] = useState<BigNumber | null>(null);
-  const [withdrawAmt, setWithdrawAmt] = useState<BigNumber | null>(null);
+  const [collateral, setCollateral] = useState<number | null>(null);
+  const [tokens, setTokens] = useState<number | null>(null);
+  const [withdrawAmt, setWithdrawAmt] = useState<number | null>(null);
   const [pendingTransfer, setPendingTransfer] = useState<string | null>(null);
 
   const getPositionInfo = async () => {
-    if (address && signer && contract) {
-      const collateral = (await contract.getCollateral(address))[0];
+    if (address && signer && contract && collDec && tokenDec) {
+      const collRaw: BigNumber = (await contract.getCollateral(address))[0];
       const position = await contract.positions(address);
-      const {
-        tokensOutstanding,
-        withdrawalRequestAmount,
-        transferPositionRequestPassTimestamp,
-      } = position;
-      setCollateral(collateral as BigNumber);
-      setTokens(tokensOutstanding[0] as BigNumber);
-      setWithdrawAmt(withdrawalRequestAmount[0] as BigNumber);
-      setPendingTransfer(
-        transferPositionRequestPassTimestamp.toString() !== "0" ? "Yes" : "No"
-      );
+
+      const tokensOutstanding: BigNumber = position.tokensOutstanding[0];
+      const withdrawReqAmt: BigNumber = position.withdrawalRequestAmount[0];
+      const xferTime: BigNumber = position.transferPositionRequestPassTimestamp;
+
+      // format data for storage
+      const collateral: number = weiToNum(collRaw, collDec);
+      const tokens: number = weiToNum(tokensOutstanding, tokenDec);
+      const withdrawAmt: number = weiToNum(withdrawReqAmt, collDec);
+      const pendingTransfer: string =
+        xferTime.toString() !== "0" ? "Yes" : "No";
+
+      // set states
+      setCollateral(collateral);
+      setTokens(tokens);
+      setWithdrawAmt(withdrawAmt);
+      setPendingTransfer(pendingTransfer);
     }
   };
 
@@ -49,7 +62,7 @@ function usePosition() {
       setPendingTransfer(null);
     }
     getPositionInfo();
-  }, [address, signer, contract]);
+  }, [address, signer, contract, collDec, tokenDec]);
 
   return { collateral, tokens, withdrawAmt, pendingTransfer };
 }

@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import { Typography, Box } from "@material-ui/core";
-import { ethers, BigNumberish } from "ethers";
+import { Typography } from "@material-ui/core";
 
 import Position from "../../containers/Position";
 import Collateral from "../../containers/Collateral";
@@ -22,8 +21,6 @@ const Container = styled.div`
   border: 1px solid #434343;
 `;
 
-const fromWei = (x: BigNumberish, u = 18) => ethers.utils.formatUnits(x, u);
-
 const YourPosition = () => {
   const { gcr } = Totals.useContainer();
   const {
@@ -32,45 +29,40 @@ const YourPosition = () => {
     withdrawAmt,
     pendingTransfer,
   } = Position.useContainer();
-  const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
-  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
+  const { symbol: collSymbol } = Collateral.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
-  const ready = tokens && collateral && collSymbol && tokenSymbol;
+  const ready =
+    tokens !== null &&
+    collateral !== null &&
+    collSymbol !== null &&
+    tokenSymbol !== null;
 
   const collateralzationRatio =
-    collateral && tokens && collDec && tokenDec
-      ? parseFloat(fromWei(collateral, collDec)) /
-        parseFloat(fromWei(tokens, tokenDec))
-      : null;
+    collateral !== null && tokens !== null ? collateral / tokens : null;
 
   return (
     <Container>
       <Typography variant="h5">Your Position</Typography>
       <Status>
         <Label>Collateral supplied: </Label>
-        {ready && collateral && collDec
-          ? `${fromWei(collateral, collDec)} ${collSymbol}`
-          : "N/A"}
+        {ready ? `${collateral} ${collSymbol}` : "N/A"}
       </Status>
       <Status>
         <Label>Tokens outstanding: </Label>
-        {ready && tokens && tokenDec
-          ? `${fromWei(tokens, tokenDec)} ${tokenSymbol}`
-          : "N/A"}
+        {ready ? `${tokens} ${tokenSymbol}` : "N/A"}
       </Status>
       <Status>
         <Label>Collateralization ratio: </Label>
-        {ready && collateralzationRatio ? collateralzationRatio : "N/A"}
+        {ready ? collateralzationRatio : "N/A"}
       </Status>
       <Status>
         <Label>Global collateralization ratio: </Label>
-        {ready && gcr ? gcr : "N/A"}
+        {ready ? gcr : "N/A"}
       </Status>
       <Status>
         <Label>Collateral pending/available to withdraw: </Label>
-        {ready && withdrawAmt && collDec
-          ? `${fromWei(withdrawAmt, collDec)} ${collSymbol}`
-          : "N/A"}
+        {ready ? `${withdrawAmt} ${collSymbol}` : "N/A"}
       </Status>
       <Status>
         <Label>Pending transfer request: </Label>
