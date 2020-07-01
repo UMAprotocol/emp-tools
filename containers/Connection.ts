@@ -23,6 +23,11 @@ function useConnection() {
       throw Error("MetaMask not found, please visit https://metamask.io/");
     }
 
+    // // for testing
+    // const provider = new ethers.providers.JsonRpcProvider()
+    // let signer = new ethers.Wallet(process.env.PRIV_KEY)
+    // signer = signer.connect(provider)
+
     // get provider and signer
     const provider = new ethers.providers.Web3Provider(
       window.ethereum as ExternalProvider
@@ -67,7 +72,7 @@ function useConnection() {
         });
       });
       // debounce to prevent subscribers making unnecessary calls
-      const block$ = observable.pipe(debounceTime(2000));
+      const block$ = observable.pipe(debounceTime(1000));
       setBlock$(block$);
     }
   }, [provider]);
