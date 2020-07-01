@@ -1,24 +1,10 @@
-import styled from "styled-components";
-import { Typography, Box } from "@material-ui/core";
-import { useEffect, useState } from "react";
-import { ethers } from "ethers";
+import { createContainer } from "unstated-next";
+import { useState, useEffect } from "react";
 
-import Connection from "../../containers/Connection";
-import Contract from "../../containers/Contract";
+import Connection from "./Connection";
+import Contract from "./Contract";
 
-const Label = styled.span`
-  color: #999999;
-`;
-
-const Status = styled(Typography)`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const fromWei = ethers.utils.formatUnits;
-
-const YourPosition = () => {
+function usePosition() {
   const { block$, signer, address } = Connection.useContainer();
   const { contract } = Contract.useContainer();
 
@@ -55,30 +41,18 @@ const YourPosition = () => {
 
   // get position info on setting of vars
   useEffect(() => {
+    if (contract === null) {
+      setCollateral(null);
+      setTokens(null);
+      setWithdrawAmt(null);
+      setPendingTransfer(null);
+    }
     getPositionInfo();
   }, [address, signer, contract]);
 
-  return (
-    <Box pt={3}>
-      <Typography variant="h5">Your Position</Typography>
-      <Status>
-        <Label>Tokens outstanding: </Label>
-        {tokens ? fromWei(tokens) : "N/A"}
-      </Status>
-      <Status>
-        <Label>Collateral supplied: </Label>
-        {collateral ? fromWei(collateral) : "N/A"}
-      </Status>
-      <Status>
-        <Label>Collateral pending/available to withdraw: </Label>
-        {withdrawAmt ? fromWei(withdrawAmt) : "N/A"}
-      </Status>
-      <Status>
-        <Label>Pending transfer request: </Label>
-        {pendingTransfer || "N/A"}
-      </Status>
-    </Box>
-  );
-};
+  return { collateral, tokens, withdrawAmt, pendingTransfer };
+}
 
-export default YourPosition;
+const Position = createContainer(usePosition);
+
+export default Position;

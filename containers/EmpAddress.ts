@@ -16,9 +16,10 @@ function useEmpAddress() {
   }, [router]);
 
   // set address and also push to query string in URL
-  const setEmpAddress = (value: string) => {
+  const setEmpAddress = (value: string | null) => {
     setAddress(value);
-    const queryObj = value.trim() === "" ? {} : { address: value };
+    const noValidAddress = value === null || value.trim() === "";
+    const queryObj = noValidAddress ? {} : { address: value };
     router.push({ pathname: "/", query: queryObj });
   };
 

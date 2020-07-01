@@ -1,9 +1,10 @@
-import Box from "@material-ui/core/Box";
+import { Box } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { useState } from "react";
 
 import MethodSelector from "./MethodSelector";
 import Create from "./Create";
+import YourPosition from "./YourPosition";
 
 export type Method = "create" | "deposit" | "withdraw" | "redeem" | "transfer";
 
@@ -17,8 +18,8 @@ const Manager = () => {
     setMethod(e.target.value as Method);
 
   return (
-    <Box my={4}>
-      <Typography variant="h5">Manage Position</Typography>
+    <Box my={0}>
+      <YourPosition />
       <MethodSelector method={method} handleChange={handleChange} />
 
       {method === "create" && <Create />}

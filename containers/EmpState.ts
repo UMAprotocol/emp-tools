@@ -1,6 +1,6 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { BigNumber, Bytes } from "ethers";
+import { BigNumber, Bytes, ethers, BigNumberish } from "ethers";
 
 import Connection from "./Connection";
 import Contract from "./Contract";
@@ -43,7 +43,11 @@ const useContractState = () => {
 
   const [state, setState] = useState<ContractState>(initState);
 
+  // get state from EMP
   const queryState = async () => {
+    if (emp === null) {
+      setState(initState);
+    }
     if (emp) {
       // have to do this ugly thing because we want call in parallel
       const res = await Promise.all([
@@ -87,6 +91,7 @@ const useContractState = () => {
     queryState();
   }, [emp]);
 
+  // get state on each block
   useEffect(() => {
     if (block$ && emp) {
       const sub = block$.subscribe(() => queryState());

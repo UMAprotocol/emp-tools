@@ -1,32 +1,14 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import { Observable } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 
 type Provider = ethers.providers.Provider;
+type Block = ethers.providers.Block;
+type Network = ethers.providers.Network;
 type ExternalProvider = ethers.providers.ExternalProvider;
 type Signer = ethers.Signer;
-
-interface Block {
-  hash: string;
-  parentHash: string;
-  number: number;
-  timestamp: number;
-  nonce: string;
-  difficulty: number;
-  gasLimit: BigNumber;
-  gasUsed: BigNumber;
-  miner: string;
-  extraData: string;
-}
-
-interface Network {
-  name: string;
-  chainId: number;
-  ensAddress?: string;
-  _defaultProvider?: (providers: any, options?: any) => any;
-}
 
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
@@ -38,7 +20,7 @@ function useConnection() {
 
   const attemptConnection = async () => {
     if (window.ethereum === undefined) {
-      throw Error("MetaMask not found");
+      throw Error("MetaMask not found, please visit https://metamask.io/");
     }
 
     // get provider and signer
@@ -70,6 +52,7 @@ function useConnection() {
       await attemptConnection();
     } catch (error) {
       setError(error);
+      alert(error.message);
     }
   };
 
@@ -83,8 +66,9 @@ function useConnection() {
             .then((block) => subscriber.next(block));
         });
       });
-      // debounce at 2 sec to prevent making unnecessary calls
-      setBlock$(observable.pipe(debounceTime(2000)));
+      // debounce to prevent subscribers making unnecessary calls
+      const block$ = observable.pipe(debounceTime(2000));
+      setBlock$(block$);
     }
   }, [provider]);
 

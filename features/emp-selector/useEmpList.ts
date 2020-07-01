@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers, Event } from "ethers";
 import uma from "@studydefi/money-legos/uma";
 import erc20 from "@studydefi/money-legos/erc20";
@@ -12,10 +12,12 @@ export interface Emp {
 
 const useEmpList = () => {
   const { signer, provider } = Connection.useContainer();
-  const [emps, setEmps] = useState<Emp[] | null>(null);
+  const [emps, setEmps] = useState<Emp[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const getEmps = async () => {
     if (signer && provider) {
+      setLoading(true);
       // get EMP creation events from EMP Creator
       const empCreator = new ethers.Contract(
         uma.expiringMultiPartyCreator.address,
@@ -49,14 +51,18 @@ const useEmpList = () => {
 
       // set state w/ data
       const emps = await Promise.all(promises);
+      setLoading(false);
       setEmps(emps);
-      console.log(emps);
     }
   };
 
+  useEffect(() => {
+    getEmps();
+  }, [signer]);
+
   return {
     emps,
-    getEmps,
+    loading,
   };
 };
 

@@ -12,6 +12,9 @@ function useContract() {
   const [contract, setContract] = useState<ethers.Contract | null>(null);
 
   useEffect(() => {
+    if (empAddress === null) {
+      setContract(null);
+    }
     if (empAddress && isValid && signer) {
       const instance = new ethers.Contract(
         empAddress,

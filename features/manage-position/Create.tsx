@@ -1,21 +1,57 @@
+import { ethers } from "ethers";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
-import { ethers } from "ethers";
+
 import Contract from "../../containers/Contract";
 import { useState } from "react";
+import Collateral from "../../containers/Collateral";
+import Token from "../../containers/Token";
+import EmpState from "../../containers/EmpState";
+import Totals from "../../containers/Totals";
+import Position from "../../containers/Position";
 
 const Container = styled(Box)`
-  max-width: 500px;
+  max-width: 720px;
 `;
+
+const Important = styled(Typography)`
+  color: red;
+  background: black;
+  display: inline-block;
+`;
+
+const fromWei = ethers.utils.formatUnits;
 
 const Create = () => {
   const { contract: emp } = Contract.useContainer();
+  const { empState } = EmpState.useContainer();
+  const {
+    symbol: collSymbol,
+    decimals: collDecimals,
+    allowance: collAllowance,
+    setMaxAllowance,
+  } = Collateral.useContainer();
+  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
+  const { gcr } = Totals.useContainer();
+  const {
+    collateral: posCollateral,
+    tokens: posTokens,
+  } = Position.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
+
+  const { collateralRequirement: collReq, minSponsorTokens } = empState;
+  const collReqPct = collReq ? `${parseFloat(fromWei(collReq)) * 100}%` : "N/A";
+
+  const needAllowance = () => {
+    if (collAllowance === null || collateral === null) return true;
+    if (collAllowance === "Infinity") return false;
+    return collAllowance < parseFloat(collateral);
+  };
 
   const mintTokens = async () => {
     if (collateral && tokens && emp) {
@@ -40,47 +76,85 @@ const Create = () => {
     }
   };
 
-  const handleCreateClick = () => mintTokens();
+  const mustMintMinimum = posTokens !== null && parseFloat(posTokens) === 0;
+
+  const handleCreateClick = () => {
+    if (mustMintMinimum && tokens !== null && minSponsorTokens && tokenDec) {
+      const insufficientMinting =
+        parseFloat(tokens) < parseFloat(fromWei(minSponsorTokens, tokenDec));
+      if (insufficientMinting) {
+        alert(
+          `You must mint at least ${fromWei(
+            minSponsorTokens,
+            tokenDec
+          )} token(s).`
+        );
+      } else {
+        mintTokens();
+      }
+    }
+  };
+
+  const computeCR = () => {
+    if (
+      !collateral ||
+      !tokens ||
+      !posCollateral ||
+      !posTokens ||
+      !collDecimals ||
+      !tokenDec
+    )
+      return null;
+    const totalCollateral =
+      parseFloat(fromWei(posCollateral, collDecimals)) + parseFloat(collateral);
+    const totalTokens =
+      parseFloat(fromWei(posTokens, tokenDec)) + parseFloat(tokens);
+    return totalCollateral / totalTokens;
+  };
+
+  const computedCR = computeCR() || 0;
 
   return (
     <Container>
       <Box py={2}>
         <Typography>
-          <i>Mint new synthetic tokens via this EMP contract.</i>
+          <i>
+            Mint new synthetic tokens ({tokenSymbol}) via this EMP contract.
+          </i>
         </Typography>
       </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>If this is your first time minting</strong>, ensure that your
-          ratio of collateral to tokens is above the GCR (noted above) and that
-          you are minting at least the "minimum sponsor tokens" amount indicated
-          above.
-        </Typography>
+      <Box pb={2}>
+        <Box py={2}>
+          <Important>
+            IMPORTANT! Please read this carefully or you may lose money.
+          </Important>
+        </Box>
+        <Box pt={2}>
+          <Typography>
+            When minting, your resulting collateralization ratio (collateral /
+            tokens) must be above the GCR and you need to mint at least{" "}
+            {minSponsorTokens ? fromWei(minSponsorTokens) : "N/A"} token(s).
+          </Typography>
+        </Box>
+        <Box py={2}>
+          <Typography>
+            Ensure that you maintain {collReqPct} collateralization or else you
+            will get liquidated. Remember to sell your tokens after you mint
+            them if you want to short the underlying.
+          </Typography>
+        </Box>
+        <Box py={2}>
+          <Typography>
+            When you're ready, fill in the desired amount of collateral and
+            tokens below and click the "Create" button.
+          </Typography>
+        </Box>
       </Box>
 
       <Box py={2}>
-        <Typography>
-          <strong>If you have an existing position</strong>, ensure that your
-          collateralization ratio will continue to satisfy the collateral
-          requirement percentage indicated above.
-        </Typography>
-      </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>Collateral: </strong> Denominated in terms of whole numbers
-          (not in Wei). Check above to see the collateral token for this EMP.
-        </Typography>
-      </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>Tokens: </strong> Denominated in terms of whole numbers (not
-          in Wei). Check above to see the synthetic token for this EMP.
-        </Typography>
-      </Box>
-      <Box py={2}>
         <TextField
           type="number"
-          label="Collateral"
+          label={`Collateral (${collSymbol})`}
           placeholder="1234"
           value={collateral}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -91,7 +165,7 @@ const Create = () => {
       <Box py={2}>
         <TextField
           type="number"
-          label="Tokens"
+          label={`Tokens (${tokenSymbol})`}
           placeholder="1234"
           value={tokens}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -100,17 +174,41 @@ const Create = () => {
         />
       </Box>
       <Box py={2}>
-        {tokens && collateral ? (
+        {needAllowance() && (
           <Button
-            variant="outlined"
+            variant="contained"
+            onClick={setMaxAllowance}
+            style={{ marginRight: `12px` }}
+          >
+            Approve
+          </Button>
+        )}
+        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr ? (
+          <Button
+            variant="contained"
             onClick={handleCreateClick}
-          >{`Create ${tokens} tokens with ${collateral} collateral`}</Button>
+          >{`Create ${tokens} ${tokenSymbol} with ${collateral} ${collSymbol}`}</Button>
         ) : (
-          <Button variant="outlined" disabled>
+          <Button variant="contained" disabled>
             Create
           </Button>
         )}
       </Box>
+
+      <Box py={2}>
+        {tokens && collateral && gcr ? (
+          <Typography>
+            Resulting CR:{" "}
+            <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
+              {computedCR}
+            </span>
+          </Typography>
+        ) : (
+          <Typography>Resulting CR: N/A</Typography>
+        )}
+        <Typography>Current GCR: {gcr || "N/A"}</Typography>
+      </Box>
+
       {hash && (
         <Box py={2}>
           <Typography>
