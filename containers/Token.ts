@@ -1,11 +1,11 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import erc20 from "@studydefi/money-legos/erc20";
 
 import Connection from "./Connection";
-import EmpState from "./EmpState";
 import EmpAddress from "./EmpAddress";
+import EmpState from "./EmpState";
 
 const fromWei = ethers.utils.formatUnits;
 
@@ -20,25 +20,31 @@ function useToken() {
   const [name, setName] = useState<string | null>(null);
   const [decimals, setDecimals] = useState<number | null>(null);
   const [allowance, setAllowance] = useState<number | "Infinity" | null>(null);
-  const [balance, setBalance] = useState<string | null>(null);
+  const [balance, setBalance] = useState<number | null>(null);
 
   const getTokenInfo = async () => {
     if (contract) {
-      const symbol = await contract.symbol();
-      const name = await contract.name();
-      const decimals = await contract.decimals();
-      const allowanceRaw = await contract.allowance(address, empAddress);
+      const symbol: string = await contract.symbol();
+      const name: string = await contract.name();
+      const decimals: number = await contract.decimals();
+      const balanceRaw: BigNumber = await contract.balanceOf(address);
+      const allowanceRaw: BigNumber = await contract.allowance(
+        address,
+        empAddress
+      );
+
+      // calculate readable balance and allowance
+      const balance = parseFloat(fromWei(balanceRaw, decimals));
       const allowance = allowanceRaw.eq(ethers.constants.MaxUint256)
         ? "Infinity"
         : parseFloat(fromWei(allowanceRaw, decimals));
-      const balanceRaw = await contract.balanceOf(address);
-      const balance = ethers.utils.formatUnits(balanceRaw, decimals);
 
+      // set states
       setSymbol(symbol);
       setName(name);
       setDecimals(decimals);
-      setAllowance(allowance);
       setBalance(balance);
+      setAllowance(allowance);
     }
   };
 
@@ -57,8 +63,8 @@ function useToken() {
     setSymbol(null);
     setName(null);
     setDecimals(null);
-    setAllowance(null);
     setBalance(null);
+    setAllowance(null);
     getTokenInfo();
   }, [contract]);
 
@@ -79,13 +85,13 @@ function useToken() {
   }, [signer, tokenAddress]);
 
   return {
+    address: tokenAddress,
     contract,
     name,
     symbol,
     decimals,
-    allowance,
     balance,
-    address: tokenAddress,
+    allowance,
     setMaxAllowance,
   };
 }
