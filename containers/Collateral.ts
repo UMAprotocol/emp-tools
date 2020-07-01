@@ -42,16 +42,6 @@ function useCollateral() {
     }
   };
 
-  // get collateral info when contract changes
-  useEffect(() => {
-    setSymbol(null);
-    setName(null);
-    setDecimals(null);
-    setAllowance(null);
-    setBalance(null);
-    getCollateralInfo();
-  }, [contract]);
-
   const setMaxAllowance = async () => {
     if (contract && empAddress) {
       try {
@@ -61,6 +51,16 @@ function useCollateral() {
       }
     }
   };
+
+  // get collateral info when contract changes
+  useEffect(() => {
+    setSymbol(null);
+    setName(null);
+    setDecimals(null);
+    setAllowance(null);
+    setBalance(null);
+    getCollateralInfo();
+  }, [contract]);
 
   // get collateral info on each new block
   useEffect(() => {
