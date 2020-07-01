@@ -76,7 +76,24 @@ const Create = () => {
     }
   };
 
-  const handleCreateClick = () => mintTokens();
+  const mustMintMinimum = posTokens !== null && parseFloat(posTokens) === 0;
+
+  const handleCreateClick = () => {
+    if (mustMintMinimum && tokens !== null && minSponsorTokens && tokenDec) {
+      const insufficientMinting =
+        parseFloat(tokens) < parseFloat(fromWei(minSponsorTokens, tokenDec));
+      if (insufficientMinting) {
+        alert(
+          `You must mint at least ${fromWei(
+            minSponsorTokens,
+            tokenDec
+          )} token(s).`
+        );
+      } else {
+        mintTokens();
+      }
+    }
+  };
 
   const computeCR = () => {
     if (
