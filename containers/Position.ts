@@ -51,7 +51,7 @@ function usePosition() {
       const sub = block$.subscribe(() => getPositionInfo());
       return () => sub.unsubscribe();
     }
-  }, [block$, address, signer, contract]);
+  }, [block$, address, signer, contract, collDec, tokenDec]);
 
   // get position info on setting of vars
   useEffect(() => {
