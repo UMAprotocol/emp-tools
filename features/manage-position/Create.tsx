@@ -32,6 +32,7 @@ const Create = () => {
   } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
   const { gcr } = Totals.useContainer();
+  // const { collateral, tokens } = Position.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
@@ -41,6 +42,12 @@ const Create = () => {
 
   const { collateralRequirement: collReq, minSponsorTokens } = empState;
   const collReqPct = collReq ? `${parseFloat(fromWei(collReq)) * 100}%` : "N/A";
+
+  const needAllowance = () => {
+    if (collAllowance === null || collateral === null) return true;
+    if (collAllowance === "Infinity") return false;
+    return collAllowance < parseFloat(collateral);
+  };
 
   const mintTokens = async () => {
     if (collateral && tokens && emp) {
@@ -78,22 +85,6 @@ const Create = () => {
           </i>
         </Typography>
       </Box>
-
-      <Box pb={2}>
-        <Box py={2}>
-          <Typography>
-            The EMP needs approval to transfer the collateral currency (
-            {collSymbol}) on your behalf. Your current allowance for this EMP
-            is: <span>{collAllowance || "N/A"}</span>
-            <br />
-            <br />
-            <Button variant="contained" onClick={setMaxAllowance}>
-              Approve Max
-            </Button>
-          </Typography>
-        </Box>
-      </Box>
-
       <Box pb={2}>
         <Box py={2}>
           <Important>
@@ -145,7 +136,16 @@ const Create = () => {
         />
       </Box>
       <Box py={2}>
-        {tokens && collateral ? (
+        {needAllowance() && (
+          <Button
+            variant="contained"
+            onClick={setMaxAllowance}
+            style={{ marginRight: `12px` }}
+          >
+            Approve
+          </Button>
+        )}
+        {tokens && collateral && !needAllowance() ? (
           <Button
             variant="contained"
             onClick={handleCreateClick}
