@@ -3,14 +3,15 @@ import { useState, useEffect } from "react";
 
 import Connection from "./Connection";
 import Contract from "./Contract";
+import { BigNumber } from "ethers";
 
 function usePosition() {
   const { block$, signer, address } = Connection.useContainer();
   const { contract } = Contract.useContainer();
 
-  const [collateral, setCollateral] = useState<string | null>(null);
-  const [tokens, setTokens] = useState<string | null>(null);
-  const [withdrawAmt, setWithdrawAmt] = useState<string | null>(null);
+  const [collateral, setCollateral] = useState<BigNumber | null>(null);
+  const [tokens, setTokens] = useState<BigNumber | null>(null);
+  const [withdrawAmt, setWithdrawAmt] = useState<BigNumber | null>(null);
   const [pendingTransfer, setPendingTransfer] = useState<string | null>(null);
 
   const getPositionInfo = async () => {
@@ -22,9 +23,9 @@ function usePosition() {
         withdrawalRequestAmount,
         transferPositionRequestPassTimestamp,
       } = position;
-      setCollateral(collateral);
-      setTokens(tokensOutstanding[0]);
-      setWithdrawAmt(withdrawalRequestAmount[0]);
+      setCollateral(collateral as BigNumber);
+      setTokens(tokensOutstanding[0] as BigNumber);
+      setWithdrawAmt(withdrawalRequestAmount[0] as BigNumber);
       setPendingTransfer(
         transferPositionRequestPassTimestamp.toString() !== "0" ? "Yes" : "No"
       );
