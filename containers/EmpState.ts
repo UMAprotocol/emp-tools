@@ -1,6 +1,6 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { BigNumber, Bytes, ethers, BigNumberish } from "ethers";
+import { BigNumber, Bytes } from "ethers";
 
 import Connection from "./Connection";
 import EmpContract from "./EmpContract";
@@ -49,7 +49,7 @@ const useContractState = () => {
       setState(initState);
     }
     if (emp) {
-      // have to do this ugly thing because we want call in parallel
+      // have to do this ugly thing because we want to call in parallel
       const res = await Promise.all([
         emp.expirationTimestamp(),
         emp.collateralCurrency(),
@@ -67,19 +67,19 @@ const useContractState = () => {
       ]);
 
       const newState: ContractState = {
-        expirationTimestamp: res[0],
-        collateralCurrency: res[1],
-        priceIdentifier: res[2],
-        tokenCurrency: res[3],
-        collateralRequirement: res[4],
-        disputeBondPct: res[5],
-        disputerDisputeRewardPct: res[6],
-        sponsorDisputeRewardPct: res[7],
-        minSponsorTokens: res[8],
-        timerAddress: res[9],
-        cumulativeFeeMultiplier: res[10],
-        rawTotalPositionCollateral: res[11],
-        totalTokensOutstanding: res[12],
+        expirationTimestamp: res[0] as BigNumber,
+        collateralCurrency: res[1] as string, // address
+        priceIdentifier: res[2] as Bytes,
+        tokenCurrency: res[3] as string, // address
+        collateralRequirement: res[4] as BigNumber,
+        disputeBondPct: res[5] as BigNumber,
+        disputerDisputeRewardPct: res[6] as BigNumber,
+        sponsorDisputeRewardPct: res[7] as BigNumber,
+        minSponsorTokens: res[8] as BigNumber,
+        timerAddress: res[9] as string, // address
+        cumulativeFeeMultiplier: res[10] as BigNumber,
+        rawTotalPositionCollateral: res[11] as BigNumber,
+        totalTokensOutstanding: res[12] as BigNumber,
       };
 
       setState(newState);
