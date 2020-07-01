@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import MethodSelector from "./MethodSelector";
 import Create from "./Create";
+import Deposit from "./Deposit";
 import YourPosition from "./YourPosition";
 
 export type Method = "create" | "deposit" | "withdraw" | "redeem" | "transfer";
@@ -23,7 +24,7 @@ const Manager = () => {
       <MethodSelector method={method} handleChange={handleChange} />
 
       {method === "create" && <Create />}
-      {method === "deposit" && <FalseDoor />}
+      {method === "deposit" && <Deposit />}
       {method === "withdraw" && <FalseDoor />}
       {method === "redeem" && <FalseDoor />}
       {method === "transfer" && <FalseDoor />}
