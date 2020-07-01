@@ -7,20 +7,24 @@ function useEmpAddress() {
   const router = useRouter();
   const [address, setAddress] = useState<string | null>(null);
 
-  // set input from query string (if it exists and is not the same)
+  // set EMP address from query string (if it exists and is not the same)
   useEffect(() => {
     const queryAddress = router.query.address;
-    if (queryAddress && queryAddress !== address) {
-      setEmpAddress(router.query.address as string);
+    const isNewAddress = queryAddress !== address;
+
+    if (queryAddress && isNewAddress && typeof queryAddress === "string") {
+      setEmpAddress(queryAddress);
     }
   }, [router]);
 
-  // set address and also push to query string in URL
+  // set EMP address and also push to query string in URL (if valid)
   const setEmpAddress = (value: string | null) => {
     setAddress(value);
     const noValidAddress = value === null || value.trim() === "";
-    const queryObj = noValidAddress ? {} : { address: value };
-    router.push({ pathname: "/", query: queryObj });
+    router.push({
+      pathname: "/",
+      query: noValidAddress ? {} : { address: value },
+    });
   };
 
   return {
