@@ -80,13 +80,11 @@ const Deposit = () => {
   // User has a position so can deposit more collateral.
   return (
     <Container>
-      <Box pb={2}>
-        <Box py={2}>
-          <Typography>
-            By depositing additional collateral into your position you will
-            increase your collateralization ratio.
-          </Typography>
-        </Box>
+      <Box pt={4} pb={2}>
+        <Typography>
+          By depositing additional collateral into your position you will
+          increase your collateralization ratio.
+        </Typography>
       </Box>
 
       <Box py={2}>
