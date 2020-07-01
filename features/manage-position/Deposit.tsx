@@ -65,7 +65,7 @@ const Deposit = () => {
       : startingCR;
 
   // User does not have a position yet.
-  if (collateral === "0") {
+  if (collateral === null || collateral.toString() === "0.0") {
     return (
       <Container>
         <Box py={2}>
