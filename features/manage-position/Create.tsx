@@ -77,7 +77,6 @@ const Create = () => {
   };
 
   const mustMintMinimum = posTokens !== null && posTokens.toString() === "0";
-  console.log(posTokens?.toString(), mustMintMinimum)
 
   const handleCreateClick = () => {
     if (mustMintMinimum && tokens !== null && minSponsorTokens && tokenDec) {
