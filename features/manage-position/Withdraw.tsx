@@ -25,7 +25,13 @@ const Deposit = () => {
 
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
-  const { tokens, collateral } = Position.useContainer();
+  const {
+    tokens,
+    collateral,
+    withdrawAmt,
+    withdrawPassTime,
+    pendingWithdraw,
+  } = Position.useContainer();
   const { gcr } = Totals.useContainer();
 
   const [collateralToWithdraw, setCollateralToWithdraw] = useState<string>("");
@@ -33,7 +39,7 @@ const Deposit = () => {
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const depositCollateral = async () => {
+  const withdrawCollateral = async () => {
     if (collateralToWithdraw && emp) {
       setHash(null);
       setSuccess(null);
@@ -65,8 +71,55 @@ const Deposit = () => {
       setError(new Error("Please check that you are connected."));
     }
   };
+  const executeWithdraw = async () => {
+    if (pendingWithdrawTimeRemaining && emp) {
+      setHash(null);
+      setSuccess(null);
+      setError(null);
 
-  const handleDepositClick = () => depositCollateral();
+      try {
+        const tx = await emp.withdrawPassedRequest({
+          gasLimit: 7000000,
+        });
+        setHash(tx.hash as string);
+        await tx.wait();
+
+        setSuccess(true);
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      }
+    } else {
+      setError(new Error("Please check that you are connected."));
+    }
+  };
+
+  const cancelWithdraw = async () => {
+    if (pendingWithdrawTimeRemaining && emp) {
+      setHash(null);
+      setSuccess(null);
+      setError(null);
+
+      try {
+        const tx = await emp.cancelWithdrawal({
+          gasLimit: 7000000,
+        });
+        setHash(tx.hash as string);
+        await tx.wait();
+
+        setSuccess(true);
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      }
+    } else {
+      setError(new Error("Please check that you are connected."));
+    }
+  };
+
+  const handleWithdrawClick = () => withdrawCollateral();
+  const handleExecuteWithdrawClick = () => executeWithdraw();
+  const handleCancelWithdrawClick = () => cancelWithdraw();
 
   const startingCR = collateral && tokens ? collateral / tokens : null;
 
@@ -77,9 +130,25 @@ const Deposit = () => {
 
   const resultingCRBelowGCR = resultingCR && gcr ? resultingCR < gcr : null;
 
-  const fastFreeableCollateral =
+  const fastWithdrawableCollateral =
     collateral && tokens && gcr ? (collateral - gcr * tokens).toFixed(2) : null;
 
+  const pendingWithdrawTimeRemaining =
+    collateral && withdrawPassTime && pendingWithdraw === "Yes"
+      ? withdrawPassTime - Math.floor(Date.now() / 1000)
+      : null;
+
+  const pastWithdrawTimeStamp = pendingWithdrawTimeRemaining
+    ? pendingWithdrawTimeRemaining <= 0
+    : null;
+
+  const pendingWithdrawTimeString = pendingWithdrawTimeRemaining
+    ? Math.floor(pendingWithdrawTimeRemaining / 3600) +
+      ":" +
+      Math.floor((pendingWithdrawTimeRemaining % 3600) / 60) +
+      ":" +
+      ((pendingWithdrawTimeRemaining % 3600) % 60)
+    : null;
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
     return (
@@ -93,7 +162,57 @@ const Deposit = () => {
     );
   }
 
-  // User has a position so can deposit more collateral.
+  // User has a position and a pending withdrawal.
+  if (collateral !== null && pendingWithdraw === "Yes") {
+    return (
+      <Container>
+        <Box pt={4} pb={2}>
+          <Typography>
+            <i>You have a pending withdraw on your position!</i>
+          </Typography>
+        </Box>
+
+        <Box pb={2}>
+          <Box py={2}>
+            <Typography>
+              Once the liveness period has passed you can execute your
+              withdrawal request. You can also cancel the withdraw request if
+              you changed your mind.
+            </Typography>
+          </Box>
+          <Box py={2}>
+            <Typography>
+              <strong>Time left until withdrawal:</strong>
+              {pendingWithdrawTimeString}
+            </Typography>
+          </Box>
+
+          <Box py={2}>
+            {pastWithdrawTimeStamp ? (
+              <Button
+                variant="contained"
+                onClick={handleExecuteWithdrawClick}
+                style={{ marginRight: `12px` }}
+              >{`Withdraw ${collateralToWithdraw} ${collSymbol} from your position`}</Button>
+            ) : (
+              <Button
+                variant="contained"
+                style={{ marginRight: `12px` }}
+                disabled
+              >
+                Execute Withdrawal Request
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              onClick={handleCancelWithdrawClick}
+            >{`Cancel withdraw request`}</Button>
+          </Box>
+        </Box>
+      </Container>
+    );
+  }
+  // User has a position and no pending withdrawal.
   return (
     <Container>
       <Box pt={4} pb={2}>
@@ -120,7 +239,7 @@ const Deposit = () => {
               <strong>"Fast" withdrawal: </strong>Instantly withdraw collateral
               until your positions collateralization ratio is equal to the
               global collateralization ratio. For your position you can
-              instantly withdraw {fastFreeableCollateral} {collSymbol}.
+              instantly withdraw {fastWithdrawableCollateral} {collSymbol}.
             </li>
             <li>
               <strong>"Slow" withdrawal: </strong> To withdraw past the global
@@ -163,10 +282,9 @@ const Deposit = () => {
 
       <Box py={2}>
         {collateralToWithdraw && collateralToWithdraw != "0" ? (
-          <Button
-            variant="contained"
-            onClick={handleDepositClick}
-          >{`Withdraw ${collateralToWithdraw} ${collSymbol} from your position`}</Button>
+          <Button variant="contained" onClick={handleWithdrawClick}>{`${
+            resultingCRBelowGCR ? "Request Withdrawal of" : "Withdraw"
+          } ${collateralToWithdraw} ${collSymbol} from your position`}</Button>
         ) : (
           <Button variant="contained" disabled>
             Withdraw

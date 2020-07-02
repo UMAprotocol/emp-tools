@@ -19,6 +19,8 @@ function usePosition() {
   const [collateral, setCollateral] = useState<number | null>(null);
   const [tokens, setTokens] = useState<number | null>(null);
   const [withdrawAmt, setWithdrawAmt] = useState<number | null>(null);
+  const [withdrawPassTime, setWithdrawPassTime] = useState<number | null>(null);
+  const [pendingWithdraw, setPendingWithdraw] = useState<string | null>(null);
   const [pendingTransfer, setPendingTransfer] = useState<string | null>(null);
 
   const getPositionInfo = async () => {
@@ -28,12 +30,17 @@ function usePosition() {
 
       const tokensOutstanding: BigNumber = position.tokensOutstanding[0];
       const withdrawReqAmt: BigNumber = position.withdrawalRequestAmount[0];
+      const withdrawReqPassTime: BigNumber =
+        position.withdrawalRequestPassTimestamp;
       const xferTime: BigNumber = position.transferPositionRequestPassTimestamp;
 
       // format data for storage
       const collateral: number = weiToNum(collRaw, collDec);
       const tokens: number = weiToNum(tokensOutstanding, tokenDec);
       const withdrawAmt: number = weiToNum(withdrawReqAmt, collDec);
+      const withdrawPassTime: number = withdrawReqPassTime.toNumber();
+      const pendingWithdraw: string =
+        withdrawReqPassTime.toString() !== "0" ? "Yes" : "No";
       const pendingTransfer: string =
         xferTime.toString() !== "0" ? "Yes" : "No";
 
@@ -41,6 +48,8 @@ function usePosition() {
       setCollateral(collateral);
       setTokens(tokens);
       setWithdrawAmt(withdrawAmt);
+      setWithdrawPassTime(withdrawPassTime);
+      setPendingWithdraw(pendingWithdraw);
       setPendingTransfer(pendingTransfer);
     }
   };
@@ -59,12 +68,21 @@ function usePosition() {
       setCollateral(null);
       setTokens(null);
       setWithdrawAmt(null);
+      setWithdrawPassTime(null);
+      setPendingWithdraw(null);
       setPendingTransfer(null);
     }
     getPositionInfo();
   }, [address, signer, contract, collDec, tokenDec]);
 
-  return { collateral, tokens, withdrawAmt, pendingTransfer };
+  return {
+    collateral,
+    tokens,
+    withdrawAmt,
+    withdrawPassTime,
+    pendingWithdraw,
+    pendingTransfer,
+  };
 }
 
 const Position = createContainer(usePosition);

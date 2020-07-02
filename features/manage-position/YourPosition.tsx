@@ -27,6 +27,7 @@ const YourPosition = () => {
     tokens,
     collateral,
     withdrawAmt,
+    pendingWithdraw,
     pendingTransfer,
   } = Position.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
@@ -63,6 +64,10 @@ const YourPosition = () => {
       <Status>
         <Label>Collateral pending/available to withdraw: </Label>
         {ready ? `${withdrawAmt} ${collSymbol}` : "N/A"}
+      </Status>
+      <Status>
+        <Label>Pending withdrawal request: </Label>
+        {ready ? `${pendingWithdraw}` : "N/A"}
       </Status>
       <Status>
         <Label>Pending transfer request: </Label>
