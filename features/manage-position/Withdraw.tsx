@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
 import { ethers } from "ethers";
@@ -182,8 +182,9 @@ const Deposit = () => {
           </Box>
           <Box py={2}>
             <Typography>
-              <strong>Time left until withdrawal:</strong>
-              {pendingWithdrawTimeString}
+              <strong>Time left until withdrawal: </strong>
+              {pendingWithdrawTimeString}<br></br>
+              <strong>Requested withdrawal amount: </strong> {withdrawAmt} {collSymbol}
             </Typography>
           </Box>
 
