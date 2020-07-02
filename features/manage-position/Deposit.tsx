@@ -81,7 +81,7 @@ const Deposit = () => {
         <TextField
           type="number"
           inputProps={{ min: "0" }}
-          label={`Add collateral (${collSymbol})`}
+          label={`Collateral (${collSymbol})`}
           placeholder="1234"
           value={collateralToDeposit}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

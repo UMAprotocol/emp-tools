@@ -5,6 +5,7 @@ import Connection from "../../containers/Connection";
 import MethodSelector from "./MethodSelector";
 import Create from "./Create";
 import Deposit from "./Deposit";
+import Withdraw from "./Withdraw";
 import YourPosition from "./YourPosition";
 
 export type Method = "create" | "deposit" | "withdraw" | "redeem" | "transfer";
@@ -36,7 +37,7 @@ const Manager = () => {
 
       {method === "create" && <Create />}
       {method === "deposit" && <Deposit />}
-      {method === "withdraw" && <FalseDoor />}
+      {method === "withdraw" && <Withdraw />}
       {method === "redeem" && <FalseDoor />}
       {method === "transfer" && <FalseDoor />}
     </Box>
