@@ -1,7 +1,7 @@
-import { Box } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
 import { useState } from "react";
+import { Box, Typography } from "@material-ui/core";
 
+import Connection from "../../containers/Connection";
 import MethodSelector from "./MethodSelector";
 import Create from "./Create";
 import Deposit from "./Deposit";
@@ -14,9 +14,20 @@ const FalseDoor = () => (
 );
 
 const Manager = () => {
+  const { signer } = Connection.useContainer();
   const [method, setMethod] = useState<Method>("create");
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) =>
     setMethod(e.target.value as Method);
+
+  if (!signer) {
+    return (
+      <Box>
+        <Typography>
+          <i>Please connect first.</i>
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box my={0}>

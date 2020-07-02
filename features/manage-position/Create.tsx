@@ -79,27 +79,39 @@ const Create = () => {
     }
   };
 
-  const mustMintMinimum = posTokens !== null && posTokens.toString() === "0";
-
   const handleCreateClick = () => {
-    if (mustMintMinimum && tokens !== null && minSponsorTokens && tokenDec) {
-      const insufficientMinting =
-        parseFloat(tokens) < parseFloat(fromWei(minSponsorTokens, tokenDec));
-      if (insufficientMinting) {
-        alert(
-          `You must mint at least ${fromWei(
-            minSponsorTokens,
-            tokenDec
-          )} token(s).`
-        );
-      } else {
-        mintTokens();
+    const firstPosition = posTokens !== null && posTokens.toString() === "0";
+    if (!firstPosition) {
+      mintTokens();
+    } else {
+      // first time minting, check min sponsor tokens
+      if (tokens !== null && minSponsorTokens && tokenDec) {
+        const insufficientMinting =
+          parseFloat(tokens) < parseFloat(fromWei(minSponsorTokens, tokenDec));
+        if (insufficientMinting) {
+          alert(
+            `You must mint at least ${fromWei(
+              minSponsorTokens,
+              tokenDec
+            )} token(s).`
+          );
+        } else {
+          mintTokens();
+        }
       }
     }
   };
 
   const computeCR = () => {
-    if (!collateral || !tokens || !posCollateral || !posTokens) return null;
+    if (
+      collateral === null ||
+      tokens === null ||
+      posCollateral === null ||
+      posTokens === null
+    )
+      return null;
+
+    // all values non-null, proceed to calculate
     const totalCollateral = posCollateral + parseFloat(collateral);
     const totalTokens = posTokens + parseFloat(tokens);
     return totalCollateral / totalTokens;

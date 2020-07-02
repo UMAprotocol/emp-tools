@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { ethers, Event } from "ethers";
+import { ethers } from "ethers";
 import uma from "@studydefi/money-legos/uma";
 import erc20 from "@studydefi/money-legos/erc20";
 
 import Connection from "../../containers/Connection";
+import { EMPs } from "./EMPs";
 
 export interface Emp {
   name: string;
@@ -18,23 +19,8 @@ const useEmpList = () => {
   const getEmps = async () => {
     if (signer && provider) {
       setLoading(true);
-      // get EMP creation events from EMP Creator
-      const empCreator = new ethers.Contract(
-        uma.expiringMultiPartyCreator.address,
-        uma.expiringMultiPartyCreator.abi,
-        signer
-      );
-      const currBlock = await provider.getBlockNumber();
-      const myFilter = empCreator.filters.CreatedExpiringMultiParty(null, null);
-      const empCreationEvts = await empCreator.queryFilter(
-        myFilter,
-        0,
-        currBlock
-      );
-
       // For each EMP address, find its token name and address
-      const promises = empCreationEvts.map(async (evt: Event) => {
-        const empAddress = evt.args && evt.args[0];
+      const promises = EMPs.map(async (empAddress: string) => {
         const emp = new ethers.Contract(
           empAddress,
           uma.expiringMultiParty.abi,
