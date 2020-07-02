@@ -20,3 +20,5 @@ At this point, you can manually test the dapp with MetaMask in your browser.
 1. Run `npm run chain`.
 2. Copy the private key into MetaMask to access the account and connect to `localhost:8545`. Your balance should be ~990 ETH and a bunch of DAI.
 3. Test.
+
+Beware, it might be a bit slow and you might need to "reset" your account on MetaMask to clear the nonce.
