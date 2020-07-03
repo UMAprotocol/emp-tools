@@ -13,13 +13,15 @@ const Container = styled(Box)`
 
 const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
-  const { symbol: collSymbol } = Collateral.useContainer();
-  const { tokens, collateral } = Position.useContainer();
+  const { symbol: collSymbol, balance } = Collateral.useContainer();
+  const { tokens, collateral, pendingWithdraw } = Position.useContainer();
 
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
+
+  const balanceTooLow = (balance || 0) < (Number(collateralToDeposit) || 0);
 
   const depositCollateral = async () => {
     if (collateralToDeposit && emp) {
@@ -51,7 +53,7 @@ const Deposit = () => {
 
   const resultingCR =
     collateral && collateralToDeposit && tokens
-      ? collateral + parseFloat(collateralToDeposit) / tokens
+      ? (collateral + parseFloat(collateralToDeposit)) / tokens
       : startingCR;
 
   // User does not have a position yet.
@@ -67,7 +69,19 @@ const Deposit = () => {
     );
   }
 
-  // User has a position so can deposit more collateral.
+  if (pendingWithdraw === null || pendingWithdraw === "Yes") {
+    return (
+        <Container>
+          <Box py={2}>
+            <Typography>
+              <i>You need to cancel or execute your pending withdrawal request before depositing additional collateral.</i>
+            </Typography>
+          </Box>
+        </Container>
+    );
+  }
+
+  // User has a position and no pending withdrawal requests so can deposit more collateral.
   return (
     <Container>
       <Box pt={4} pb={2}>
@@ -83,6 +97,8 @@ const Deposit = () => {
           inputProps={{ min: "0" }}
           label={`Collateral (${collSymbol})`}
           placeholder="1234"
+          error={balanceTooLow}
+          helperText={balanceTooLow ? `${collSymbol} balance too low`: null}
           value={collateralToDeposit}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCollateralToDeposit(e.target.value)
@@ -91,7 +107,7 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        {collateralToDeposit && collateralToDeposit != "0" ? (
+        {collateralToDeposit && collateralToDeposit != "0" && !balanceTooLow ? (
           <Button
             variant="contained"
             onClick={handleDepositClick}

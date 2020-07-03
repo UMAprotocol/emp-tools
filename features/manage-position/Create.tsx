@@ -30,12 +30,14 @@ const Create = () => {
     decimals: collDec,
     allowance: collAllowance,
     setMaxAllowance,
+    balance
   } = Collateral.useContainer();
   const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { gcr } = Totals.useContainer();
   const {
     collateral: posCollateral,
     tokens: posTokens,
+    pendingWithdraw
   } = Position.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
@@ -49,6 +51,7 @@ const Create = () => {
     collReq && collDec
       ? `${parseFloat(fromWei(collReq, collDec)) * 100}%`
       : "N/A";
+  const balanceTooLow = (balance || 0) < (Number(collateral) || 0);
 
   const needAllowance = () => {
     if (collAllowance === null || collateral === null) return true;
@@ -119,6 +122,19 @@ const Create = () => {
 
   const computedCR = computeCR() || 0;
 
+  if (pendingWithdraw === null || pendingWithdraw === "Yes") {
+    return (
+        <Container>
+          <Box py={2}>
+            <Typography>
+              <i>You need to cancel or execute your pending withdrawal request before creating additional tokens.</i>
+            </Typography>
+          </Box>
+        </Container>
+    );
+  }
+
+  // User has no pending withdrawal requests so they can create tokens.
   return (
     <Container>
       <Box py={2}>
@@ -164,7 +180,10 @@ const Create = () => {
           type="number"
           label={`Collateral (${collSymbol})`}
           placeholder="1234"
+          inputProps={{ min: "0" }}
           value={collateral}
+          error={balanceTooLow}
+          helperText={balanceTooLow ? "Balance too low" : null}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCollateral(e.target.value)
           }
@@ -175,6 +194,7 @@ const Create = () => {
           type="number"
           label={`Tokens (${tokenSymbol})`}
           placeholder="1234"
+          inputProps={{ min: "0" }}
           value={tokens}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokens(e.target.value)
@@ -191,7 +211,7 @@ const Create = () => {
             Approve
           </Button>
         )}
-        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr ? (
+        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr && !balanceTooLow ? (
           <Button
             variant="contained"
             onClick={handleCreateClick}

@@ -125,7 +125,7 @@ const Deposit = () => {
 
   const resultingCR =
     collateral && collateralToWithdraw && tokens
-      ? collateral - parseFloat(collateralToWithdraw) / tokens
+      ? (collateral - parseFloat(collateralToWithdraw)) / tokens
       : startingCR;
 
   const resultingCRBelowGCR = resultingCR && gcr ? resultingCR < gcr : null;
@@ -135,7 +135,7 @@ const Deposit = () => {
 
   const pendingWithdrawTimeRemaining =
     collateral && withdrawPassTime && pendingWithdraw === "Yes"
-      ? withdrawPassTime - Math.floor(Date.now() / 1000)
+      ? withdrawPassTime - Math.floor(Date.now() / 1000) - 7200
       : null;
 
   const pastWithdrawTimeStamp = pendingWithdrawTimeRemaining
@@ -143,11 +143,11 @@ const Deposit = () => {
     : null;
 
   const pendingWithdrawTimeString = pendingWithdrawTimeRemaining
-    ? Math.floor(pendingWithdrawTimeRemaining / 3600) +
+    ? Math.max(0, Math.floor(pendingWithdrawTimeRemaining / 3600)) +
       ":" +
-      Math.floor((pendingWithdrawTimeRemaining % 3600) / 60) +
+      Math.max(0, Math.floor((pendingWithdrawTimeRemaining % 3600) / 60)) +
       ":" +
-      ((pendingWithdrawTimeRemaining % 3600) % 60)
+      Math.max(0, ((pendingWithdrawTimeRemaining % 3600) % 60))
     : null;
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
