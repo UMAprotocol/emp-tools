@@ -43,9 +43,7 @@ const Redeem = () => {
         tokensToRedeem
       );
       try {
-        const tx = await emp.redeem([tokensToRedeemWei], {
-          gasLimit: 7000000,
-        });
+        const tx = await emp.redeem([tokensToRedeemWei]);
         setHash(tx.hash as string);
         await tx.wait();
         setSuccess(true);
