@@ -6,6 +6,7 @@ import MethodSelector from "./MethodSelector";
 import Create from "./Create";
 import Deposit from "./Deposit";
 import Redeem from "./Redeem";
+import Withdraw from "./Withdraw";
 import YourPosition from "./YourPosition";
 
 export type Method = "create" | "deposit" | "withdraw" | "redeem" | "transfer";
@@ -37,9 +38,8 @@ const Manager = () => {
 
       {method === "create" && <Create />}
       {method === "deposit" && <Deposit />}
-      {method === "withdraw" && <FalseDoor />}
+      {method === "withdraw" && <Withdraw />}
       {method === "redeem" && <Redeem />}
-      {method === "transfer" && <FalseDoor />}
     </Box>
   );
 };
