@@ -25,7 +25,7 @@ const Redeem = () => {
 
   const tokensToRedeemFloat = isNaN(parseFloat(tokensToRedeem)) ? 0 : parseFloat(tokensToRedeem);
   const isEmpty = tokensToRedeem === "";
-  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && tokensToRedeemFloat < borrowedTokens;
+  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && tokensToRedeemFloat <= borrowedTokens;
 
   const needAllowance = () => {
     if (syntheticAllowance === null || tokensToRedeem === null) return true;
@@ -120,8 +120,8 @@ const Redeem = () => {
 
       <Box py={2}>
         <Typography>{`Current borrowed ${syntheticSymbol}: ${borrowedTokens}`}</Typography>
-        <Typography>{`Remaining debt after redemption: ${borrowedTokens - parseFloat(tokensToRedeem)}`}</Typography>
-        <Typography>{`Collateral you will receive on redemption: ${(parseFloat(tokensToRedeem) / borrowedTokens) * collateral} ${collSymbol}`}</Typography>
+        <Typography>{`Remaining debt after redemption: ${borrowedTokens - tokensToRedeemFloat}`}</Typography>
+        <Typography>{`Collateral you will receive on redemption: ${(tokensToRedeemFloat / borrowedTokens) * collateral} ${collSymbol}`}</Typography>
       </Box>
 
       {hash && (
