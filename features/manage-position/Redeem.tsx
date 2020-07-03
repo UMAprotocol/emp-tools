@@ -16,7 +16,7 @@ const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
   const { tokens: borrowedTokens, collateral, pendingWithdraw } = Position.useContainer();
-  const { symbol: syntheticSymbol, allowance: syntheticAllowance, setMaxAllowance } = Token.useContainer();
+  const { symbol: syntheticSymbol, allowance: syntheticAllowance, setMaxAllowance, balance: syntheticBalance } = Token.useContainer();
 
   const [tokensToRedeem, setTokensToRedeem] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -24,8 +24,9 @@ const Redeem = () => {
   const [error, setError] = useState<Error | null>(null);
 
   const tokensToRedeemFloat = isNaN(parseFloat(tokensToRedeem)) ? 0 : parseFloat(tokensToRedeem);
+  const maxRedeem = Math.min((syntheticBalance || 0), (borrowedTokens || 0));
   const isEmpty = tokensToRedeem === "";
-  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && tokensToRedeemFloat <= (borrowedTokens || 0);
+  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && tokensToRedeemFloat <= (maxRedeem);
 
   const needAllowance = () => {
     if (syntheticAllowance === null || tokensToRedeem === null) return true;
@@ -101,7 +102,7 @@ const Redeem = () => {
           label={`Redeeem (${syntheticSymbol})`}
           placeholder="1234"
           error={!isEmpty && !canSendTxn}
-          helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${borrowedTokens}` : null}
+          helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${maxRedeem}` : null}
           value={tokensToRedeem}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokensToRedeem(e.target.value)
