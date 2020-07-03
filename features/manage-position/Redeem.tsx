@@ -101,6 +101,7 @@ const Redeem = () => {
           label={`Redeeem (${syntheticSymbol})`}
           placeholder="1234"
           error={!isEmpty && !canSendTxn}
+          helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${borrowedTokens}` : null}
           value={tokensToRedeem}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokensToRedeem(e.target.value)

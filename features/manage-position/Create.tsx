@@ -30,6 +30,7 @@ const Create = () => {
     decimals: collDec,
     allowance: collAllowance,
     setMaxAllowance,
+    balance
   } = Collateral.useContainer();
   const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { gcr } = Totals.useContainer();
@@ -50,6 +51,7 @@ const Create = () => {
     collReq && collDec
       ? `${parseFloat(fromWei(collReq, collDec)) * 100}%`
       : "N/A";
+  const balanceTooLow = (balance || 0) < (Number(collateral) || 0);
 
   const needAllowance = () => {
     if (collAllowance === null || collateral === null) return true;
@@ -179,6 +181,8 @@ const Create = () => {
           label={`Collateral (${collSymbol})`}
           placeholder="1234"
           value={collateral}
+          error={balanceTooLow}
+          helperText={balanceTooLow ? "Balance too low" : null}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCollateral(e.target.value)
           }
@@ -205,7 +209,7 @@ const Create = () => {
             Approve
           </Button>
         )}
-        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr ? (
+        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr && !balanceTooLow ? (
           <Button
             variant="contained"
             onClick={handleCreateClick}
