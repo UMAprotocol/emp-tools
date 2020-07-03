@@ -23,11 +23,14 @@ const Redeem = () => {
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
+  const tokensToRedeemFloat = isNaN(parseFloat(tokensToRedeem)) ? 0 : parseFloat(tokensToRedeem);
+  const isEmpty = tokensToRedeem === "";
+  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && tokensToRedeemFloat < borrowedTokens;
 
   const needAllowance = () => {
     if (syntheticAllowance === null || tokensToRedeem === null) return true;
     if (syntheticAllowance === "Infinity") return false;
-    return syntheticAllowance < parseFloat(tokensToRedeem);
+    return syntheticAllowance < tokensToRedeemFloat;
   };
 
   const redeemTokens = async () => {
@@ -39,7 +42,7 @@ const Redeem = () => {
         tokensToRedeem
       );
       try {
-        const tx = await emp.deposit([tokensToRedeemWei], {
+        const tx = await emp.redeem([tokensToRedeemWei], {
           gasLimit: 7000000,
         });
         setHash(tx.hash as string);
@@ -83,9 +86,9 @@ const Redeem = () => {
       <Box py={2}>
         <TextField
           type="number"
-          inputProps={{ min: "0", max: borrowedTokens.toString() }}
           label={`Redeeem (${syntheticSymbol})`}
           placeholder="1234"
+          error={!isEmpty && !canSendTxn}
           value={tokensToRedeem}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokensToRedeem(e.target.value)
@@ -103,7 +106,7 @@ const Redeem = () => {
             Approve
           </Button>
         )}
-        {tokensToRedeem && tokensToRedeem != "0" && !needAllowance() ? (
+        {canSendTxn && !needAllowance() ? (
           <Button
             variant="contained"
             onClick={handleRedemptionClick}
