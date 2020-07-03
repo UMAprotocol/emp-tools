@@ -135,7 +135,7 @@ const Deposit = () => {
 
   const pendingWithdrawTimeRemaining =
     collateral && withdrawPassTime && pendingWithdraw === "Yes"
-      ? withdrawPassTime - Math.floor(Date.now() / 1000)
+      ? withdrawPassTime - Math.floor(Date.now() / 1000) - 7200
       : null;
 
   const pastWithdrawTimeStamp = pendingWithdrawTimeRemaining

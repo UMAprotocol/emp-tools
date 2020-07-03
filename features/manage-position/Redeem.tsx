@@ -15,7 +15,7 @@ const Container = styled(Box)`
 const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
-  const { tokens: borrowedTokens, collateral } = Position.useContainer();
+  const { tokens: borrowedTokens, collateral, pendingWithdraw } = Position.useContainer();
   const { symbol: syntheticSymbol, allowance: syntheticAllowance, setMaxAllowance } = Token.useContainer();
 
   const [tokensToRedeem, setTokensToRedeem] = useState<string>("");
@@ -72,7 +72,19 @@ const Redeem = () => {
     );
   }
 
-  // User has a position so can deposit more collateral.
+  if (pendingWithdraw === null || pendingWithdraw === "Yes") {
+    return (
+        <Container>
+          <Box py={2}>
+            <Typography>
+              <i>You need to cancel or execute your pending withdrawal request before redeeming tokens.</i>
+            </Typography>
+          </Box>
+        </Container>
+    );
+  }
+
+  // User has a position and no withdraw requests, so they can redeem tokens.
   return (
     <Container>
       <Box pt={4} pb={2}>

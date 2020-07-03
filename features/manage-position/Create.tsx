@@ -36,6 +36,7 @@ const Create = () => {
   const {
     collateral: posCollateral,
     tokens: posTokens,
+    pendingWithdraw
   } = Position.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
@@ -119,6 +120,19 @@ const Create = () => {
 
   const computedCR = computeCR() || 0;
 
+  if (pendingWithdraw === null || pendingWithdraw === "Yes") {
+    return (
+        <Container>
+          <Box py={2}>
+            <Typography>
+              <i>You need to cancel or execute your pending withdrawal request before creating additional tokens.</i>
+            </Typography>
+          </Box>
+        </Container>
+    );
+  }
+
+  // User has no pending withdrawal requests so they can create tokens.
   return (
     <Container>
       <Box py={2}>

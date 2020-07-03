@@ -14,7 +14,7 @@ const Container = styled(Box)`
 const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
-  const { tokens, collateral } = Position.useContainer();
+  const { tokens, collateral, pendingWithdraw } = Position.useContainer();
 
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -67,7 +67,19 @@ const Deposit = () => {
     );
   }
 
-  // User has a position so can deposit more collateral.
+  if (pendingWithdraw === null || pendingWithdraw === "Yes") {
+    return (
+        <Container>
+          <Box py={2}>
+            <Typography>
+              <i>You need to cancel or execute your pending withdrawal request before depositing additional collateral.</i>
+            </Typography>
+          </Box>
+        </Container>
+    );
+  }
+
+  // User has a position and no pending withdrawal requests so can deposit more collateral.
   return (
     <Container>
       <Box pt={4} pb={2}>
