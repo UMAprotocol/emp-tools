@@ -51,7 +51,7 @@ const Deposit = () => {
 
   const resultingCR =
     collateral && collateralToDeposit && tokens
-      ? collateral + parseFloat(collateralToDeposit) / tokens
+      ? (collateral + parseFloat(collateralToDeposit)) / tokens
       : startingCR;
 
   // User does not have a position yet.
