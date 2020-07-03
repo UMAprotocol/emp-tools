@@ -101,6 +101,7 @@ const Redeem = () => {
           type="number"
           label={`Redeeem (${syntheticSymbol})`}
           placeholder="1234"
+          inputProps={{ min: "0" }}
           error={!isEmpty && !canSendTxn}
           helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${maxRedeem}` : null}
           value={tokensToRedeem}

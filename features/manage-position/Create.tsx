@@ -180,6 +180,7 @@ const Create = () => {
           type="number"
           label={`Collateral (${collSymbol})`}
           placeholder="1234"
+          inputProps={{ min: "0" }}
           value={collateral}
           error={balanceTooLow}
           helperText={balanceTooLow ? "Balance too low" : null}
@@ -193,6 +194,7 @@ const Create = () => {
           type="number"
           label={`Tokens (${tokenSymbol})`}
           placeholder="1234"
+          inputProps={{ min: "0" }}
           value={tokens}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokens(e.target.value)
