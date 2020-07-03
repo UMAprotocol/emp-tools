@@ -19,6 +19,7 @@ interface ContractState {
   cumulativeFeeMultiplier: BigNumber | null;
   rawTotalPositionCollateral: BigNumber | null;
   totalTokensOutstanding: BigNumber | null;
+  liquidationLiveness: BigNumber | null;
 }
 
 const initState = {
@@ -35,6 +36,7 @@ const initState = {
   cumulativeFeeMultiplier: null,
   rawTotalPositionCollateral: null,
   totalTokensOutstanding: null,
+  liquidationLiveness: null,
 };
 
 const useContractState = () => {
@@ -64,6 +66,7 @@ const useContractState = () => {
         emp.cumulativeFeeMultiplier(),
         emp.rawTotalPositionCollateral(),
         emp.totalTokensOutstanding(),
+        emp.liquidationLiveness(),
       ]);
 
       const newState: ContractState = {
@@ -80,6 +83,7 @@ const useContractState = () => {
         cumulativeFeeMultiplier: res[10] as BigNumber,
         rawTotalPositionCollateral: res[11] as BigNumber,
         totalTokensOutstanding: res[12] as BigNumber,
+        liquidationLiveness: res[13] as BigNumber,
       };
 
       setState(newState);
