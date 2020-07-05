@@ -32,9 +32,7 @@ const Deposit = () => {
         collateralToDeposit
       );
       try {
-        const tx = await emp.deposit([collateralToDepositWei], {
-          gasLimit: 7000000,
-        });
+        const tx = await emp.deposit([collateralToDepositWei]);
         setHash(tx.hash as string);
         await tx.wait();
         setSuccess(true);
