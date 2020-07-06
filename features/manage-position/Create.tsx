@@ -67,7 +67,9 @@ const Create = () => {
       const collateralWei = ethers.utils.parseUnits(collateral);
       const tokensWei = ethers.utils.parseUnits(tokens);
       try {
-        const tx = await emp.create([collateralWei], [tokensWei]);
+        const tx = await emp.create([collateralWei], [tokensWei], {
+          gasLimit: 7000000,
+        });
         setHash(tx.hash as string);
         await tx.wait();
         setSuccess(true);
