@@ -13,9 +13,7 @@ MAINNET_NODE_URL=https://mainnet.infura.io/v3/<INFURA_API_KEY>
 PRIV_KEY=0x123456789...
 ```
 
-This will spin up a test chain forked off mainnet and also swap 10 ETH to DAI on Uniswap so that you have a healthy balance of ETH and DAI to test with.
-
-At this point, you can manually test the dapp with MetaMask in your browser.
+The following instructions will spin up a test chain forked off mainnet and also swap 10 ETH to DAI on Uniswap so that you have a healthy balance of ETH and DAI to test with. You can manually test the dapp with MetaMask in your browser this way.
 
 1. Run `npm run chain`.
 2. Copy the private key into MetaMask to access the account and connect to `localhost:8545`. Your balance should be ~990 ETH and a bunch of DAI.
