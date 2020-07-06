@@ -10,6 +10,8 @@ import EmpState from "../../containers/EmpState";
 import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
 
+import { getEtherscanUrl } from "../../utils/getEtherscanUrl";
+
 const Container = styled(Box)`
   max-width: 720px;
 `;
@@ -18,6 +20,11 @@ const Important = styled(Typography)`
   color: red;
   background: black;
   display: inline-block;
+`;
+
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
 `;
 
 const fromWei = ethers.utils.formatUnits;
@@ -240,7 +247,14 @@ const Create = () => {
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> {hash}
+            <strong>Tx Receipt: </strong>
+              <Link
+                href={getEtherscanUrl(hash)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
           </Typography>
         </Box>
       )}
