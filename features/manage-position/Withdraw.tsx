@@ -289,7 +289,7 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        <Typography>Current global CR: {gcr?.toFixed(2) || "N/A"}</Typography>
+        <Typography>Current global CR: {gcr || "N/A"}</Typography>
         <Typography>Current position CR: {startingCR || "N/A"}</Typography>
         <Typography>Resulting position CR: {resultingCR || "N/A"}</Typography>
         {collateralToWithdraw && collateralToWithdraw != "0" ? (
