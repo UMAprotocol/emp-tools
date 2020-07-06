@@ -108,7 +108,7 @@ const Redeem = () => {
           placeholder="1234"
           inputProps={{ min: "0" }}
           error={!isEmpty && !canSendTxn}
-          helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${maxRedeem}` : null}
+          helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${maxRedeem} or the entire position` : null}
           value={tokensToRedeem}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokensToRedeem(e.target.value)
