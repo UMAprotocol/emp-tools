@@ -1,7 +1,7 @@
 import { ethers, Wallet, ContractInterface } from "ethers";
 import Connection from "../containers/Connection";
 
-const networkToEtherscanHostMap = (networkName: string) => {
+const networkToEtherscanHostMap = (networkName: string | undefined) => {
     switch(networkName) {
         case "kovan":
             return "https://kovan.etherscan.io";
