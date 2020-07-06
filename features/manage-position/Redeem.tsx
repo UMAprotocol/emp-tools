@@ -30,9 +30,10 @@ const Redeem = () => {
 
   const tokensToRedeemFloat = isNaN(parseFloat(tokensToRedeem)) ? 0 : parseFloat(tokensToRedeem);
   const tokensAboveMin = borrowedTokens && empState.minSponsorTokens ? borrowedTokens - weiToNum(empState.minSponsorTokens) : 0;
-  const maxRedeem = Math.min((syntheticBalance || 0), (borrowedTokens || 0), (tokensAboveMin ||0));
+  const unwindPosition = borrowedTokens && tokensToRedeemFloat && syntheticBalance && borrowedTokens === tokensToRedeemFloat && borrowedTokens <= syntheticBalance;
+  const maxRedeem = Math.min((syntheticBalance || 0), (borrowedTokens || 0), (tokensAboveMin || 0));
   const isEmpty = tokensToRedeem === "";
-  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && tokensToRedeemFloat <= (maxRedeem);
+  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && (tokensToRedeemFloat <= (maxRedeem) || unwindPosition);
 
   const needAllowance = () => {
     if (syntheticAllowance === null || tokensToRedeem === null) return true;
