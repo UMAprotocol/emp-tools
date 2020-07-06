@@ -49,15 +49,11 @@ const Deposit = () => {
       );
       try {
         if (resultingCRBelowGCR) {
-          const tx = await emp.requestWithdrawal([collateralToWithdrawWei], {
-            gasLimit: 7000000,
-          });
+          const tx = await emp.requestWithdrawal([collateralToWithdrawWei]);
           setHash(tx.hash as string);
           await tx.wait();
         } else if (!resultingCRBelowGCR) {
-          const tx = await emp.withdraw([collateralToWithdrawWei], {
-            gasLimit: 7000000,
-          });
+          const tx = await emp.withdraw([collateralToWithdrawWei]);
           setHash(tx.hash as string);
           await tx.wait();
         }
@@ -78,9 +74,7 @@ const Deposit = () => {
       setError(null);
 
       try {
-        const tx = await emp.withdrawPassedRequest({
-          gasLimit: 7000000,
-        });
+        const tx = await emp.withdrawPassedRequest();
         setHash(tx.hash as string);
         await tx.wait();
 
@@ -101,9 +95,7 @@ const Deposit = () => {
       setError(null);
 
       try {
-        const tx = await emp.cancelWithdrawal({
-          gasLimit: 7000000,
-        });
+        const tx = await emp.cancelWithdrawal();
         setHash(tx.hash as string);
         await tx.wait();
 
