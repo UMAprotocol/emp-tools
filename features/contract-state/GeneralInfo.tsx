@@ -3,6 +3,10 @@ import { ethers, BigNumberish } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
+import Collateral from "../../containers/Collateral";
+import Token from "../../containers/Token";
+import EmpContract from "../../containers/EmpContract";
+import Totals from "../../containers/Totals";
 
 const Label = styled.span`
   color: #999999;
@@ -14,33 +18,44 @@ const Status = styled(Typography)`
   text-overflow: ellipsis;
 `;
 
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
+`;
+
 const fromWei = ethers.utils.formatUnits;
-const weiToNum = (x: BigNumberish) => parseFloat(fromWei(x));
 
 const GeneralInfo = () => {
+  const { contract } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
+  const { gcr } = Totals.useContainer();
+
   const {
     expirationTimestamp: expiry,
     priceIdentifier: priceId,
     collateralRequirement: collReq,
     minSponsorTokens,
-    cumulativeFeeMultiplier: multiplier,
-    rawTotalPositionCollateral: rawColl,
-    totalTokensOutstanding: totalTokensWei,
   } = empState;
-
-  // do some calc
-  const totalColl =
-    multiplier && rawColl ? weiToNum(multiplier) * weiToNum(rawColl) : null;
-  const totalTokens = totalTokensWei ? weiToNum(totalTokensWei) : null;
-  const gcr = totalColl && totalTokens ? totalColl / totalTokens : null;
+  const { symbol: collSymbol } = Collateral.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   // format nice date
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
 
   return (
     <Box>
-      <Typography variant="h5">General Info</Typography>
+      <Typography variant="h5">
+        General Info{" "}
+        {contract && (
+          <Link
+            href={`https://etherscan.io/address/${contract.address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            etherscan
+          </Link>
+        )}
+      </Typography>
       <Status>
         <Label>Expiry Date: </Label>
         {expiry ? (
@@ -64,17 +79,9 @@ const GeneralInfo = () => {
 
       <Status>
         <Label>Minimum Sponsor Tokens: </Label>
-        {minSponsorTokens ? fromWei(minSponsorTokens) : "N/A"}
-      </Status>
-
-      <Status>
-        <Label>Total Collateral: </Label>
-        {totalColl ? totalColl : "N/A"}
-      </Status>
-
-      <Status>
-        <Label>Total Tokens: </Label>
-        {totalTokens ? totalTokens : "N/A"}
+        {minSponsorTokens
+          ? `${fromWei(minSponsorTokens)} ${tokenSymbol}`
+          : "N/A"}
       </Status>
 
       <Status>

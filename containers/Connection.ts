@@ -1,32 +1,14 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import { Observable } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 
 type Provider = ethers.providers.Provider;
+type Block = ethers.providers.Block;
+type Network = ethers.providers.Network;
 type ExternalProvider = ethers.providers.ExternalProvider;
 type Signer = ethers.Signer;
-
-interface Block {
-  hash: string;
-  parentHash: string;
-  number: number;
-  timestamp: number;
-  nonce: string;
-  difficulty: number;
-  gasLimit: BigNumber;
-  gasUsed: BigNumber;
-  miner: string;
-  extraData: string;
-}
-
-interface Network {
-  name: string;
-  chainId: number;
-  ensAddress?: string;
-  _defaultProvider?: (providers: any, options?: any) => any;
-}
 
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
@@ -38,8 +20,13 @@ function useConnection() {
 
   const attemptConnection = async () => {
     if (window.ethereum === undefined) {
-      throw Error("MetaMask not found");
+      throw Error("MetaMask not found, please visit https://metamask.io/");
     }
+
+    // // for testing
+    // const provider = new ethers.providers.JsonRpcProvider()
+    // let signer = new ethers.Wallet(process.env.PRIV_KEY)
+    // signer = signer.connect(provider)
 
     // get provider and signer
     const provider = new ethers.providers.Web3Provider(
@@ -70,6 +57,7 @@ function useConnection() {
       await attemptConnection();
     } catch (error) {
       setError(error);
+      alert(error.message);
     }
   };
 
@@ -77,14 +65,15 @@ function useConnection() {
   useEffect(() => {
     if (provider) {
       const observable = new Observable<Block>((subscriber) => {
-        provider.on("block", (blockNumber) => {
+        provider.on("block", (blockNumber: number) => {
           provider
             .getBlock(blockNumber)
             .then((block) => subscriber.next(block));
         });
       });
-      // debounce at 2 sec to prevent making unnecessary calls
-      setBlock$(observable.pipe(debounceTime(2000)));
+      // debounce to prevent subscribers making unnecessary calls
+      const block$ = observable.pipe(debounceTime(1000));
+      setBlock$(block$);
     }
   }, [provider]);
 

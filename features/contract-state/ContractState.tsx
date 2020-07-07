@@ -1,19 +1,18 @@
-import { Box } from "@material-ui/core";
-
+import { Box, Grid } from "@material-ui/core";
 import GeneralInfo from "./GeneralInfo";
-import CollateralInfo from "./CollateralInfo";
-import TokenInfo from "./TokenInfo";
 import DisputeParams from "./DisputeParams";
-import YourPosition from "./YourPosition";
+import Totals from "./Totals";
 
 const ContractState = () => {
   return (
     <Box py={4}>
-      <GeneralInfo />
-      <CollateralInfo />
-      <TokenInfo />
-      <DisputeParams />
-      <YourPosition />
+      <Grid container spacing={4}>
+        <Totals />
+      </Grid>
+      <Box pt={4}>
+        <GeneralInfo />
+        <DisputeParams />
+      </Box>
     </Box>
   );
 };

@@ -1,9 +1,13 @@
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
 import { useState } from "react";
+import { Box, Typography } from "@material-ui/core";
 
+import Connection from "../../containers/Connection";
 import MethodSelector from "./MethodSelector";
 import Create from "./Create";
+import Deposit from "./Deposit";
+import Redeem from "./Redeem";
+import Withdraw from "./Withdraw";
+import YourPosition from "./YourPosition";
 
 export type Method = "create" | "deposit" | "withdraw" | "redeem" | "transfer";
 
@@ -12,20 +16,30 @@ const FalseDoor = () => (
 );
 
 const Manager = () => {
+  const { signer } = Connection.useContainer();
   const [method, setMethod] = useState<Method>("create");
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) =>
     setMethod(e.target.value as Method);
 
+  if (!signer) {
+    return (
+      <Box>
+        <Typography>
+          <i>Please connect first.</i>
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Box my={4}>
-      <Typography variant="h5">Manage Position</Typography>
+    <Box my={0}>
+      <YourPosition />
       <MethodSelector method={method} handleChange={handleChange} />
 
       {method === "create" && <Create />}
-      {method === "deposit" && <FalseDoor />}
-      {method === "withdraw" && <FalseDoor />}
-      {method === "redeem" && <FalseDoor />}
-      {method === "transfer" && <FalseDoor />}
+      {method === "deposit" && <Deposit />}
+      {method === "withdraw" && <Withdraw />}
+      {method === "redeem" && <Redeem />}
     </Box>
   );
 };

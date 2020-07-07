@@ -1,11 +1,17 @@
 import App from "next/app";
 import Head from "next/head";
 
+import "../utils/global.css";
+
 import { WithStylingProviders } from "../utils/styling";
 import Connection from "../containers/Connection";
-import Contract from "../containers/Contract";
+import EmpContract from "../containers/EmpContract";
 import EmpAddress from "../containers/EmpAddress";
 import EmpState from "../containers/EmpState";
+import Collateral from "../containers/Collateral";
+import Token from "../containers/Token";
+import Position from "../containers/Position";
+import Totals from "../containers/Totals";
 
 interface IProps {
   children: React.ReactNode;
@@ -14,9 +20,17 @@ interface IProps {
 const WithStateContainerProviders = ({ children }: IProps) => (
   <Connection.Provider>
     <EmpAddress.Provider>
-      <Contract.Provider>
-        <EmpState.Provider>{children}</EmpState.Provider>
-      </Contract.Provider>
+      <EmpContract.Provider>
+        <EmpState.Provider>
+          <Collateral.Provider>
+            <Token.Provider>
+              <Totals.Provider>
+                <Position.Provider>{children}</Position.Provider>
+              </Totals.Provider>
+            </Token.Provider>
+          </Collateral.Provider>
+        </EmpState.Provider>
+      </EmpContract.Provider>
     </EmpAddress.Provider>
   </Connection.Provider>
 );

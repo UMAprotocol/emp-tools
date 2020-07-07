@@ -1,21 +1,70 @@
+import { ethers } from "ethers";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
-import { ethers } from "ethers";
-import Contract from "../../containers/Contract";
+
+import EmpContract from "../../containers/EmpContract";
 import { useState } from "react";
+import Collateral from "../../containers/Collateral";
+import Token from "../../containers/Token";
+import EmpState from "../../containers/EmpState";
+import Totals from "../../containers/Totals";
+import Position from "../../containers/Position";
+
+import { useEtherscanUrl } from "./useEtherscanUrl";
 
 const Container = styled(Box)`
-  max-width: 500px;
+  max-width: 720px;
 `;
 
+const Important = styled(Typography)`
+  color: red;
+  background: black;
+  display: inline-block;
+`;
+
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
+`;
+
+const fromWei = ethers.utils.formatUnits;
+
 const Create = () => {
-  const { contract: emp } = Contract.useContainer();
+  const { contract: emp } = EmpContract.useContainer();
+  const { empState } = EmpState.useContainer();
+  const {
+    symbol: collSymbol,
+    decimals: collDec,
+    allowance: collAllowance,
+    setMaxAllowance,
+    balance
+  } = Collateral.useContainer();
+  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
+  const { gcr } = Totals.useContainer();
+  const {
+    collateral: posCollateral,
+    tokens: posTokens,
+    pendingWithdraw
+  } = Position.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
+
+  const { collateralRequirement: collReq, minSponsorTokens } = empState;
+  const collReqPct =
+    collReq && collDec
+      ? `${parseFloat(fromWei(collReq, collDec)) * 100}%`
+      : "N/A";
+  const balanceTooLow = (balance || 0) < (Number(collateral) || 0);
+
+  const needAllowance = () => {
+    if (collAllowance === null || collateral === null) return true;
+    if (collAllowance === "Infinity") return false;
+    return collAllowance < parseFloat(collateral);
+  };
 
   const mintTokens = async () => {
     if (collateral && tokens && emp) {
@@ -25,9 +74,7 @@ const Create = () => {
       const collateralWei = ethers.utils.parseUnits(collateral);
       const tokensWei = ethers.utils.parseUnits(tokens);
       try {
-        const tx = await emp.create([collateralWei], [tokensWei], {
-          gasLimit: 7000000,
-        });
+        const tx = await emp.create([collateralWei], [tokensWei]);
         setHash(tx.hash as string);
         await tx.wait();
         setSuccess(true);
@@ -40,49 +87,110 @@ const Create = () => {
     }
   };
 
-  const handleCreateClick = () => mintTokens();
+  const handleCreateClick = () => {
+    const firstPosition = posTokens !== null && posTokens.toString() === "0";
+    if (!firstPosition) {
+      mintTokens();
+    } else {
+      // first time minting, check min sponsor tokens
+      if (tokens !== null && minSponsorTokens && tokenDec) {
+        const insufficientMinting =
+          parseFloat(tokens) < parseFloat(fromWei(minSponsorTokens, tokenDec));
+        if (insufficientMinting) {
+          alert(
+            `You must mint at least ${fromWei(
+              minSponsorTokens,
+              tokenDec
+            )} token(s).`
+          );
+        } else {
+          mintTokens();
+        }
+      }
+    }
+  };
 
+  const computeCR = () => {
+    if (
+      collateral === null ||
+      tokens === null ||
+      posCollateral === null ||
+      posTokens === null
+    )
+      return null;
+
+    // all values non-null, proceed to calculate
+    const totalCollateral = posCollateral + parseFloat(collateral);
+    const totalTokens = posTokens + parseFloat(tokens);
+    return totalCollateral / totalTokens;
+  };
+
+  const computedCR = computeCR() || 0;
+
+  const etherscanUrl = useEtherscanUrl(hash);
+
+  if (pendingWithdraw === null || pendingWithdraw === "Yes") {
+    return (
+        <Container>
+          <Box py={2}>
+            <Typography>
+              <i>You need to cancel or execute your pending withdrawal request before creating additional tokens.</i>
+            </Typography>
+          </Box>
+        </Container>
+    );
+  }
+
+  // User has no pending withdrawal requests so they can create tokens.
   return (
     <Container>
       <Box py={2}>
         <Typography>
-          <i>Mint new synthetic tokens via this EMP contract.</i>
+          <i>
+            Mint new synthetic tokens ({tokenSymbol}) via this EMP contract.
+          </i>
         </Typography>
       </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>If this is your first time minting</strong>, ensure that your
-          ratio of collateral to tokens is above the GCR (noted above) and that
-          you are minting at least the "minimum sponsor tokens" amount indicated
-          above.
-        </Typography>
+      <Box pb={2}>
+        <Box py={2}>
+          <Important>
+            IMPORTANT! Please read this carefully or you may lose money.
+          </Important>
+        </Box>
+        <Box pt={2}>
+          <Typography>
+            When minting, your resulting collateralization ratio (collateral /
+            tokens) must be above the GCR and you need to mint at least{" "}
+            {minSponsorTokens && tokenDec
+              ? fromWei(minSponsorTokens, tokenDec)
+              : "N/A"}{" "}
+            token(s).
+          </Typography>
+        </Box>
+        <Box py={2}>
+          <Typography>
+            Ensure that you maintain {collReqPct} collateralization or else you
+            will get liquidated. Remember to sell your tokens after you mint
+            them if you want to short the underlying.
+          </Typography>
+        </Box>
+        <Box py={2}>
+          <Typography>
+            When you're ready, fill in the desired amount of collateral and
+            tokens below and click the "Create" button.
+          </Typography>
+        </Box>
       </Box>
 
       <Box py={2}>
-        <Typography>
-          <strong>If you have an existing position</strong>, ensure that your
-          collateralization ratio will continue to satisfy the collateral
-          requirement percentage indicated above.
-        </Typography>
-      </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>Collateral: </strong> Denominated in terms of whole numbers
-          (not in Wei). Check above to see the collateral token for this EMP.
-        </Typography>
-      </Box>
-      <Box py={2}>
-        <Typography>
-          <strong>Tokens: </strong> Denominated in terms of whole numbers (not
-          in Wei). Check above to see the synthetic token for this EMP.
-        </Typography>
-      </Box>
-      <Box py={2}>
         <TextField
           type="number"
-          label="Collateral"
+          label={`Collateral (${collSymbol})`}
           placeholder="1234"
+          inputProps={{ min: "0" }}
           value={collateral}
+          error={balanceTooLow}
+          helperText={balanceTooLow ? "Balance too low" : null}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCollateral(e.target.value)
           }
@@ -91,8 +199,9 @@ const Create = () => {
       <Box py={2}>
         <TextField
           type="number"
-          label="Tokens"
+          label={`Tokens (${tokenSymbol})`}
           placeholder="1234"
+          inputProps={{ min: "0" }}
           value={tokens}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokens(e.target.value)
@@ -100,21 +209,54 @@ const Create = () => {
         />
       </Box>
       <Box py={2}>
-        {tokens && collateral ? (
+        {needAllowance() && (
           <Button
-            variant="outlined"
+            variant="contained"
+            onClick={setMaxAllowance}
+            style={{ marginRight: `12px` }}
+          >
+            Approve
+          </Button>
+        )}
+        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr && !balanceTooLow ? (
+          <Button
+            variant="contained"
             onClick={handleCreateClick}
-          >{`Create ${tokens} tokens with ${collateral} collateral`}</Button>
+          >{`Create ${tokens} ${tokenSymbol} with ${collateral} ${collSymbol}`}</Button>
         ) : (
-          <Button variant="outlined" disabled>
+          <Button variant="contained" disabled>
             Create
           </Button>
         )}
       </Box>
+
+      <Box py={2}>
+        {tokens && collateral && gcr ? (
+          <Typography>
+            Resulting CR:{" "}
+            <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
+              {computedCR}
+            </span>
+          </Typography>
+        ) : (
+          <Typography>Resulting CR: N/A</Typography>
+        )}
+        <Typography>Current GCR: {gcr || "N/A"}</Typography>
+      </Box>
+
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> {hash}
+            <strong>Tx Receipt: </strong>
+              {etherscanUrl ? (
+                <Link
+                  href={etherscanUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {hash}
+                </Link>
+              ) : hash}
           </Typography>
         </Box>
       )}

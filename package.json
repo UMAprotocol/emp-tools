@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "chain": "ts-node -O '{\"module\":\"commonjs\"}' chain.ts"
   },
   "dependencies": {
     "@material-ui/core": "^4.10.2",
@@ -12,6 +13,7 @@
     "@studydefi/money-legos": "^2.3.2",
     "date-fns": "^2.14.0",
     "ethers": "^5.0.1",
+    "jazzicon": "^1.5.0",
     "next": "^9.4.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -24,6 +26,9 @@
     "@types/react": "^16.9.36",
     "@types/styled-components": "^5.1.0",
     "babel-plugin-styled-components": "^1.11.0-0",
+    "dotenv": "^8.2.0",
+    "ganache-core": "^2.10.2",
+    "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   },
   "prettier": {
