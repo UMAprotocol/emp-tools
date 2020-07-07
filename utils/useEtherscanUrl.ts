@@ -21,7 +21,3 @@ export const useEtherscanUrl = (txnHash: string | null) => {
   const baseUrl = NETWORK_MAP[network.name] || NETWORK_MAP["mainnet"];
   return `${baseUrl}/tx/${txnHash}`;
 };
-
-module.exports = { useEtherscanUrl };
-
-export {};
