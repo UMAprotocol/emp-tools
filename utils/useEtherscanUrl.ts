@@ -1,4 +1,3 @@
-import { ethers, Wallet, ContractInterface } from "ethers";
 import Connection from "../containers/Connection";
 
 const networkToEtherscanHostMap = (networkName: string | undefined) => {
@@ -16,13 +15,18 @@ const networkToEtherscanHostMap = (networkName: string | undefined) => {
     }
 }
 
-export const getEtherscanUrl = (txnHash: string) => {
-  const { network } = Connection.useContainer();
-  const etherscanHost = networkToEtherscanHostMap(network?.name);
-
-  return `${etherscanHost}/tx/${txnHash}`;
+export const useEtherscanUrl = (txnHash: string | null) => {
+    if (!txnHash) { 
+      return undefined; 
+    }
+    else {
+        const { network } = Connection.useContainer();
+        const etherscanHost = networkToEtherscanHostMap(network?.name);
+    
+        return `${etherscanHost}/tx/${txnHash}`;  
+    }
 };
 
-module.exports = { getEtherscanUrl };
+module.exports = { useEtherscanUrl };
 
 export {};

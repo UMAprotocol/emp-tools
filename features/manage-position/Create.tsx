@@ -10,7 +10,8 @@ import EmpState from "../../containers/EmpState";
 import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
 
-import { getEtherscanUrl } from "../../utils/getEtherscanUrl";
+import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import { Hash } from "crypto";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -126,6 +127,8 @@ const Create = () => {
   };
 
   const computedCR = computeCR() || 0;
+
+  const etherscanUrl = useEtherscanUrl(hash);
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
@@ -246,13 +249,15 @@ const Create = () => {
         <Box py={2}>
           <Typography>
             <strong>Tx Receipt: </strong>
-              <Link
-                href={getEtherscanUrl(hash)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {hash}
-              </Link>
+              {etherscanUrl ? (
+                <Link
+                  href={etherscanUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {hash}
+                </Link>
+              ) : hash}
           </Typography>
         </Box>
       )}
