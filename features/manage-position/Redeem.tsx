@@ -1,9 +1,10 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
-import { ethers } from "ethers";
+import { ethers, BigNumberish } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
+import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import Token from "../../containers/Token";
@@ -12,8 +13,12 @@ const Container = styled(Box)`
   max-width: 720px;
 `;
 
+const fromWei = ethers.utils.formatUnits
+const weiToNum = (x: BigNumberish, u = 18) => parseFloat(fromWei(x, u))
+
 const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
+  const { empState } = EmpState.useContainer()
   const { symbol: collSymbol } = Collateral.useContainer();
   const { tokens: borrowedTokens, collateral, pendingWithdraw } = Position.useContainer();
   const { symbol: syntheticSymbol, allowance: syntheticAllowance, setMaxAllowance, balance: syntheticBalance } = Token.useContainer();
@@ -24,9 +29,11 @@ const Redeem = () => {
   const [error, setError] = useState<Error | null>(null);
 
   const tokensToRedeemFloat = isNaN(parseFloat(tokensToRedeem)) ? 0 : parseFloat(tokensToRedeem);
-  const maxRedeem = Math.min((syntheticBalance || 0), (borrowedTokens || 0));
+  const tokensAboveMin = borrowedTokens && empState.minSponsorTokens ? borrowedTokens - weiToNum(empState.minSponsorTokens) : 0;
+  const unwindPosition = borrowedTokens && tokensToRedeemFloat && syntheticBalance && borrowedTokens === tokensToRedeemFloat && borrowedTokens <= syntheticBalance;
+  const maxRedeem = Math.min((syntheticBalance || 0), (borrowedTokens || 0), (tokensAboveMin || 0));
   const isEmpty = tokensToRedeem === "";
-  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && tokensToRedeemFloat <= (maxRedeem);
+  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && (tokensToRedeemFloat <= (maxRedeem) || unwindPosition);
 
   const needAllowance = () => {
     if (syntheticAllowance === null || tokensToRedeem === null) return true;
@@ -101,7 +108,7 @@ const Redeem = () => {
           placeholder="1234"
           inputProps={{ min: "0" }}
           error={!isEmpty && !canSendTxn}
-          helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${maxRedeem}` : null}
+          helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${maxRedeem} or the entire position` : null}
           value={tokensToRedeem}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokensToRedeem(e.target.value)
