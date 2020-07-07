@@ -1,4 +1,4 @@
-import Connection from "../containers/Connection";
+import Connection from "../../containers/Connection";
 
 interface NetworkMap {
   [key: string]: string;

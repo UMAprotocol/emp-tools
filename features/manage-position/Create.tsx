@@ -10,7 +10,7 @@ import EmpState from "../../containers/EmpState";
 import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
 
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import { useEtherscanUrl } from "./useEtherscanUrl";
 
 const Container = styled(Box)`
   max-width: 720px;
