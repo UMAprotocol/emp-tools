@@ -5,7 +5,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "chain": "ts-node chain.ts"
+    "chain": "ts-node -O '{\"module\":\"commonjs\"}' chain.ts"
   },
   "dependencies": {
     "@material-ui/core": "^4.10.2",
