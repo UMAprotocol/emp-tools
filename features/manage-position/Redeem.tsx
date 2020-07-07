@@ -9,8 +9,15 @@ import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import Token from "../../containers/Token";
 
+import { useEtherscanUrl } from "./useEtherscanUrl";
+
 const Container = styled(Box)`
   max-width: 720px;
+`;
+
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
 `;
 
 const fromWei = ethers.utils.formatUnits
@@ -62,6 +69,8 @@ const Redeem = () => {
       setError(new Error("Please check that you are connected."));
     }
   };
+
+  const etherscanUrl = useEtherscanUrl(hash);
 
   const handleRedemptionClick = () => redeemTokens();
 
@@ -147,7 +156,16 @@ const Redeem = () => {
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> {hash}
+            <strong>Tx Hash: </strong> 
+            {etherscanUrl ? (
+                <Link
+                  href={etherscanUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {hash}
+                </Link>
+              ) : hash}
           </Typography>
         </Box>
       )}
