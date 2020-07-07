@@ -10,6 +10,8 @@ import EmpState from "../../containers/EmpState";
 import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
 
+import { useEtherscanUrl } from "./useEtherscanUrl";
+
 const Container = styled(Box)`
   max-width: 720px;
 `;
@@ -18,6 +20,11 @@ const Important = styled(Typography)`
   color: red;
   background: black;
   display: inline-block;
+`;
+
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
 `;
 
 const fromWei = ethers.utils.formatUnits;
@@ -119,6 +126,8 @@ const Create = () => {
   };
 
   const computedCR = computeCR() || 0;
+
+  const etherscanUrl = useEtherscanUrl(hash);
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
@@ -238,7 +247,16 @@ const Create = () => {
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> {hash}
+            <strong>Tx Receipt: </strong>
+              {etherscanUrl ? (
+                <Link
+                  href={etherscanUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {hash}
+                </Link>
+              ) : hash}
           </Typography>
         </Box>
       )}
