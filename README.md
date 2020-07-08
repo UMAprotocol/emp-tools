@@ -1,8 +1,8 @@
 # EMP Tools
 
-A simple frontend for viewing EMP details and minting tokens.
+_Expiring Multi Party is UMA's most current financial smart contract template. This UI is a community-made tool to make interfacing with the protocol easier, please use at your own risk._
 
-I mostly made this because I really wanted to view the "live" GCR value. But then I just kept adding more and more features.
+Live frontend: https://emp-tools.vercel.app/
 
 ## Manual testing
 
