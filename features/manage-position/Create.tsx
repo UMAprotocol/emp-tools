@@ -129,6 +129,19 @@ const Create = () => {
 
   const etherscanUrl = useEtherscanUrl(hash);
 
+  // User has not selected an EMP yet. We can detect this by checking if any properties in `empState` are `null`.
+  if (collReq === null) {
+    return (
+      <Container>
+        <Box py={2}>
+          <Typography>
+            <i>Please first select an EMP from the dropdown above.</i>
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
         <Container>
