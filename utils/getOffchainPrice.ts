@@ -17,8 +17,7 @@ const PRICE_FEEDS: PriceFeedIdentifierMap = {
 
 export const getOffchainPrice = async (pricefeedIdentifier: string) => {
   try {
-    const corsProxy = "https://cors-anywhere.herokuapp.com/";
-    const response = await fetch(corsProxy + PRICE_FEEDS[pricefeedIdentifier]);
+    const response = await fetch(PRICE_FEEDS[pricefeedIdentifier]);
     const json = await response.json();
     return utils.parseEther(json[0].price as string);
   } catch (err) {
