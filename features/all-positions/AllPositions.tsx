@@ -1,79 +1,101 @@
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container, Typography } from "@material-ui/core";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Container,
+  Typography,
+} from "@material-ui/core";
+import { utils, BigNumberish, BigNumber } from "ethers";
 
 import Token from "../../containers/Token";
+import EmpSponsors from "../../containers/EmpSponsors";
+import EmpContract from "../../containers/EmpContract";
 
 const AllPositions = () => {
-    const { symbol: tokenSymbol } = Token.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
+  const { activeSponsors } = EmpSponsors.useContainer();
+  const { contract: emp } = EmpContract.useContainer();
 
-    if (tokenSymbol === null) {
-        return (
-          <Container>
-            <Box py={2}>
-              <Typography>
-                <i>Please first select an EMP from the dropdown above.</i>
-              </Typography>
-            </Box>
-          </Container>
-        );
-    }
-
-    const estimatedPrice = tokenSymbol?.includes("yCOMP") ? 187 : 0.0259
-
-    const createSponsorData = (address: string, collateral: number, tokens: number, liqs: number) => {
-        return { 
-            address, 
-            collateral, 
-            tokens, 
-            cRatio: (tokens / (collateral * estimatedPrice)), 
-            liqs
-        };
-    }
-
-    const rows = (tokenSymbol?.includes("yCOMP") ? [
-        createSponsorData('0x1BAE75724Ac6765D6A7306b41b4E7aAa2aCC8B5d', 1, 412.5, 0),
-        createSponsorData('0xD1F55571cbB04139716a9a5076Aa69626B6df009', 350, 170000, 1),
-        createSponsorData('0xd165164cbAb65004Da73C596712687C16b981274', 1, 700, 0),
-        createSponsorData('0x6408c3deE9Aa842db991a1B2fc0ae94D6354724b', 1, 800, 0),
-        createSponsorData('0xD38D3b64504480945F482c03670352CA35679630', 1, 488, 0)
-    ] : [
-        createSponsorData('0x367f62F022E0c8236d664fBA35b594591270Dafb', 1500000, 56250, 2),
-        createSponsorData('0x2e4dE42F0b8ac51D435bd98121Af106388D911Bd', 90000, 4000, 1),
-        createSponsorData('0x74d1bf5ECeEeFc91c61D53c3eDaC9c1173A97853', 500000, 18750, 0),
-        createSponsorData('0xd6D30F186E802c1558b8137bd730f7f4AEC17aE7', 1000, 38, 0),
-        createSponsorData('0x3F603a18Bed7cc5CeEFdC83ff1CE0CF5B3764e2e', 1000, 40, 0)
-
-    ]);
-
+  if (tokenSymbol === null || emp === null) {
     return (
-        <Box py={4}>
-        <TableContainer component={Paper}>
-        <Table>
-            <TableHead>
-            <TableRow>
-                <TableCell>Active Sponsor</TableCell>
-                <TableCell align="right">Locked Collateral</TableCell>
-                <TableCell align="right">Tokens Outstanding</TableCell>
-                <TableCell align="right">Collateral Ratio (estimated price: {estimatedPrice})</TableCell>
-                <TableCell align="right">Pending Liquidations</TableCell>
-            </TableRow>
-            </TableHead>
-            <TableBody>
-            {rows.map((row) => (
-                <TableRow key={row.address}>
-                <TableCell component="th" scope="row">
-                    {row.address}
-                </TableCell>
-                <TableCell align="right">{row.collateral}</TableCell>
-                <TableCell align="right">{row.tokens}</TableCell>
-                <TableCell align="right">{row.cRatio}</TableCell>
-                <TableCell align="right">{row.liqs}</TableCell>
-                </TableRow>
-            ))}
-            </TableBody>
-        </Table>
-            </TableContainer>
+      <Container>
+        <Box py={2}>
+          <Typography>
+            <i>Please first select an EMP from the dropdown above.</i>
+          </Typography>
         </Box>
+      </Container>
     );
+  }
+
+  const estimatedPrice = tokenSymbol?.includes("yCOMP") ? "187" : "0.0259";
+
+  const activeEmpSponsors = activeSponsors[emp.address];
+
+  const prettyBalance = (x: BigNumberish | null) => {
+    return x === null ? "N/A" : utils.commify(utils.formatEther(x));
+  };
+
+  const getCollateralRatio = (
+    collateral: BigNumber | null,
+    tokens: BigNumber | null
+  ) => {
+    if (collateral === null || tokens === null) return "N/A";
+    const tokensScaled = tokens
+      .mul(utils.parseEther(estimatedPrice))
+      .div(utils.parseEther("1"));
+    return collateral.mul(utils.parseEther("1")).div(tokensScaled);
+  };
+
+  return (
+    <Box py={4}>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Active Sponsor</TableCell>
+              <TableCell align="right">Locked Collateral</TableCell>
+              <TableCell align="right">Tokens Outstanding</TableCell>
+              <TableCell align="right">
+                Collateral Ratio (estimated price: {estimatedPrice})
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {activeEmpSponsors &&
+              Object.keys(activeEmpSponsors).map((sponsor: string) => (
+                <TableRow key={sponsor}>
+                  <TableCell component="th" scope="row">
+                    {sponsor}
+                  </TableCell>
+                  <TableCell align="right">
+                    {prettyBalance(activeEmpSponsors[sponsor].lockedCollateral)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {prettyBalance(
+                      activeEmpSponsors[sponsor].tokensOutstanding
+                    )}
+                  </TableCell>
+                  <TableCell align="right">
+                    {prettyBalance(
+                      getCollateralRatio(
+                        activeEmpSponsors[sponsor].lockedCollateral,
+                        activeEmpSponsors[sponsor].tokensOutstanding
+                      )
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+  );
 };
 
 export default AllPositions;
