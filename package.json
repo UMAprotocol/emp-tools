@@ -41,7 +41,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "echo '🛁 Linting changed files with Prettier' && pretty-quick --staged && echo '🔏 Compiling Typescript' && npx tsc"
+      "pre-commit": "echo '🛁 Linting changed files with Prettier' && npx pretty-quick --staged && echo '🔏 Compiling Typescript' && npx tsc"
     }
   },
   "license": "ISC"
