@@ -28,6 +28,9 @@
     "babel-plugin-styled-components": "^1.11.0-0",
     "dotenv": "^8.2.0",
     "ganache-core": "^2.10.2",
+    "husky": "^4.2.3",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   },
@@ -35,6 +38,11 @@
     "trailingComma": "es5",
     "semi": true,
     "singleQuote": false
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "echo '🛁 Linting changed files with Prettier' && pretty-quick --staged && echo '🔏 Compiling Typescript' && npx tsc"
+    }
   },
   "license": "ISC"
 }
