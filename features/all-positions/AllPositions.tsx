@@ -15,11 +15,13 @@ import { utils, BigNumberish, BigNumber } from "ethers";
 import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import EmpContract from "../../containers/EmpContract";
+import PriceFeed from "../../containers/PriceFeed";
 
 const AllPositions = () => {
   const { symbol: tokenSymbol } = Token.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { contract: emp } = EmpContract.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
 
   if (tokenSymbol === null || emp === null) {
     return (
@@ -33,8 +35,6 @@ const AllPositions = () => {
     );
   }
 
-  const estimatedPrice = tokenSymbol?.includes("yCOMP") ? "187" : "0.0259";
-
   const activeEmpSponsors = activeSponsors[emp.address];
 
   const prettyBalance = (x: BigNumberish | null) => {
@@ -45,56 +45,68 @@ const AllPositions = () => {
     collateral: BigNumber | null,
     tokens: BigNumber | null
   ) => {
-    if (collateral === null || tokens === null) return "N/A";
-    const tokensScaled = tokens
-      .mul(utils.parseEther(estimatedPrice))
-      .div(utils.parseEther("1"));
+    if (collateral === null || tokens === null || latestPrice === null)
+      return null;
+    const tokensScaled = tokens.mul(latestPrice).div(utils.parseEther("1"));
     return collateral.mul(utils.parseEther("1")).div(tokensScaled);
   };
 
   return (
-    <Box py={4}>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Active Sponsor</TableCell>
-              <TableCell align="right">Locked Collateral</TableCell>
-              <TableCell align="right">Tokens Outstanding</TableCell>
-              <TableCell align="right">
-                Collateral Ratio (estimated price: {estimatedPrice})
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {activeEmpSponsors &&
-              Object.keys(activeEmpSponsors).map((sponsor: string) => (
-                <TableRow key={sponsor}>
-                  <TableCell component="th" scope="row">
-                    {sponsor}
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(activeEmpSponsors[sponsor].lockedCollateral)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(
-                      activeEmpSponsors[sponsor].tokensOutstanding
-                    )}
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(
-                      getCollateralRatio(
-                        activeEmpSponsors[sponsor].lockedCollateral,
+    <Container>
+      <Box>
+        <Typography>
+          <i>
+            Estimated prices are sourced from the latest trade data on Coinbase
+            Pro API.
+          </i>
+        </Typography>
+      </Box>
+      <Box py={4}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Active Sponsor</TableCell>
+                <TableCell align="right">Locked Collateral</TableCell>
+                <TableCell align="right">Tokens Outstanding</TableCell>
+                <TableCell align="right">
+                  Collateral Ratio (using price:{" "}
+                  {latestPrice ? utils.formatEther(latestPrice) : "N/A"})
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {activeEmpSponsors &&
+                Object.keys(activeEmpSponsors).map((sponsor: string) => (
+                  <TableRow key={sponsor}>
+                    <TableCell component="th" scope="row">
+                      {sponsor}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(
+                        activeEmpSponsors[sponsor].lockedCollateral
+                      )}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(
                         activeEmpSponsors[sponsor].tokensOutstanding
-                      )
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+                      )}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(
+                        getCollateralRatio(
+                          activeEmpSponsors[sponsor].lockedCollateral,
+                          activeEmpSponsors[sponsor].tokensOutstanding
+                        )
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </Container>
   );
 };
 
