@@ -1,7 +1,6 @@
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container, Typography } from "@material-ui/core";
 
 import Token from "../../containers/Token";
-import Connection from "../../containers/Connection";
 
 const AllPositions = () => {
     const { symbol: tokenSymbol } = Token.useContainer();
@@ -25,7 +24,7 @@ const AllPositions = () => {
             address, 
             collateral, 
             tokens, 
-            cRatio: (tokens / (collateral * getEstimatedPrice())), 
+            cRatio: (tokens / (collateral * estimatedPrice)), 
             liqs
         };
     }
@@ -54,7 +53,7 @@ const AllPositions = () => {
                 <TableCell>Active Sponsor</TableCell>
                 <TableCell align="right">Locked Collateral</TableCell>
                 <TableCell align="right">Tokens Outstanding</TableCell>
-                <TableCell align="right">Collateral Ratio (estimated price: {getEstimatedPrice()})</TableCell>
+                <TableCell align="right">Collateral Ratio (estimated price: {estimatedPrice})</TableCell>
                 <TableCell align="right">Pending Liquidations</TableCell>
             </TableRow>
             </TableHead>
