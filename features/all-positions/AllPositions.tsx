@@ -18,13 +18,7 @@ const AllPositions = () => {
         );
     }
 
-    const getEstimatedPrice = () => {
-        if (tokenSymbol?.includes("yCOMP")) {
-            return 187;
-        } else {
-            return 0.0259;
-        }
-    }
+    const estimatedPrice = tokenSymbol?.includes("yCOMP") ? 187 : 0.0259
 
     const createSponsorData = (address: string, collateral: number, tokens: number, liqs: number) => {
         return { 
