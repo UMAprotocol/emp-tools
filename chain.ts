@@ -5,7 +5,14 @@ import { ethers } from "ethers";
 import { getDai } from "./utils/getDai";
 
 const port = 8545;
+
+// Required environment variables.
 const nodeUrl = process.env.MAINNET_NODE_URL;
+if (!nodeUrl) {
+  throw new Error(`Set a "MAINNET_NODE_URL" in your .env from which to fork from`);
+}
+
+// Optional environment variables.
 const privKey = process.env.PRIV_KEY;
 
 // start server
@@ -36,6 +43,8 @@ server.listen(port, async (err: any) => {
       const provider = new ethers.providers.JsonRpcProvider();
       const wallet = new ethers.Wallet(privKey);
       await getDai(wallet.connect(provider));
+    } else {
+      console.log(`No "PRIV_KEY" specified to mint DAI to`)
     }
   }
 });

@@ -2,6 +2,10 @@ import { ethers, Wallet, ContractInterface } from "ethers";
 import uniswap from "@studydefi/money-legos/uniswap";
 import erc20 from "@studydefi/money-legos/erc20";
 
+/**
+ * @notice Buys 10 ETH worth of DAI on Uniswap for `wallet`.
+ * @param wallet ethers.Wallet object to mint DAI to.
+ */
 export const getDai = async (wallet: Wallet) => {
   const daiContract = new ethers.Contract(erc20.dai.address, erc20.abi, wallet);
 
