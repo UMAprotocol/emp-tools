@@ -1,4 +1,3 @@
-const fetch = require("node-fetch");
 const { utils } = require("ethers");
 
 // TODO: This is a really simple mapping of identifier to URL to query to get latest price for an identifier.
