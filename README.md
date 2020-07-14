@@ -1,8 +1,8 @@
 # EMP Tools
 
-A simple frontend for viewing EMP details and minting tokens.
+_Expiring Multi Party is UMA's most current financial smart contract template. This UI is a community-made tool to make interfacing with the protocol easier, please use at your own risk._
 
-I mostly made this because I really wanted to view the "live" GCR value. But then I just kept adding more and more features.
+Live frontend: https://emp-tools.vercel.app/
 
 ## Manual testing
 
@@ -20,3 +20,9 @@ The following instructions will spin up a test chain forked off mainnet and also
 3. Test.
 
 Beware, it might be a bit slow and you might need to "reset" your account on MetaMask to clear the nonce.
+
+## Deployment and Hosting
+
+Every push to the default branch causes a deployment to the primary domain. Every branch and PR pushed is also deployed to a unique subdomain, all thanks to Vercel.
+
+[![Powered by Vercel](./public/powered-by-vercel.svg)](https://vercel.com/?utm_source=uma%2Femp-tools)
