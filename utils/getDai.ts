@@ -27,7 +27,7 @@ export const getDai = async (wallet: Wallet) => {
   );
 
   // do the actual swapping of 10 ETH to DAI
-  await daiExchangeContract.ethToTokenSwapInput(
+  const swapTx = await daiExchangeContract.ethToTokenSwapInput(
     1, // min amount of token retrieved
     2525644800, // random timestamp in the future (year 2050)
     {
@@ -35,13 +35,10 @@ export const getDai = async (wallet: Wallet) => {
       value: ethers.utils.parseEther("10"),
     }
   );
+  console.log(`Swapped ETH for DAI: ${swapTx.hash}`);
 
   const ethAfter = await wallet.getBalance();
   const daiAfter = await daiContract.balanceOf(wallet.address);
   console.log("ETH balance", ethers.utils.formatEther(ethAfter), "ETH");
   console.log("DAI balance", ethers.utils.formatUnits(daiAfter), "DAI");
 };
-
-module.exports = { getDai };
-
-export {};

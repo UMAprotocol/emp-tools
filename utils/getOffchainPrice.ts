@@ -10,7 +10,7 @@ interface PriceFeedIdentifierMap {
 
 // TODO: Currently using the coinbase API instead of CryptoWatch because CryptoWatch has strict CORS
 // policy that prevents requests coming from localhost domains.
-const PRICE_FEEDS: PriceFeedIdentifierMap = {
+export const PRICE_FEEDS: PriceFeedIdentifierMap = {
   compusd: "https://api.pro.coinbase.com/products/COMP-USD/trades?limit=1",
   ethbtc: "https://api.pro.coinbase.com/products/ETH-BTC/trades?limit=1",
 };
@@ -24,7 +24,3 @@ export const getOffchainPrice = async (pricefeedIdentifier: string) => {
     console.error(`Failed to get price for: ${pricefeedIdentifier}:`, err);
   }
 };
-
-module.exports = { getOffchainPrice };
-
-export {};

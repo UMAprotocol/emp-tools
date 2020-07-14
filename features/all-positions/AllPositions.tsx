@@ -10,6 +10,7 @@ import {
   Container,
   Typography,
 } from "@material-ui/core";
+import styled from "styled-components";
 import { utils, BigNumberish, BigNumber } from "ethers";
 
 import Token from "../../containers/Token";
@@ -17,11 +18,16 @@ import EmpSponsors from "../../containers/EmpSponsors";
 import EmpContract from "../../containers/EmpContract";
 import PriceFeed from "../../containers/PriceFeed";
 
+const Link = styled.a`
+  color: white;
+  font-size: 18px;
+`;
+
 const AllPositions = () => {
   const { symbol: tokenSymbol } = Token.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { contract: emp } = EmpContract.useContainer();
-  const { latestPrice } = PriceFeed.useContainer();
+  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
 
   if (tokenSymbol === null || emp === null) {
     return (
@@ -55,10 +61,10 @@ const AllPositions = () => {
     <Container>
       <Box>
         <Typography>
-          <i>
-            Estimated prices are sourced from the latest trade data on Coinbase
-            Pro API.
-          </i>
+          <i>Estimated prices are sourced from the latest trade data on: </i>
+          <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
+            Coinbase Pro.
+          </Link>
         </Typography>
       </Box>
       <Box py={4}>
