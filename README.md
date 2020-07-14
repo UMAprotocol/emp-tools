@@ -20,3 +20,9 @@ The following instructions will spin up a test chain forked off mainnet and also
 3. Test.
 
 Beware, it might be a bit slow and you might need to "reset" your account on MetaMask to clear the nonce.
+
+## Deployment and Hosting
+
+Every push to the default branch causes a deployment to the primary domain. Every branch and PR pushed is also deployed to a unique subdomain, all thanks to Vercel.
+
+[![Powered by Vercel](./public/powered-by-vercel.svg)](https://vercel.com/?utm_source=uma%2Femp-tools)
