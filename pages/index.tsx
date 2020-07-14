@@ -44,7 +44,7 @@ export default function Index() {
                   rel="noopener noreferrer"
                 >
                   UMA
-                </a> 
+                </a>
                 's most current financial smart contract template. This UI is a
                 community-made tool to make interfacing with the protocol
                 easier, please use at your own risk. The source code can be
@@ -64,6 +64,15 @@ export default function Index() {
         )}
 
         {tabIndex === 1 && <ManagePosition />}
+      </Box>
+      <Box py={4} textAlign="center">
+        <a
+          href="https://vercel.com/?utm_source=uma%2Femp-tools"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src="/powered-by-vercel.svg" alt="Powered by Vercel"/>
+        </a>
       </Box>
     </Container>
   );
