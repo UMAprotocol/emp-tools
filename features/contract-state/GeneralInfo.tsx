@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ethers, BigNumberish } from "ethers";
+import { ethers } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";

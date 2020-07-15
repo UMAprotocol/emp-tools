@@ -28,6 +28,9 @@
     "babel-plugin-styled-components": "^1.11.0-0",
     "dotenv": "^8.2.0",
     "ganache-core": "^2.10.2",
+    "husky": "^4.2.3",
+    "lint-staged": ">=10",
+    "prettier": "^2.0.5",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   },
@@ -36,5 +39,13 @@
     "semi": true,
     "singleQuote": false
   },
-  "license": "ISC"
+  "husky": {
+    "hooks": {
+      "pre-commit": "echo '🛁 Linting staged files' && lint-staged && echo '🔏 Compiling Typescript' && npx tsc"
+    }
+  },
+  "license": "ISC",
+  "lint-staged": {
+    "*.{ts,tsx,css,html,md}": "prettier --write"
+  }
 }

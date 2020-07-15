@@ -8,10 +8,12 @@ import Connection from "../containers/Connection";
 import EmpContract from "../containers/EmpContract";
 import EmpAddress from "../containers/EmpAddress";
 import EmpState from "../containers/EmpState";
+import EmpSponsors from "../containers/EmpSponsors";
 import Collateral from "../containers/Collateral";
 import Token from "../containers/Token";
 import Position from "../containers/Position";
 import Totals from "../containers/Totals";
+import PriceFeed from "../containers/PriceFeed";
 
 interface IProps {
   children: React.ReactNode;
@@ -22,13 +24,17 @@ const WithStateContainerProviders = ({ children }: IProps) => (
     <EmpAddress.Provider>
       <EmpContract.Provider>
         <EmpState.Provider>
-          <Collateral.Provider>
-            <Token.Provider>
-              <Totals.Provider>
-                <Position.Provider>{children}</Position.Provider>
-              </Totals.Provider>
-            </Token.Provider>
-          </Collateral.Provider>
+          <EmpSponsors.Provider>
+            <Collateral.Provider>
+              <Token.Provider>
+                <Totals.Provider>
+                  <PriceFeed.Provider>
+                    <Position.Provider>{children}</Position.Provider>
+                  </PriceFeed.Provider>
+                </Totals.Provider>
+              </Token.Provider>
+            </Collateral.Provider>
+          </EmpSponsors.Provider>
         </EmpState.Provider>
       </EmpContract.Provider>
     </EmpAddress.Provider>
