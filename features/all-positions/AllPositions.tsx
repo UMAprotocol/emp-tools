@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import styled from "styled-components";
-import { utils, BigNumberish, BigNumber } from "ethers";
+import { utils, BigNumberish } from "ethers";
 
 import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
@@ -43,18 +43,20 @@ const AllPositions = () => {
 
   const activeEmpSponsors = activeSponsors[emp.address];
 
-  const prettyBalance = (x: BigNumberish | null) => {
-    return x === null ? "N/A" : utils.commify(utils.formatEther(x));
+  const prettyBalance = (x: BigNumberish) => {
+    try {
+      return utils.commify(x as string);
+    } catch (error) {
+      return "N/A";
+    }
   };
 
   const getCollateralRatio = (
-    collateral: BigNumber | null,
-    tokens: BigNumber | null
+    collateral: BigNumberish,
+    tokens: BigNumberish
   ) => {
-    if (collateral === null || tokens === null || latestPrice === null)
-      return null;
-    const tokensScaled = tokens.mul(latestPrice).div(utils.parseEther("1"));
-    return collateral.mul(utils.parseEther("1")).div(tokensScaled);
+    const tokensScaled = Number(tokens) * Number(latestPrice);
+    return Number(collateral) / tokensScaled;
   };
 
   return (
@@ -77,7 +79,7 @@ const AllPositions = () => {
                 <TableCell align="right">Tokens Outstanding</TableCell>
                 <TableCell align="right">
                   Collateral Ratio (using price:{" "}
-                  {latestPrice ? utils.formatEther(latestPrice) : "N/A"})
+                  {latestPrice ? latestPrice : "N/A"})
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -89,9 +91,7 @@ const AllPositions = () => {
                       {sponsor}
                     </TableCell>
                     <TableCell align="right">
-                      {prettyBalance(
-                        activeEmpSponsors[sponsor].lockedCollateral
-                      )}
+                      {prettyBalance(activeEmpSponsors[sponsor].collateral)}
                     </TableCell>
                     <TableCell align="right">
                       {prettyBalance(
@@ -101,7 +101,7 @@ const AllPositions = () => {
                     <TableCell align="right">
                       {prettyBalance(
                         getCollateralRatio(
-                          activeEmpSponsors[sponsor].lockedCollateral,
+                          activeEmpSponsors[sponsor].collateral,
                           activeEmpSponsors[sponsor].tokensOutstanding
                         )
                       )}
