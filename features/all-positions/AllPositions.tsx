@@ -44,11 +44,7 @@ const AllPositions = () => {
   const activeEmpSponsors = activeSponsors[emp.address];
 
   const prettyBalance = (x: BigNumberish) => {
-    try {
-      return utils.commify(x as string);
-    } catch (error) {
-      return "N/A";
-    }
+    return utils.commify(x as string);
   };
 
   const getCollateralRatio = (
@@ -85,29 +81,34 @@ const AllPositions = () => {
             </TableHead>
             <TableBody>
               {activeEmpSponsors &&
-                Object.keys(activeEmpSponsors).map((sponsor: string) => (
-                  <TableRow key={sponsor}>
-                    <TableCell component="th" scope="row">
-                      {sponsor}
-                    </TableCell>
-                    <TableCell align="right">
-                      {prettyBalance(activeEmpSponsors[sponsor].collateral)}
-                    </TableCell>
-                    <TableCell align="right">
-                      {prettyBalance(
-                        activeEmpSponsors[sponsor].tokensOutstanding
-                      )}
-                    </TableCell>
-                    <TableCell align="right">
-                      {prettyBalance(
-                        getCollateralRatio(
-                          activeEmpSponsors[sponsor].collateral,
-                          activeEmpSponsors[sponsor].tokensOutstanding
-                        )
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                Object.keys(activeEmpSponsors).map(
+                  (sponsor: string) =>
+                    activeEmpSponsors[sponsor] &&
+                    activeEmpSponsors[sponsor].collateral &&
+                    activeEmpSponsors[sponsor].tokensOutstanding && (
+                      <TableRow key={sponsor}>
+                        <TableCell component="th" scope="row">
+                          {sponsor}
+                        </TableCell>
+                        <TableCell align="right">
+                          {prettyBalance(activeEmpSponsors[sponsor].collateral)}
+                        </TableCell>
+                        <TableCell align="right">
+                          {prettyBalance(
+                            activeEmpSponsors[sponsor].tokensOutstanding
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {prettyBalance(
+                            getCollateralRatio(
+                              activeEmpSponsors[sponsor].collateral,
+                              activeEmpSponsors[sponsor].tokensOutstanding
+                            )
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    )
+                )}
             </TableBody>
           </Table>
         </TableContainer>
