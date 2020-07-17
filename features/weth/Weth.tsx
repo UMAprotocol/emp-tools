@@ -74,9 +74,7 @@ const Weth = () => {
   const {
     contract: weth,
     wethBalance,
-    wethAllowance,
     ethBalance,
-    setMaxAllowance,
   } = WethContract.useContainer();
   const { signer } = Connection.useContainer();
 
@@ -88,14 +86,9 @@ const Weth = () => {
 
   const etherscanUrl = useEtherscanUrl(hash);
 
-  const _submitTxn = async (
-    amount: BigNumberish | null,
-    action: ACTION_TYPE
-  ) => {
+  const _submitTxn = async (amount: string | null, action: ACTION_TYPE) => {
     if (weth) {
-      if (amount && utils.parseEther(amount as string).gt(0)) {
-        alert(action === ACTION_TYPE.WRAP ? "Wrapping!" : "Unwrapping!");
-
+      if (amount && utils.parseEther(amount).gt(0)) {
         setHash(null);
         setSuccess(null);
         setError(null);
@@ -104,12 +97,10 @@ const Weth = () => {
           let tx;
           if (action === ACTION_TYPE.WRAP) {
             tx = await weth.deposit({
-              value: utils.parseEther(amount as string),
+              value: utils.parseEther(amount),
             });
           } else {
-            tx = await weth.withdraw(
-              utils.parseEther(amount as string).toString()
-            );
+            tx = await weth.withdraw(utils.parseEther(amount).toString());
           }
           setHash(tx.hash as string);
           await tx.wait();
@@ -129,10 +120,10 @@ const Weth = () => {
 
     switch (action) {
       case ACTION_TYPE.WRAP:
-        _submitTxn(ethAmount, ACTION_TYPE.WRAP);
+        _submitTxn(ethAmount as string, ACTION_TYPE.WRAP);
         break;
       case ACTION_TYPE.UNWRAP:
-        _submitTxn(wethAmount, ACTION_TYPE.UNWRAP);
+        _submitTxn(wethAmount as string, ACTION_TYPE.UNWRAP);
         break;
       default:
         alert("Invalid action!");
@@ -141,6 +132,7 @@ const Weth = () => {
 
   const handleMax = () => {
     setWethAmount(wethBalance ? wethBalance.toString() : null);
+    console.log(wethAmount);
   };
 
   if (!signer) {
@@ -169,13 +161,6 @@ const Weth = () => {
             <IconAndNameContainer>
               <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
               <TokenName>WETH</TokenName>
-              <Button
-                onClick={setMaxAllowance}
-                variant="outlined"
-                color="secondary"
-              >
-                Unlock{" "}
-              </Button>
             </IconAndNameContainer>
             <TokenBalance>{wethBalance}</TokenBalance>
           </BalanceElement>
@@ -223,7 +208,6 @@ const Weth = () => {
                 value={wethAmount ? wethAmount : ""}
                 onChange={(e) => setWethAmount(e.target.value)}
                 variant="outlined"
-                helperText={`Current WETH allowance: ${wethAllowance}`}
                 InputLabelProps={{
                   shrink: true,
                 }}
