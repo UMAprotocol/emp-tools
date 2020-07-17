@@ -37,20 +37,20 @@ const useEmpSponsors = () => {
         console.error(`Apollo client failed to fetch graph data:`, error);
       }
       if (!loading && data) {
-        data.financialContracts
-          .find(
-            (contract: FinancialContractQuery) =>
-              utils.getAddress(contract.id) === emp.address
-          )
-          .sponsorPositions.forEach((position: PositionState) => {
-            const address = utils.getAddress(position.id.split("-")[0]);
+        const empData = data.financialContracts.find(
+          (contract: FinancialContractQuery) =>
+            utils.getAddress(contract.id) === emp.address
+        );
 
-            newPositions[address] = {
-              tokensOutstanding: position.tokensOutstanding,
-              collateral: position.collateral,
-              id: address,
-            };
-          });
+        empData.sponsorPositions.forEach((position: PositionState) => {
+          const address = utils.getAddress(position.id.split("-")[0]);
+
+          newPositions[address] = {
+            tokensOutstanding: position.tokensOutstanding,
+            collateral: position.collateral,
+            id: address,
+          };
+        });
 
         setActivePositions(newPositions);
       }
