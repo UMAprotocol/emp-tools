@@ -7,50 +7,70 @@ import {
 } from "@material-ui/core";
 import { FormEvent, useState } from "react";
 import { BigNumberish, utils } from "ethers";
+import styled from "styled-components";
 
 import WethContract from "../../containers/WethContract";
 import Connection from "../../containers/Connection";
+import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
 enum ACTION_TYPE {
   WRAP,
   UNWRAP,
 }
 
+const Link = styled.a`
+  color: white;
+  font-size: 14px;
+`;
+
 const Weth = () => {
-  const { contract: weth } = WethContract.useContainer();
+  const {
+    contract: weth,
+    wethBalance,
+    ethBalance,
+  } = WethContract.useContainer();
   const { signer } = Connection.useContainer();
 
-  const [ethAmount, setEthAmount] = useState<BigNumberish>("0");
-  const [wethAmount, setWethAmount] = useState<BigNumberish>("0");
+  const [ethAmount, setEthAmount] = useState<BigNumberish | null>(null);
+  const [wethAmount, setWethAmount] = useState<BigNumberish | null>(null);
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const _submitTxn = async (amount: BigNumberish, action: ACTION_TYPE) => {
-    if (weth && amount && utils.parseEther(amount as string).gt(0)) {
-      alert(action === ACTION_TYPE.WRAP ? "Wrapping!" : "Unwrapping!");
+  const etherscanUrl = useEtherscanUrl(hash);
 
-      setHash(null);
-      setSuccess(null);
-      setError(null);
+  const _submitTxn = async (
+    amount: BigNumberish | null,
+    action: ACTION_TYPE
+  ) => {
+    if (weth) {
+      if (amount && utils.parseEther(amount as string).gt(0)) {
+        alert(action === ACTION_TYPE.WRAP ? "Wrapping!" : "Unwrapping!");
 
-      try {
-        let tx;
-        if (action === ACTION_TYPE.WRAP) {
-          tx = await weth.deposit({
-            value: utils.parseEther(amount as string),
-          });
-        } else {
-          tx = await weth.withdraw(
-            utils.parseEther(amount as string).toString()
-          );
+        setHash(null);
+        setSuccess(null);
+        setError(null);
+
+        try {
+          let tx;
+          if (action === ACTION_TYPE.WRAP) {
+            tx = await weth.deposit({
+              value: utils.parseEther(amount as string),
+            });
+          } else {
+            tx = await weth.withdraw(
+              utils.parseEther(amount as string).toString()
+            );
+          }
+          setHash(tx.hash as string);
+          await tx.wait();
+          setSuccess(true);
+        } catch (error) {
+          console.error(error);
+          setError(error);
         }
-        setHash(tx.hash as string);
-        await tx.wait();
-        setSuccess(true);
-      } catch (error) {
-        console.error(error);
-        setError(error);
+      } else {
+        setError(new Error("Invalid amount"));
       }
     } else {
       setError(new Error("Please check that you are connected."));
@@ -65,7 +85,7 @@ const Weth = () => {
         _submitTxn(ethAmount, ACTION_TYPE.WRAP);
         break;
       case ACTION_TYPE.UNWRAP:
-        _submitTxn(ethAmount, ACTION_TYPE.UNWRAP);
+        _submitTxn(wethAmount, ACTION_TYPE.UNWRAP);
         break;
       default:
         alert("Invalid action!");
@@ -84,6 +104,10 @@ const Weth = () => {
 
   return (
     <Box py={4}>
+      <Box pt={4}>
+        <Typography>WETH: {wethBalance}</Typography>
+        <Typography>ETH: {ethBalance}</Typography>
+      </Box>
       <Box pt={4}>
         <form
           noValidate
@@ -133,6 +157,38 @@ const Weth = () => {
           />
         </form>
       </Box>
+      {hash && (
+        <Box py={4}>
+          <Typography>
+            <strong>Tx Receipt: </strong>
+            {etherscanUrl ? (
+              <Link
+                href={etherscanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
+            ) : (
+              hash
+            )}
+          </Typography>
+        </Box>
+      )}
+      {success && (
+        <Box py={4}>
+          <Typography>
+            <strong>Transaction successful!</strong>
+          </Typography>
+        </Box>
+      )}
+      {error && (
+        <Box py={2}>
+          <Typography>
+            <span style={{ color: "red" }}>{error.message}</span>
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 };

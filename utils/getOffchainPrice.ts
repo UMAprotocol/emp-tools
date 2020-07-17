@@ -1,5 +1,3 @@
-const { utils } = require("ethers");
-
 // TODO: This is a really simple mapping of identifier to URL to query to get latest price for an identifier.
 // Future work should blend off-chain prices from different sources similar to how we do it in
 // `protocol/financial-templates-lib/price-feed/MedianizerPriceFeed.js`
