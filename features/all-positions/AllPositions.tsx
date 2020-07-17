@@ -41,7 +41,8 @@ const AllPositions = () => {
     );
   }
 
-  const prettyBalance = (x: BigNumberish) => {
+  const prettyBalance = (x: BigNumberish | null) => {
+    if (!x) return "N/A";
     return utils.commify(x as string);
   };
 
@@ -49,6 +50,7 @@ const AllPositions = () => {
     collateral: BigNumberish,
     tokens: BigNumberish
   ) => {
+    if (!latestPrice) return null;
     const tokensScaled = Number(tokens) * Number(latestPrice);
     return Number(collateral) / tokensScaled;
   };
