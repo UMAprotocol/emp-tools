@@ -41,8 +41,6 @@ const AllPositions = () => {
     );
   }
 
-  const activeEmpSponsors = activeSponsors[emp.address];
-
   const prettyBalance = (x: BigNumberish) => {
     return utils.commify(x as string);
   };
@@ -66,52 +64,53 @@ const AllPositions = () => {
         </Typography>
       </Box>
       <Box py={4}>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Active Sponsor</TableCell>
-                <TableCell align="right">Locked Collateral</TableCell>
-                <TableCell align="right">Tokens Outstanding</TableCell>
-                <TableCell align="right">
-                  Collateral Ratio (using price:{" "}
-                  {latestPrice ? latestPrice : "N/A"})
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {activeEmpSponsors &&
-                Object.keys(activeEmpSponsors).map(
+        {activeSponsors && (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Active Sponsor</TableCell>
+                  <TableCell align="right">Locked Collateral</TableCell>
+                  <TableCell align="right">Tokens Outstanding</TableCell>
+                  <TableCell align="right">
+                    Collateral Ratio (using price:{" "}
+                    {latestPrice ? latestPrice : "N/A"})
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Object.keys(activeSponsors).map(
                   (sponsor: string) =>
-                    activeEmpSponsors[sponsor] &&
-                    activeEmpSponsors[sponsor].collateral &&
-                    activeEmpSponsors[sponsor].tokensOutstanding && (
+                    activeSponsors[sponsor] &&
+                    activeSponsors[sponsor].collateral &&
+                    activeSponsors[sponsor].tokensOutstanding && (
                       <TableRow key={sponsor}>
                         <TableCell component="th" scope="row">
                           {sponsor}
                         </TableCell>
                         <TableCell align="right">
-                          {prettyBalance(activeEmpSponsors[sponsor].collateral)}
+                          {prettyBalance(activeSponsors[sponsor].collateral)}
                         </TableCell>
                         <TableCell align="right">
                           {prettyBalance(
-                            activeEmpSponsors[sponsor].tokensOutstanding
+                            activeSponsors[sponsor].tokensOutstanding
                           )}
                         </TableCell>
                         <TableCell align="right">
                           {prettyBalance(
                             getCollateralRatio(
-                              activeEmpSponsors[sponsor].collateral,
-                              activeEmpSponsors[sponsor].tokensOutstanding
+                              activeSponsors[sponsor].collateral,
+                              activeSponsors[sponsor].tokensOutstanding
                             )
                           )}
                         </TableCell>
                       </TableRow>
                     )
                 )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </Container>
   );
