@@ -8,6 +8,9 @@ export const ACTIVE_POSITIONS = gql`
         id
         collateral
         tokensOutstanding
+        sponsor {
+          id
+        }
       }
     }
   }

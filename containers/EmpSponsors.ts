@@ -7,19 +7,28 @@ import EmpContract from "./EmpContract";
 import { useQuery } from "@apollo/client";
 import { ACTIVE_POSITIONS } from "../apollo/queries";
 
+// Interfaces for dApp state storage.
 interface PositionState {
   tokensOutstanding: BigNumberish;
   collateral: BigNumberish;
-  id: string;
+}
+
+interface SponsorPositionState extends PositionState {
+  sponsor: string;
 }
 
 interface SponsorMap {
-  [address: string]: PositionState;
+  [sponsor: string]: SponsorPositionState;
+}
+
+// Interfaces for GraphQl queries.
+interface PositionQuery extends PositionState {
+  sponsor: { id: string };
 }
 
 interface FinancialContractQuery {
   id: string;
-  sponsorPositions: PositionState;
+  sponsorPositions: PositionQuery;
 }
 
 const useEmpSponsors = () => {
@@ -42,13 +51,13 @@ const useEmpSponsors = () => {
             utils.getAddress(contract.id) === emp.address
         );
 
-        empData.sponsorPositions.forEach((position: PositionState) => {
-          const address = utils.getAddress(position.id.split("-")[0]);
+        empData.sponsorPositions.forEach((position: PositionQuery) => {
+          const sponsor = utils.getAddress(position.sponsor.id);
 
-          newPositions[address] = {
+          newPositions[sponsor] = {
             tokensOutstanding: position.tokensOutstanding,
             collateral: position.collateral,
-            id: address,
+            sponsor,
           };
         });
 
