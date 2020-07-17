@@ -81,34 +81,34 @@ const AllPositions = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Object.keys(activeSponsors).map(
-                  (sponsor: string) =>
-                    activeSponsors[sponsor] &&
-                    activeSponsors[sponsor].collateral &&
-                    activeSponsors[sponsor].tokensOutstanding && (
+                {Object.keys(activeSponsors).map((sponsor: string) => {
+                  const activeSponsor = activeSponsors[sponsor];
+                  return (
+                    activeSponsor &&
+                    activeSponsor.collateral &&
+                    activeSponsor.tokensOutstanding && (
                       <TableRow key={sponsor}>
                         <TableCell component="th" scope="row">
                           {sponsor}
                         </TableCell>
                         <TableCell align="right">
-                          {prettyBalance(activeSponsors[sponsor].collateral)}
+                          {prettyBalance(activeSponsor.collateral)}
                         </TableCell>
                         <TableCell align="right">
-                          {prettyBalance(
-                            activeSponsors[sponsor].tokensOutstanding
-                          )}
+                          {prettyBalance(activeSponsor.tokensOutstanding)}
                         </TableCell>
                         <TableCell align="right">
                           {prettyBalance(
                             getCollateralRatio(
-                              activeSponsors[sponsor].collateral,
-                              activeSponsors[sponsor].tokensOutstanding
+                              activeSponsor.collateral,
+                              activeSponsor.tokensOutstanding
                             )
                           )}
                         </TableCell>
                       </TableRow>
                     )
-                )}
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
