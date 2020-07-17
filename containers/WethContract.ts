@@ -14,32 +14,27 @@ function useContract() {
   const getBalanceInfo = async () => {
     if (contract) {
       const wethBalanceRaw: BigNumber = await contract.balanceOf(address);
-      console.log(wethBalanceRaw.toString());
-
-      // calculate readable balances.
       const wethBalance = parseFloat(utils.formatEther(wethBalanceRaw));
-
       setWethBalance(wethBalance);
     }
+
     if (provider) {
       const ethBalanceRaw: BigNumber = await provider.getBalance(
         address as string
       );
-      console.log(ethBalanceRaw.toString());
-
-      // calculate readable balances.
       const ethBalance = parseFloat(utils.formatEther(ethBalanceRaw));
-
       setEthBalance(ethBalance);
     }
   };
 
-  // get token info when contract changes
+  // get token info when contract changes or when address is reset
   useEffect(() => {
     setWethBalance(null);
     setEthBalance(null);
-    getBalanceInfo();
-  }, [contract]);
+    if (address) {
+      getBalanceInfo();
+    }
+  }, [contract, address, provider]);
 
   // get token info on each new block
   useEffect(() => {
@@ -47,7 +42,7 @@ function useContract() {
       const sub = block$.subscribe(() => getBalanceInfo());
       return () => sub.unsubscribe();
     }
-  }, [block$, signer, contract]);
+  }, [block$, contract, address, provider]);
 
   useEffect(() => {
     if (signer) {

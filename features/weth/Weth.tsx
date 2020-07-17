@@ -23,6 +23,60 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
+const MaxLink = styled.div`
+  text-decoration-line: underline;
+  color: var(--link-text);
+`;
+
+const TokenIcon = styled.img`
+  width: 20px;
+  height: 20px;
+  margin-right: 13px;
+`;
+
+const TokenName = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const IconAndNameContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const TokenBalance = styled.div`
+  display: flex;
+  align-items: center;
+  text-align: center;
+`;
+
+const BalanceElement = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: var(--highlighted-selector-text);
+  padding: 0px 30px 0px 30px;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 22px;
+  margin-top: 20px;
+`;
+
+const InputElement = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: var(--highlighted-selector-text);
+  padding: 0px 30px 0px 30px;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 22px;
+  margin-top: 20px;
+`;
+
 const Weth = () => {
   const {
     contract: weth,
@@ -69,8 +123,6 @@ const Weth = () => {
           console.error(error);
           setError(error);
         }
-      } else {
-        setError(new Error("Invalid amount"));
       }
     } else {
       setError(new Error("Please check that you are connected."));
@@ -92,6 +144,10 @@ const Weth = () => {
     }
   };
 
+  const handleMax = () => {
+    setWethAmount(wethBalance ? wethBalance.toString() : null);
+  };
+
   if (!signer) {
     return (
       <Box>
@@ -105,57 +161,84 @@ const Weth = () => {
   return (
     <Box py={4}>
       <Box pt={4}>
-        <Typography>WETH: {wethBalance}</Typography>
-        <Typography>ETH: {ethBalance}</Typography>
+        <BalanceElement>
+          <IconAndNameContainer>
+            <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
+            <TokenName>ETH</TokenName>
+          </IconAndNameContainer>
+          <TokenBalance>{ethBalance}</TokenBalance>
+        </BalanceElement>
+        <InputElement>
+          <form
+            noValidate
+            autoComplete="off"
+            onSubmit={(e) => handleClick(e, ACTION_TYPE.WRAP)}
+          >
+            <TextField
+              type="number"
+              label="ETH"
+              value={ethAmount ? ethAmount : ""}
+              onChange={(e) => setEthAmount(e.target.value)}
+              variant="outlined"
+              helperText="Keep some ETH unwrapped for transaction fees"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button type="submit" variant="contained">
+                      Wrap
+                    </Button>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </form>
+        </InputElement>
       </Box>
       <Box pt={4}>
-        <form
-          noValidate
-          autoComplete="off"
-          onSubmit={(e) => handleClick(e, ACTION_TYPE.WRAP)}
-        >
-          <TextField
-            type="number"
-            label="ETH"
-            value={ethAmount}
-            onChange={(e) => setEthAmount(e.target.value)}
-            variant="outlined"
-            helperText="Keep some ETH unwrapped for transaction fees"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button type="submit" variant="contained">
-                    Wrap
-                  </Button>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </form>
-      </Box>
-      <Box pt={4}>
-        <form
-          noValidate
-          autoComplete="off"
-          onSubmit={(e) => handleClick(e, ACTION_TYPE.UNWRAP)}
-        >
-          <TextField
-            type="number"
-            label="WETH"
-            value={wethAmount}
-            onChange={(e) => setWethAmount(e.target.value)}
-            variant="outlined"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button type="submit" variant="contained">
-                    Unwrap
-                  </Button>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </form>
+        <BalanceElement>
+          <IconAndNameContainer>
+            <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
+            <TokenName>WETH</TokenName>
+          </IconAndNameContainer>
+          <TokenBalance>{wethBalance}</TokenBalance>
+        </BalanceElement>
+        <InputElement>
+          <form
+            noValidate
+            autoComplete="off"
+            onSubmit={(e) => handleClick(e, ACTION_TYPE.UNWRAP)}
+          >
+            <TextField
+              type="number"
+              label="WETH"
+              value={wethAmount ? wethAmount : ""}
+              onChange={(e) => setWethAmount(e.target.value)}
+              variant="outlined"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Button onClick={() => handleMax()}>
+                      <MaxLink>Max</MaxLink>
+                    </Button>
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button type="submit" variant="contained">
+                      Unwrap
+                    </Button>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </form>
+        </InputElement>
       </Box>
       {hash && (
         <Box py={4}>
