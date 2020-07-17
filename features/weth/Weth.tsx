@@ -25,7 +25,6 @@ const Link = styled.a`
 
 const MaxLink = styled.div`
   text-decoration-line: underline;
-  color: var(--link-text);
 `;
 
 const TokenIcon = styled.img`
@@ -55,12 +54,6 @@ const BalanceElement = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  color: var(--highlighted-selector-text);
-  padding: 0px 30px 0px 30px;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 22px;
   margin-top: 20px;
 `;
 
@@ -68,20 +61,21 @@ const InputElement = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  color: var(--highlighted-selector-text);
-  padding: 0px 30px 0px 30px;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 22px;
   margin-top: 20px;
+`;
+
+const Container = styled.div`
+  padding: 1rem;
+  border: 1px solid #434343;
 `;
 
 const Weth = () => {
   const {
     contract: weth,
     wethBalance,
+    wethAllowance,
     ethBalance,
+    setMaxAllowance,
   } = WethContract.useContainer();
   const { signer } = Connection.useContainer();
 
@@ -161,84 +155,93 @@ const Weth = () => {
   return (
     <Box py={4}>
       <Box pt={4}>
-        <BalanceElement>
-          <IconAndNameContainer>
-            <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
-            <TokenName>ETH</TokenName>
-          </IconAndNameContainer>
-          <TokenBalance>{ethBalance}</TokenBalance>
-        </BalanceElement>
-        <InputElement>
-          <form
-            noValidate
-            autoComplete="off"
-            onSubmit={(e) => handleClick(e, ACTION_TYPE.WRAP)}
-          >
-            <TextField
-              type="number"
-              label="ETH"
-              value={ethAmount ? ethAmount : ""}
-              onChange={(e) => setEthAmount(e.target.value)}
-              variant="outlined"
-              helperText="Keep some ETH unwrapped for transaction fees"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Button type="submit" variant="contained">
-                      Wrap
-                    </Button>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </form>
-        </InputElement>
+        <Container>
+          <Typography variant="h5">My Wallet</Typography>
+          <BalanceElement>
+            <IconAndNameContainer>
+              <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
+              <TokenName>ETH</TokenName>
+            </IconAndNameContainer>
+            <TokenBalance>{ethBalance}</TokenBalance>
+          </BalanceElement>
+          <BalanceElement>
+            <IconAndNameContainer>
+              <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
+              <TokenName>WETH</TokenName>
+            </IconAndNameContainer>
+            <TokenBalance>{wethBalance}</TokenBalance>
+          </BalanceElement>
+          <BalanceElement>
+            <Button onClick={setMaxAllowance}>Unlock WETH </Button>
+          </BalanceElement>
+        </Container>
       </Box>
       <Box pt={4}>
-        <BalanceElement>
-          <IconAndNameContainer>
-            <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
-            <TokenName>WETH</TokenName>
-          </IconAndNameContainer>
-          <TokenBalance>{wethBalance}</TokenBalance>
-        </BalanceElement>
-        <InputElement>
-          <form
-            noValidate
-            autoComplete="off"
-            onSubmit={(e) => handleClick(e, ACTION_TYPE.UNWRAP)}
-          >
-            <TextField
-              type="number"
-              label="WETH"
-              value={wethAmount ? wethAmount : ""}
-              onChange={(e) => setWethAmount(e.target.value)}
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Button onClick={() => handleMax()}>
-                      <MaxLink>Max</MaxLink>
-                    </Button>
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Button type="submit" variant="contained">
-                      Unwrap
-                    </Button>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </form>
-        </InputElement>
+        <Container>
+          <InputElement>
+            <form
+              noValidate
+              autoComplete="off"
+              onSubmit={(e) => handleClick(e, ACTION_TYPE.WRAP)}
+            >
+              <TextField
+                type="number"
+                label="ETH"
+                value={ethAmount ? ethAmount : ""}
+                onChange={(e) => setEthAmount(e.target.value)}
+                variant="outlined"
+                helperText="Keep some ETH unwrapped for transaction fees"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button type="submit" variant="contained">
+                        Wrap
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </form>
+          </InputElement>
+          <InputElement>
+            <form
+              noValidate
+              autoComplete="off"
+              onSubmit={(e) => handleClick(e, ACTION_TYPE.UNWRAP)}
+            >
+              <TextField
+                type="number"
+                label="WETH"
+                value={wethAmount ? wethAmount : ""}
+                onChange={(e) => setWethAmount(e.target.value)}
+                variant="outlined"
+                helperText={`Current WETH allowance: ${wethAllowance}`}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Button onClick={() => handleMax()}>
+                        <MaxLink>Max</MaxLink>
+                      </Button>
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button type="submit" variant="contained">
+                        Unwrap
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </form>
+          </InputElement>
+        </Container>
       </Box>
       {hash && (
         <Box py={4}>
