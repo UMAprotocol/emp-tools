@@ -36,6 +36,7 @@ const TokenIcon = styled.img`
 const TokenName = styled.div`
   display: flex;
   align-items: center;
+  margin-right: 13px;
 `;
 
 const IconAndNameContainer = styled.div`
@@ -168,11 +169,15 @@ const Weth = () => {
             <IconAndNameContainer>
               <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
               <TokenName>WETH</TokenName>
+              <Button
+                onClick={setMaxAllowance}
+                variant="outlined"
+                color="secondary"
+              >
+                Unlock{" "}
+              </Button>
             </IconAndNameContainer>
             <TokenBalance>{wethBalance}</TokenBalance>
-          </BalanceElement>
-          <BalanceElement>
-            <Button onClick={setMaxAllowance}>Unlock WETH </Button>
           </BalanceElement>
         </Container>
       </Box>
