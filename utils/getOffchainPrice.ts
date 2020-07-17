@@ -21,5 +21,6 @@ export const getOffchainPrice = async (pricefeedIdentifier: string) => {
     return json[0].price as number;
   } catch (err) {
     console.error(`Failed to get price for: ${pricefeedIdentifier}:`, err);
+    return null;
   }
 };

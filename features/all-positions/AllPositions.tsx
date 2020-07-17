@@ -41,9 +41,8 @@ const AllPositions = () => {
     );
   }
 
-  const activeEmpSponsors = activeSponsors[emp.address];
-
-  const prettyBalance = (x: BigNumberish) => {
+  const prettyBalance = (x: BigNumberish | null) => {
+    if (!x) return "N/A";
     return utils.commify(x as string);
   };
 
@@ -51,6 +50,7 @@ const AllPositions = () => {
     collateral: BigNumberish,
     tokens: BigNumberish
   ) => {
+    if (!latestPrice) return null;
     const tokensScaled = Number(tokens) * Number(latestPrice);
     return Number(collateral) / tokensScaled;
   };
@@ -66,52 +66,53 @@ const AllPositions = () => {
         </Typography>
       </Box>
       <Box py={4}>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Active Sponsor</TableCell>
-                <TableCell align="right">Locked Collateral</TableCell>
-                <TableCell align="right">Tokens Outstanding</TableCell>
-                <TableCell align="right">
-                  Collateral Ratio (using price:{" "}
-                  {latestPrice ? latestPrice : "N/A"})
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {activeEmpSponsors &&
-                Object.keys(activeEmpSponsors).map(
-                  (sponsor: string) =>
-                    activeEmpSponsors[sponsor] &&
-                    activeEmpSponsors[sponsor].collateral &&
-                    activeEmpSponsors[sponsor].tokensOutstanding && (
+        {activeSponsors && (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Active Sponsor</TableCell>
+                  <TableCell align="right">Locked Collateral</TableCell>
+                  <TableCell align="right">Tokens Outstanding</TableCell>
+                  <TableCell align="right">
+                    Collateral Ratio (using price:{" "}
+                    {latestPrice ? latestPrice : "N/A"})
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Object.keys(activeSponsors).map((sponsor: string) => {
+                  const activeSponsor = activeSponsors[sponsor];
+                  return (
+                    activeSponsor &&
+                    activeSponsor.collateral &&
+                    activeSponsor.tokensOutstanding && (
                       <TableRow key={sponsor}>
                         <TableCell component="th" scope="row">
                           {sponsor}
                         </TableCell>
                         <TableCell align="right">
-                          {prettyBalance(activeEmpSponsors[sponsor].collateral)}
+                          {prettyBalance(activeSponsor.collateral)}
                         </TableCell>
                         <TableCell align="right">
-                          {prettyBalance(
-                            activeEmpSponsors[sponsor].tokensOutstanding
-                          )}
+                          {prettyBalance(activeSponsor.tokensOutstanding)}
                         </TableCell>
                         <TableCell align="right">
                           {prettyBalance(
                             getCollateralRatio(
-                              activeEmpSponsors[sponsor].collateral,
-                              activeEmpSponsors[sponsor].tokensOutstanding
+                              activeSponsor.collateral,
+                              activeSponsor.tokensOutstanding
                             )
                           )}
                         </TableCell>
                       </TableRow>
                     )
-                )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </Container>
   );

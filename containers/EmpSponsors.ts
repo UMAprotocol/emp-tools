@@ -2,84 +2,73 @@ import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 import { BigNumberish, utils } from "ethers";
 
-import Connection from "./Connection";
 import EmpContract from "./EmpContract";
 
 import { useQuery } from "@apollo/client";
 import { ACTIVE_POSITIONS } from "../apollo/queries";
 
+// Interfaces for dApp state storage.
 interface PositionState {
   tokensOutstanding: BigNumberish;
   collateral: BigNumberish;
-  id: string;
+}
+
+interface SponsorPositionState extends PositionState {
+  sponsor: string;
 }
 
 interface SponsorMap {
-  [address: string]: PositionState;
+  [sponsor: string]: SponsorPositionState;
 }
 
-interface EmpMap {
-  [address: string]: SponsorMap;
+// Interfaces for GraphQl queries.
+interface PositionQuery extends PositionState {
+  sponsor: { id: string };
 }
 
 interface FinancialContractQuery {
   id: string;
-  sponsorPositions: PositionState;
+  sponsorPositions: PositionQuery;
 }
 
 const useEmpSponsors = () => {
-  const { block$ } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { loading, error, data } = useQuery(ACTIVE_POSITIONS);
 
-  const [activePositions, setActivePositions] = useState<EmpMap>({});
+  const [activePositions, setActivePositions] = useState<SponsorMap>({});
 
   // get position information about every sponsor that has ever created a position.
   const querySponsors = async () => {
+    // Start with a fresh table.
+    let newPositions: SponsorMap = {};
     if (emp) {
       if (error) {
         console.error(`Apollo client failed to fetch graph data:`, error);
       }
       if (!loading && data) {
-        // Create a clone of the active-positions mapping that we can update.
-        let newPositions = { ...activePositions };
+        const empData = data.financialContracts.find(
+          (contract: FinancialContractQuery) =>
+            utils.getAddress(contract.id) === emp.address
+        );
 
-        // Map all active sponsor information to each EMP.
-        if (!newPositions[emp.address]) {
-          newPositions[emp.address] = {};
-        }
+        empData.sponsorPositions.forEach((position: PositionQuery) => {
+          const sponsor = utils.getAddress(position.sponsor.id);
 
-        data.financialContracts
-          .find(
-            (contract: FinancialContractQuery) =>
-              utils.getAddress(contract.id) === emp.address
-          )
-          .sponsorPositions.forEach((position: PositionState) => {
-            const address = utils.getAddress(position.id.split("-")[0]);
+          newPositions[sponsor] = {
+            tokensOutstanding: position.tokensOutstanding,
+            collateral: position.collateral,
+            sponsor,
+          };
+        });
 
-            newPositions[emp.address][address] = {
-              tokensOutstanding: position.tokensOutstanding,
-              collateral: position.collateral,
-              id: address,
-            };
-            setActivePositions(newPositions);
-          });
+        setActivePositions(newPositions);
       }
     }
   };
 
-  // Update sponsor list when emp state changes and graphql query stops loading
   useEffect(() => {
     querySponsors();
-  }, [loading, emp]);
-
-  // get state on each block
-  useEffect(() => {
-    if (block$) {
-      const sub = block$.subscribe(() => querySponsors());
-      return () => sub.unsubscribe();
-    }
-  }, [block$, emp]);
+  }, [emp]);
 
   return { activeSponsors: activePositions };
 };
