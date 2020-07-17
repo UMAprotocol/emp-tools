@@ -33,7 +33,10 @@ interface FinancialContractQuery {
 
 const useEmpSponsors = () => {
   const { contract: emp } = EmpContract.useContainer();
-  const { loading, error, data } = useQuery(ACTIVE_POSITIONS);
+  const { loading, error, data, networkStatus } = useQuery(ACTIVE_POSITIONS, {
+    pollInterval: 1000,
+    notifyOnNetworkStatusChange: true,
+  });
 
   const [activePositions, setActivePositions] = useState<SponsorMap>({});
 
@@ -66,9 +69,10 @@ const useEmpSponsors = () => {
     }
   };
 
+  // Change state when emp changes or when the graphQL networkStatus changes. This will change every `pollInterval` ms when data is polled anew.
   useEffect(() => {
     querySponsors();
-  }, [emp]);
+  }, [emp, networkStatus]);
 
   return { activeSponsors: activePositions };
 };
