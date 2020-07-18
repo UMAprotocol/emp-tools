@@ -18,6 +18,9 @@ enum ACTION_TYPE {
   UNWRAP,
 }
 
+const ETHEREUM_LOGO_URL =
+  "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png";
+
 const Link = styled.a`
   color: white;
   font-size: 14px;
@@ -109,6 +112,8 @@ const Weth = () => {
           console.error(error);
           setError(error);
         }
+      } else {
+        setError(new Error("Invalid amount"));
       }
     } else {
       setError(new Error("Please check that you are connected."));
@@ -131,8 +136,7 @@ const Weth = () => {
   };
 
   const handleMax = () => {
-    setWethAmount(wethBalance ? wethBalance.toString() : null);
-    console.log(wethAmount);
+    setWethAmount(wethBalance ? (wethBalance as string) : null);
   };
 
   if (!signer) {
@@ -152,14 +156,14 @@ const Weth = () => {
           <Typography variant="h5">My Wallet</Typography>
           <BalanceElement>
             <IconAndNameContainer>
-              <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
+              <TokenIcon src={ETHEREUM_LOGO_URL} />
               <TokenName>ETH</TokenName>
             </IconAndNameContainer>
             <TokenBalance>{ethBalance}</TokenBalance>
           </BalanceElement>
           <BalanceElement>
             <IconAndNameContainer>
-              <TokenIcon src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
+              <TokenIcon src={ETHEREUM_LOGO_URL} />
               <TokenName>WETH</TokenName>
             </IconAndNameContainer>
             <TokenBalance>{wethBalance}</TokenBalance>

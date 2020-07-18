@@ -1,6 +1,6 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { ethers, BigNumber, utils } from "ethers";
+import { ethers, BigNumber, utils, BigNumberish } from "ethers";
 import { weth } from "@studydefi/money-legos/erc20";
 
 import Connection from "./Connection";
@@ -8,20 +8,18 @@ import Connection from "./Connection";
 function useContract() {
   const { signer, address, block$, provider } = Connection.useContainer();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
-  const [ethBalance, setEthBalance] = useState<string | null>(null);
-  const [wethBalance, setWethBalance] = useState<string | null>(null);
+  const [ethBalance, setEthBalance] = useState<BigNumberish | null>(null);
+  const [wethBalance, setWethBalance] = useState<BigNumberish | null>(null);
 
   const getTokenInfo = async () => {
-    if (contract) {
+    if (contract && address) {
       const wethBalanceRaw: BigNumber = await contract.balanceOf(address);
       const wethBalance = utils.formatEther(wethBalanceRaw);
       setWethBalance(wethBalance);
     }
 
-    if (provider) {
-      const ethBalanceRaw: BigNumber = await provider.getBalance(
-        address as string
-      );
+    if (provider && address) {
+      const ethBalanceRaw: BigNumber = await provider.getBalance(address);
       const ethBalance = utils.formatEther(ethBalanceRaw);
       setEthBalance(ethBalance);
     }
@@ -31,9 +29,7 @@ function useContract() {
   useEffect(() => {
     setWethBalance(null);
     setEthBalance(null);
-    if (address) {
-      getTokenInfo();
-    }
+    getTokenInfo();
   }, [contract, address, provider]);
 
   // get token info on each new block
