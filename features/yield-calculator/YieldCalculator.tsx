@@ -29,21 +29,42 @@ const FormInput = styled.div`
 const YieldCalculator = () => {
   const [tokenAmount, setTokenAmount] = useState<number | null>(100);
   const [tokenPrice, setTokenPrice] = useState<number | null>(
-    Math.random() * 12 + 240
+    1 - Math.random() * 0.1
   );
-  const [daysToExpiry, setDaysToExpiry] = useState<number | null>();
-  const expirationTimestamp = 1598918400;
 
   // TODO: Put this in a container and update it every second.
+  const expirationTimestamp = 1598918400;
   const calculateDaysToExpiry = () => {
     const currentTimestamp = Math.round(Date.now() / 1000);
     const secondsToExpiry = expirationTimestamp - currentTimestamp;
 
     return Math.round(secondsToExpiry / (60 * 60 * 24));
   };
+  const [daysToExpiry, setDaysToExpiry] = useState<number | null>(
+    calculateDaysToExpiry()
+  );
+
+  const calculateYield = () => {
+    if (!tokenPrice || tokenPrice <= 0) {
+      return null;
+    }
+    if (!daysToExpiry || daysToExpiry <= 0) {
+      return null;
+    }
+    if (!tokenAmount || daysToExpiry <= 0) {
+      return null;
+    }
+    const yieldPerUnit = Math.pow(1 / tokenPrice, 1 / 365 / daysToExpiry) - 1;
+    return yieldPerUnit * tokenAmount;
+  };
+  const [yieldAmount, setYieldAmount] = useState<number | null>(
+    calculateYield()
+  );
 
   const handleClick = (e: FormEvent) => {
     e.preventDefault();
+
+    setYieldAmount(calculateYield());
   };
 
   return (
@@ -55,7 +76,7 @@ const YieldCalculator = () => {
             <TextField
               type="number"
               label="yUSD Quantity"
-              value={tokenAmount ? tokenAmount : ""}
+              value={tokenAmount !== null ? tokenAmount : ""}
               onChange={(e) => setTokenAmount(parseFloat(e.target.value))}
               variant="outlined"
               InputLabelProps={{
@@ -67,7 +88,7 @@ const YieldCalculator = () => {
             <TextField
               type="number"
               label="Current yUSD Price"
-              value={tokenPrice ? tokenPrice : ""}
+              value={tokenPrice !== null ? tokenPrice : ""}
               onChange={(e) => setTokenPrice(parseFloat(e.target.value))}
               helperText={`Sourced from https://balancer.exchange`}
               variant="outlined"
@@ -80,9 +101,8 @@ const YieldCalculator = () => {
             <TextField
               type="number"
               label="Days to Expiry"
-              defaultValue={
-                calculateDaysToExpiry() ? calculateDaysToExpiry() : ""
-              }
+              value={daysToExpiry !== null ? daysToExpiry : ""}
+              onChange={(e) => setDaysToExpiry(parseFloat(e.target.value))}
               helperText={`Expiration time: ${new Date(
                 expirationTimestamp * 1000
               )}`}
@@ -92,6 +112,19 @@ const YieldCalculator = () => {
               }}
             />
           </FormInput>
+          <FormInput>
+            <TextField
+              disabled
+              type="number"
+              label="Yield"
+              value={yieldAmount !== null ? yieldAmount : ""}
+              variant="outlined"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </FormInput>
+          <Button type="submit">Calculate</Button>
         </form>
       </Container>
     </Box>
