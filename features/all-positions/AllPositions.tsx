@@ -84,9 +84,8 @@ const AllPositions = () => {
                 {Object.keys(activeSponsors).map((sponsor: string) => {
                   const activeSponsor = activeSponsors[sponsor];
                   return (
-                    activeSponsor &&
-                    activeSponsor.collateral &&
-                    activeSponsor.tokensOutstanding && (
+                    activeSponsor?.collateral &&
+                    activeSponsor?.tokensOutstanding && (
                       <TableRow key={sponsor}>
                         <TableCell component="th" scope="row">
                           {sponsor}
