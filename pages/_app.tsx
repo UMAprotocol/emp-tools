@@ -15,30 +15,35 @@ import Position from "../containers/Position";
 import Totals from "../containers/Totals";
 import PriceFeed from "../containers/PriceFeed";
 
+import { ApolloProvider } from "@apollo/client";
+import { client } from "../apollo/client";
+
 interface IProps {
   children: React.ReactNode;
 }
 
 const WithStateContainerProviders = ({ children }: IProps) => (
-  <Connection.Provider>
-    <EmpAddress.Provider>
-      <EmpContract.Provider>
-        <EmpState.Provider>
-          <EmpSponsors.Provider>
-            <Collateral.Provider>
-              <Token.Provider>
-                <Totals.Provider>
-                  <PriceFeed.Provider>
-                    <Position.Provider>{children}</Position.Provider>
-                  </PriceFeed.Provider>
-                </Totals.Provider>
-              </Token.Provider>
-            </Collateral.Provider>
-          </EmpSponsors.Provider>
-        </EmpState.Provider>
-      </EmpContract.Provider>
-    </EmpAddress.Provider>
-  </Connection.Provider>
+  <ApolloProvider client={client}>
+    <Connection.Provider>
+      <EmpAddress.Provider>
+        <EmpContract.Provider>
+          <EmpState.Provider>
+            <EmpSponsors.Provider>
+              <Collateral.Provider>
+                <Token.Provider>
+                  <Totals.Provider>
+                    <PriceFeed.Provider>
+                      <Position.Provider>{children}</Position.Provider>
+                    </PriceFeed.Provider>
+                  </Totals.Provider>
+                </Token.Provider>
+              </Collateral.Provider>
+            </EmpSponsors.Provider>
+          </EmpState.Provider>
+        </EmpContract.Provider>
+      </EmpAddress.Provider>
+    </Connection.Provider>
+  </ApolloProvider>
 );
 
 export default class MyApp extends App {

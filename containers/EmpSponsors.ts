@@ -1,81 +1,81 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { BigNumber, Event } from "ethers";
+import { BigNumberish, utils } from "ethers";
 
-import Connection from "./Connection";
 import EmpContract from "./EmpContract";
 
+import { useQuery } from "@apollo/client";
+import { ACTIVE_POSITIONS } from "../apollo/queries";
+
+// Interfaces for dApp state storage.
 interface PositionState {
-  tokensOutstanding: BigNumber | null;
-  lockedCollateral: BigNumber | null;
+  tokensOutstanding: BigNumberish;
+  collateral: BigNumberish;
+}
+
+interface SponsorPositionState extends PositionState {
+  sponsor: string;
 }
 
 interface SponsorMap {
-  [address: string]: PositionState;
+  [sponsor: string]: SponsorPositionState;
 }
 
-interface EmpMap {
-  [address: string]: SponsorMap;
+// Interfaces for GraphQl queries.
+interface PositionQuery extends PositionState {
+  sponsor: { id: string };
+}
+
+interface FinancialContractQuery {
+  id: string;
+  sponsorPositions: PositionQuery;
 }
 
 const useEmpSponsors = () => {
-  const { block$ } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
+  // Because apollo caches results of queries, we will poll/refresh this query periodically.
+  // We set the poll interval to a very slow 5 seconds for now since the position states
+  // are not expected to change much.
+  // Source: https://www.apollographql.com/docs/react/data/queries/#polling
+  const { loading, error, data } = useQuery(ACTIVE_POSITIONS, {
+    pollInterval: 5000,
+  });
 
-  const [activePositions, setActivePositions] = useState<EmpMap>({});
+  const [activePositions, setActivePositions] = useState<SponsorMap>({});
 
   // get position information about every sponsor that has ever created a position.
   const querySponsors = async () => {
+    // Start with a fresh table.
+    let newPositions: SponsorMap = {};
     if (emp) {
-      const newSponsorFilter = emp.filters.NewSponsor(null);
-      const newSponsorEvents = await emp.queryFilter(newSponsorFilter);
-
-      // Create a clone of the active-positions mapping that we can update.
-      let newPositions = { ...activePositions };
-
-      // Map all active sponsor information to each EMP.
-      if (!newPositions[emp.address]) {
-        newPositions[emp.address] = {};
+      if (error) {
+        console.error(`Apollo client failed to fetch graph data:`, error);
       }
+      if (!loading && data) {
+        const empData = data.financialContracts.find(
+          (contract: FinancialContractQuery) =>
+            utils.getAddress(contract.id) === emp.address
+        );
 
-      newSponsorEvents.forEach(async (e: Event) => {
-        const sponsorAddress = e.args?.sponsor;
+        empData.sponsorPositions.forEach((position: PositionQuery) => {
+          const sponsor = utils.getAddress(position.sponsor.id);
 
-        if (!newPositions[emp.address][sponsorAddress]) {
-          // Check if sponsor has a current position. Current positions have locked
-          // a non-zero amount of collateral.
-          const res = await Promise.all([
-            emp.positions(sponsorAddress),
-            emp.getCollateral(sponsorAddress),
-          ]);
-          const positionData = res[0];
-          const collateral = res[1];
+          newPositions[sponsor] = {
+            tokensOutstanding: position.tokensOutstanding,
+            collateral: position.collateral,
+            sponsor,
+          };
+        });
 
-          // Update the active positions mapping.
-          if (collateral[0].gt(0)) {
-            newPositions[emp.address][sponsorAddress] = {
-              tokensOutstanding: positionData.tokensOutstanding[0],
-              lockedCollateral: collateral[0],
-            };
-            setActivePositions(newPositions);
-          }
-        }
-      });
+        setActivePositions(newPositions);
+      }
     }
   };
 
-  // get state on setting of contract
+  // Change state when emp changes or when the graphQL data changes due to polling.
   useEffect(() => {
     querySponsors();
-  }, [emp]);
-
-  // get state on each block
-  useEffect(() => {
-    if (block$) {
-      const sub = block$.subscribe(() => querySponsors());
-      return () => sub.unsubscribe();
-    }
-  }, [block$, emp]);
+  }, [emp, data]);
 
   return { activeSponsors: activePositions };
 };
