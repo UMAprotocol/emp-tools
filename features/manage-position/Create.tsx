@@ -127,9 +127,11 @@ const Create = () => {
     const totalTokens = posTokens + parseFloat(tokens);
     return totalCollateral / (totalTokens * Number(latestPrice));
   };
-
   const computedCR = computeCR() || 0;
-  const computedGCR = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+
+  const pricedCR =
+    computedCR && latestPrice ? computedCR / Number(latestPrice) : null;
+  const pricedGCR = gcr && latestPrice ? gcr / Number(latestPrice) : null;
 
   const etherscanUrl = useEtherscanUrl(hash);
 
@@ -260,13 +262,13 @@ const Create = () => {
           <Typography>
             Resulting CR:{" "}
             <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
-              {computedCR}
+              {pricedCR}
             </span>
           </Typography>
         ) : (
           <Typography>Resulting CR: N/A</Typography>
         )}
-        <Typography>Current GCR: {computedGCR || "N/A"}</Typography>
+        <Typography>Current GCR: {pricedGCR || "N/A"}</Typography>
       </Box>
 
       {hash && (
