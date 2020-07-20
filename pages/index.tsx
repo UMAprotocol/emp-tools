@@ -75,7 +75,7 @@ export default function Index() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <img src="/powered-by-vercel.svg" alt="Powered by Vercel"/>
+          <img src="/powered-by-vercel.svg" alt="Powered by Vercel" />
         </a>
       </Box>
     </Container>
