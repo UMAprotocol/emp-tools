@@ -5,6 +5,7 @@ import Position from "../../containers/Position";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import Totals from "../../containers/Totals";
+import PriceFeed from "../../containers/PriceFeed";
 
 const Label = styled.span`
   color: #999999;
@@ -17,8 +18,13 @@ const Status = styled(Typography)`
 `;
 
 const Container = styled.div`
+  margin-top: 20px;
   padding: 1rem;
   border: 1px solid #434343;
+`;
+
+const Link = styled.a`
+  font-size: 14px;
 `;
 
 const YourPosition = () => {
@@ -32,15 +38,24 @@ const YourPosition = () => {
   } = Position.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
+  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
 
   const ready =
     tokens !== null &&
     collateral !== null &&
     collSymbol !== null &&
-    tokenSymbol !== null;
+    tokenSymbol !== null &&
+    latestPrice !== null &&
+    sourceUrl;
 
-  const collateralzationRatio =
+  const collateralizationRatio =
     collateral !== null && tokens !== null ? collateral / tokens : null;
+  const pricedCollateralizationRatio =
+    collateralizationRatio !== null && latestPrice !== null
+      ? collateralizationRatio / Number(latestPrice)
+      : null;
+  const pricedGcr =
+    gcr !== null && latestPrice !== null ? gcr / Number(latestPrice) : null;
 
   return (
     <Container>
@@ -54,12 +69,28 @@ const YourPosition = () => {
         {ready ? `${tokens} ${tokenSymbol}` : "N/A"}
       </Status>
       <Status>
-        <Label>Collateralization ratio: </Label>
-        {ready ? collateralzationRatio : "N/A"}
+        <Label>
+          Estimated Token price (
+          <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
+            Coinbase Pro
+          </Link>
+          ):{" "}
+        </Label>
+        {ready ? `${latestPrice?.toLocaleString()}` : "N/A"}
       </Status>
       <Status>
-        <Label>Global collateralization ratio: </Label>
-        {ready ? gcr : "N/A"}
+        <Label>(CR) Collateralization ratio: </Label>
+        {pricedCollateralizationRatio
+          ? `${pricedCollateralizationRatio?.toFixed(
+              4
+            )} (${collSymbol} / ${tokenSymbol})`
+          : "N/A"}
+      </Status>
+      <Status>
+        <Label>(GCR) Global collateralization ratio: </Label>
+        {pricedGcr
+          ? `${pricedGcr?.toFixed(4)} (${collSymbol} / ${tokenSymbol})`
+          : "N/A"}
       </Status>
       <Status>
         <Label>Collateral pending/available to withdraw: </Label>

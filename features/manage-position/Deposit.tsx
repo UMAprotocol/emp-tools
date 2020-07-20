@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
+import PriceFeed from "../../containers/PriceFeed";
 
 import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
@@ -22,6 +23,7 @@ const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol, balance } = Collateral.useContainer();
   const { tokens, collateral, pendingWithdraw } = Position.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
 
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -56,11 +58,15 @@ const Deposit = () => {
 
   const handleDepositClick = () => depositCollateral();
 
-  const startingCR = collateral && tokens ? collateral / tokens : null;
+  const startingCR =
+    collateral && tokens && latestPrice
+      ? collateral / (tokens * Number(latestPrice))
+      : null;
 
   const resultingCR =
-    collateral && collateralToDeposit && tokens
-      ? (collateral + parseFloat(collateralToDeposit)) / tokens
+    collateral && collateralToDeposit && tokens && latestPrice
+      ? (collateral + parseFloat(collateralToDeposit)) /
+        (tokens * Number(latestPrice))
       : startingCR;
 
   // User does not have a position yet.
