@@ -1,21 +1,7 @@
-import {
-  Box,
-  TextField,
-  Button,
-  InputAdornment,
-  Typography,
-} from "@material-ui/core";
+import { Box, TextField, Button, Typography } from "@material-ui/core";
 import { FormEvent, useState } from "react";
-import { BigNumberish, utils } from "ethers";
 import styled from "styled-components";
-
-const ETHEREUM_LOGO_URL =
-  "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png";
-
-const Link = styled.a`
-  color: white;
-  font-size: 14px;
-`;
+import EmpState from "../../containers/EmpState";
 
 const Container = styled.div`
   padding: 1rem;
@@ -26,21 +12,30 @@ const FormInput = styled.div`
   margin-top: 20px;
 `;
 
+const MS_TO_S = 1000;
+const S_TO_DAYS = 60 * 60 * 24;
+const DAYS_TO_YEAR = 365;
+
 const YieldCalculator = () => {
-  const [tokenAmount, setTokenAmount] = useState<number | null>(100);
+  const { empState } = EmpState.useContainer();
   const [tokenPrice, setTokenPrice] = useState<number | null>(
     1 - Math.random() * 0.1
   );
 
-  // TODO: Put this in a container and update it every second.
-  const expirationTimestamp = 1598918400;
-  const calculateDaysToExpiry = () => {
-    const currentTimestamp = Math.round(Date.now() / 1000);
-    const secondsToExpiry = expirationTimestamp - currentTimestamp;
+  const expirationTimestamp = empState.expirationTimestamp;
 
-    return Math.round(secondsToExpiry / (60 * 60 * 24));
+  // TODO: Put this in a container and update it every second.
+  const calculateDaysToExpiry = () => {
+    if (expirationTimestamp) {
+      const currentTimestamp = Math.round(Date.now() / MS_TO_S);
+      const secondsToExpiry = expirationTimestamp.toNumber() - currentTimestamp;
+
+      return Math.round(secondsToExpiry / S_TO_DAYS);
+    } else {
+      return 0;
+    }
   };
-  const [daysToExpiry, setDaysToExpiry] = useState<number | null>(
+  const [daysToExpiry, setDaysToExpiry] = useState<number>(
     calculateDaysToExpiry()
   );
 
@@ -51,11 +46,9 @@ const YieldCalculator = () => {
     if (!daysToExpiry || daysToExpiry <= 0) {
       return null;
     }
-    if (!tokenAmount || daysToExpiry <= 0) {
-      return null;
-    }
-    const yieldPerUnit = Math.pow(1 / tokenPrice, 1 / 365 / daysToExpiry) - 1;
-    return yieldPerUnit * tokenAmount;
+    const yieldPerUnit =
+      Math.pow(1 / tokenPrice, 1 / (DAYS_TO_YEAR / daysToExpiry)) - 1;
+    return yieldPerUnit;
   };
   const [yieldAmount, setYieldAmount] = useState<number | null>(
     calculateYield()
@@ -67,30 +60,23 @@ const YieldCalculator = () => {
     setYieldAmount(calculateYield());
   };
 
+  const prettyPercentage = (x: number | null) => {
+    if (x === null) return "N/A";
+    return (x * 100).toFixed(4);
+  };
+
   return (
     <Box pt={4}>
       <Container>
         <form noValidate autoComplete="off" onSubmit={(e) => handleClick(e)}>
           <Typography variant="h5">yUSD Yield Calculator</Typography>
-          <FormInput>
-            <TextField
-              type="number"
-              label="yUSD Quantity"
-              value={tokenAmount !== null ? tokenAmount : ""}
-              onChange={(e) => setTokenAmount(parseFloat(e.target.value))}
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </FormInput>
+          <FormInput></FormInput>
           <FormInput>
             <TextField
               type="number"
               label="Current yUSD Price"
-              value={tokenPrice !== null ? tokenPrice : ""}
+              value={tokenPrice !== null ? tokenPrice.toString() : ""}
               onChange={(e) => setTokenPrice(parseFloat(e.target.value))}
-              helperText={`Sourced from https://balancer.exchange`}
               variant="outlined"
               InputLabelProps={{
                 shrink: true,
@@ -101,11 +87,13 @@ const YieldCalculator = () => {
             <TextField
               type="number"
               label="Days to Expiry"
-              value={daysToExpiry !== null ? daysToExpiry : ""}
+              value={daysToExpiry !== null ? daysToExpiry.toString() : ""}
               onChange={(e) => setDaysToExpiry(parseFloat(e.target.value))}
-              helperText={`Expiration time: ${new Date(
-                expirationTimestamp * 1000
-              )}`}
+              helperText={`Expiration time: ${
+                expirationTimestamp
+                  ? new Date(expirationTimestamp?.toNumber() * 1000)
+                  : "N/A"
+              }`}
               variant="outlined"
               InputLabelProps={{
                 shrink: true,
@@ -115,9 +103,11 @@ const YieldCalculator = () => {
           <FormInput>
             <TextField
               disabled
-              type="number"
-              label="Yield"
-              value={yieldAmount !== null ? yieldAmount : ""}
+              type="string"
+              label="APY"
+              value={
+                yieldAmount !== null ? `${prettyPercentage(yieldAmount)}%` : ""
+              }
               variant="outlined"
               InputLabelProps={{
                 shrink: true,
