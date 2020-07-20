@@ -9,7 +9,7 @@ import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import Token from "../../containers/Token";
 
-import { useEtherscanUrl } from "./useEtherscanUrl";
+import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -20,27 +20,53 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
-const fromWei = ethers.utils.formatUnits
-const weiToNum = (x: BigNumberish, u = 18) => parseFloat(fromWei(x, u))
+const fromWei = ethers.utils.formatUnits;
+const weiToNum = (x: BigNumberish, u = 18) => parseFloat(fromWei(x, u));
 
 const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
-  const { empState } = EmpState.useContainer()
+  const { empState } = EmpState.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
-  const { tokens: borrowedTokens, collateral, pendingWithdraw } = Position.useContainer();
-  const { symbol: syntheticSymbol, allowance: syntheticAllowance, setMaxAllowance, balance: syntheticBalance } = Token.useContainer();
+  const {
+    tokens: borrowedTokens,
+    collateral,
+    pendingWithdraw,
+  } = Position.useContainer();
+  const {
+    symbol: syntheticSymbol,
+    allowance: syntheticAllowance,
+    setMaxAllowance,
+    balance: syntheticBalance,
+  } = Token.useContainer();
 
   const [tokensToRedeem, setTokensToRedeem] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const tokensToRedeemFloat = isNaN(parseFloat(tokensToRedeem)) ? 0 : parseFloat(tokensToRedeem);
-  const tokensAboveMin = borrowedTokens && empState.minSponsorTokens ? borrowedTokens - weiToNum(empState.minSponsorTokens) : 0;
-  const unwindPosition = borrowedTokens && tokensToRedeemFloat && syntheticBalance && borrowedTokens === tokensToRedeemFloat && borrowedTokens <= syntheticBalance;
-  const maxRedeem = Math.min((syntheticBalance || 0), (borrowedTokens || 0), (tokensAboveMin || 0));
+  const tokensToRedeemFloat = isNaN(parseFloat(tokensToRedeem))
+    ? 0
+    : parseFloat(tokensToRedeem);
+  const tokensAboveMin =
+    borrowedTokens && empState.minSponsorTokens
+      ? borrowedTokens - weiToNum(empState.minSponsorTokens)
+      : 0;
+  const unwindPosition =
+    borrowedTokens &&
+    tokensToRedeemFloat &&
+    syntheticBalance &&
+    borrowedTokens === tokensToRedeemFloat &&
+    borrowedTokens <= syntheticBalance;
+  const maxRedeem = Math.min(
+    syntheticBalance || 0,
+    borrowedTokens || 0,
+    tokensAboveMin || 0
+  );
   const isEmpty = tokensToRedeem === "";
-  const canSendTxn = !isNaN(parseFloat(tokensToRedeem)) && tokensToRedeemFloat >= 0 && (tokensToRedeemFloat <= (maxRedeem) || unwindPosition);
+  const canSendTxn =
+    !isNaN(parseFloat(tokensToRedeem)) &&
+    tokensToRedeemFloat >= 0 &&
+    (tokensToRedeemFloat <= maxRedeem || unwindPosition);
 
   const needAllowance = () => {
     if (syntheticAllowance === null || tokensToRedeem === null) return true;
@@ -53,9 +79,7 @@ const Redeem = () => {
       setHash(null);
       setSuccess(null);
       setError(null);
-      const tokensToRedeemWei = ethers.utils.parseUnits(
-        tokensToRedeem
-      );
+      const tokensToRedeemWei = ethers.utils.parseUnits(tokensToRedeem);
       try {
         const tx = await emp.redeem([tokensToRedeemWei]);
         setHash(tx.hash as string);
@@ -75,7 +99,12 @@ const Redeem = () => {
   const handleRedemptionClick = () => redeemTokens();
 
   // User does not have a position yet.
-  if (borrowedTokens === null || borrowedTokens.toString() === "0" || collateral === null || collateral.toString() === "0") {
+  if (
+    borrowedTokens === null ||
+    borrowedTokens.toString() === "0" ||
+    collateral === null ||
+    collateral.toString() === "0"
+  ) {
     return (
       <Container>
         <Box py={2}>
@@ -89,13 +118,16 @@ const Redeem = () => {
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-        <Container>
-          <Box py={2}>
-            <Typography>
-              <i>You need to cancel or execute your pending withdrawal request before redeeming tokens.</i>
-            </Typography>
-          </Box>
-        </Container>
+      <Container>
+        <Box py={2}>
+          <Typography>
+            <i>
+              You need to cancel or execute your pending withdrawal request
+              before redeeming tokens.
+            </i>
+          </Typography>
+        </Box>
+      </Container>
     );
   }
 
@@ -117,7 +149,11 @@ const Redeem = () => {
           placeholder="1234"
           inputProps={{ min: "0" }}
           error={!isEmpty && !canSendTxn}
-          helperText={!isEmpty && !canSendTxn ? `Input must be between 0 and ${maxRedeem} or the entire position` : null}
+          helperText={
+            !isEmpty && !canSendTxn
+              ? `Input must be between 0 and ${maxRedeem} or the entire position`
+              : null
+          }
           value={tokensToRedeem}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokensToRedeem(e.target.value)
@@ -126,7 +162,7 @@ const Redeem = () => {
       </Box>
 
       <Box py={2}>
-      {needAllowance() && (
+        {needAllowance() && (
           <Button
             variant="contained"
             onClick={setMaxAllowance}
@@ -149,23 +185,29 @@ const Redeem = () => {
 
       <Box py={2}>
         <Typography>{`Current borrowed ${syntheticSymbol}: ${borrowedTokens}`}</Typography>
-        <Typography>{`Remaining debt after redemption: ${borrowedTokens - tokensToRedeemFloat}`}</Typography>
-        <Typography>{`Collateral you will receive on redemption: ${(tokensToRedeemFloat / borrowedTokens) * collateral} ${collSymbol}`}</Typography>
+        <Typography>{`Remaining debt after redemption: ${
+          borrowedTokens - tokensToRedeemFloat
+        }`}</Typography>
+        <Typography>{`Collateral you will receive on redemption: ${
+          (tokensToRedeemFloat / borrowedTokens) * collateral
+        } ${collSymbol}`}</Typography>
       </Box>
 
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> 
+            <strong>Tx Hash: </strong>
             {etherscanUrl ? (
-                <Link
-                  href={etherscanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {hash}
-                </Link>
-              ) : hash}
+              <Link
+                href={etherscanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
+            ) : (
+              hash
+            )}
           </Typography>
         </Box>
       )}

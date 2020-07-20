@@ -1,4 +1,4 @@
-import Connection from "../../containers/Connection";
+import Connection from "../containers/Connection";
 
 interface NetworkMap {
   [key: string]: string;
@@ -12,12 +12,18 @@ const NETWORK_MAP: NetworkMap = {
   mainnet: "https://etherscan.io",
 };
 
-export const useEtherscanUrl = (txnHash: string | null) => {
+export const useEtherscanUrl = (hex: string | null) => {
   const { network } = Connection.useContainer();
-  if (!txnHash || !network) {
+
+  if (!network || !hex || !network.name) {
     return undefined;
   }
-
   const baseUrl = NETWORK_MAP[network.name] || NETWORK_MAP["mainnet"];
-  return `${baseUrl}/tx/${txnHash}`;
+  if (hex.length == 66) {
+    return `${baseUrl}/tx/${hex}`;
+  }
+  if (hex.length == 42) {
+    return `${baseUrl}/address/${hex}`;
+  }
+  return undefined;
 };
