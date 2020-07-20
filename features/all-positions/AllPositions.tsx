@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import {
   Box,
   Table,
@@ -9,6 +11,11 @@ import {
   Paper,
   Container,
   Typography,
+  Dialog,
+  Button,
+  TextField,
+  Tab,
+  Tabs,
 } from "@material-ui/core";
 import styled from "styled-components";
 import { utils, BigNumberish } from "ethers";
@@ -27,6 +34,39 @@ const Link = styled.a`
   font-size: 18px;
 `;
 
+const MoreInfo = styled.a`
+  height: 20px;
+  width: 20px;
+  background-color: #303030;
+  border-radius: 50%;
+  display: inline-block;
+  text-align: center;
+
+  &:hover {
+    background-color: white;
+    transition: 0.5s;
+    cursor: pointer;
+  }
+`;
+
+const PositionDialog = styled.div`
+  width: 100%;
+  border-color: white;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+`;
+
+const StyledTabs = styled(Tabs)`
+  & .MuiTabs-flexContainer {
+    border-bottom: 1px solid #999;
+  }
+  & .Mui-selected {
+    font-weight: bold;
+  }
+  padding-bottom: 2rem;
+`;
+
 const AllPositions = () => {
   const { empState } = EmpState.useContainer();
   const { priceIdentifier: priceId } = empState;
@@ -35,6 +75,23 @@ const AllPositions = () => {
   const { activeSponsors } = EmpSponsors.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+
+  const [openDialog, setOpenDialog] = useState<boolean | null>(false);
+  const [dialogAddress, setDialogAddress] = useState<string | null>("");
+  const [dialogTabIndex, setDialogTabIndex] = useState(0);
+  const [depositTokens, setDepositTokens] = useState<string>("");
+
+  const handleOpen = (address: string) => {
+    setOpenDialog(true);
+    setDialogAddress(address);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+    setDialogAddress("");
+  };
+
+  const handelLiquidate = () => {};
 
   if (tokenSymbol === null || emp === null) {
     return (
@@ -72,6 +129,7 @@ const AllPositions = () => {
       <Box>
         <Typography>
           <i>
+            val: {JSON.stringify(openDialog)}
             Estimated price of {latestPrice ? latestPrice : "N/A"} for{" "}
             {priceId ? utils.parseBytes32String(priceId) : "N/A"} sourced from{" "}
           </i>
@@ -92,6 +150,7 @@ const AllPositions = () => {
                     Synthetics ({tokenSymbol})
                   </TableCell>
                   <TableCell align="right">Collateral Ratio</TableCell>
+                  <TableCell align="right"></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -120,6 +179,11 @@ const AllPositions = () => {
                             )
                           )}
                         </TableCell>
+                        <TableCell align="right">
+                          <MoreInfo onClick={() => handleOpen(sponsor)}>
+                            ⋮
+                          </MoreInfo>
+                        </TableCell>
                       </TableRow>
                     )
                   );
@@ -129,6 +193,77 @@ const AllPositions = () => {
           </TableContainer>
         )}
       </Box>
+
+      <Dialog
+        open={openDialog || false}
+        onClose={handleClose}
+        aria-labelledby="simple-Dialog-title"
+        aria-describedby="simple-Dialog-description"
+      >
+        <PositionDialog>
+          <h1>Additional Position Actions</h1>
+          <ul>
+            <li>
+              Sponsor:{" "}
+              <a href={dialogAddress ? useEtherscanUrl(dialogAddress) : "N/A"}>
+                {prettyAddress(dialogAddress)}
+              </a>
+            </li>
+            <li>
+              Position Collateral({collSymbol}):{" "}
+              {dialogAddress &&
+                prettyBalance(activeSponsors[dialogAddress].collateral)}
+            </li>
+            <li>
+              Minted Synthetics({tokenSymbol}):{" "}
+              {dialogAddress &&
+                prettyBalance(activeSponsors[dialogAddress].tokensOutstanding)}
+            </li>
+            <li>Pending withdrawal: No</li>
+            <li>Pending Transfer: No</li>
+            <li>
+              Collateralization ratio:{" "}
+              {dialogAddress &&
+                prettyBalance(
+                  getCollateralRatio(
+                    activeSponsors[dialogAddress].collateral,
+                    activeSponsors[dialogAddress].tokensOutstanding
+                  )
+                )}
+            </li>
+          </ul>
+
+          <StyledTabs
+            value={dialogTabIndex}
+            onChange={(_, i) => setDialogTabIndex(i)}
+            indicatorColor="primary"
+            textColor="primary"
+            centered
+          >
+            <Tab label="Liquidate" disableRipple />
+            <Tab label="Deposit" disableRipple />
+          </StyledTabs>
+
+          {dialogTabIndex === 0 && (
+            <Button
+              variant="contained"
+              onClick={handelLiquidate}
+            >{`Liquidate Position`}</Button>
+          )}
+          {dialogTabIndex === 1 && (
+            <TextField
+              type="number"
+              label={`Deposit ${collSymbol}`}
+              placeholder="1234"
+              inputProps={{ min: "0" }}
+              value={depositTokens}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDepositTokens(e.target.value)
+              }
+            />
+          )}
+        </PositionDialog>
+      </Dialog>
     </Container>
   );
 };
