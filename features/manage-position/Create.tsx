@@ -125,7 +125,7 @@ const Create = () => {
     // all values non-null, proceed to calculate
     const totalCollateral = posCollateral + parseFloat(collateral);
     const totalTokens = posTokens + parseFloat(tokens);
-    return totalCollateral / (totalTokens * Number(latestPrice));
+    return totalCollateral / totalTokens;
   };
   const computedCR = computeCR() || 0;
 
