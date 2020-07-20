@@ -9,7 +9,7 @@ import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import Totals from "../../containers/Totals";
 
-import { useEtherscanUrl } from "./useEtherscanUrl";
+import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
 const Container = styled(Box)`
   max-width: 720px;
