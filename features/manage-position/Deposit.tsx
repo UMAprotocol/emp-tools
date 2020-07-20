@@ -59,15 +59,16 @@ const Deposit = () => {
   const handleDepositClick = () => depositCollateral();
 
   const startingCR =
-    collateral && tokens && latestPrice
-      ? collateral / (tokens * Number(latestPrice))
-      : null;
+    collateral && tokens && latestPrice ? collateral / tokens : null;
+  const pricedStartingCR =
+    startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
 
   const resultingCR =
     collateral && collateralToDeposit && tokens && latestPrice
-      ? (collateral + parseFloat(collateralToDeposit)) /
-        (tokens * Number(latestPrice))
+      ? (collateral + parseFloat(collateralToDeposit)) / tokens
       : startingCR;
+  const pricedResultingCR =
+    resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
 
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
@@ -136,8 +137,8 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        <Typography>Current CR: {startingCR || "N/A"}</Typography>
-        <Typography>Resulting CR: {resultingCR || "N/A"}</Typography>
+        <Typography>Current CR: {pricedStartingCR || "N/A"}</Typography>
+        <Typography>Resulting CR: {pricedResultingCR || "N/A"}</Typography>
       </Box>
 
       {hash && (
