@@ -32,7 +32,7 @@ const YieldCalculator = () => {
 
       return Math.round(secondsToExpiry / S_TO_DAYS);
     } else {
-      return 0;
+      return 30;
     }
   };
   const [daysToExpiry, setDaysToExpiry] = useState<number>(
