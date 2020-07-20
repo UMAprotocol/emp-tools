@@ -136,8 +136,12 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        <Typography>Current CR: {pricedStartingCR || "N/A"}</Typography>
-        <Typography>Resulting CR: {pricedResultingCR || "N/A"}</Typography>
+        <Typography>
+          Current CR: {pricedStartingCR?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Resulting CR: {pricedResultingCR?.toFixed(4) || "N/A"}
+        </Typography>
       </Box>
 
       {hash && (

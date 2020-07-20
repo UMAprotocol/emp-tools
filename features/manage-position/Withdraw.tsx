@@ -305,12 +305,14 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        <Typography>Current global CR: {pricedGcr || "N/A"}</Typography>
         <Typography>
-          Current position CR: {pricedStartingCR || "N/A"}
+          Current global CR: {pricedGcr?.toFixed(4) || "N/A"}
         </Typography>
         <Typography>
-          Resulting position CR: {pricedResultingCR || "N/A"}
+          Current position CR: {pricedStartingCR?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Resulting position CR: {pricedResultingCR?.toFixed(4) || "N/A"}
         </Typography>
         {collateralToWithdraw && collateralToWithdraw != "0" ? (
           resultingCRBelowGCR ? (

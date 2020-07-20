@@ -262,13 +262,13 @@ const Create = () => {
           <Typography>
             Resulting CR:{" "}
             <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
-              {pricedCR}
+              {pricedCR?.toFixed(4)}
             </span>
           </Typography>
         ) : (
           <Typography>Resulting CR: N/A</Typography>
         )}
-        <Typography>Current GCR: {pricedGCR || "N/A"}</Typography>
+        <Typography>Current GCR: {pricedGCR?.toFixed(4) || "N/A"}</Typography>
       </Box>
 
       {hash && (
