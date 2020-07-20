@@ -18,9 +18,7 @@ const DAYS_TO_YEAR = 365;
 
 const YieldCalculator = () => {
   const { empState } = EmpState.useContainer();
-  const [tokenPrice, setTokenPrice] = useState<number | null>(
-    1 - Math.random() * 0.1
-  );
+  const [tokenPrice, setTokenPrice] = useState<number | null>(0.9575);
 
   const expirationTimestamp = empState.expirationTimestamp;
 
