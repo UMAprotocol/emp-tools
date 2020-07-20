@@ -37,14 +37,14 @@ const Create = () => {
     decimals: collDec,
     allowance: collAllowance,
     setMaxAllowance,
-    balance
+    balance,
   } = Collateral.useContainer();
   const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { gcr } = Totals.useContainer();
   const {
     collateral: posCollateral,
     tokens: posTokens,
-    pendingWithdraw
+    pendingWithdraw,
   } = Position.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
@@ -144,13 +144,16 @@ const Create = () => {
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-        <Container>
-          <Box py={2}>
-            <Typography>
-              <i>You need to cancel or execute your pending withdrawal request before creating additional tokens.</i>
-            </Typography>
-          </Box>
-        </Container>
+      <Container>
+        <Box py={2}>
+          <Typography>
+            <i>
+              You need to cancel or execute your pending withdrawal request
+              before creating additional tokens.
+            </i>
+          </Typography>
+        </Box>
+      </Container>
     );
   }
 
@@ -231,7 +234,12 @@ const Create = () => {
             Approve
           </Button>
         )}
-        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr && !balanceTooLow ? (
+        {tokens &&
+        collateral &&
+        gcr &&
+        !needAllowance() &&
+        computedCR > gcr &&
+        !balanceTooLow ? (
           <Button
             variant="contained"
             onClick={handleCreateClick}
@@ -261,15 +269,17 @@ const Create = () => {
         <Box py={2}>
           <Typography>
             <strong>Tx Receipt: </strong>
-              {etherscanUrl ? (
-                <Link
-                  href={etherscanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {hash}
-                </Link>
-              ) : hash}
+            {etherscanUrl ? (
+              <Link
+                href={etherscanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
+            ) : (
+              hash
+            )}
           </Typography>
         </Box>
       )}
