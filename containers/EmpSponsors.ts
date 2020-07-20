@@ -33,12 +33,18 @@ interface FinancialContractQuery {
 
 const useEmpSponsors = () => {
   const { contract: emp } = EmpContract.useContainer();
-  const { loading, error, data } = useQuery(ACTIVE_POSITIONS);
+  // Because apollo caches results of queries, we will poll/refresh this query periodically.
+  // We set the poll interval to a very slow 5 seconds for now since the position states
+  // are not expected to change much.
+  // Source: https://www.apollographql.com/docs/react/data/queries/#polling
+  const { loading, error, data } = useQuery(ACTIVE_POSITIONS, {
+    pollInterval: 5000,
+  });
 
   const [activePositions, setActivePositions] = useState<SponsorMap>({});
 
   // get position information about every sponsor that has ever created a position.
-  const querySponsors = async () => {
+  const querySponsors = () => {
     // Start with a fresh table.
     let newPositions: SponsorMap = {};
     if (emp) {
@@ -66,9 +72,10 @@ const useEmpSponsors = () => {
     }
   };
 
+  // Change state when emp changes or when the graphQL data changes due to polling.
   useEffect(() => {
     querySponsors();
-  }, [emp]);
+  }, [emp, data]);
 
   return { activeSponsors: activePositions };
 };

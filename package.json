@@ -5,7 +5,8 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "chain": "ts-node -O '{\"module\":\"commonjs\"}' chain.ts"
+    "chain": "ts-node -O '{\"module\":\"commonjs\"}' chain.ts",
+    "lint": "prettier './**/*.{ts,tsx,css,html,md}' --write"
   },
   "dependencies": {
     "@apollo/client": "^3.0.1",
