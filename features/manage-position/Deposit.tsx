@@ -58,13 +58,12 @@ const Deposit = () => {
 
   const handleDepositClick = () => depositCollateral();
 
-  const startingCR =
-    collateral && tokens && latestPrice ? collateral / tokens : null;
+  const startingCR = collateral && tokens ? collateral / tokens : null;
   const pricedStartingCR =
     startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
 
   const resultingCR =
-    collateral && collateralToDeposit && tokens && latestPrice
+    collateral && collateralToDeposit && tokens
       ? (collateral + parseFloat(collateralToDeposit)) / tokens
       : startingCR;
   const pricedResultingCR =
