@@ -78,13 +78,16 @@ const Deposit = () => {
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-        <Container>
-          <Box py={2}>
-            <Typography>
-              <i>You need to cancel or execute your pending withdrawal request before depositing additional collateral.</i>
-            </Typography>
-          </Box>
-        </Container>
+      <Container>
+        <Box py={2}>
+          <Typography>
+            <i>
+              You need to cancel or execute your pending withdrawal request
+              before depositing additional collateral.
+            </i>
+          </Typography>
+        </Box>
+      </Container>
     );
   }
 
@@ -105,7 +108,7 @@ const Deposit = () => {
           label={`Collateral (${collSymbol})`}
           placeholder="1234"
           error={balanceTooLow}
-          helperText={balanceTooLow ? `${collSymbol} balance too low`: null}
+          helperText={balanceTooLow ? `${collSymbol} balance too low` : null}
           value={collateralToDeposit}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCollateralToDeposit(e.target.value)
@@ -134,16 +137,18 @@ const Deposit = () => {
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> 
+            <strong>Tx Hash: </strong>
             {etherscanUrl ? (
-                <Link
-                  href={etherscanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {hash}
-                </Link>
-              ) : hash}
+              <Link
+                href={etherscanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
+            ) : (
+              hash
+            )}
           </Typography>
         </Box>
       )}

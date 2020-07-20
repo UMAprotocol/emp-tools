@@ -148,7 +148,7 @@ const Deposit = () => {
       ":" +
       Math.max(0, Math.floor((pendingWithdrawTimeRemaining % 3600) / 60)) +
       ":" +
-      Math.max(0, ((pendingWithdrawTimeRemaining % 3600) % 60))
+      Math.max(0, (pendingWithdrawTimeRemaining % 3600) % 60)
     : null;
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
@@ -321,16 +321,18 @@ const Deposit = () => {
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> 
+            <strong>Tx Hash: </strong>
             {etherscanUrl ? (
-                <Link
-                  href={etherscanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {hash}
-                </Link>
-              ) : hash}
+              <Link
+                href={etherscanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
+            ) : (
+              hash
+            )}
           </Typography>
         </Box>
       )}
