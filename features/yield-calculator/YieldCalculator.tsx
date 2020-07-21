@@ -22,7 +22,6 @@ const YieldCalculator = () => {
 
   const expirationTimestamp = empState.expirationTimestamp;
 
-  // TODO: Put this in a container and update it every second.
   const calculateDaysToExpiry = () => {
     if (expirationTimestamp) {
       const currentTimestamp = Math.round(Date.now() / MS_TO_S);
@@ -30,11 +29,11 @@ const YieldCalculator = () => {
 
       return Math.round(secondsToExpiry / S_TO_DAYS);
     } else {
-      return 30;
+      return null;
     }
   };
   const [daysToExpiry, setDaysToExpiry] = useState<number>(
-    calculateDaysToExpiry()
+    calculateDaysToExpiry() || 30
   );
 
   const calculateYield = () => {
@@ -45,7 +44,7 @@ const YieldCalculator = () => {
       return null;
     }
     const yieldPerUnit =
-      Math.pow(1 / tokenPrice, 1 / (DAYS_TO_YEAR / daysToExpiry)) - 1;
+      Math.pow(1 / tokenPrice, 1 / (daysToExpiry / DAYS_TO_YEAR)) - 1;
     return yieldPerUnit;
   };
   const [yieldAmount, setYieldAmount] = useState<number | null>(
@@ -73,7 +72,7 @@ const YieldCalculator = () => {
             <TextField
               type="number"
               label="Current yUSD Price"
-              value={tokenPrice !== null ? tokenPrice.toString() : ""}
+              value={tokenPrice?.toString() || ""}
               onChange={(e) => setTokenPrice(parseFloat(e.target.value))}
               variant="outlined"
               InputLabelProps={{
@@ -85,13 +84,9 @@ const YieldCalculator = () => {
             <TextField
               type="number"
               label="Days to Expiry"
-              value={daysToExpiry !== null ? daysToExpiry.toString() : ""}
+              value={daysToExpiry?.toString() || ""}
               onChange={(e) => setDaysToExpiry(parseFloat(e.target.value))}
-              helperText={`Expiration time: ${
-                expirationTimestamp
-                  ? new Date(expirationTimestamp?.toNumber() * 1000)
-                  : "N/A"
-              }`}
+              helperText={`Days to expiry for selected EMP: ${calculateDaysToExpiry()}`}
               variant="outlined"
               InputLabelProps={{
                 shrink: true,
@@ -102,9 +97,9 @@ const YieldCalculator = () => {
             <TextField
               disabled
               type="string"
-              label="APY"
+              label="APY (%)"
               value={
-                yieldAmount !== null ? `${prettyPercentage(yieldAmount)}%` : ""
+                yieldAmount !== null ? `${prettyPercentage(yieldAmount)}` : ""
               }
               variant="outlined"
               InputLabelProps={{
