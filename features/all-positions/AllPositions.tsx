@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
-
+import { useState, MouseEvent } from "react";
+import { ethers } from "ethers";
+const fromWei = ethers.utils.formatUnits;
 import {
   Box,
+  Grid,
   Table,
   TableBody,
   TableCell,
@@ -14,9 +16,15 @@ import {
   Dialog,
   Button,
   TextField,
-  Tab,
-  Tabs,
+  Select,
+  InputLabel,
+  FormControl,
+  MenuItem,
 } from "@material-ui/core";
+
+import ToggleButton from "@material-ui/lab/ToggleButton";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+
 import styled from "styled-components";
 import { utils, BigNumberish } from "ethers";
 
@@ -32,6 +40,12 @@ import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 const Link = styled.a`
   color: white;
   font-size: 18px;
+`;
+
+const Important = styled(Typography)`
+  color: red;
+  background: black;
+  display: inline-block;
 `;
 
 const MoreInfo = styled.a`
@@ -52,34 +66,49 @@ const MoreInfo = styled.a`
 const PositionDialog = styled.div`
   width: 100%;
   border-color: white;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: 15px;
+  padding-right: 15px;
   padding-bottom: 20px;
-`;
-
-const StyledTabs = styled(Tabs)`
-  & .MuiTabs-flexContainer {
-    border-bottom: 1px solid #999;
-  }
-  & .Mui-selected {
-    font-weight: bold;
-  }
-  padding-bottom: 2rem;
 `;
 
 const AllPositions = () => {
   const { empState } = EmpState.useContainer();
-  const { priceIdentifier: priceId } = empState;
-  const { symbol: tokenSymbol } = Token.useContainer();
-  const { symbol: collSymbol } = Collateral.useContainer();
+  const { priceIdentifier: priceId, collateralRequirement: collReq } = empState;
+  const {
+    symbol: tokenSymbol,
+    balance: tokenBalance,
+    allowance: tokenAllowance,
+    setMaxAllowance: setMaxTokenAllowance,
+  } = Token.useContainer();
+  const {
+    symbol: collSymbol,
+    balance: collBalance,
+    allowance: collAllowance,
+    setMaxAllowance: setMaxCollateralAllowance,
+  } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
 
   const [openDialog, setOpenDialog] = useState<boolean | null>(false);
   const [dialogAddress, setDialogAddress] = useState<string | null>("");
-  const [dialogTabIndex, setDialogTabIndex] = useState(0);
-  const [depositTokens, setDepositTokens] = useState<string>("");
+  const [dialogTabIndex, setDialogTabIndex] = useState<string | null>("top-up");
+  const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
+  const [minCollPerToken, setMinCollPerToken] = useState<string>("");
+  const [maxCollPerToken, setMaxCollPerToken] = useState<string>("");
+  const [maxTokensToLiquidate, setMaxTokensToLiquidate] = useState<string>("");
+  const [deadline, setDeadline] = useState<string>("");
+
+  const [hash, setHash] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+
+  const handleAlignment = (
+    event: MouseEvent<HTMLElement>,
+    newAlignment: string | null
+  ) => {
+    setDialogTabIndex(newAlignment);
+  };
 
   const handleOpen = (address: string) => {
     setOpenDialog(true);
@@ -91,7 +120,149 @@ const AllPositions = () => {
     setDialogAddress("");
   };
 
-  const handelLiquidate = () => {};
+  const executeLiquidation = async () => {
+    if (
+      minCollPerToken &&
+      maxCollPerToken &&
+      maxTokensToLiquidate &&
+      deadline &&
+      !collBalanceTooLow() &&
+      !tokenBalanceTooLow &&
+      emp
+    ) {
+      setHash(null);
+      setSuccess(null);
+      setError(null);
+      const minCollPerTokenWei = ethers.utils.parseUnits(minCollPerToken);
+      const maxCollPerTokenWei = ethers.utils.parseUnits(maxCollPerToken);
+      const maxTokensToLiquidateWei = ethers.utils.parseUnits(
+        maxTokensToLiquidate
+      );
+      const deadlineTimestamp = Math.floor(Date.now() / 1000) + deadline;
+      try {
+        if (needCollateralAllowance()) await setMaxCollateralAllowance();
+        if (needTokenAllowance()) await setMaxTokenAllowance();
+
+        const tx = await emp.createLiquidation(
+          dialogAddress,
+          minCollPerTokenWei,
+          maxCollPerTokenWei,
+          maxTokensToLiquidateWei,
+          deadlineTimestamp
+        );
+        setHash(tx.hash as string);
+        await tx.wait();
+
+        setSuccess(true);
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      }
+    } else {
+      setError(new Error("Please check that you are connected."));
+    }
+  };
+
+  const executeTopUp = async () => {
+    if (collateralToDeposit && !collBalanceTooLow() && emp) {
+      setHash(null);
+      setSuccess(null);
+      setError(null);
+      const collateralToWithdrawWei = ethers.utils.parseUnits(
+        collateralToDeposit
+      );
+
+      try {
+        if (needCollateralAllowance()) await setMaxCollateralAllowance();
+        const tx = await emp.depositTo(dialogAddress, collateralToWithdrawWei);
+        setHash(tx.hash as string);
+        await tx.wait();
+
+        setSuccess(true);
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      }
+    } else {
+      setError(new Error("Please check that you are connected."));
+    }
+  };
+
+  const underCollateralizedPrice = () => {
+    if (dialogAddress && latestPrice && collReq) {
+      const sponsorPosition = activeSponsors[dialogAddress];
+
+      return (
+        Number(sponsorPosition.collateral) /
+        (Number(sponsorPosition.tokensOutstanding) *
+          parseFloat(fromWei(collReq)))
+      ).toFixed(4);
+    }
+    return 0;
+  };
+
+  const underCollateralizedPercent = () => {
+    if (underCollateralizedPrice() && latestPrice) {
+      return (
+        (Number(underCollateralizedPrice()) / Number(latestPrice)) *
+        100
+      ).toFixed(0);
+    }
+    return 0;
+  };
+
+  const collBalanceTooLow = () => {
+    if (dialogTabIndex == "top-up") {
+      return (collBalance || 0) < (Number(collateralToDeposit) || 0);
+    }
+    if (dialogTabIndex == "liquidate") {
+      const finalFee = "10"; // TODO: replace this with the actual final fee for the given contract.
+      return (collBalance || 0) < (Number(finalFee) || 0);
+    }
+  };
+
+  const tokenBalanceTooLow =
+    (tokenBalance || 0) < (Number(maxTokensToLiquidate) || 0);
+
+  const needCollateralAllowance = () => {
+    if (dialogTabIndex == "top-up") {
+      if (collAllowance === null || collateralToDeposit === null) return true;
+      if (collAllowance === "Infinity") return false;
+      return collAllowance < parseFloat(collateralToDeposit);
+    }
+    if (dialogTabIndex == "liquidate") {
+      const finalFee = "10"; // TODO: replace this with the actual final fee for the given contract.
+      if (collAllowance === null || finalFee === null) return true;
+      if (collAllowance === "Infinity") return false;
+      return collAllowance < parseFloat(finalFee);
+    }
+    return true;
+  };
+  const needTokenAllowance = () => {
+    if (tokenAllowance === null || maxTokensToLiquidate === null) return true;
+    if (tokenAllowance === "Infinity") return false;
+    return tokenAllowance < parseFloat(maxTokensToLiquidate);
+  };
+
+  // Liquidation requires both collateral and synthetic to be approved. This
+  // results in a number of different configurations the user could be in depending
+  // on their interaction with this Dapp. Process the text here to keep the
+  // component simple.
+  const liquidationNeedAllowanceText = () => {
+    if (!needCollateralAllowance() && !needTokenAllowance()) {
+      return "zzz";
+    }
+    if (needCollateralAllowance() && !needTokenAllowance()) {
+      return `You will need to sign two transactions one to approve collateral ${collSymbol} and a second to preform the liquidation.`;
+    }
+    if (!needCollateralAllowance() && needTokenAllowance()) {
+      return `You will need to sign two transactions one to approve synthetic ${tokenSymbol} and a second to preform the liquidation.`;
+    }
+    if (needCollateralAllowance() && needTokenAllowance()) {
+      return `You will need to sign three transactions one to approve synthetic ${tokenSymbol}, one to approve collateral ${collSymbol} and a third to preform the liquidation.`;
+    }
+    return "z";
+  };
 
   if (tokenSymbol === null || emp === null) {
     return (
@@ -129,7 +300,6 @@ const AllPositions = () => {
       <Box>
         <Typography>
           <i>
-            val: {JSON.stringify(openDialog)}
             Estimated price of {latestPrice ? latestPrice : "N/A"} for{" "}
             {priceId ? utils.parseBytes32String(priceId) : "N/A"} sourced from{" "}
           </i>
@@ -201,67 +371,243 @@ const AllPositions = () => {
         aria-describedby="simple-Dialog-description"
       >
         <PositionDialog>
-          <h1>Additional Position Actions</h1>
-          <ul>
-            <li>
-              Sponsor:{" "}
-              <a href={dialogAddress ? useEtherscanUrl(dialogAddress) : "N/A"}>
-                {prettyAddress(dialogAddress)}
-              </a>
-            </li>
-            <li>
-              Position Collateral({collSymbol}):{" "}
-              {dialogAddress &&
-                prettyBalance(activeSponsors[dialogAddress].collateral)}
-            </li>
-            <li>
-              Minted Synthetics({tokenSymbol}):{" "}
-              {dialogAddress &&
-                prettyBalance(activeSponsors[dialogAddress].tokensOutstanding)}
-            </li>
-            <li>Pending withdrawal: No</li>
-            <li>Pending Transfer: No</li>
-            <li>
-              Collateralization ratio:{" "}
-              {dialogAddress &&
-                prettyBalance(
-                  getCollateralRatio(
-                    activeSponsors[dialogAddress].collateral,
-                    activeSponsors[dialogAddress].tokensOutstanding
-                  )
+          <Container>
+            <Box>
+              <Box>
+                <h1>Additional Position Actions</h1>
+                <Typography>
+                  <strong>Position Information:</strong>
+                </Typography>
+                <ul style={{ fontSize: 16 }}>
+                  <li>
+                    Sponsor:{" "}
+                    <a
+                      href={
+                        dialogAddress ? useEtherscanUrl(dialogAddress) : "N/A"
+                      }
+                    >
+                      {prettyAddress(dialogAddress)}
+                    </a>
+                  </li>
+                  <li>
+                    Position Collateral({collSymbol}):{" "}
+                    {dialogAddress &&
+                      prettyBalance(activeSponsors[dialogAddress].collateral)}
+                  </li>
+                  <li>
+                    Minted Synthetics({tokenSymbol}):{" "}
+                    {dialogAddress &&
+                      prettyBalance(
+                        activeSponsors[dialogAddress].tokensOutstanding
+                      )}
+                  </li>
+                  <li>Pending withdrawal: No</li>
+                  <li>Pending Transfer: No</li>
+                  <li>
+                    Collateralization ratio:{" "}
+                    {dialogAddress &&
+                      prettyBalance(
+                        getCollateralRatio(
+                          activeSponsors[dialogAddress].collateral,
+                          activeSponsors[dialogAddress].tokensOutstanding
+                        )
+                      )}
+                  </li>
+                </ul>
+                <hr />
+              </Box>
+              <Box pt={2} textAlign="center">
+                <ToggleButtonGroup
+                  value={dialogTabIndex}
+                  exclusive
+                  onChange={handleAlignment}
+                >
+                  <ToggleButton value="top-up">top up</ToggleButton>
+                  <ToggleButton value="liquidate">liquidate</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+              <Box>
+                {dialogTabIndex === "top-up" && (
+                  <Box pt={2}>
+                    <Typography>
+                      <strong>Top up this sponsor position</strong>
+                      <br></br>
+                      You can deposit additional collateral to this sponsor's
+                      position, even if it's not yours.
+                    </Typography>
+                    <Box pt={2}>
+                      <Grid container spacing={4}>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            type="number"
+                            inputProps={{ min: "0" }}
+                            label={`Collateral (${collSymbol})`}
+                            placeholder="1234"
+                            error={collBalanceTooLow()}
+                            helperText={
+                              collBalanceTooLow()
+                                ? `${collSymbol} balance too low`
+                                : null
+                            }
+                            value={collateralToDeposit}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => setCollateralToDeposit(e.target.value)}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Box py={2}>
+                            {collateralToDeposit &&
+                            collateralToDeposit != "0" &&
+                            !collBalanceTooLow() ? (
+                              <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={executeTopUp}
+                              >{`Deposit ${collateralToDeposit} ${collSymbol} into the position`}</Button>
+                            ) : (
+                              <Button fullWidth variant="contained" disabled>
+                                Deposit
+                              </Button>
+                            )}
+                          </Box>
+                        </Grid>
+                      </Grid>
+                      {needCollateralAllowance() && (
+                        <Typography>
+                          <br></br>
+                          <strong>Note:</strong> You will need to sign two
+                          transactions one to approve {collSymbol} and a second
+                          to preform the deposit.
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
                 )}
-            </li>
-          </ul>
+                {dialogTabIndex === "liquidate" && (
+                  <Box pt={2}>
+                    <Typography>
+                      <strong>Liquidate this sponsor</strong>
+                      <br></br>For the position to be under collateralize{" "}
+                      {priceId ? utils.parseBytes32String(priceId) : "N/A"}{" "}
+                      would need to increase by {underCollateralizedPercent()}%
+                      to {underCollateralizedPrice()}. You can still liquidate
+                      this position if you have a different opinion on the{" "}
+                      {priceId ? utils.parseBytes32String(priceId) : "N/A"}{" "}
+                      price.
+                      <br></br>
+                      <br></br>
+                    </Typography>
+                    <Important>
+                      Exercise caution! Incorrectly liquidating a position can
+                      loose you money! See the{" "}
+                      <a
+                        href="https://docs.umaproject.org/synthetic-tokens/explainer#liquidation-and-dispute"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        UMA docs
+                      </a>
+                      .
+                    </Important>
+                    <Box pt={2} pb={2}>
+                      <Grid container spacing={4}>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            type="number"
+                            inputProps={{ min: "0" }}
+                            label={`Min collateral/token`}
+                            placeholder="1234"
+                            value={minCollPerToken}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => setMinCollPerToken(e.target.value)}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            type="number"
+                            inputProps={{ min: "0" }}
+                            label={`Max collateral/token`}
+                            placeholder="1234"
+                            value={maxCollPerToken}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => setMaxCollPerToken(e.target.value)}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            type="number"
+                            inputProps={{ min: "0" }}
+                            label={`Max tokens to liquidate`}
+                            placeholder="1234"
+                            error={tokenBalanceTooLow}
+                            helperText={
+                              tokenBalanceTooLow
+                                ? `${tokenSymbol} balance too low`
+                                : null
+                            }
+                            value={maxTokensToLiquidate}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => setMaxTokensToLiquidate(e.target.value)}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <FormControl fullWidth>
+                            <InputLabel>Deadline</InputLabel>
+                            <Select
+                              value={deadline}
+                              onChange={(
+                                e: React.ChangeEvent<{ value: unknown }>
+                              ) => setDeadline(e.target.value as string)}
+                            >
+                              <MenuItem value={60}>1 minute</MenuItem>
+                              <MenuItem value={5 * 60}>5 minutes</MenuItem>
+                              <MenuItem value={30 * 60}>30 minutes</MenuItem>
+                              <MenuItem value={60 * 60}>1 hour</MenuItem>
+                              <MenuItem value={5 * 60 * 60}>5 hours</MenuItem>
+                              <MenuItem value={1911772800}>Forever</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </Box>
 
-          <StyledTabs
-            value={dialogTabIndex}
-            onChange={(_, i) => setDialogTabIndex(i)}
-            indicatorColor="primary"
-            textColor="primary"
-            centered
-          >
-            <Tab label="Liquidate" disableRipple />
-            <Tab label="Deposit" disableRipple />
-          </StyledTabs>
-
-          {dialogTabIndex === 0 && (
-            <Button
-              variant="contained"
-              onClick={handelLiquidate}
-            >{`Liquidate Position`}</Button>
-          )}
-          {dialogTabIndex === 1 && (
-            <TextField
-              type="number"
-              label={`Deposit ${collSymbol}`}
-              placeholder="1234"
-              inputProps={{ min: "0" }}
-              value={depositTokens}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDepositTokens(e.target.value)
-              }
-            />
-          )}
+                    <Box textAlign="center" pt={2} pb={2}>
+                      {minCollPerToken &&
+                      maxCollPerToken &&
+                      maxTokensToLiquidate &&
+                      deadline &&
+                      !collBalanceTooLow() &&
+                      !tokenBalanceTooLow ? (
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          onClick={executeLiquidation}
+                        >{`Submit liquidation`}</Button>
+                      ) : (
+                        <Button fullWidth variant="contained" disabled>
+                          Submit liquidation
+                        </Button>
+                      )}
+                    </Box>
+                    {liquidationNeedAllowanceText() && (
+                      <Typography>
+                        <strong>Note: </strong>
+                        {liquidationNeedAllowanceText()}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Container>
         </PositionDialog>
       </Dialog>
     </Container>
