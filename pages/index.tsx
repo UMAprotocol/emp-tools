@@ -7,6 +7,7 @@ import ContractState from "../features/contract-state/ContractState";
 import ManagePosition from "../features/manage-position/ManagePosition";
 import EmpSelector from "../features/emp-selector/EmpSelector";
 import AllPositions from "../features/all-positions/AllPositions";
+import Weth from "../features/weth/Weth";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -34,6 +35,7 @@ export default function Index() {
           <Tab label="General Info" disableRipple />
           <Tab label="Manage Position" disableRipple />
           <Tab label="All Positions" disableRipple />
+          <Tab label="Wrap/Unwrap WETH" disableRipple />
         </StyledTabs>
         {tabIndex === 0 && (
           <>
@@ -68,6 +70,8 @@ export default function Index() {
         {tabIndex === 1 && <ManagePosition />}
 
         {tabIndex === 2 && <AllPositions />}
+
+        {tabIndex === 3 && <Weth />}
       </Box>
       <Box py={4} textAlign="center">
         <a

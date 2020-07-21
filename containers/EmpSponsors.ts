@@ -44,7 +44,7 @@ const useEmpSponsors = () => {
   const [activePositions, setActivePositions] = useState<SponsorMap>({});
 
   // get position information about every sponsor that has ever created a position.
-  const querySponsors = async () => {
+  const querySponsors = () => {
     // Start with a fresh table.
     let newPositions: SponsorMap = {};
     if (emp) {
