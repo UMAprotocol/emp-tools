@@ -50,6 +50,7 @@ const AllPositions = () => {
 
   const prettyBalance = (x: BigNumberish | null) => {
     if (!x) return "N/A";
+    x = Number(x).toFixed(4);
     return utils.commify(x as string);
   };
 
@@ -72,7 +73,8 @@ const AllPositions = () => {
       <Box>
         <Typography>
           <i>
-            Estimated price of {latestPrice ? latestPrice : "N/A"} for{" "}
+            Estimated price of{" "}
+            {latestPrice ? Number(latestPrice).toFixed(4) : "N/A"} for{" "}
             {priceId ? utils.parseBytes32String(priceId) : "N/A"} sourced from{" "}
           </i>
           <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
