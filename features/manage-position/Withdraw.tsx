@@ -8,6 +8,7 @@ import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import Totals from "../../containers/Totals";
+import PriceFeed from "../../containers/PriceFeed";
 
 import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
@@ -40,6 +41,7 @@ const Deposit = () => {
     pendingWithdraw,
   } = Position.useContainer();
   const { gcr } = Totals.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
 
   const [collateralToWithdraw, setCollateralToWithdraw] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -122,27 +124,31 @@ const Deposit = () => {
   const handleExecuteWithdrawClick = () => executeWithdraw();
   const handleCancelWithdrawClick = () => cancelWithdraw();
 
+  // Calculations using raw collateral ratios:
   const startingCR = collateral && tokens ? collateral / tokens : null;
-
   const resultingCR =
     collateral && collateralToWithdraw && tokens
       ? (collateral - parseFloat(collateralToWithdraw)) / tokens
       : startingCR;
-
   const resultingCRBelowGCR = resultingCR && gcr ? resultingCR < gcr : null;
-
   const fastWithdrawableCollateral =
     collateral && tokens && gcr ? (collateral - gcr * tokens).toFixed(2) : null;
 
+  // Calculations of collateral ratios using same units as price feed:
+  const pricedStartingCR =
+    startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
+  const pricedResultingCR =
+    resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
+  const pricedGcr = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+
+  // Pending withdrawal request information:
   const pendingWithdrawTimeRemaining =
     collateral && withdrawPassTime && pendingWithdraw === "Yes"
       ? withdrawPassTime - Math.floor(Date.now() / 1000) - 7200
       : null;
-
   const pastWithdrawTimeStamp = pendingWithdrawTimeRemaining
     ? pendingWithdrawTimeRemaining <= 0
     : null;
-
   const pendingWithdrawTimeString = pendingWithdrawTimeRemaining
     ? Math.max(0, Math.floor(pendingWithdrawTimeRemaining / 3600)) +
       ":" +
@@ -150,6 +156,7 @@ const Deposit = () => {
       ":" +
       Math.max(0, (pendingWithdrawTimeRemaining % 3600) % 60)
     : null;
+
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
     return (
@@ -298,9 +305,15 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        <Typography>Current global CR: {gcr || "N/A"}</Typography>
-        <Typography>Current position CR: {startingCR || "N/A"}</Typography>
-        <Typography>Resulting position CR: {resultingCR || "N/A"}</Typography>
+        <Typography>
+          Current global CR: {pricedGcr?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Current position CR: {pricedStartingCR?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Resulting position CR: {pricedResultingCR?.toFixed(4) || "N/A"}
+        </Typography>
         {collateralToWithdraw && collateralToWithdraw != "0" ? (
           resultingCRBelowGCR ? (
             <Typography style={{ color: "red" }}>
