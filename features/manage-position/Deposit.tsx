@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
+import PriceFeed from "../../containers/PriceFeed";
 
 import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
@@ -22,6 +23,7 @@ const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol, balance } = Collateral.useContainer();
   const { tokens, collateral, pendingWithdraw } = Position.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
 
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -57,11 +59,15 @@ const Deposit = () => {
   const handleDepositClick = () => depositCollateral();
 
   const startingCR = collateral && tokens ? collateral / tokens : null;
+  const pricedStartingCR =
+    startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
 
   const resultingCR =
     collateral && collateralToDeposit && tokens
       ? (collateral + parseFloat(collateralToDeposit)) / tokens
       : startingCR;
+  const pricedResultingCR =
+    resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
 
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
@@ -130,8 +136,12 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        <Typography>Current CR: {startingCR || "N/A"}</Typography>
-        <Typography>Resulting CR: {resultingCR || "N/A"}</Typography>
+        <Typography>
+          Current CR: {pricedStartingCR?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Resulting CR: {pricedResultingCR?.toFixed(4) || "N/A"}
+        </Typography>
       </Box>
 
       {hash && (

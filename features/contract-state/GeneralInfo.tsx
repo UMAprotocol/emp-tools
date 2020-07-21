@@ -7,6 +7,7 @@ import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpContract from "../../containers/EmpContract";
 import Totals from "../../containers/Totals";
+import PriceFeed from "../../containers/PriceFeed";
 
 const Label = styled.span`
   color: #999999;
@@ -29,6 +30,7 @@ const GeneralInfo = () => {
   const { contract } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const { gcr } = Totals.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
 
   const {
     expirationTimestamp: expiry,
@@ -41,6 +43,8 @@ const GeneralInfo = () => {
 
   // format nice date
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
+
+  const pricedGcr = gcr && latestPrice ? gcr / Number(latestPrice) : null;
 
   return (
     <Box>
@@ -89,7 +93,7 @@ const GeneralInfo = () => {
         <Tooltip
           title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
         >
-          <span>{gcr ? gcr : "N/A"}</span>
+          <span>{pricedGcr ? pricedGcr.toFixed(4) : "N/A"}</span>
         </Tooltip>
       </Status>
     </Box>

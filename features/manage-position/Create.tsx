@@ -9,6 +9,7 @@ import Token from "../../containers/Token";
 import EmpState from "../../containers/EmpState";
 import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
+import PriceFeed from "../../containers/PriceFeed";
 
 import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
@@ -46,6 +47,7 @@ const Create = () => {
     tokens: posTokens,
     pendingWithdraw,
   } = Position.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
@@ -115,7 +117,8 @@ const Create = () => {
       collateral === null ||
       tokens === null ||
       posCollateral === null ||
-      posTokens === null
+      posTokens === null ||
+      latestPrice === null
     )
       return null;
 
@@ -124,8 +127,11 @@ const Create = () => {
     const totalTokens = posTokens + parseFloat(tokens);
     return totalCollateral / totalTokens;
   };
-
   const computedCR = computeCR() || 0;
+
+  const pricedCR =
+    computedCR && latestPrice ? computedCR / Number(latestPrice) : null;
+  const pricedGCR = gcr && latestPrice ? gcr / Number(latestPrice) : null;
 
   const etherscanUrl = useEtherscanUrl(hash);
 
@@ -256,13 +262,13 @@ const Create = () => {
           <Typography>
             Resulting CR:{" "}
             <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
-              {computedCR}
+              {pricedCR?.toFixed(4)}
             </span>
           </Typography>
         ) : (
           <Typography>Resulting CR: N/A</Typography>
         )}
-        <Typography>Current GCR: {gcr || "N/A"}</Typography>
+        <Typography>Current GCR: {pricedGCR?.toFixed(4) || "N/A"}</Typography>
       </Box>
 
       {hash && (
