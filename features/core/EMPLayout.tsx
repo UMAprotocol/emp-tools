@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import { Container, Box, Typography, Tab, Tabs } from "@material-ui/core";
+import { Container, Box, Tab, Tabs } from "@material-ui/core";
 import { useRouter } from "next/router";
 
 import Header from "./Header";
 import EmpSelector from "../emp-selector/EmpSelector";
+import Footer from "./Footer";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -13,11 +14,6 @@ const StyledTabs = styled(Tabs)`
     font-weight: bold;
   }
   padding-bottom: 2rem;
-`;
-
-const Blurb = styled.div`
-  padding: 1rem;
-  border: 1px solid #434343;
 `;
 
 interface IProps {
@@ -74,15 +70,7 @@ export default function Layout({ children }: IProps) {
 
         {children}
       </Box>
-      <Box py={4} textAlign="center">
-        <a
-          href="https://vercel.com/?utm_source=uma%2Femp-tools"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="/powered-by-vercel.svg" alt="Powered by Vercel" />
-        </a>
-      </Box>
+      <Footer />
     </Container>
   );
 }
