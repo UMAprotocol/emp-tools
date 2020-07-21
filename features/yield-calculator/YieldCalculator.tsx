@@ -10,6 +10,7 @@ const Container = styled.div`
 
 const FormInput = styled.div`
   margin-top: 20px;
+  margin-bottom: 20px;
 `;
 
 const MS_TO_S = 1000;
@@ -107,7 +108,9 @@ const YieldCalculator = () => {
               }}
             />
           </FormInput>
-          <Button type="submit">Calculate</Button>
+          <Button type="submit" variant="contained">
+            Calculate
+          </Button>
         </form>
       </Container>
     </Box>
