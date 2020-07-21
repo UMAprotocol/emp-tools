@@ -1,10 +1,11 @@
+import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import uma from "@studydefi/money-legos/uma";
 import erc20 from "@studydefi/money-legos/erc20";
 
-import Connection from "../../containers/Connection";
-import { EMPs } from "./EMPs";
+import Connection from "./Connection";
+import { EMPs } from "../utils/deployedEmpList";
 
 export interface Emp {
   name: string;
@@ -52,4 +53,6 @@ const useEmpList = () => {
   };
 };
 
-export default useEmpList;
+const EmpDeployed = createContainer(useEmpList);
+
+export default EmpDeployed;

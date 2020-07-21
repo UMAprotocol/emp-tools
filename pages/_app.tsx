@@ -9,6 +9,7 @@ import EmpContract from "../containers/EmpContract";
 import EmpAddress from "../containers/EmpAddress";
 import EmpState from "../containers/EmpState";
 import EmpSponsors from "../containers/EmpSponsors";
+import EmpDeployed from "../containers/EmpDeployed";
 import Collateral from "../containers/Collateral";
 import Token from "../containers/Token";
 import Position from "../containers/Position";
@@ -28,21 +29,23 @@ const WithStateContainerProviders = ({ children }: IProps) => (
     <Connection.Provider>
       <EmpAddress.Provider>
         <EmpContract.Provider>
-          <WethContract.Provider>
-            <EmpState.Provider>
-              <EmpSponsors.Provider>
-                <Collateral.Provider>
-                  <Token.Provider>
-                    <Totals.Provider>
-                      <PriceFeed.Provider>
-                        <Position.Provider>{children}</Position.Provider>
-                      </PriceFeed.Provider>
-                    </Totals.Provider>
-                  </Token.Provider>
-                </Collateral.Provider>
-              </EmpSponsors.Provider>
-            </EmpState.Provider>
-          </WethContract.Provider>
+          <EmpDeployed.Provider>
+            <WethContract.Provider>
+              <EmpState.Provider>
+                <EmpSponsors.Provider>
+                  <Collateral.Provider>
+                    <Token.Provider>
+                      <Totals.Provider>
+                        <PriceFeed.Provider>
+                          <Position.Provider>{children}</Position.Provider>
+                        </PriceFeed.Provider>
+                      </Totals.Provider>
+                    </Token.Provider>
+                  </Collateral.Provider>
+                </EmpSponsors.Provider>
+              </EmpState.Provider>
+            </WethContract.Provider>
+          </EmpDeployed.Provider>
         </EmpContract.Provider>
       </EmpAddress.Provider>
     </Connection.Provider>

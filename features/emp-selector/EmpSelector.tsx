@@ -8,9 +8,9 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 
 import ListItemText from "@material-ui/core/ListItemText";
-import useEmpList from "./useEmpList";
 import EmpAddress from "../../containers/EmpAddress";
 import Connection from "../../containers/Connection";
+import EmpDeployed from "../../containers/EmpDeployed";
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
@@ -36,7 +36,7 @@ const FormWrapper = styled(FormControl)`
 const EmpSelector = () => {
   const { signer } = Connection.useContainer();
   const { empAddress, setEmpAddress } = EmpAddress.useContainer();
-  const { emps, loading } = useEmpList();
+  const { emps, loading } = EmpDeployed.useContainer();
 
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const value = e.target.value;
