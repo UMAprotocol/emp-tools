@@ -104,7 +104,10 @@ const AllPositions = () => {
                     activeSponsor?.tokensOutstanding && (
                       <TableRow key={sponsor}>
                         <TableCell component="th" scope="row">
-                          <a href={sponsor ? useEtherscanUrl(sponsor) : "N/A"}>
+                          <a
+                            href={sponsor ? useEtherscanUrl(sponsor) : "N/A"}
+                            target="_blank"
+                          >
                             {prettyAddress(sponsor)}
                           </a>
                         </TableCell>
