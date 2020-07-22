@@ -70,13 +70,13 @@ const YourPosition = () => {
       </Status>
       <Status>
         <Label>
-          Estimated Token price (
+          Estimated identifier price (
           <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
             Coinbase Pro
           </Link>
           ):{" "}
         </Label>
-        {ready ? `${latestPrice?.toLocaleString()}` : "N/A"}
+        {ready ? `${Number(latestPrice).toFixed(4)}` : "N/A"}
       </Status>
       <Status>
         <Label>(CR) Collateralization ratio: </Label>

@@ -8,8 +8,7 @@ import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import Token from "../../containers/Token";
-
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import Etherscan from "../../containers/Etherscan";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -38,6 +37,7 @@ const Redeem = () => {
     setMaxAllowance,
     balance: syntheticBalance,
   } = Token.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [tokensToRedeem, setTokensToRedeem] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -93,8 +93,6 @@ const Redeem = () => {
       setError(new Error("Please check that you are connected."));
     }
   };
-
-  const etherscanUrl = useEtherscanUrl(hash);
 
   const handleRedemptionClick = () => redeemTokens();
 
@@ -197,9 +195,9 @@ const Redeem = () => {
         <Box py={2}>
           <Typography>
             <strong>Tx Hash: </strong>
-            {etherscanUrl ? (
+            {hash ? (
               <Link
-                href={etherscanUrl}
+                href={getEtherscanUrl(hash)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

@@ -1,25 +1,26 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { BigNumberish } from "ethers";
 
-import { getOffchainPrice, PRICE_FEEDS } from "../utils/getOffchainPrice";
+import {
+  getOffchainPriceFromTokenSymbol,
+  getPricefeedParamsFromTokenSymbol,
+} from "../utils/getOffchainPrice";
 
 import Token from "./Token";
 
 function usePriceFeed() {
   const { symbol: tokenSymbol } = Token.useContainer();
 
-  const [latestPrice, setLatestPrice] = useState<BigNumberish | null>(null);
+  const [latestPrice, setLatestPrice] = useState<number | null>(null);
   const [source, setSource] = useState<string | undefined>(undefined);
 
   const queryPrice = async () => {
     setLatestPrice(null);
 
     if (tokenSymbol) {
-      const identifier = tokenSymbol.includes("yCOMP") ? "compusd" : "ethbtc";
-      const query = await getOffchainPrice(identifier);
+      const query = await getOffchainPriceFromTokenSymbol(tokenSymbol);
       setLatestPrice(query);
-      setSource(PRICE_FEEDS[identifier]);
+      setSource(getPricefeedParamsFromTokenSymbol(tokenSymbol)?.source);
     }
   };
 

@@ -7,8 +7,8 @@ import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
-
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import Etherscan from "../../containers/Etherscan";
+import { hashMessage } from "ethers/lib/utils";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -24,6 +24,7 @@ const Deposit = () => {
   const { symbol: collSymbol, balance } = Collateral.useContainer();
   const { tokens, collateral, pendingWithdraw } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -53,8 +54,6 @@ const Deposit = () => {
       setError(new Error("Please check that you are connected."));
     }
   };
-
-  const etherscanUrl = useEtherscanUrl(hash);
 
   const handleDepositClick = () => depositCollateral();
 
@@ -148,9 +147,9 @@ const Deposit = () => {
         <Box py={2}>
           <Typography>
             <strong>Tx Hash: </strong>
-            {etherscanUrl ? (
+            {hash ? (
               <Link
-                href={etherscanUrl}
+                href={getEtherscanUrl(hash)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

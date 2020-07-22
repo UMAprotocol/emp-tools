@@ -11,7 +11,7 @@ import styled from "styled-components";
 
 import WethContract from "../../containers/WethContract";
 import Connection from "../../containers/Connection";
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import Etherscan from "../../containers/Etherscan";
 
 enum ACTION_TYPE {
   WRAP,
@@ -80,14 +80,13 @@ const Weth = () => {
     ethBalance,
   } = WethContract.useContainer();
   const { signer } = Connection.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [ethAmount, setEthAmount] = useState<BigNumberish | null>(null);
   const [wethAmount, setWethAmount] = useState<BigNumberish | null>(null);
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
-
-  const etherscanUrl = useEtherscanUrl(hash);
 
   const _submitTxn = async (amount: string | null, action: ACTION_TYPE) => {
     if (weth) {
@@ -240,9 +239,9 @@ const Weth = () => {
         <Box py={4}>
           <Typography>
             <strong>Tx Receipt: </strong>
-            {etherscanUrl ? (
+            {hash ? (
               <Link
-                href={etherscanUrl}
+                href={getEtherscanUrl(hash)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
