@@ -4,8 +4,7 @@ import { Box, Grid, Typography, Tooltip } from "@material-ui/core";
 import TotalsContainer from "../../containers/Totals";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
-
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import Etherscan from "../../containers/Etherscan";
 
 const DataBox = styled(Box)`
   border: 1px solid #434343;
@@ -47,9 +46,7 @@ const Totals = () => {
     address: collAddress,
   } = Collateral.useContainer();
   const { symbol: tokenSymbol, address: tokenAddress } = Token.useContainer();
-
-  const collateralEtherscan = useEtherscanUrl(collAddress ? collAddress : null);
-  const tokenEtherscan = useEtherscanUrl(tokenAddress ? tokenAddress : null);
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const loading =
     !totalCollateral || !totalTokens || !collSymbol || !tokenSymbol;
@@ -69,9 +66,9 @@ const Totals = () => {
             of <White>collateral</White> supplied
           </Label>
           <LinksContainer>
-            {collateralEtherscan && (
+            {collAddress && (
               <SmallLink
-                href={collateralEtherscan}
+                href={getEtherscanUrl(collAddress)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -105,9 +102,9 @@ const Totals = () => {
             </Label>
           </Tooltip>
           <LinksContainer>
-            {tokenEtherscan && (
+            {tokenAddress && (
               <SmallLink
-                href={tokenEtherscan}
+                href={getEtherscanUrl(tokenAddress)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

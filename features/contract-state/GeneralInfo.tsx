@@ -7,9 +7,9 @@ import Token from "../../containers/Token";
 import EmpContract from "../../containers/EmpContract";
 import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
+import Etherscan from "../../containers/Etherscan";
 
 import { DOCS_MAP } from "../../utils/getDocLinks";
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
 const Label = styled.span`
   color: #999999;
@@ -33,6 +33,7 @@ const GeneralInfo = () => {
   const { empState } = EmpState.useContainer();
   const { gcr } = Totals.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const {
     expirationTimestamp: expiry,
@@ -42,8 +43,6 @@ const GeneralInfo = () => {
     withdrawalLiveness,
   } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
-
-  const contractEtherscan = useEtherscanUrl(contract ? contract.address : null);
 
   // format nice date
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
@@ -58,9 +57,9 @@ const GeneralInfo = () => {
     <Box>
       <Typography variant="h5">
         General Info{" "}
-        {contract && (
+        {contract?.address && (
           <Link
-            href={contractEtherscan}
+            href={getEtherscanUrl(contract.address)}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -92,7 +91,7 @@ const GeneralInfo = () => {
           </Link>
           ):{" "}
         </Label>
-        {latestPrice ? `${latestPrice?.toLocaleString()}` : "N/A"}
+        {latestPrice ? `${Number(latestPrice).toFixed(4)}` : "N/A"}
       </Status>
 
       <Status>

@@ -10,8 +10,7 @@ import EmpState from "../../containers/EmpState";
 import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
-
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import Etherscan from "../../containers/Etherscan";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -48,6 +47,7 @@ const Create = () => {
     pendingWithdraw,
   } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
@@ -132,8 +132,6 @@ const Create = () => {
   const pricedCR =
     computedCR && latestPrice ? computedCR / Number(latestPrice) : null;
   const pricedGCR = gcr && latestPrice ? gcr / Number(latestPrice) : null;
-
-  const etherscanUrl = useEtherscanUrl(hash);
 
   // User has not selected an EMP yet. We can detect this by checking if any properties in `empState` are `null`.
   if (collReq === null) {
@@ -275,9 +273,9 @@ const Create = () => {
         <Box py={2}>
           <Typography>
             <strong>Tx Receipt: </strong>
-            {etherscanUrl ? (
+            {hash ? (
               <Link
-                href={etherscanUrl}
+                href={getEtherscanUrl(hash)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

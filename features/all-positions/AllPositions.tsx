@@ -19,8 +19,7 @@ import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import EmpContract from "../../containers/EmpContract";
 import PriceFeed from "../../containers/PriceFeed";
-
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import Etherscan from "../../containers/Etherscan";
 
 const Link = styled.a`
   color: white;
@@ -35,6 +34,7 @@ const AllPositions = () => {
   const { activeSponsors } = EmpSponsors.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   if (tokenSymbol === null || emp === null) {
     return (
@@ -104,10 +104,7 @@ const AllPositions = () => {
                     activeSponsor?.tokensOutstanding && (
                       <TableRow key={sponsor}>
                         <TableCell component="th" scope="row">
-                          <a
-                            href={sponsor ? useEtherscanUrl(sponsor) : "N/A"}
-                            target="_blank"
-                          >
+                          <a href={getEtherscanUrl(sponsor)} target="_blank">
                             {prettyAddress(sponsor)}
                           </a>
                         </TableCell>

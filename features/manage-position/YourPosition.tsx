@@ -76,7 +76,7 @@ const YourPosition = () => {
           </Link>
           ):{" "}
         </Label>
-        {ready ? `${latestPrice?.toLocaleString()}` : "N/A"}
+        {ready ? `${Number(latestPrice).toFixed(4)}` : "N/A"}
       </Status>
       <Status>
         <Label>(CR) Collateralization ratio: </Label>
