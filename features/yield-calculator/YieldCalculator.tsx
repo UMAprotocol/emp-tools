@@ -45,7 +45,7 @@ const YieldCalculator = () => {
     }
   };
 
-  // @dev: We set this state var `daysToExpiry` after declaring `calculateDaysToExpiry()` because we first want to check if its value is
+  // We set this state var `daysToExpiry` after declaring `calculateDaysToExpiry()` because we first want to check if its value is
   // non null in order to set its default value.
   const [daysToExpiry, setDaysToExpiry] = useState<string | null>(
     calculateDaysToExpiry()?.toString() || PLACEHOLDER_DAYS_TO_EXPIRY
@@ -70,7 +70,7 @@ const YieldCalculator = () => {
   };
 
   const prettyPercentage = (x: number | null) => {
-    if (x === null) return "N/A";
+    if (x === null) return "";
     return (x * 100).toFixed(4);
   };
 
@@ -115,9 +115,7 @@ const YieldCalculator = () => {
               disabled
               type="string"
               label="APY (%)"
-              value={
-                yieldAmount !== null ? `${prettyPercentage(yieldAmount)}` : ""
-              }
+              value={prettyPercentage(yieldAmount)}
               variant="outlined"
               InputLabelProps={{
                 shrink: true,
