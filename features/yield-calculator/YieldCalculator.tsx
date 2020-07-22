@@ -72,7 +72,7 @@ const YieldCalculator = () => {
           <FormInput>
             <TextField
               type="number"
-              label="Current yUSD Price"
+              label="Current yUSD Price (USD)"
               value={tokenPrice?.toString() || ""}
               onChange={(e) => setTokenPrice(parseFloat(e.target.value))}
               variant="outlined"
