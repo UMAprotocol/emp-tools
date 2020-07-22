@@ -36,6 +36,7 @@ const GeneralInfo = () => {
     priceIdentifier: priceId,
     collateralRequirement: collReq,
     minSponsorTokens,
+    withdrawalLiveness,
   } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
 
@@ -43,6 +44,10 @@ const GeneralInfo = () => {
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
 
   const pricedGcr = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+
+  const withdrawalLivenessInMinutes = withdrawalLiveness
+    ? Number(withdrawalLiveness) / 60
+    : null;
 
   return (
     <Box>
@@ -54,7 +59,7 @@ const GeneralInfo = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            etherscan
+            Etherscan
           </Link>
         )}
       </Typography>
@@ -103,6 +108,31 @@ const GeneralInfo = () => {
           title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
         >
           <span>{pricedGcr ? pricedGcr.toFixed(4) : "N/A"}</span>
+        </Tooltip>
+      </Status>
+
+      <Status>
+        <Label>
+          Withdrawal Liveness (minutes) (
+          <Link
+            href={
+              "https://docs.umaproject.org/synthetic-tokens/explainer#slow-withdrawal"
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Docs
+          </Link>
+          ) :
+        </Label>
+        <Tooltip
+          title={`To withdraw past the global collateralization ratio, you will need to wait a liveness period before completing your withdrawal.`}
+        >
+          <span>
+            {withdrawalLiveness
+              ? withdrawalLivenessInMinutes?.toFixed(2)
+              : "N/A"}
+          </span>
         </Tooltip>
       </Status>
     </Box>

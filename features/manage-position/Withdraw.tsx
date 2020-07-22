@@ -29,7 +29,7 @@ const Link = styled.a`
 
 const Deposit = () => {
   const { empState } = EmpState.useContainer();
-  const { liquidationLiveness } = empState;
+  const { withdrawalLiveness } = empState;
 
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
@@ -254,10 +254,10 @@ const Deposit = () => {
             </li>
             <li>
               <strong>"Slow" withdrawal: </strong> To withdraw past the global
-              collateralization ratio, you will need to wait a livness period
-              before compleating your withdrawal. For this EMP this is{" "}
-              {liquidationLiveness &&
-                Math.floor(liquidationLiveness.toNumber() / (60 * 60))}{" "}
+              collateralization ratio, you will need to wait a liveness period
+              before completing your withdrawal. For this EMP this is{" "}
+              {withdrawalLiveness &&
+                Math.floor(withdrawalLiveness.toNumber() / (60 * 60))}{" "}
               hours. When preforming this kind of withdrawal one must ensure
               that their position is sufficiently collateralized after the
               withdrawal or you risk being liquidated.

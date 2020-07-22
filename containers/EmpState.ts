@@ -20,6 +20,7 @@ interface ContractState {
   rawTotalPositionCollateral: BigNumber | null;
   totalTokensOutstanding: BigNumber | null;
   liquidationLiveness: BigNumber | null;
+  withdrawalLiveness: BigNumber | null;
 }
 
 const initState = {
@@ -37,6 +38,7 @@ const initState = {
   rawTotalPositionCollateral: null,
   totalTokensOutstanding: null,
   liquidationLiveness: null,
+  withdrawalLiveness: null,
 };
 
 const useContractState = () => {
@@ -67,6 +69,7 @@ const useContractState = () => {
         emp.rawTotalPositionCollateral(),
         emp.totalTokensOutstanding(),
         emp.liquidationLiveness(),
+        emp.withdrawalLiveness(),
       ]);
 
       const newState: ContractState = {
@@ -84,6 +87,7 @@ const useContractState = () => {
         rawTotalPositionCollateral: res[11] as BigNumber,
         totalTokensOutstanding: res[12] as BigNumber,
         liquidationLiveness: res[13] as BigNumber,
+        withdrawalLiveness: res[14] as BigNumber,
       };
 
       setState(newState);
