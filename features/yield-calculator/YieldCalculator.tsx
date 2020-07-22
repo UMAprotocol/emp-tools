@@ -13,9 +13,9 @@ const FormInput = styled.div`
   margin-bottom: 20px;
 `;
 
-const MS_TO_S = 1000;
-const S_TO_DAYS = 60 * 60 * 24;
-const DAYS_TO_YEAR = 365;
+const MS_PER_S = 1000;
+const S_PER_DAY = 60 * 60 * 24;
+const DAYS_PER_YEAR = 365;
 
 const YieldCalculator = () => {
   const { empState } = EmpState.useContainer();
@@ -25,10 +25,10 @@ const YieldCalculator = () => {
 
   const calculateDaysToExpiry = () => {
     if (expirationTimestamp) {
-      const currentTimestamp = Math.round(Date.now() / MS_TO_S);
+      const currentTimestamp = Math.round(Date.now() / MS_PER_S);
       const secondsToExpiry = expirationTimestamp.toNumber() - currentTimestamp;
 
-      return Math.round(secondsToExpiry / S_TO_DAYS);
+      return Math.round(secondsToExpiry / S_PER_DAY);
     } else {
       return null;
     }
@@ -45,7 +45,7 @@ const YieldCalculator = () => {
       return null;
     }
     const yieldPerUnit =
-      Math.pow(1 / tokenPrice, 1 / (daysToExpiry / DAYS_TO_YEAR)) - 1;
+      Math.pow(1 / tokenPrice, 1 / (daysToExpiry / DAYS_PER_YEAR)) - 1;
     return yieldPerUnit;
   };
   const [yieldAmount, setYieldAmount] = useState<number | null>(
