@@ -9,8 +9,8 @@ import Token from "../../containers/Token";
 import EmpState from "../../containers/EmpState";
 import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
-
-import { useEtherscanUrl } from "./useEtherscanUrl";
+import PriceFeed from "../../containers/PriceFeed";
+import Etherscan from "../../containers/Etherscan";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -37,15 +37,17 @@ const Create = () => {
     decimals: collDec,
     allowance: collAllowance,
     setMaxAllowance,
-    balance
+    balance,
   } = Collateral.useContainer();
   const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { gcr } = Totals.useContainer();
   const {
     collateral: posCollateral,
     tokens: posTokens,
-    pendingWithdraw
+    pendingWithdraw,
   } = Position.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [collateral, setCollateral] = useState<string>("");
   const [tokens, setTokens] = useState<string>("");
@@ -115,7 +117,8 @@ const Create = () => {
       collateral === null ||
       tokens === null ||
       posCollateral === null ||
-      posTokens === null
+      posTokens === null ||
+      latestPrice === null
     )
       return null;
 
@@ -124,10 +127,24 @@ const Create = () => {
     const totalTokens = posTokens + parseFloat(tokens);
     return totalCollateral / totalTokens;
   };
-
   const computedCR = computeCR() || 0;
 
-  const etherscanUrl = useEtherscanUrl(hash);
+  const pricedCR =
+    computedCR && latestPrice ? computedCR / Number(latestPrice) : null;
+  const pricedGCR = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+
+  // User has not selected an EMP yet. We can detect this by checking if any properties in `empState` are `null`.
+  if (collReq === null) {
+    return (
+      <Container>
+        <Box py={2}>
+          <Typography>
+            <i>Please first select an EMP from the dropdown above.</i>
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
 
   // User has not selected an EMP yet. We can detect this by checking if any properties in `empState` are `null`.
   if (collReq === null) {
@@ -144,13 +161,16 @@ const Create = () => {
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-        <Container>
-          <Box py={2}>
-            <Typography>
-              <i>You need to cancel or execute your pending withdrawal request before creating additional tokens.</i>
-            </Typography>
-          </Box>
-        </Container>
+      <Container>
+        <Box py={2}>
+          <Typography>
+            <i>
+              You need to cancel or execute your pending withdrawal request
+              before creating additional tokens.
+            </i>
+          </Typography>
+        </Box>
+      </Container>
     );
   }
 
@@ -231,7 +251,12 @@ const Create = () => {
             Approve
           </Button>
         )}
-        {tokens && collateral && gcr && !needAllowance() && computedCR > gcr && !balanceTooLow ? (
+        {tokens &&
+        collateral &&
+        gcr &&
+        !needAllowance() &&
+        computedCR > gcr &&
+        !balanceTooLow ? (
           <Button
             variant="contained"
             onClick={handleCreateClick}
@@ -248,28 +273,30 @@ const Create = () => {
           <Typography>
             Resulting CR:{" "}
             <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
-              {computedCR}
+              {pricedCR?.toFixed(4)}
             </span>
           </Typography>
         ) : (
           <Typography>Resulting CR: N/A</Typography>
         )}
-        <Typography>Current GCR: {gcr || "N/A"}</Typography>
+        <Typography>Current GCR: {pricedGCR?.toFixed(4) || "N/A"}</Typography>
       </Box>
 
       {hash && (
         <Box py={2}>
           <Typography>
             <strong>Tx Receipt: </strong>
-              {etherscanUrl ? (
-                <Link
-                  href={etherscanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {hash}
-                </Link>
-              ) : hash}
+            {hash ? (
+              <Link
+                href={getEtherscanUrl(hash)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
+            ) : (
+              hash
+            )}
           </Typography>
         </Box>
       )}

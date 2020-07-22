@@ -6,8 +6,9 @@ import { ethers } from "ethers";
 import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
-
-import { useEtherscanUrl } from "./useEtherscanUrl";
+import PriceFeed from "../../containers/PriceFeed";
+import Etherscan from "../../containers/Etherscan";
+import { hashMessage } from "ethers/lib/utils";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -22,6 +23,8 @@ const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol, balance } = Collateral.useContainer();
   const { tokens, collateral, pendingWithdraw } = Position.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -52,16 +55,18 @@ const Deposit = () => {
     }
   };
 
-  const etherscanUrl = useEtherscanUrl(hash);
-
   const handleDepositClick = () => depositCollateral();
 
   const startingCR = collateral && tokens ? collateral / tokens : null;
+  const pricedStartingCR =
+    startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
 
   const resultingCR =
     collateral && collateralToDeposit && tokens
       ? (collateral + parseFloat(collateralToDeposit)) / tokens
       : startingCR;
+  const pricedResultingCR =
+    resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
 
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
@@ -78,13 +83,16 @@ const Deposit = () => {
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-        <Container>
-          <Box py={2}>
-            <Typography>
-              <i>You need to cancel or execute your pending withdrawal request before depositing additional collateral.</i>
-            </Typography>
-          </Box>
-        </Container>
+      <Container>
+        <Box py={2}>
+          <Typography>
+            <i>
+              You need to cancel or execute your pending withdrawal request
+              before depositing additional collateral.
+            </i>
+          </Typography>
+        </Box>
+      </Container>
     );
   }
 
@@ -105,7 +113,7 @@ const Deposit = () => {
           label={`Collateral (${collSymbol})`}
           placeholder="1234"
           error={balanceTooLow}
-          helperText={balanceTooLow ? `${collSymbol} balance too low`: null}
+          helperText={balanceTooLow ? `${collSymbol} balance too low` : null}
           value={collateralToDeposit}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCollateralToDeposit(e.target.value)
@@ -127,23 +135,29 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        <Typography>Current CR: {startingCR || "N/A"}</Typography>
-        <Typography>Resulting CR: {resultingCR || "N/A"}</Typography>
+        <Typography>
+          Current CR: {pricedStartingCR?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Resulting CR: {pricedResultingCR?.toFixed(4) || "N/A"}
+        </Typography>
       </Box>
 
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> 
-            {etherscanUrl ? (
-                <Link
-                  href={etherscanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {hash}
-                </Link>
-              ) : hash}
+            <strong>Tx Hash: </strong>
+            {hash ? (
+              <Link
+                href={getEtherscanUrl(hash)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
+            ) : (
+              hash
+            )}
           </Typography>
         </Box>
       )}

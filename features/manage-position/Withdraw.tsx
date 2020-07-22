@@ -8,8 +8,8 @@ import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import Totals from "../../containers/Totals";
-
-import { useEtherscanUrl } from "./useEtherscanUrl";
+import PriceFeed from "../../containers/PriceFeed";
+import Etherscan from "../../containers/Etherscan";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -28,7 +28,7 @@ const Link = styled.a`
 
 const Deposit = () => {
   const { empState } = EmpState.useContainer();
-  const { liquidationLiveness } = empState;
+  const { withdrawalLiveness } = empState;
 
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
@@ -40,6 +40,8 @@ const Deposit = () => {
     pendingWithdraw,
   } = Position.useContainer();
   const { gcr } = Totals.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [collateralToWithdraw, setCollateralToWithdraw] = useState<string>("");
   const [hash, setHash] = useState<string | null>(null);
@@ -116,40 +118,43 @@ const Deposit = () => {
     }
   };
 
-  const etherscanUrl = useEtherscanUrl(hash);
-
   const handleWithdrawClick = () => withdrawCollateral();
   const handleExecuteWithdrawClick = () => executeWithdraw();
   const handleCancelWithdrawClick = () => cancelWithdraw();
 
+  // Calculations using raw collateral ratios:
   const startingCR = collateral && tokens ? collateral / tokens : null;
-
   const resultingCR =
     collateral && collateralToWithdraw && tokens
       ? (collateral - parseFloat(collateralToWithdraw)) / tokens
       : startingCR;
-
   const resultingCRBelowGCR = resultingCR && gcr ? resultingCR < gcr : null;
-
   const fastWithdrawableCollateral =
     collateral && tokens && gcr ? (collateral - gcr * tokens).toFixed(2) : null;
 
+  // Calculations of collateral ratios using same units as price feed:
+  const pricedStartingCR =
+    startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
+  const pricedResultingCR =
+    resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
+  const pricedGcr = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+
+  // Pending withdrawal request information:
   const pendingWithdrawTimeRemaining =
     collateral && withdrawPassTime && pendingWithdraw === "Yes"
       ? withdrawPassTime - Math.floor(Date.now() / 1000) - 7200
       : null;
-
   const pastWithdrawTimeStamp = pendingWithdrawTimeRemaining
     ? pendingWithdrawTimeRemaining <= 0
     : null;
-
   const pendingWithdrawTimeString = pendingWithdrawTimeRemaining
     ? Math.max(0, Math.floor(pendingWithdrawTimeRemaining / 3600)) +
       ":" +
       Math.max(0, Math.floor((pendingWithdrawTimeRemaining % 3600) / 60)) +
       ":" +
-      Math.max(0, ((pendingWithdrawTimeRemaining % 3600) % 60))
+      Math.max(0, (pendingWithdrawTimeRemaining % 3600) % 60)
     : null;
+
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
     return (
@@ -247,10 +252,10 @@ const Deposit = () => {
             </li>
             <li>
               <strong>"Slow" withdrawal: </strong> To withdraw past the global
-              collateralization ratio, you will need to wait a livness period
-              before compleating your withdrawal. For this EMP this is{" "}
-              {liquidationLiveness &&
-                Math.floor(liquidationLiveness.toNumber() / (60 * 60))}{" "}
+              collateralization ratio, you will need to wait a liveness period
+              before completing your withdrawal. For this EMP this is{" "}
+              {withdrawalLiveness &&
+                Math.floor(withdrawalLiveness.toNumber() / (60 * 60))}{" "}
               hours. When preforming this kind of withdrawal one must ensure
               that their position is sufficiently collateralized after the
               withdrawal or you risk being liquidated.
@@ -298,9 +303,15 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        <Typography>Current global CR: {gcr || "N/A"}</Typography>
-        <Typography>Current position CR: {startingCR || "N/A"}</Typography>
-        <Typography>Resulting position CR: {resultingCR || "N/A"}</Typography>
+        <Typography>
+          Current global CR: {pricedGcr?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Current position CR: {pricedStartingCR?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Resulting position CR: {pricedResultingCR?.toFixed(4) || "N/A"}
+        </Typography>
         {collateralToWithdraw && collateralToWithdraw != "0" ? (
           resultingCRBelowGCR ? (
             <Typography style={{ color: "red" }}>
@@ -321,16 +332,18 @@ const Deposit = () => {
       {hash && (
         <Box py={2}>
           <Typography>
-            <strong>Tx Hash: </strong> 
-            {etherscanUrl ? (
-                <Link
-                  href={etherscanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {hash}
-                </Link>
-              ) : hash}
+            <strong>Tx Hash: </strong>
+            {hash ? (
+              <Link
+                href={getEtherscanUrl(hash)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hash}
+              </Link>
+            ) : (
+              hash
+            )}
           </Typography>
         </Box>
       )}

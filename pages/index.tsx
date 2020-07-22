@@ -6,6 +6,9 @@ import Header from "../features/core/Header";
 import ContractState from "../features/contract-state/ContractState";
 import ManagePosition from "../features/manage-position/ManagePosition";
 import EmpSelector from "../features/emp-selector/EmpSelector";
+import AllPositions from "../features/all-positions/AllPositions";
+import Weth from "../features/weth/Weth";
+import YieldCalculator from "../features/yield-calculator/YieldCalculator";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -32,6 +35,9 @@ export default function Index() {
         <StyledTabs value={tabIndex} onChange={(_, i) => setTabIndex(i)}>
           <Tab label="General Info" disableRipple />
           <Tab label="Manage Position" disableRipple />
+          <Tab label="All Positions" disableRipple />
+          <Tab label="Wrap/Unwrap WETH" disableRipple />
+          <Tab label="Yield Calculator" disableRipple />
         </StyledTabs>
         {tabIndex === 0 && (
           <>
@@ -64,6 +70,21 @@ export default function Index() {
         )}
 
         {tabIndex === 1 && <ManagePosition />}
+
+        {tabIndex === 2 && <AllPositions />}
+
+        {tabIndex === 3 && <Weth />}
+
+        {tabIndex === 4 && <YieldCalculator />}
+      </Box>
+      <Box py={4} textAlign="center">
+        <a
+          href="https://vercel.com/?utm_source=uma%2Femp-tools"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src="/powered-by-vercel.svg" alt="Powered by Vercel" />
+        </a>
       </Box>
       <Box py={4} textAlign="center">
         <a

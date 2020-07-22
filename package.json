@@ -5,14 +5,17 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "chain": "ts-node -O '{\"module\":\"commonjs\"}' chain.ts"
+    "chain": "ts-node -O '{\"module\":\"commonjs\"}' chain.ts",
+    "lint": "prettier './**/*.{ts,tsx,css,html,md}' --write"
   },
   "dependencies": {
+    "@apollo/client": "^3.0.1",
     "@material-ui/core": "^4.10.2",
     "@material-ui/icons": "^4.9.1",
     "@studydefi/money-legos": "^2.3.2",
     "date-fns": "^2.14.0",
     "ethers": "^5.0.1",
+    "graphql": "^15.3.0",
     "jazzicon": "^1.5.0",
     "next": "^9.4.4",
     "react": "^16.13.1",
@@ -28,6 +31,9 @@
     "babel-plugin-styled-components": "^1.11.0-0",
     "dotenv": "^8.2.0",
     "ganache-core": "^2.10.2",
+    "husky": "^4.2.3",
+    "lint-staged": ">=10",
+    "prettier": "^2.0.5",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   },
@@ -36,5 +42,13 @@
     "semi": true,
     "singleQuote": false
   },
-  "license": "ISC"
+  "husky": {
+    "hooks": {
+      "pre-commit": "echo '🛁 Linting staged files' && lint-staged && echo '🔏 Compiling Typescript' && npx tsc"
+    }
+  },
+  "license": "ISC",
+  "lint-staged": {
+    "*.{ts,tsx,css,html,md}": "prettier --write"
+  }
 }

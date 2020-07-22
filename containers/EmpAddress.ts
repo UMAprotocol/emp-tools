@@ -28,7 +28,7 @@ function useEmpAddress() {
   };
 
   return {
-    empAddress: address,
+    empAddress: address ? ethers.utils.getAddress(address) : null,
     setEmpAddress,
     isValid: ethers.utils.isAddress(address || ""),
   };

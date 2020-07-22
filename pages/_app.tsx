@@ -8,31 +8,48 @@ import Connection from "../containers/Connection";
 import EmpContract from "../containers/EmpContract";
 import EmpAddress from "../containers/EmpAddress";
 import EmpState from "../containers/EmpState";
+import EmpSponsors from "../containers/EmpSponsors";
 import Collateral from "../containers/Collateral";
 import Token from "../containers/Token";
 import Position from "../containers/Position";
 import Totals from "../containers/Totals";
+import PriceFeed from "../containers/PriceFeed";
+import WethContract from "../containers/WethContract";
+import Etherscan from "../containers/Etherscan";
+
+import { ApolloProvider } from "@apollo/client";
+import { client } from "../apollo/client";
 
 interface IProps {
   children: React.ReactNode;
 }
 
 const WithStateContainerProviders = ({ children }: IProps) => (
-  <Connection.Provider>
-    <EmpAddress.Provider>
-      <EmpContract.Provider>
-        <EmpState.Provider>
-          <Collateral.Provider>
-            <Token.Provider>
-              <Totals.Provider>
-                <Position.Provider>{children}</Position.Provider>
-              </Totals.Provider>
-            </Token.Provider>
-          </Collateral.Provider>
-        </EmpState.Provider>
-      </EmpContract.Provider>
-    </EmpAddress.Provider>
-  </Connection.Provider>
+  <ApolloProvider client={client}>
+    <Connection.Provider>
+      <EmpAddress.Provider>
+        <EmpContract.Provider>
+          <WethContract.Provider>
+            <EmpState.Provider>
+              <EmpSponsors.Provider>
+                <Collateral.Provider>
+                  <Token.Provider>
+                    <Totals.Provider>
+                      <PriceFeed.Provider>
+                        <Etherscan.Provider>
+                          <Position.Provider>{children}</Position.Provider>
+                        </Etherscan.Provider>
+                      </PriceFeed.Provider>
+                    </Totals.Provider>
+                  </Token.Provider>
+                </Collateral.Provider>
+              </EmpSponsors.Provider>
+            </EmpState.Provider>
+          </WethContract.Provider>
+        </EmpContract.Provider>
+      </EmpAddress.Provider>
+    </Connection.Provider>
+  </ApolloProvider>
 );
 
 export default class MyApp extends App {
