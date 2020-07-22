@@ -8,6 +8,8 @@ import EmpContract from "../../containers/EmpContract";
 import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 
+import { DOCS_MAP } from "../../utils/getDocLinks";
+
 const Label = styled.span`
   color: #999999;
 `;
@@ -115,9 +117,7 @@ const GeneralInfo = () => {
         <Label>
           Withdrawal Liveness (minutes) (
           <Link
-            href={
-              "https://docs.umaproject.org/synthetic-tokens/explainer#slow-withdrawal"
-            }
+            href={DOCS_MAP.SLOW_WITHDRAW}
             target="_blank"
             rel="noopener noreferrer"
           >
