@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
-import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpContract from "../../containers/EmpContract";
 import Totals from "../../containers/Totals";
@@ -30,7 +29,7 @@ const GeneralInfo = () => {
   const { contract } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const { gcr } = Totals.useContainer();
-  const { latestPrice } = PriceFeed.useContainer();
+  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
 
   const {
     expirationTimestamp: expiry,
@@ -38,7 +37,6 @@ const GeneralInfo = () => {
     collateralRequirement: collReq,
     minSponsorTokens,
   } = empState;
-  const { symbol: collSymbol } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
 
   // format nice date
@@ -74,6 +72,17 @@ const GeneralInfo = () => {
       <Status>
         <Label>Price Feed Identifier: </Label>
         {priceId ? ethers.utils.parseBytes32String(priceId) : "N/A"}
+      </Status>
+
+      <Status>
+        <Label>
+          Estimated Identifier Price (
+          <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
+            Coinbase Pro
+          </Link>
+          ):{" "}
+        </Label>
+        {latestPrice ? `${latestPrice?.toLocaleString()}` : "N/A"}
       </Status>
 
       <Status>

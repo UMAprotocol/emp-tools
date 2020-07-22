@@ -70,7 +70,7 @@ const YourPosition = () => {
       </Status>
       <Status>
         <Label>
-          Estimated Token price (
+          Estimated identifier price (
           <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
             Coinbase Pro
           </Link>
