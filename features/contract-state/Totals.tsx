@@ -5,6 +5,8 @@ import TotalsContainer from "../../containers/Totals";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 
+import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+
 const DataBox = styled(Box)`
   border: 1px solid #434343;
   padding: 1rem 2rem;
@@ -45,6 +47,10 @@ const Totals = () => {
     address: collAddress,
   } = Collateral.useContainer();
   const { symbol: tokenSymbol, address: tokenAddress } = Token.useContainer();
+
+  const collateralEtherscan = useEtherscanUrl(collAddress ? collAddress : null);
+  const tokenEtherscan = useEtherscanUrl(tokenAddress ? tokenAddress : null);
+
   const loading =
     !totalCollateral || !totalTokens || !collSymbol || !tokenSymbol;
   return (
@@ -63,13 +69,15 @@ const Totals = () => {
             of <White>collateral</White> supplied
           </Label>
           <LinksContainer>
-            <SmallLink
-              href={`https://etherscan.io/address/${collAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </SmallLink>
+            {collateralEtherscan && (
+              <SmallLink
+                href={collateralEtherscan}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan
+              </SmallLink>
+            )}
             <SmallLink
               href={`https://uniswap.info/token/${collAddress}`}
               target="_blank"
@@ -97,13 +105,15 @@ const Totals = () => {
             </Label>
           </Tooltip>
           <LinksContainer>
-            <SmallLink
-              href={`https://etherscan.io/address/${tokenAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </SmallLink>
+            {tokenEtherscan && (
+              <SmallLink
+                href={tokenEtherscan}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan
+              </SmallLink>
+            )}
             <SmallLink
               href={`https://uniswap.info/token/${tokenAddress}`}
               target="_blank"

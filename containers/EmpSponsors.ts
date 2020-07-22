@@ -54,7 +54,7 @@ const useEmpSponsors = () => {
       if (!loading && data) {
         const empData = data.financialContracts.find(
           (contract: FinancialContractQuery) =>
-            utils.getAddress(contract.id) === emp.address
+            utils.getAddress(contract.id) === utils.getAddress(emp.address)
         );
 
         empData.sponsorPositions.forEach((position: PositionQuery) => {

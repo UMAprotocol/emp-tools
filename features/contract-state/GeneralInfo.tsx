@@ -9,6 +9,7 @@ import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 
 import { DOCS_MAP } from "../../utils/getDocLinks";
+import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
 
 const Label = styled.span`
   color: #999999;
@@ -42,6 +43,8 @@ const GeneralInfo = () => {
   } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
 
+  const contractEtherscan = useEtherscanUrl(contract ? contract.address : null);
+
   // format nice date
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
 
@@ -57,7 +60,7 @@ const GeneralInfo = () => {
         General Info{" "}
         {contract && (
           <Link
-            href={`https://etherscan.io/address/${contract.address}`}
+            href={contractEtherscan}
             target="_blank"
             rel="noopener noreferrer"
           >
