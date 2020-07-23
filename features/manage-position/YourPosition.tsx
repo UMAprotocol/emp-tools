@@ -1,11 +1,18 @@
 import styled from "styled-components";
 import { Typography } from "@material-ui/core";
+import { ethers } from "ethers";
 
 import Position from "../../containers/Position";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
+import EmpState from "../../containers/EmpState";
+
+import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+
+const fromWei = ethers.utils.formatUnits;
+const hexToUtf8 = ethers.utils.parseBytes32String;
 
 const Label = styled.span`
   color: #999999;
@@ -36,7 +43,8 @@ const YourPosition = () => {
     pendingWithdraw,
     pendingTransfer,
   } = Position.useContainer();
-  const { symbol: collSymbol } = Collateral.useContainer();
+  const { empState } = EmpState.useContainer();
+  const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
 
@@ -56,6 +64,15 @@ const YourPosition = () => {
       : null;
   const pricedGcr =
     gcr !== null && latestPrice !== null ? gcr / Number(latestPrice) : null;
+  const collReqFromWei =
+    empState?.collateralRequirement && collDec
+      ? parseFloat(fromWei(empState.collateralRequirement, collDec))
+      : null;
+  const liquidationPrice = getLiquidationPrice(
+    collateral,
+    tokens,
+    collReqFromWei
+  );
 
   return (
     <Container>
@@ -90,6 +107,18 @@ const YourPosition = () => {
         <Label>(GCR) Global collateralization ratio: </Label>
         {pricedGcr
           ? `${pricedGcr?.toFixed(4)} (${collSymbol} / ${tokenSymbol})`
+          : "N/A"}
+      </Status>
+      <Status>
+        <Label>Collateral Requirement: </Label>
+        {collReqFromWei ? `${collReqFromWei?.toFixed(4)}` : "N/A"}
+      </Status>
+      <Status>
+        <Label>Liquidation Price: </Label>
+        {liquidationPrice && empState?.priceIdentifier
+          ? `${liquidationPrice?.toFixed(4)} ${hexToUtf8(
+              empState.priceIdentifier
+            )}`
           : "N/A"}
       </Status>
       <Status>

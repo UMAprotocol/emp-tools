@@ -135,11 +135,14 @@ const Create = () => {
     computedCR && latestPrice ? computedCR / Number(latestPrice) : null;
   const pricedGCR = gcr && latestPrice ? gcr / Number(latestPrice) : null;
 
-  const liquidationPrice = getLiquidationPrice(
-    parseFloat(collateral),
-    parseFloat(tokens),
-    collReqFromWei
-  );
+  const liquidationPrice =
+    posCollateral !== null && posTokens !== null
+      ? getLiquidationPrice(
+          parseFloat(collateral) + posCollateral,
+          parseFloat(tokens) + posTokens,
+          collReqFromWei
+        )
+      : null;
 
   // User has not selected an EMP yet. We can detect this by checking if any properties in `empState` are `null`.
   if (collReq === null) {
@@ -265,7 +268,7 @@ const Create = () => {
 
       <Box py={2}>
         <Typography>
-          Liquidation Price:{" "}
+          Resulting Liquidation Price:{" "}
           {liquidationPrice && empState?.priceIdentifier && (
             <span>
               {liquidationPrice?.toFixed(4)}
