@@ -4,10 +4,13 @@ import { Box, Button, TextField, Typography } from "@material-ui/core";
 import { ethers } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
+import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
+
+import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -18,9 +21,19 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
+const fromWei = ethers.utils.formatUnits;
+const hexToUtf8 = ethers.utils.parseBytes32String;
+
 const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
-  const { symbol: collSymbol, balance } = Collateral.useContainer();
+  const { empState } = EmpState.useContainer();
+  const {
+    symbol: collSymbol,
+    balance,
+    decimals: collDec,
+    allowance,
+    setMaxAllowance,
+  } = Collateral.useContainer();
   const { tokens, collateral, pendingWithdraw } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
@@ -31,6 +44,12 @@ const Deposit = () => {
   const [error, setError] = useState<Error | null>(null);
 
   const balanceTooLow = (balance || 0) < (Number(collateralToDeposit) || 0);
+
+  const needAllowance = () => {
+    if (allowance === null || collateral === null) return true;
+    if (allowance === "Infinity") return false;
+    return allowance < parseFloat(collateralToDeposit);
+  };
 
   const depositCollateral = async () => {
     if (collateralToDeposit && emp) {
@@ -66,6 +85,18 @@ const Deposit = () => {
       : startingCR;
   const pricedResultingCR =
     resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
+
+  const collReqFromWei =
+    empState?.collateralRequirement && collDec
+      ? parseFloat(fromWei(empState.collateralRequirement, collDec))
+      : null;
+  const liquidationPrice = collateral
+    ? getLiquidationPrice(
+        collateral + parseFloat(collateralToDeposit),
+        tokens,
+        collReqFromWei
+      )
+    : null;
 
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
@@ -121,7 +152,19 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        {collateralToDeposit && collateralToDeposit != "0" && !balanceTooLow ? (
+        {needAllowance() && (
+          <Button
+            variant="contained"
+            onClick={setMaxAllowance}
+            style={{ marginRight: `12px` }}
+          >
+            Approve
+          </Button>
+        )}
+        {!needAllowance() &&
+        collateralToDeposit &&
+        collateralToDeposit != "0" &&
+        !balanceTooLow ? (
           <Button
             variant="contained"
             onClick={handleDepositClick}
@@ -139,6 +182,14 @@ const Deposit = () => {
         </Typography>
         <Typography>
           Resulting CR: {pricedResultingCR?.toFixed(4) || "N/A"}
+        </Typography>
+        <Typography>
+          Liquidation Price:{" "}
+          {liquidationPrice && empState?.priceIdentifier
+            ? `${liquidationPrice?.toFixed(4)} ${hexToUtf8(
+                empState.priceIdentifier
+              )}`
+            : "N/A"}
         </Typography>
       </Box>
 

@@ -343,7 +343,7 @@ const Deposit = () => {
 
       <Box py={2}>
         <Typography>
-          Current position CR: {pricedStartingCR?.toFixed(4) || "N/A"}
+          Current CR: {pricedStartingCR?.toFixed(4) || "N/A"}
         </Typography>
         <Typography>Current GCR: {pricedGcr?.toFixed(4) || "N/A"}</Typography>
         {liquidationPrice !== null && empState?.priceIdentifier && (
