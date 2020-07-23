@@ -139,7 +139,7 @@ const Deposit = () => {
       ? (collateral - parseFloat(collateralToWithdraw)) / tokens
       : startingCR;
   const resultingCRBelowGCR =
-    resultingCR !== null && gcr !== null ? resultingCR < gcr : null;
+    resultingCR !== null && gcr !== null ? resultingCR < gcr : false;
   const fastWithdrawableCollateral =
     collateral !== null && tokens !== null && gcr !== null
       ? (collateral - gcr * tokens).toFixed(2)
@@ -156,6 +156,10 @@ const Deposit = () => {
       : null;
   const pricedGcr =
     gcr !== null && latestPrice !== null ? gcr / Number(latestPrice) : null;
+  const resultingPricedCRBelowCRRequirement =
+    pricedResultingCR !== null && collReqFromWei !== null
+      ? pricedResultingCR < collReqFromWei
+      : true;
 
   // Pending withdrawal request information:
   const pendingWithdrawTimeRemaining =
@@ -285,19 +289,19 @@ const Deposit = () => {
           <ul style={{ fontSize: 16 }}>
             <li>
               <strong>"Fast" withdrawal: </strong>Instantly withdraw collateral
-              until your positions collateralization ratio is equal to the
-              global collateralization ratio. For your position you can
-              instantly withdraw {fastWithdrawableCollateral} {collSymbol}.
+              until your positions CR is equal to the GCR. For your position you
+              can instantly withdraw up to {fastWithdrawableCollateral}{" "}
+              {collSymbol}.
             </li>
             <li>
-              <strong>"Slow" withdrawal: </strong> To withdraw past the global
-              collateralization ratio, you will need to wait a liveness period
-              before completing your withdrawal. For this EMP this is{" "}
+              <strong>"Slow" withdrawal: </strong> To withdraw your position CR
+              below the GCR, you will need to wait a liveness period before
+              completing your withdrawal. For this EMP this is{" "}
               {withdrawalLiveness !== null &&
                 Math.floor(withdrawalLiveness.toNumber() / (60 * 60))}{" "}
-              hours. When preforming this kind of withdrawal one must ensure
-              that their position is sufficiently collateralized after the
-              withdrawal or you risk being liquidated.
+              hours. When preforming this kind of withdrawal you should ensure
+              that your position is sufficiently collateralized above the CR
+              requirement after the withdrawal or you risk being liquidated.
             </li>
           </ul>
         </Box>
@@ -330,7 +334,7 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        {withdrawAmountValid ? (
+        {withdrawAmountValid && !resultingPricedCRBelowCRRequirement ? (
           <Button variant="contained" onClick={handleWithdrawClick}>{`${
             resultingCRBelowGCR ? "Request Withdrawal of" : "Withdraw"
           } ${collateralToWithdraw} ${collSymbol} from your position`}</Button>
@@ -354,18 +358,29 @@ const Deposit = () => {
             )}`}
           </Typography>
         )}
-        {withdrawAmountValid && resultingCRBelowGCR && (
-          <span>
-            <Typography>
-              Resulting position CR: {pricedResultingCR?.toFixed(4) || "N/A"}
-            </Typography>
+        <Typography>
+          CR Requirement: {collReqFromWei?.toFixed(4) || "N/A"}
+        </Typography>
+        {withdrawAmountValid && resultingPricedCRBelowCRRequirement && (
+          <Typography style={{ color: "red" }}>
+            Withdrawal would drop your CR below the CR requirement and your
+            position will be at risk of getting liquidated.
+          </Typography>
+        )}
+        {pricedResultingCR !== null && (
+          <Typography>
+            Resulting position CR: {pricedResultingCR.toFixed(4) || "N/A"}
+          </Typography>
+        )}
+        {withdrawAmountValid &&
+          !resultingPricedCRBelowCRRequirement &&
+          resultingCRBelowGCR && (
             <Typography style={{ color: "red" }}>
               Withdrawal places CR below GCR. Will use slow withdrawal. Ensure
               that your final CR is above the EMP CR requirement or you could
               risk liquidation.
             </Typography>
-          </span>
-        )}
+          )}
         {withdrawAmountValid && !resultingCRBelowGCR && (
           <Typography style={{ color: "green" }}>
             Withdrawal maintains CR above GCR. Will use fast withdrawal.
