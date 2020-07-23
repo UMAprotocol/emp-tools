@@ -11,7 +11,7 @@ export enum EXCHANGES {
   BALANCER,
 }
 
-export const EXCHANGE_NAMES: ExchangeNameMap = {
+export const EXCHANGE_NAMES_MAP: ExchangeNameMap = {
   [EXCHANGES.UNISWAP]: "Uniswap",
   [EXCHANGES.BALANCER]: "Balancer",
 };
@@ -30,7 +30,7 @@ export const TOKEN_TO_EXCHANGE_MAP: TokenExchangeMap = {
 
 export const EXCHANGE_LINK_MAP: ExchangeLinkMap = {
   [EXCHANGES.UNISWAP]: (tokenAddress) =>
-    `https://uniswap.info/token/${tokenAddress}`,
+    `https://app.uniswap.org/#/swap?outputCurrency=${tokenAddress}`,
   [EXCHANGES.BALANCER]: (tokenAddress) =>
     `https://balancer.exchange/#/swap/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48/${tokenAddress}`,
   // This returns a Balancer exchange URL to buy `tokenAddress` and sell USDC, a well understood currency
@@ -49,12 +49,12 @@ export const getExchangeTypeFromTokenSymbol = (symbol: string | null) => {
   }
 };
 
-export const getExchangeLinkFuncFromTokenSymbol = (symbol: string | null) => {
+export const getExchangeInfo = (symbol: string | null) => {
   const exchangeType = getExchangeTypeFromTokenSymbol(symbol);
   if (exchangeType !== null) {
     return {
-      name: EXCHANGE_NAMES[exchangeType],
-      baseurl: EXCHANGE_LINK_MAP[exchangeType],
+      name: EXCHANGE_NAMES_MAP[exchangeType],
+      getExchangeUrl: EXCHANGE_LINK_MAP[exchangeType],
     };
   }
 };

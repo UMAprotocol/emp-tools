@@ -6,7 +6,7 @@ import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 
-import { getExchangeLinkFuncFromTokenSymbol } from "../../utils/getExchangeLinks";
+import { getExchangeInfo } from "../../utils/getExchangeLinks";
 
 const DataBox = styled(Box)`
   border: 1px solid #434343;
@@ -50,7 +50,7 @@ const Totals = () => {
   const { symbol: tokenSymbol, address: tokenAddress } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
-  const getExchangeLink = getExchangeLinkFuncFromTokenSymbol(tokenSymbol);
+  const exchangeInfo = getExchangeInfo(tokenSymbol);
 
   const loading =
     !totalCollateral || !totalTokens || !collSymbol || !tokenSymbol;
@@ -79,13 +79,13 @@ const Totals = () => {
                 Etherscan
               </SmallLink>
             )}
-            {getExchangeLink !== undefined && collAddress && tokenAddress && (
+            {exchangeInfo !== undefined && collAddress && (
               <SmallLink
-                href={getExchangeLink.baseurl(collAddress)}
+                href={exchangeInfo.getExchangeUrl(collAddress)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {getExchangeLink.name}
+                {exchangeInfo.name}
               </SmallLink>
             )}
           </LinksContainer>
@@ -117,13 +117,13 @@ const Totals = () => {
                 Etherscan
               </SmallLink>
             )}
-            {getExchangeLink !== undefined && collAddress && tokenAddress && (
+            {exchangeInfo !== undefined && tokenAddress && (
               <SmallLink
-                href={getExchangeLink.baseurl(tokenAddress)}
+                href={exchangeInfo.getExchangeUrl(tokenAddress)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {getExchangeLink.name}
+                {exchangeInfo.name}
               </SmallLink>
             )}
           </LinksContainer>
