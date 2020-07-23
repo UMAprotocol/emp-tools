@@ -33,6 +33,7 @@ export const EXCHANGE_LINK_MAP: ExchangeLinkMap = {
     `https://uniswap.info/token/${tokenAddress}`,
   [EXCHANGES.BALANCER]: (tokenAddress) =>
     `https://balancer.exchange/#/swap/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48/${tokenAddress}`,
+  // This returns a Balancer exchange URL to buy `tokenAddress` and sell USDC, a well understood currency
 };
 
 export const getExchangeTypeFromTokenSymbol = (symbol: string | null) => {
