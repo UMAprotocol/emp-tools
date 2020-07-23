@@ -21,6 +21,10 @@ import EmpContract from "../../containers/EmpContract";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
+import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+
+const fromWei = utils.formatUnits;
+
 const Link = styled.a`
   color: white;
   font-size: 18px;
@@ -30,11 +34,20 @@ const AllPositions = () => {
   const { empState } = EmpState.useContainer();
   const { priceIdentifier: priceId } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
-  const { symbol: collSymbol } = Collateral.useContainer();
+  const {
+    symbol: collSymbol,
+    decimals: collDecimals,
+  } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
+
+  const { collateralRequirement } = empState;
+  const collReqFromWei =
+    collateralRequirement && collDecimals
+      ? parseFloat(fromWei(collateralRequirement, collDecimals))
+      : null;
 
   if (tokenSymbol === null || emp === null) {
     return (
@@ -94,6 +107,7 @@ const AllPositions = () => {
                     Synthetics ({tokenSymbol})
                   </TableCell>
                   <TableCell align="right">Collateral Ratio</TableCell>
+                  <TableCell align="right">Liquidation Price</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -101,7 +115,8 @@ const AllPositions = () => {
                   const activeSponsor = activeSponsors[sponsor];
                   return (
                     activeSponsor?.collateral &&
-                    activeSponsor?.tokensOutstanding && (
+                    activeSponsor?.tokensOutstanding &&
+                    collReqFromWei && (
                       <TableRow key={sponsor}>
                         <TableCell component="th" scope="row">
                           <a href={getEtherscanUrl(sponsor)} target="_blank">
@@ -119,6 +134,15 @@ const AllPositions = () => {
                             getCollateralRatio(
                               activeSponsor.collateral,
                               activeSponsor.tokensOutstanding
+                            )
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {prettyBalance(
+                            getLiquidationPrice(
+                              Number(activeSponsor.collateral),
+                              Number(activeSponsor.tokensOutstanding),
+                              collReqFromWei
                             )
                           )}
                         </TableCell>

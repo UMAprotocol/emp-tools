@@ -12,6 +12,8 @@ import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
+import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+
 const Container = styled(Box)`
   max-width: 720px;
 `;
@@ -28,6 +30,7 @@ const Link = styled.a`
 `;
 
 const fromWei = ethers.utils.formatUnits;
+const hexToUtf8 = ethers.utils.parseBytes32String;
 
 const Create = () => {
   const { contract: emp } = EmpContract.useContainer();
@@ -56,10 +59,9 @@ const Create = () => {
   const [error, setError] = useState<Error | null>(null);
 
   const { collateralRequirement: collReq, minSponsorTokens } = empState;
-  const collReqPct =
-    collReq && collDec
-      ? `${parseFloat(fromWei(collReq, collDec)) * 100}%`
-      : "N/A";
+  const collReqFromWei =
+    collReq && collDec ? parseFloat(fromWei(collReq, collDec)) : null;
+  const collReqPct = collReqFromWei ? `${collReqFromWei * 100}%` : "N/A";
   const balanceTooLow = (balance || 0) < (Number(collateral) || 0);
 
   const needAllowance = () => {
@@ -132,6 +134,12 @@ const Create = () => {
   const pricedCR =
     computedCR && latestPrice ? computedCR / Number(latestPrice) : null;
   const pricedGCR = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+
+  const liquidationPrice = getLiquidationPrice(
+    parseFloat(collateral),
+    parseFloat(tokens),
+    collReqFromWei
+  );
 
   // User has not selected an EMP yet. We can detect this by checking if any properties in `empState` are `null`.
   if (collReq === null) {
@@ -256,16 +264,23 @@ const Create = () => {
       </Box>
 
       <Box py={2}>
-        {tokens && collateral && gcr ? (
-          <Typography>
-            Resulting CR:{" "}
+        <Typography>
+          Liquidation Price:{" "}
+          {liquidationPrice && empState?.priceIdentifier && (
+            <span>
+              {liquidationPrice?.toFixed(4)}
+              {` ${hexToUtf8(empState.priceIdentifier)}`}
+            </span>
+          )}
+        </Typography>
+        <Typography>
+          Resulting CR:{" "}
+          {tokens && collateral && gcr && (
             <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
               {pricedCR?.toFixed(4)}
             </span>
-          </Typography>
-        ) : (
-          <Typography>Resulting CR: N/A</Typography>
-        )}
+          )}
+        </Typography>
         <Typography>Current GCR: {pricedGCR?.toFixed(4) || "N/A"}</Typography>
       </Box>
 
