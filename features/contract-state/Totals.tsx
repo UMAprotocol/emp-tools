@@ -6,6 +6,8 @@ import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 
+import { getExchangeLinkFuncFromTokenSymbol } from "../../utils/getExchangeLinks";
+
 const DataBox = styled(Box)`
   border: 1px solid #434343;
   padding: 1rem 2rem;
@@ -48,6 +50,8 @@ const Totals = () => {
   const { symbol: tokenSymbol, address: tokenAddress } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
+  const getExchangeLink = getExchangeLinkFuncFromTokenSymbol(tokenSymbol);
+
   const loading =
     !totalCollateral || !totalTokens || !collSymbol || !tokenSymbol;
   return (
@@ -75,13 +79,15 @@ const Totals = () => {
                 Etherscan
               </SmallLink>
             )}
-            <SmallLink
-              href={`https://uniswap.info/token/${collAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Uniswap
-            </SmallLink>
+            {getExchangeLink !== undefined && collAddress && tokenAddress && (
+              <SmallLink
+                href={getExchangeLink.baseurl(collAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {getExchangeLink.name}
+              </SmallLink>
+            )}
           </LinksContainer>
         </DataBox>
       </Grid>
@@ -111,13 +117,15 @@ const Totals = () => {
                 Etherscan
               </SmallLink>
             )}
-            <SmallLink
-              href={`https://uniswap.info/token/${tokenAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Uniswap
-            </SmallLink>
+            {getExchangeLink !== undefined && collAddress && tokenAddress && (
+              <SmallLink
+                href={getExchangeLink.baseurl(tokenAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {getExchangeLink.name}
+              </SmallLink>
+            )}
           </LinksContainer>
         </DataBox>
       </Grid>
