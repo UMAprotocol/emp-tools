@@ -1,6 +1,12 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Box, Button, TextField, Typography } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  InputAdornment,
+} from "@material-ui/core";
 import { ethers, BigNumberish } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
@@ -17,6 +23,10 @@ const Container = styled(Box)`
 const Link = styled.a`
   color: white;
   font-size: 14px;
+`;
+
+const MaxLink = styled.div`
+  text-decoration-line: underline;
 `;
 
 const fromWei = ethers.utils.formatUnits;
@@ -74,6 +84,11 @@ const Redeem = () => {
     return syntheticAllowance < tokensToRedeemFloat;
   };
 
+  const collateralToReceive =
+    borrowedTokens !== null && borrowedTokens > 0 && collateral !== null
+      ? (tokensToRedeemFloat / borrowedTokens) * collateral
+      : null;
+
   const redeemTokens = async () => {
     if (tokensToRedeem && emp) {
       setHash(null);
@@ -95,6 +110,10 @@ const Redeem = () => {
   };
 
   const handleRedemptionClick = () => redeemTokens();
+
+  const handleMax = () => {
+    setTokensToRedeem(borrowedTokens ? borrowedTokens.toString() : "");
+  };
 
   // User does not have a position yet.
   if (
@@ -156,6 +175,15 @@ const Redeem = () => {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTokensToRedeem(e.target.value)
           }
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Button onClick={() => handleMax()}>
+                  <MaxLink>Max</MaxLink>
+                </Button>
+              </InputAdornment>
+            ),
+          }}
         />
       </Box>
 
@@ -186,9 +214,7 @@ const Redeem = () => {
         <Typography>{`Remaining debt after redemption: ${
           borrowedTokens - tokensToRedeemFloat
         }`}</Typography>
-        <Typography>{`Collateral you will receive on redemption: ${
-          (tokensToRedeemFloat / borrowedTokens) * collateral
-        } ${collSymbol}`}</Typography>
+        <Typography>{`Collateral you will receive on redemption: ${collateralToReceive} ${collSymbol}`}</Typography>
       </Box>
 
       {hash && (
