@@ -96,7 +96,7 @@ const Totals = () => {
               <Small> {tokenSymbol}</Small>
             </Tooltip>
           </Typography>
-          <Tooltip title="This is the total number of tokens minted minus the total number of tokens redeemed.">
+          <Tooltip title="Total number of tokens minted minus the total number of tokens redeemed.">
             <Label>
               of <White>synthetic tokens</White> outstanding
             </Label>

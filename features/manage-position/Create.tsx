@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import styled from "styled-components";
-import { Box, Button, TextField, Typography } from "@material-ui/core";
+import { Box, Button, TextField, Typography, Grid } from "@material-ui/core";
 
 import EmpContract from "../../containers/EmpContract";
 import { useState } from "react";
@@ -12,9 +12,7 @@ import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
-const Container = styled(Box)`
-  max-width: 720px;
-`;
+const Container = styled(Box)``;
 
 const Important = styled(Typography)`
   color: red;
@@ -172,11 +170,10 @@ const Create = () => {
         </Typography>
       </Box>
       <Box pb={2}>
-        <Box py={2}>
-          <Important>
-            IMPORTANT! Please read this carefully or you may lose money.
-          </Important>
-        </Box>
+        <Important>
+          IMPORTANT! Please read this carefully or you may lose money.
+        </Important>
+
         <Box pt={2}>
           <Typography>
             When minting, your resulting collateralization ratio (collateral /
@@ -194,68 +191,76 @@ const Create = () => {
             them if you want to short the underlying.
           </Typography>
         </Box>
-        <Box py={2}>
+        <Box pb={2}>
           <Typography>
-            When you're ready, fill in the desired amount of collateral and
-            tokens below and click the "Create" button.
+            When you're ready, fill in the amount of collateral and tokens below
+            and click Create.
           </Typography>
         </Box>
       </Box>
 
-      <Box py={2}>
-        <TextField
-          type="number"
-          label={`Collateral (${collSymbol})`}
-          placeholder="1234"
-          inputProps={{ min: "0" }}
-          value={collateral}
-          error={balanceTooLow}
-          helperText={balanceTooLow ? "Balance too low" : null}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setCollateral(e.target.value)
-          }
-        />
-      </Box>
-      <Box py={2}>
-        <TextField
-          type="number"
-          label={`Tokens (${tokenSymbol})`}
-          placeholder="1234"
-          inputProps={{ min: "0" }}
-          value={tokens}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setTokens(e.target.value)
-          }
-        />
-      </Box>
-      <Box py={2}>
-        {needAllowance() && (
-          <Button
-            variant="contained"
-            onClick={setMaxAllowance}
-            style={{ marginRight: `12px` }}
-          >
-            Approve
-          </Button>
-        )}
-        {tokens &&
-        collateral &&
-        gcr &&
-        !needAllowance() &&
-        computedCR > gcr &&
-        !balanceTooLow ? (
-          <Button
-            variant="contained"
-            onClick={handleCreateClick}
-          >{`Create ${tokens} ${tokenSymbol} with ${collateral} ${collSymbol}`}</Button>
-        ) : (
-          <Button variant="contained" disabled>
-            Create
-          </Button>
-        )}
-      </Box>
+      <Grid container spacing={3}>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            type="number"
+            variant="outlined"
+            label={`Collateral (${collSymbol})`}
+            placeholder="1234"
+            inputProps={{ min: "0" }}
+            value={collateral}
+            error={balanceTooLow}
+            helperText={balanceTooLow ? "Balance too low" : null}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setCollateral(e.target.value)
+            }
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            type="number"
+            variant="outlined"
+            label={`Tokens (${tokenSymbol})`}
+            placeholder="1234"
+            inputProps={{ min: "0" }}
+            value={tokens}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setTokens(e.target.value)
+            }
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <Box py={1}>
+            {needAllowance() && (
+              <Button
+                variant="contained"
+                onClick={setMaxAllowance}
+                style={{ marginRight: `12px` }}
+              >
+                Approve
+              </Button>
+            )}
+            {tokens &&
+            collateral &&
+            gcr &&
+            !needAllowance() &&
+            computedCR > gcr &&
+            !balanceTooLow ? (
+              <Button
+                variant="contained"
+                onClick={handleCreateClick}
+              >{`Create ${tokens} ${tokenSymbol} with ${collateral} ${collSymbol}`}</Button>
+            ) : (
+              <Button variant="contained" disabled>
+                Create
+              </Button>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
 
-      <Box py={2}>
+      <Box py={4}>
         {tokens && collateral && gcr ? (
           <Typography>
             Resulting CR:{" "}

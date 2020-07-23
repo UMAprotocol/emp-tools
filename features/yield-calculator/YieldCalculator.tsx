@@ -1,4 +1,4 @@
-import { Box, TextField, Typography } from "@material-ui/core";
+import { Box, TextField, Typography, Grid } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import EmpState from "../../containers/EmpState";
@@ -80,48 +80,73 @@ const YieldCalculator = () => {
   }, [tokenPrice, daysToExpiry]);
 
   return (
-    <Box pt={4}>
+    <Box>
+      <Box pb={4}>
+        <Typography>
+          yUSD is a fixed yielding, expiring token that will be redeemable for
+          exactly 1 USD in collateral at expiry. To use this calculator enter in
+          the current yUSD price and the Days to expiry. an Implied yearly APR
+          is shown. To learn more about yUSD see the UMA Medium post{" "}
+          <a
+            href="https://medium.com/uma-project/the-yield-dollar-on-uma-3a492e79069f"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            here
+          </a>
+          .
+        </Typography>
+      </Box>
       <Container>
+        <Typography variant="h5">yUSD Yield Calculator</Typography>
         <form noValidate autoComplete="off">
-          <Typography variant="h5">yUSD Yield Calculator</Typography>
-          <FormInput></FormInput>
-          <FormInput>
-            <TextField
-              type="number"
-              label="Current yUSD Price (USD)"
-              value={tokenPrice?.toString() || ""}
-              onChange={(e) => setTokenPrice(e.target.value)}
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </FormInput>
-          <FormInput>
-            <TextField
-              type="string"
-              label="Days to Expiry"
-              value={daysToExpiry?.toString() || ""}
-              onChange={(e) => setDaysToExpiry(e.target.value)}
-              helperText={`Days to expiry for selected EMP: ${calculateDaysToExpiry()}`}
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </FormInput>
-          <FormInput>
-            <TextField
-              disabled
-              type="string"
-              label="APY (%)"
-              value={prettyPercentage(yieldAmount)}
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </FormInput>
+          <Grid container spacing={3}>
+            <Grid item xs={4}>
+              <FormInput>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Current yUSD Price (USD)"
+                  value={tokenPrice?.toString() || ""}
+                  onChange={(e) => setTokenPrice(e.target.value)}
+                  variant="outlined"
+                  inputProps={{ min: "0", max: "10", step: "0.01" }}
+                  helperText={`Enter the market observable price`}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </FormInput>
+            </Grid>
+            <Grid item xs={4}>
+              <FormInput>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Days to Expiry"
+                  value={daysToExpiry?.toString() || ""}
+                  onChange={(e) => setDaysToExpiry(e.target.value)}
+                  inputProps={{ min: "0", max: "10", step: "1" }}
+                  helperText={
+                    calculateDaysToExpiry()
+                      ? `Days to expiry for chosen EMP: ${calculateDaysToExpiry()}`
+                      : ""
+                  }
+                  variant="outlined"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </FormInput>
+            </Grid>
+            <Grid item xs={4}>
+              <Box pt={4}>
+                <Typography variant="h6">
+                  Yearly APR: {prettyPercentage(yieldAmount)}%
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
         </form>
       </Container>
     </Box>
