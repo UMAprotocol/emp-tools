@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
 import { ethers } from "ethers";
@@ -10,6 +10,8 @@ import Position from "../../containers/Position";
 import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
+
+import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 
 const Container = styled(Box)`
   max-width: 720px;
@@ -26,12 +28,15 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
+const hexToUtf8 = ethers.utils.parseBytes32String;
+const fromWei = ethers.utils.formatUnits;
+
 const Deposit = () => {
   const { empState } = EmpState.useContainer();
   const { withdrawalLiveness } = empState;
 
   const { contract: emp } = EmpContract.useContainer();
-  const { symbol: collSymbol } = Collateral.useContainer();
+  const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const {
     tokens,
     collateral,
@@ -123,37 +128,71 @@ const Deposit = () => {
   const handleCancelWithdrawClick = () => cancelWithdraw();
 
   // Calculations using raw collateral ratios:
-  const startingCR = collateral && tokens ? collateral / tokens : null;
+  const collReqFromWei =
+    empState.collateralRequirement && collDec
+      ? parseFloat(fromWei(empState.collateralRequirement, collDec))
+      : null;
+  const startingCR =
+    collateral !== null && tokens !== null ? collateral / tokens : null;
   const resultingCR =
-    collateral && collateralToWithdraw && tokens
+    collateral !== null && collateralToWithdraw !== null && tokens !== null
       ? (collateral - parseFloat(collateralToWithdraw)) / tokens
       : startingCR;
-  const resultingCRBelowGCR = resultingCR && gcr ? resultingCR < gcr : null;
+  const resultingCRBelowGCR =
+    resultingCR !== null && gcr !== null ? resultingCR < gcr : null;
   const fastWithdrawableCollateral =
-    collateral && tokens && gcr ? (collateral - gcr * tokens).toFixed(2) : null;
+    collateral !== null && tokens !== null && gcr !== null
+      ? (collateral - gcr * tokens).toFixed(2)
+      : null;
 
   // Calculations of collateral ratios using same units as price feed:
   const pricedStartingCR =
-    startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
+    startingCR !== null && latestPrice !== null
+      ? startingCR / Number(latestPrice)
+      : null;
   const pricedResultingCR =
-    resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
-  const pricedGcr = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+    resultingCR !== null && latestPrice !== null
+      ? resultingCR / Number(latestPrice)
+      : null;
+  const pricedGcr =
+    gcr !== null && latestPrice !== null ? gcr / Number(latestPrice) : null;
 
   // Pending withdrawal request information:
   const pendingWithdrawTimeRemaining =
-    collateral && withdrawPassTime && pendingWithdraw === "Yes"
-      ? withdrawPassTime - Math.floor(Date.now() / 1000) - 7200
+    collateral !== null &&
+    withdrawPassTime !== null &&
+    withdrawalLiveness &&
+    pendingWithdraw === "Yes" &&
+    empState.currentTime
+      ? withdrawPassTime - empState.currentTime.toNumber()
       : null;
-  const pastWithdrawTimeStamp = pendingWithdrawTimeRemaining
-    ? pendingWithdrawTimeRemaining <= 0
-    : null;
-  const pendingWithdrawTimeString = pendingWithdrawTimeRemaining
-    ? Math.max(0, Math.floor(pendingWithdrawTimeRemaining / 3600)) +
-      ":" +
-      Math.max(0, Math.floor((pendingWithdrawTimeRemaining % 3600) / 60)) +
-      ":" +
-      Math.max(0, (pendingWithdrawTimeRemaining % 3600) % 60)
-    : null;
+  const pastWithdrawTimeStamp =
+    pendingWithdrawTimeRemaining !== null
+      ? pendingWithdrawTimeRemaining <= 0
+      : null;
+  const pendingWithdrawTimeString =
+    pendingWithdrawTimeRemaining !== null
+      ? Math.max(0, Math.floor(pendingWithdrawTimeRemaining / 3600)) +
+        ":" +
+        Math.max(0, Math.floor((pendingWithdrawTimeRemaining % 3600) / 60)) +
+        ":" +
+        Math.max(0, (pendingWithdrawTimeRemaining % 3600) % 60)
+      : null;
+
+  // Data inferred from potential withdrawal amount.
+  const withdrawAmountValid =
+    collateralToWithdraw !== null &&
+    collateral !== null &&
+    parseFloat(collateralToWithdraw) <= collateral &&
+    parseFloat(collateralToWithdraw) > 0;
+  const liquidationPrice =
+    collateral !== null && tokens !== null && collReqFromWei !== null
+      ? getLiquidationPrice(
+          collateral - parseFloat(collateralToWithdraw),
+          tokens,
+          collReqFromWei
+        )
+      : null;
 
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
@@ -254,7 +293,7 @@ const Deposit = () => {
               <strong>"Slow" withdrawal: </strong> To withdraw past the global
               collateralization ratio, you will need to wait a liveness period
               before completing your withdrawal. For this EMP this is{" "}
-              {withdrawalLiveness &&
+              {withdrawalLiveness !== null &&
                 Math.floor(withdrawalLiveness.toNumber() / (60 * 60))}{" "}
               hours. When preforming this kind of withdrawal one must ensure
               that their position is sufficiently collateralized after the
@@ -291,7 +330,7 @@ const Deposit = () => {
       </Box>
 
       <Box py={2}>
-        {collateralToWithdraw && collateralToWithdraw != "0" ? (
+        {withdrawAmountValid ? (
           <Button variant="contained" onClick={handleWithdrawClick}>{`${
             resultingCRBelowGCR ? "Request Withdrawal of" : "Withdraw"
           } ${collateralToWithdraw} ${collSymbol} from your position`}</Button>
@@ -304,28 +343,33 @@ const Deposit = () => {
 
       <Box py={2}>
         <Typography>
-          Current global CR: {pricedGcr?.toFixed(4) || "N/A"}
-        </Typography>
-        <Typography>
           Current position CR: {pricedStartingCR?.toFixed(4) || "N/A"}
         </Typography>
-        <Typography>
-          Resulting position CR: {pricedResultingCR?.toFixed(4) || "N/A"}
-        </Typography>
-        {collateralToWithdraw && collateralToWithdraw != "0" ? (
-          resultingCRBelowGCR ? (
+        <Typography>Current GCR: {pricedGcr?.toFixed(4) || "N/A"}</Typography>
+        {liquidationPrice !== null && empState?.priceIdentifier && (
+          <Typography>
+            Liquidation Price:
+            {` ${liquidationPrice.toFixed(4)} ${hexToUtf8(
+              empState.priceIdentifier
+            )}`}
+          </Typography>
+        )}
+        {withdrawAmountValid && resultingCRBelowGCR && (
+          <span>
+            <Typography>
+              Resulting position CR: {pricedResultingCR?.toFixed(4) || "N/A"}
+            </Typography>
             <Typography style={{ color: "red" }}>
               Withdrawal places CR below GCR. Will use slow withdrawal. Ensure
               that your final CR is above the EMP CR requirement or you could
               risk liquidation.
             </Typography>
-          ) : (
-            <Typography style={{ color: "green" }}>
-              Withdrawal places CR above GCR. Will use fast withdrawal.
-            </Typography>
-          )
-        ) : (
-          ""
+          </span>
+        )}
+        {withdrawAmountValid && !resultingCRBelowGCR && (
+          <Typography style={{ color: "green" }}>
+            Withdrawal maintains CR above GCR. Will use fast withdrawal.
+          </Typography>
         )}
       </Box>
 

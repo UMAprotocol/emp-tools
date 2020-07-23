@@ -125,7 +125,7 @@ const GeneralInfo = () => {
           >
             Docs
           </Link>
-          ) :
+          ){`: `}
         </Label>
         <Tooltip
           title={`To withdraw past the global collateralization ratio, you will need to wait a liveness period before completing your withdrawal.`}

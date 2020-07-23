@@ -8,7 +8,6 @@ import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
-import { hashMessage } from "ethers/lib/utils";
 
 const Container = styled(Box)`
   max-width: 720px;

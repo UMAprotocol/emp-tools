@@ -10,7 +10,7 @@ import Withdraw from "./Withdraw";
 import YourPosition from "./YourPosition";
 import YourWallet from "./YourWallet";
 
-export type Method = "create" | "deposit" | "withdraw" | "redeem" | "transfer";
+export type Method = "create" | "deposit" | "withdraw" | "redeem";
 
 const FalseDoor = () => (
   <Typography>This feature has not been implemented yet.</Typography>

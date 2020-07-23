@@ -4,11 +4,12 @@ export function getLiquidationPrice(
   crThreshold: number | null
 ) {
   if (
-    tokens === 0 ||
-    crThreshold === 0 ||
     !collateral ||
     !tokens ||
-    !crThreshold
+    !crThreshold ||
+    tokens <= 0 ||
+    crThreshold <= 0 ||
+    collateral <= 0
   ) {
     return null;
   }
