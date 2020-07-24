@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
 import { ethers } from "ethers";
 
+import Connection from "../../containers/Connection";
 import EmpState from "../../containers/EmpState";
 import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
@@ -26,7 +27,8 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
-const Deposit = () => {
+const Withdraw = () => {
+  const { notify } = Connection.useContainer();
   const { empState } = EmpState.useContainer();
   const { withdrawalLiveness } = empState;
 
@@ -60,10 +62,12 @@ const Deposit = () => {
         if (resultingCRBelowGCR) {
           const tx = await emp.requestWithdrawal([collateralToWithdrawWei]);
           setHash(tx.hash as string);
+          notify?.hash(tx.hash);
           await tx.wait();
         } else if (!resultingCRBelowGCR) {
           const tx = await emp.withdraw([collateralToWithdrawWei]);
           setHash(tx.hash as string);
+          notify?.hash(tx.hash);
           await tx.wait();
         }
 
@@ -85,6 +89,7 @@ const Deposit = () => {
       try {
         const tx = await emp.withdrawPassedRequest();
         setHash(tx.hash as string);
+        notify?.hash(tx.hash);
         await tx.wait();
 
         setSuccess(true);
@@ -106,6 +111,7 @@ const Deposit = () => {
       try {
         const tx = await emp.cancelWithdrawal();
         setHash(tx.hash as string);
+        notify?.hash(tx.hash);
         await tx.wait();
 
         setSuccess(true);
@@ -365,4 +371,4 @@ const Deposit = () => {
   );
 };
 
-export default Deposit;
+export default Withdraw;

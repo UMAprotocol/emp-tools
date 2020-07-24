@@ -4,6 +4,7 @@ import { Box, Button, TextField, Typography } from "@material-ui/core";
 import { ethers, BigNumberish } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
+import Connection from "../../containers/Connection";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
@@ -24,6 +25,7 @@ const weiToNum = (x: BigNumberish, u = 18) => parseFloat(fromWei(x, u));
 
 const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
+  const { notify } = Connection.useContainer();
   const { empState } = EmpState.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
   const {
@@ -83,6 +85,7 @@ const Redeem = () => {
       try {
         const tx = await emp.redeem([tokensToRedeemWei]);
         setHash(tx.hash as string);
+        notify?.hash(tx.hash);
         await tx.wait();
         setSuccess(true);
       } catch (error) {

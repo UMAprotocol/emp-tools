@@ -1,9 +1,10 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { initOnboard, initNotify } from "./OnboardServices";
 import { API as OnboardApi, Wallet } from "bnc-onboard/dist/src/interfaces";
 import { API as NotifyApi } from "bnc-notify/dist/src/interfaces";
+import Onboard from "bnc-onboard";
+import Notify from "bnc-notify";
 import { Observable } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 
@@ -24,29 +25,90 @@ function useConnection() {
   const [block$, setBlock$] = useState<Observable<Block> | null>(null);
 
   const attemptConnection = async () => {
-    const onboard = initOnboard({
-      address: setAddress,
-      network: setNetwork,
-      wallet: async (wallet: Wallet) => {
-        if (wallet.provider) {
-          const ethersProvider = new ethers.providers.Web3Provider(
-            wallet.provider
-          );
-          setProvider(ethersProvider);
-          setNetwork(await ethersProvider.getNetwork());
-          setSigner(ethersProvider.getSigner());
-          await ethersProvider.send("eth_requestAccounts", []);
-          setAddress(await ethersProvider.getSigner().getAddress());
-          setSelectedWallet(wallet.name);
-        } else {
-          setProvider(null);
-        }
+    const rpcUrl =
+      "https://mainnet.infura.io/v3/d5e29c9b9a9d4116a7348113f57770a8";
+
+    const apiKey = process.env.REACT_APP_ONBOARD_API_KEY
+      ? process.env.REACT_APP_ONBOARD_API_KEY
+      : "12153f55-f29e-4f11-aa07-90f10da5d778";
+    const onboard = Onboard({
+      dappId: apiKey,
+      hideBranding: true,
+      networkId: 1, // Default to main net. If on a different network will change with the subscription.
+      subscriptions: {
+        address: setAddress,
+        network: async (networkId) => {
+          onboard.config({ networkId: networkId });
+        },
+        wallet: async (wallet: Wallet) => {
+          if (wallet.provider) {
+            const ethersProvider = new ethers.providers.Web3Provider(
+              wallet.provider
+            );
+            setProvider(ethersProvider);
+            setNetwork(await ethersProvider.getNetwork());
+            setSigner(ethersProvider.getSigner());
+            await ethersProvider.send("eth_requestAccounts", []);
+            setAddress(await ethersProvider.getSigner().getAddress());
+            setSelectedWallet(wallet.name);
+          } else {
+            setProvider(null);
+          }
+        },
       },
+      walletSelect: {
+        wallets: [
+          { walletName: "metamask" },
+          {
+            walletName: "trezor",
+            appUrl: "https://reactdemo.blocknative.com",
+            email: "aaron@blocknative.com",
+            rpcUrl,
+          },
+          {
+            walletName: "ledger",
+            rpcUrl,
+          },
+          { walletName: "dapper" },
+          { walletName: "coinbase" },
+          { walletName: "status" },
+          // { walletName: "walletLink", rpcUrl },
+          // {
+          //   walletName: "portis",
+          //   apiKey: "b2b7586f-2b1e-4c30-a7fb-c2d1533b153b",
+          // },
+          // { walletName: "fortmatic", apiKey: "pk_test_886ADCAB855632AA" },
+          { walletName: "unilogin" },
+          { walletName: "torus" },
+          // { walletName: "squarelink", apiKey: "87288b677f8cfb09a986" },
+          { walletName: "authereum", disableNotifications: true },
+          { walletName: "trust", rpcUrl },
+          // {
+          //   walletName: "walletConnect",
+          //   infuraKey: "d5e29c9b9a9d4116a7348113f57770a8",
+          // },
+          { walletName: "opera" },
+          { walletName: "operaTouch" },
+          { walletName: "imToken", rpcUrl },
+        ],
+      },
+      walletCheck: [
+        { checkName: "derivationPath" },
+        { checkName: "connect" },
+        { checkName: "accounts" },
+        { checkName: "network" },
+        { checkName: "balance", minimumBalance: "100000" },
+      ],
     });
+
     await onboard.walletSelect();
     setOnboard(onboard);
-
-    setNotify(initNotify());
+    setNotify(
+      Notify({
+        dappId: apiKey ? apiKey : "",
+        networkId: network?.chainId || 1,
+      })
+    );
 
     if (window.ethereum === undefined) {
       throw Error("MetaMask not found, please visit https://metamask.io/");

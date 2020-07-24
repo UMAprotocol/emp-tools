@@ -56,16 +56,17 @@ const useEmpSponsors = () => {
           (contract: FinancialContractQuery) =>
             utils.getAddress(contract.id) === emp.address
         );
+        if (empData) {
+          empData.positions.forEach((position: PositionQuery) => {
+            const sponsor = utils.getAddress(position.sponsor.id);
 
-        empData.positions.forEach((position: PositionQuery) => {
-          const sponsor = utils.getAddress(position.sponsor.id);
-
-          newPositions[sponsor] = {
-            tokensOutstanding: position.tokensOutstanding,
-            collateral: position.collateral,
-            sponsor,
-          };
-        });
+            newPositions[sponsor] = {
+              tokensOutstanding: position.tokensOutstanding,
+              collateral: position.collateral,
+              sponsor,
+            };
+          });
+        }
 
         setActivePositions(newPositions);
       }

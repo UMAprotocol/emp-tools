@@ -79,7 +79,7 @@ const Weth = () => {
     wethBalance,
     ethBalance,
   } = WethContract.useContainer();
-  const { signer } = Connection.useContainer();
+  const { signer, notify } = Connection.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [ethAmount, setEthAmount] = useState<BigNumberish | null>(null);
@@ -105,6 +105,7 @@ const Weth = () => {
             tx = await weth.withdraw(utils.parseEther(amount).toString());
           }
           setHash(tx.hash as string);
+          notify?.hash(tx.hash);
           await tx.wait();
           setSuccess(true);
         } catch (error) {
@@ -254,7 +255,7 @@ const Weth = () => {
         </Box>
       )}
       {success && (
-        <Box py={4}>
+        <Box py={2}>
           <Typography>
             <strong>Transaction successful!</strong>
           </Typography>

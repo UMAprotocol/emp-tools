@@ -4,6 +4,7 @@ import { Box, Button, TextField, Typography } from "@material-ui/core";
 import { ethers } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
+import Connection from "../../containers/Connection";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
@@ -20,6 +21,7 @@ const Link = styled.a`
 `;
 
 const Deposit = () => {
+  const { notify } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { symbol: collSymbol, balance } = Collateral.useContainer();
   const { tokens, collateral, pendingWithdraw } = Position.useContainer();
@@ -44,6 +46,7 @@ const Deposit = () => {
       try {
         const tx = await emp.deposit([collateralToDepositWei]);
         setHash(tx.hash as string);
+        notify?.hash(tx.hash);
         await tx.wait();
         setSuccess(true);
       } catch (error) {

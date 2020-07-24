@@ -80,7 +80,7 @@ const Create = () => {
       try {
         const tx = await emp.create([collateralWei], [tokensWei]);
         setHash(tx.hash as string);
-        notify.hash(hash);
+        notify?.hash(tx.hash);
         await tx.wait();
         setSuccess(true);
       } catch (error) {
