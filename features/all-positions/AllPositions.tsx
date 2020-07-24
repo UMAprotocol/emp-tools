@@ -9,6 +9,7 @@ import {
   Paper,
   Container,
   Typography,
+  Tooltip,
 } from "@material-ui/core";
 import styled from "styled-components";
 import { utils, BigNumberish } from "ethers";
@@ -102,12 +103,23 @@ const AllPositions = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Sponsor</TableCell>
-                  <TableCell align="right">Collateral ({collSymbol})</TableCell>
                   <TableCell align="right">
-                    Synthetics ({tokenSymbol})
+                    Collateral
+                    <br />({collSymbol})
+                  </TableCell>
+                  <TableCell align="right">
+                    Synthetics
+                    <br />({tokenSymbol})
                   </TableCell>
                   <TableCell align="right">Collateral Ratio</TableCell>
-                  <TableCell align="right">Liquidation Price</TableCell>
+                  <Tooltip
+                    title={`This is the price that the identifier (${
+                      priceId ? utils.parseBytes32String(priceId) : "N/A"
+                    }) must increase to in order for the position be liquidatable`}
+                    placement="top"
+                  >
+                    <TableCell align="right">Liquidation Price</TableCell>
+                  </Tooltip>
                 </TableRow>
               </TableHead>
               <TableBody>
