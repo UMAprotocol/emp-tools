@@ -97,7 +97,7 @@ const Deposit = () => {
     <Box>
       <Box pt={2} pb={4}>
         <Typography>
-          Adding additional collateral into your position you will increase the
+          Adding additional collateral into your position will increase your
           collateralization ratio.
         </Typography>
       </Box>
