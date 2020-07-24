@@ -47,7 +47,8 @@ const GeneralInfo = () => {
   // format nice date
   const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
 
-  const pricedGcr = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+  const pricedGcr =
+    gcr !== null && latestPrice ? gcr / Number(latestPrice) : null;
 
   const withdrawalLivenessInMinutes = withdrawalLiveness
     ? Number(withdrawalLiveness) / 60
@@ -111,7 +112,7 @@ const GeneralInfo = () => {
         <Tooltip
           title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
         >
-          <span>{pricedGcr ? pricedGcr.toFixed(4) : "N/A"}</span>
+          <span>{pricedGcr !== null ? pricedGcr.toFixed(4) : "N/A"}</span>
         </Tooltip>
       </Status>
 

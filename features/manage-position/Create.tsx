@@ -132,8 +132,13 @@ const Create = () => {
   const computedCR = computeCR() || 0;
 
   const pricedCR =
-    computedCR && latestPrice ? computedCR / Number(latestPrice) : null;
-  const pricedGCR = gcr && latestPrice ? gcr / Number(latestPrice) : null;
+    latestPrice !== null && latestPrice > 0
+      ? computedCR / Number(latestPrice)
+      : null;
+  const pricedGCR =
+    gcr !== null && latestPrice !== null && latestPrice > 0
+      ? gcr / Number(latestPrice)
+      : null;
 
   const liquidationPrice =
     posCollateral !== null && posTokens !== null
@@ -251,7 +256,7 @@ const Create = () => {
         )}
         {tokens &&
         collateral &&
-        gcr &&
+        gcr !== null &&
         !needAllowance() &&
         computedCR > gcr &&
         !balanceTooLow ? (
@@ -269,7 +274,7 @@ const Create = () => {
       <Box py={2}>
         <Typography>
           Resulting Liquidation Price:{" "}
-          {liquidationPrice && empState?.priceIdentifier && (
+          {liquidationPrice !== null && empState?.priceIdentifier && (
             <span>
               {liquidationPrice?.toFixed(4)}
               {` ${hexToUtf8(empState.priceIdentifier)}`}
@@ -278,7 +283,7 @@ const Create = () => {
         </Typography>
         <Typography>
           Resulting CR:{" "}
-          {tokens && collateral && gcr && (
+          {computedCR && pricedCR !== null && gcr !== null && (
             <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
               {pricedCR?.toFixed(4)}
             </span>

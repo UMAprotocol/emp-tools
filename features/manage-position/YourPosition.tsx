@@ -39,6 +39,7 @@ const YourPosition = () => {
   const {
     tokens,
     collateral,
+    cRatio,
     withdrawAmt,
     pendingWithdraw,
     pendingTransfer,
@@ -51,16 +52,15 @@ const YourPosition = () => {
   const ready =
     tokens !== null &&
     collateral !== null &&
+    cRatio !== null &&
     collSymbol !== null &&
     tokenSymbol !== null &&
     latestPrice !== null &&
     sourceUrl;
 
-  const collateralizationRatio =
-    collateral !== null && tokens !== null ? collateral / tokens : null;
   const pricedCollateralizationRatio =
-    collateralizationRatio !== null && latestPrice !== null
-      ? collateralizationRatio / Number(latestPrice)
+    cRatio !== null && latestPrice !== null && latestPrice > 0
+      ? cRatio / Number(latestPrice)
       : null;
   const pricedGcr =
     gcr !== null && latestPrice !== null ? gcr / Number(latestPrice) : null;
@@ -97,7 +97,7 @@ const YourPosition = () => {
       </Status>
       <Status>
         <Label>(CR) Collateralization ratio: </Label>
-        {pricedCollateralizationRatio
+        {pricedCollateralizationRatio !== null
           ? `${pricedCollateralizationRatio?.toFixed(
               4
             )} (${collSymbol} / ${tokenSymbol})`
@@ -105,7 +105,7 @@ const YourPosition = () => {
       </Status>
       <Status>
         <Label>(GCR) Global collateralization ratio: </Label>
-        {pricedGcr
+        {pricedGcr !== null
           ? `${pricedGcr?.toFixed(4)} (${collSymbol} / ${tokenSymbol})`
           : "N/A"}
       </Status>

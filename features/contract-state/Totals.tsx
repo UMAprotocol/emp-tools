@@ -49,7 +49,10 @@ const Totals = () => {
   const { getEtherscanUrl } = Etherscan.useContainer();
 
   const loading =
-    !totalCollateral || !totalTokens || !collSymbol || !tokenSymbol;
+    totalCollateral === null ||
+    totalTokens === null ||
+    !collSymbol ||
+    !tokenSymbol;
   return (
     <>
       <Grid item xs={6}>
