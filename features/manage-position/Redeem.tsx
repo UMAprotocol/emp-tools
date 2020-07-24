@@ -157,6 +157,14 @@ const Redeem = () => {
           <strong>Note:</strong> this will not change the collateralization
           ratio of your position.
         </Typography>
+        <br></br>
+        <Typography>
+          When redeeming, you must keep at least{" "}
+          {empState?.minSponsorTokens
+            ? weiToNum(empState.minSponsorTokens)
+            : "N/A"}{" "}
+          token(s) in your position.
+        </Typography>
       </Box>
 
       <Grid container spacing={3}>

@@ -115,12 +115,17 @@ const Create = () => {
   };
 
   const computeCR = () => {
+    if (collateral === null || tokens === null) return null;
+    return parseFloat(collateral) / parseFloat(tokens);
+  };
+  const computedCR = computeCR() || 0;
+
+  const resultCR = () => {
     if (
       collateral === null ||
       tokens === null ||
       posCollateral === null ||
-      posTokens === null ||
-      latestPrice === null
+      posTokens === null
     )
       return null;
 
@@ -129,11 +134,11 @@ const Create = () => {
     const totalTokens = posTokens + parseFloat(tokens);
     return totalCollateral / totalTokens;
   };
-  const computedCR = computeCR() || cRatio;
+  const resultingCR = resultCR() || cRatio;
 
   const pricedCR =
-    latestPrice !== null && latestPrice > 0 && computedCR !== null
-      ? computedCR / Number(latestPrice)
+    latestPrice !== null && latestPrice > 0 && resultingCR !== null
+      ? resultingCR / Number(latestPrice)
       : null;
   const pricedGCR =
     gcr !== null && latestPrice !== null && latestPrice > 0
@@ -190,8 +195,9 @@ const Create = () => {
 
         <Box pt={2}>
           <Typography>
-            When minting, your resulting collateralization ratio (collateral /
-            tokens) must be above the GCR and you need to mint at least{" "}
+            When minting, the ratio of collateral deposited to tokens created
+            (collateral / tokens) must be above the GCR and you need to mint at
+            least{" "}
             {minSponsorTokens && tokenDec
               ? fromWei(minSponsorTokens, tokenDec)
               : "N/A"}{" "}
@@ -277,6 +283,14 @@ const Create = () => {
 
       <Box py={4}>
         <Typography>
+          CR of newly created tokens:{" "}
+          {resultingCR !== null && gcr !== null && (
+            <span style={{ color: resultingCR < gcr ? "red" : "unset" }}>
+              {resultingCR?.toFixed(4)}
+            </span>
+          )}
+        </Typography>
+        <Typography>
           Resulting Liquidation Price:{" "}
           {liquidationPrice !== null && empState?.priceIdentifier && (
             <span>
@@ -287,11 +301,7 @@ const Create = () => {
         </Typography>
         <Typography>
           Resulting CR:{" "}
-          {computedCR !== null && pricedCR !== null && gcr !== null && (
-            <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
-              {pricedCR?.toFixed(4)}
-            </span>
-          )}
+          {pricedCR !== null && <span>{pricedCR?.toFixed(4)}</span>}
         </Typography>
         <Typography>Current GCR: {pricedGCR?.toFixed(4) || "N/A"}</Typography>
       </Box>
