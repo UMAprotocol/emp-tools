@@ -84,8 +84,8 @@ const YieldCalculator = () => {
       <Box pb={4}>
         <Typography>
           yUSD is a fixed yielding, expiring token that will be redeemable for
-          exactly 1 USD in collateral at expiry. To use this calculator enter in
-          the current yUSD price and the Days to expiry. an Implied yearly APR
+          exactly 1 USD worth of ETH at expiry. To use this calculator enter in
+          the current yUSD price and the Days to expiry. An implied yearly APR
           is shown. To learn more about yUSD see the UMA Medium post{" "}
           <a
             href="https://medium.com/uma-project/the-yield-dollar-on-uma-3a492e79069f"

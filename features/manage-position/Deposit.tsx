@@ -10,8 +10,6 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 import { hashMessage } from "ethers/lib/utils";
 
-const Container = styled(Box)``;
-
 const Link = styled.a`
   color: white;
   font-size: 14px;
@@ -69,19 +67,19 @@ const Deposit = () => {
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>Create a position before depositing more collateral.</i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>
@@ -90,13 +88,13 @@ const Deposit = () => {
             </i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   // User has a position and no pending withdrawal requests so can deposit more collateral.
   return (
-    <Container>
+    <Box>
       <Box pt={2} pb={4}>
         <Typography>
           Adding additional collateral into your position you will increase the
@@ -184,7 +182,7 @@ const Deposit = () => {
           </Typography>
         </Box>
       )}
-    </Container>
+    </Box>
   );
 };
 

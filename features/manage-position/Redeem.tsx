@@ -10,8 +10,6 @@ import Position from "../../containers/Position";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 
-const Container = styled(Box)``;
-
 const Link = styled.a`
   color: white;
   font-size: 14px;
@@ -102,19 +100,19 @@ const Redeem = () => {
     collateral.toString() === "0"
   ) {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>You need to borrow tokens before redeeming.</i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>
@@ -123,13 +121,13 @@ const Redeem = () => {
             </i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   // User has a position and no withdraw requests, so they can redeem tokens.
   return (
-    <Container>
+    <Box>
       <Box pt={2} pb={4}>
         <Typography>
           By redeeming your synthetic tokens, you will pay back a portion of
@@ -229,7 +227,7 @@ const Redeem = () => {
           </Typography>
         </Box>
       )}
-    </Container>
+    </Box>
   );
 };
 

@@ -11,7 +11,7 @@ import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
-const Container = styled(Box)``;
+import { DOCS_MAP } from "../../utils/getDocLinks";
 
 const Important = styled(Typography)`
   color: red;
@@ -127,8 +127,16 @@ const Deposit = () => {
       ? (collateral - parseFloat(collateralToWithdraw)) / tokens
       : startingCR;
   const resultingCRBelowGCR = resultingCR && gcr ? resultingCR < gcr : null;
-  const fastWithdrawableCollateral =
-    collateral && tokens && gcr ? (gcr * tokens - collateral).toFixed(2) : null;
+  const fastWithdrawableCollateral = () => {
+    if (collateral && tokens && gcr) {
+      const withdrawableCollat = collateral - gcr * tokens;
+      // Only if there is more than 0 fast withdrawable collateral should we return a value.
+      // Else, there is nothing that can be fast withdrawn.
+      if (withdrawableCollat > 0) return withdrawableCollat.toFixed(2);
+      else return "0";
+    }
+    return null;
+  };
 
   // Calculations of collateral ratios using same units as price feed:
   const pricedStartingCR =
@@ -156,20 +164,20 @@ const Deposit = () => {
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>Create a position before withdrawing collateral.</i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   // User has a position and a pending withdrawal.
   if (collateral !== null && pendingWithdraw === "Yes") {
     return (
-      <Container>
+      <Box>
         <Box pt={4} pb={2}>
           <Typography>
             <i>You have a pending withdraw on your position!</i>
@@ -216,12 +224,12 @@ const Deposit = () => {
             >{`Cancel withdraw request`}</Button>
           </Box>
         </Box>
-      </Container>
+      </Box>
     );
   }
   // User has a position and no pending withdrawal.
   return (
-    <Container>
+    <Box>
       <Box pt={2} pb={2}>
         <Typography>
           <i>
@@ -246,7 +254,7 @@ const Deposit = () => {
               <strong>"Fast" withdraw: </strong>Instantly withdraw collateral
               until your collateralization ratio equals the global
               collateralization ratio. For your position you can withdraw{" "}
-              {fastWithdrawableCollateral} {collSymbol}.
+              {fastWithdrawableCollateral()} {collSymbol}.
             </li>
             <li>
               <strong>"Slow" withdraw: </strong> To withdraw past the global
@@ -264,7 +272,7 @@ const Deposit = () => {
           <Typography>
             For more info on the different kinds of withdrawals see the{" "}
             <a
-              href="https://docs.umaproject.org/uma/synthetic_tokens/explainer.html#_managing_token_sponsor_positions"
+              href={DOCS_MAP.MANAGING_POSITION}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -364,7 +372,7 @@ const Deposit = () => {
           </Typography>
         </Box>
       )}
-    </Container>
+    </Box>
   );
 };
 

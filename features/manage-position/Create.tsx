@@ -12,8 +12,6 @@ import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
-const Container = styled(Box)``;
-
 const Important = styled(Typography)`
   color: red;
   background: black;
@@ -134,34 +132,30 @@ const Create = () => {
   // User has not selected an EMP yet. We can detect this by checking if any properties in `empState` are `null`.
   if (collReq === null) {
     return (
-      <Container>
-        <Box py={2}>
-          <Typography>
-            <i>Please first select an EMP from the dropdown above.</i>
-          </Typography>
-        </Box>
-      </Container>
+      <Box py={2}>
+        <Typography>
+          <i>Please first select an EMP from the dropdown above.</i>
+        </Typography>
+      </Box>
     );
   }
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-      <Container>
-        <Box py={2}>
-          <Typography>
-            <i>
-              You need to cancel or execute your pending withdrawal request
-              before creating additional tokens.
-            </i>
-          </Typography>
-        </Box>
-      </Container>
+      <Box py={2}>
+        <Typography>
+          <i>
+            You need to cancel or execute your pending withdrawal request before
+            creating additional tokens.
+          </i>
+        </Typography>
+      </Box>
     );
   }
 
   // User has no pending withdrawal requests so they can create tokens.
   return (
-    <Container>
+    <Box>
       <Box py={2}>
         <Typography>
           <i>
@@ -306,7 +300,7 @@ const Create = () => {
           </Typography>
         </Box>
       )}
-    </Container>
+    </Box>
   );
 };
 

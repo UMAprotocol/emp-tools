@@ -155,7 +155,7 @@ const Weth = () => {
       <Box pb={4}>
         <Typography>
           Convert your ETH into WETH to be used as contract collateral. This is
-          needed for yUSD. To learn more about WETh see{" "}
+          needed for yUSD. To learn more about WETH see{" "}
           <a href="https://weth.io/" target="_blank" rel="noopener noreferrer">
             weth.io
           </a>
