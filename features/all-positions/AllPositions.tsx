@@ -38,13 +38,11 @@ const AllPositions = () => {
 
   if (tokenSymbol === null || emp === null) {
     return (
-      <Container>
-        <Box py={2}>
-          <Typography>
-            <i>Please first select an EMP from the dropdown above.</i>
-          </Typography>
-        </Box>
-      </Container>
+      <Box>
+        <Typography>
+          <i>Please first connect and select an EMP from the dropdown above.</i>
+        </Typography>
+      </Box>
     );
   }
 
@@ -69,31 +67,35 @@ const AllPositions = () => {
   };
 
   return (
-    <Container>
+    <Box>
       <Box>
         <Typography>
-          <i>
-            Estimated price of{" "}
-            {latestPrice ? Number(latestPrice).toFixed(4) : "N/A"} for{" "}
-            {priceId ? utils.parseBytes32String(priceId) : "N/A"} sourced from{" "}
-          </i>
+          Estimated price of{" "}
+          {latestPrice ? Number(latestPrice).toFixed(4) : "N/A"} for{" "}
+          {priceId ? utils.parseBytes32String(priceId) : "N/A"} sourced from{" "}
           <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
             Coinbase Pro.
           </Link>
         </Typography>
       </Box>
-      <Box py={4}>
+      <Box pt={4}>
         {activeSponsors && (
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Sponsor</TableCell>
-                  <TableCell align="right">Collateral ({collSymbol})</TableCell>
-                  <TableCell align="right">
-                    Synthetics ({tokenSymbol})
+                  <TableCell>
+                    <strong>Sponsor</strong>
                   </TableCell>
-                  <TableCell align="right">Collateral Ratio</TableCell>
+                  <TableCell align="right">
+                    <strong>Collateral ({collSymbol})</strong>
+                  </TableCell>
+                  <TableCell align="right">
+                    <strong>Synthetics ({tokenSymbol})</strong>
+                  </TableCell>
+                  <TableCell align="right">
+                    <strong>Collateral Ratio</strong>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -131,7 +133,7 @@ const AllPositions = () => {
           </TableContainer>
         )}
       </Box>
-    </Container>
+    </Box>
   );
 };
 

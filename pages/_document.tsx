@@ -1,4 +1,5 @@
 import Document from "next/document";
+import Head from "next/head";
 import { ServerStyleSheet } from "styled-components";
 import { ServerStyleSheets } from "@material-ui/styles";
 
@@ -22,6 +23,13 @@ export default class MyDocument extends Document {
         ...initialProps,
         styles: (
           <>
+            <Head>
+              <link
+                rel="icon"
+                type="image/x-icon"
+                href="../public/favicon.ico"
+              />
+            </Head>
             {initialProps.styles}
             {materialSheets.getStyleElement()}
             {styledComponentsSheet.getStyleElement()}

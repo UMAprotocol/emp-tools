@@ -62,9 +62,7 @@ const Totals = () => {
             <strong>
               {loading ? "N/A" : Number(totalCollateral).toLocaleString()}
             </strong>
-            <Tooltip title="Etherscan Link">
-              <Small> {collSymbol}</Small>
-            </Tooltip>
+            <Small> {collSymbol}</Small>
           </Typography>
           <Label>
             of <White>collateral</White> supplied
@@ -98,15 +96,12 @@ const Totals = () => {
             <strong>
               {loading ? "N/A" : Number(totalTokens).toLocaleString()}
             </strong>
-            <Tooltip title="Etherscan Link">
-              <Small> {tokenSymbol}</Small>
-            </Tooltip>
+
+            <Small> {tokenSymbol}</Small>
           </Typography>
-          <Tooltip title="This is the total number of tokens minted minus the total number of tokens redeemed.">
-            <Label>
-              of <White>synthetic tokens</White> outstanding
-            </Label>
-          </Tooltip>
+          <Label>
+            of <White>synthetic tokens</White> outstanding
+          </Label>
           <LinksContainer>
             {tokenAddress && (
               <SmallLink
