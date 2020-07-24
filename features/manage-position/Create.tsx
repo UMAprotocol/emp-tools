@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Box, Button, TextField, Typography } from "@material-ui/core";
 
 import EmpContract from "../../containers/EmpContract";
+import Connection from "../../containers/Connection";
 import { useState } from "react";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
@@ -30,6 +31,7 @@ const Link = styled.a`
 const fromWei = ethers.utils.formatUnits;
 
 const Create = () => {
+  const { notify } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const {
@@ -78,6 +80,7 @@ const Create = () => {
       try {
         const tx = await emp.create([collateralWei], [tokensWei]);
         setHash(tx.hash as string);
+        notify.hash(hash);
         await tx.wait();
         setSuccess(true);
       } catch (error) {

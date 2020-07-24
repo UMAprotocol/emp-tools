@@ -13,6 +13,8 @@
     "@material-ui/core": "^4.10.2",
     "@material-ui/icons": "^4.9.1",
     "@studydefi/money-legos": "^2.3.2",
+    "bnc-notify": "^1.2.4",
+    "bnc-onboard": "^1.10.3",
     "date-fns": "^2.14.0",
     "ethers": "^5.0.1",
     "graphql": "^15.3.0",
