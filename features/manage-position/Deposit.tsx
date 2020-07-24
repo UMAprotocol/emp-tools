@@ -34,11 +34,16 @@ const Deposit = () => {
     allowance,
     setMaxAllowance,
   } = Collateral.useContainer();
-  const { tokens, collateral, pendingWithdraw } = Position.useContainer();
+  const {
+    tokens,
+    collateral,
+    cRatio,
+    pendingWithdraw,
+  } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
-  const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
+  const [collateralToDeposit, setCollateralToDeposit] = useState<string>("0");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -56,10 +61,10 @@ const Deposit = () => {
       setHash(null);
       setSuccess(null);
       setError(null);
-      const collateralToDepositWei = ethers.utils.parseUnits(
-        collateralToDeposit
-      );
       try {
+        const collateralToDepositWei = ethers.utils.parseUnits(
+          collateralToDeposit
+        );
         const tx = await emp.deposit([collateralToDepositWei]);
         setHash(tx.hash as string);
         await tx.wait();
@@ -75,28 +80,36 @@ const Deposit = () => {
 
   const handleDepositClick = () => depositCollateral();
 
-  const startingCR = collateral && tokens ? collateral / tokens : null;
+  const startingCR = cRatio;
   const pricedStartingCR =
-    startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
+    startingCR !== null && latestPrice !== null && latestPrice > 0
+      ? startingCR / Number(latestPrice)
+      : null;
 
   const resultingCR =
-    collateral && collateralToDeposit && tokens
+    collateral !== null &&
+    collateralToDeposit !== "0" &&
+    tokens !== null &&
+    tokens > 0
       ? (collateral + parseFloat(collateralToDeposit)) / tokens
       : startingCR;
   const pricedResultingCR =
-    resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
+    resultingCR && latestPrice !== null && latestPrice > 0
+      ? resultingCR / Number(latestPrice)
+      : null;
 
   const collReqFromWei =
-    empState?.collateralRequirement && collDec
+    empState?.collateralRequirement && collDec !== null
       ? parseFloat(fromWei(empState.collateralRequirement, collDec))
       : null;
-  const liquidationPrice = collateral
-    ? getLiquidationPrice(
-        collateral + parseFloat(collateralToDeposit),
-        tokens,
-        collReqFromWei
-      )
-    : null;
+  const liquidationPrice =
+    collateral !== null
+      ? getLiquidationPrice(
+          collateral + parseFloat(collateralToDeposit),
+          tokens,
+          collReqFromWei
+        )
+      : null;
 
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
@@ -162,8 +175,8 @@ const Deposit = () => {
           </Button>
         )}
         {!needAllowance() &&
-        collateralToDeposit &&
-        collateralToDeposit != "0" &&
+        !isNaN(parseFloat(collateralToDeposit)) &&
+        parseFloat(collateralToDeposit) > 0 &&
         !balanceTooLow ? (
           <Button
             variant="contained"
@@ -184,8 +197,8 @@ const Deposit = () => {
           Resulting CR: {pricedResultingCR?.toFixed(4) || "N/A"}
         </Typography>
         <Typography>
-          Liquidation Price:{" "}
-          {liquidationPrice && empState?.priceIdentifier
+          Resulting Liquidation Price:{" "}
+          {liquidationPrice !== null && empState?.priceIdentifier
             ? `${liquidationPrice?.toFixed(4)} ${hexToUtf8(
                 empState.priceIdentifier
               )}`

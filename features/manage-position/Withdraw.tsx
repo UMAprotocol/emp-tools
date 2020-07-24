@@ -40,6 +40,7 @@ const Deposit = () => {
   const {
     tokens,
     collateral,
+    cRatio,
     withdrawAmt,
     withdrawPassTime,
     pendingWithdraw,
@@ -48,7 +49,7 @@ const Deposit = () => {
   const { latestPrice } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
-  const [collateralToWithdraw, setCollateralToWithdraw] = useState<string>("");
+  const [collateralToWithdraw, setCollateralToWithdraw] = useState<string>("0");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -58,10 +59,10 @@ const Deposit = () => {
       setHash(null);
       setSuccess(null);
       setError(null);
-      const collateralToWithdrawWei = ethers.utils.parseUnits(
-        collateralToWithdraw
-      );
       try {
+        const collateralToWithdrawWei = ethers.utils.parseUnits(
+          collateralToWithdraw
+        );
         if (resultingCRBelowGCR) {
           const tx = await emp.requestWithdrawal([collateralToWithdrawWei]);
           setHash(tx.hash as string);
@@ -132,10 +133,9 @@ const Deposit = () => {
     empState.collateralRequirement && collDec
       ? parseFloat(fromWei(empState.collateralRequirement, collDec))
       : null;
-  const startingCR =
-    collateral !== null && tokens !== null ? collateral / tokens : null;
+  const startingCR = cRatio;
   const resultingCR =
-    collateral !== null && collateralToWithdraw !== null && tokens !== null
+    collateral !== null && collateralToWithdraw && tokens !== null && tokens > 0
       ? (collateral - parseFloat(collateralToWithdraw)) / tokens
       : startingCR;
   const resultingCRBelowGCR =
@@ -147,11 +147,11 @@ const Deposit = () => {
 
   // Calculations of collateral ratios using same units as price feed:
   const pricedStartingCR =
-    startingCR !== null && latestPrice !== null
+    startingCR !== null && latestPrice !== null && latestPrice > 0
       ? startingCR / Number(latestPrice)
       : null;
   const pricedResultingCR =
-    resultingCR !== null && latestPrice !== null
+    resultingCR !== null && latestPrice !== null && latestPrice > 0
       ? resultingCR / Number(latestPrice)
       : null;
   const pricedGcr =
@@ -184,10 +184,14 @@ const Deposit = () => {
       : null;
 
   // Data inferred from potential withdrawal amount.
+  const withdrawUnderbalance =
+    collateralToWithdraw &&
+    collateral &&
+    parseFloat(collateralToWithdraw) <= collateral;
   const withdrawAmountValid =
     collateralToWithdraw !== null &&
     collateral !== null &&
-    parseFloat(collateralToWithdraw) <= collateral &&
+    withdrawUnderbalance &&
     parseFloat(collateralToWithdraw) > 0;
   const liquidationPrice =
     collateral !== null && tokens !== null && collReqFromWei !== null
@@ -330,6 +334,7 @@ const Deposit = () => {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCollateralToWithdraw(e.target.value)
           }
+          helperText={!withdrawUnderbalance ? `Invalid amount` : null}
         />
       </Box>
 
@@ -361,15 +366,15 @@ const Deposit = () => {
         <Typography>
           CR Requirement: {collReqFromWei?.toFixed(4) || "N/A"}
         </Typography>
+        {pricedResultingCR !== null && (
+          <Typography>
+            Resulting position CR: {pricedResultingCR.toFixed(4) || "N/A"}
+          </Typography>
+        )}
         {withdrawAmountValid && resultingPricedCRBelowCRRequirement && (
           <Typography style={{ color: "red" }}>
             Withdrawal would drop your CR below the CR requirement and your
             position will be at risk of getting liquidated.
-          </Typography>
-        )}
-        {pricedResultingCR !== null && (
-          <Typography>
-            Resulting position CR: {pricedResultingCR.toFixed(4) || "N/A"}
           </Typography>
         )}
         {withdrawAmountValid &&

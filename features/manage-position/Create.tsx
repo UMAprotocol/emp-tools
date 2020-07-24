@@ -47,21 +47,25 @@ const Create = () => {
   const {
     collateral: posCollateral,
     tokens: posTokens,
+    cRatio,
     pendingWithdraw,
   } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
-  const [collateral, setCollateral] = useState<string>("");
-  const [tokens, setTokens] = useState<string>("");
+  const [collateral, setCollateral] = useState<string>("0");
+  const [tokens, setTokens] = useState<string>("0");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   const { collateralRequirement: collReq, minSponsorTokens } = empState;
   const collReqFromWei =
-    collReq && collDec ? parseFloat(fromWei(collReq, collDec)) : null;
-  const collReqPct = collReqFromWei ? `${collReqFromWei * 100}%` : "N/A";
+    collReq !== null && collDec !== null
+      ? parseFloat(fromWei(collReq, collDec))
+      : null;
+  const collReqPct =
+    collReqFromWei !== null ? `${collReqFromWei * 100}%` : "N/A";
   const balanceTooLow = (balance || 0) < (Number(collateral) || 0);
 
   const needAllowance = () => {
@@ -75,9 +79,9 @@ const Create = () => {
       setHash(null);
       setSuccess(null);
       setError(null);
-      const collateralWei = ethers.utils.parseUnits(collateral);
-      const tokensWei = ethers.utils.parseUnits(tokens);
       try {
+        const collateralWei = ethers.utils.parseUnits(collateral);
+        const tokensWei = ethers.utils.parseUnits(tokens);
         const tx = await emp.create([collateralWei], [tokensWei]);
         setHash(tx.hash as string);
         await tx.wait();
@@ -129,10 +133,10 @@ const Create = () => {
     const totalTokens = posTokens + parseFloat(tokens);
     return totalCollateral / totalTokens;
   };
-  const computedCR = computeCR() || 0;
+  const computedCR = computeCR() || cRatio;
 
   const pricedCR =
-    latestPrice !== null && latestPrice > 0
+    latestPrice !== null && latestPrice > 0 && computedCR !== null
       ? computedCR / Number(latestPrice)
       : null;
   const pricedGCR =
@@ -258,6 +262,7 @@ const Create = () => {
         collateral &&
         gcr !== null &&
         !needAllowance() &&
+        computedCR !== null &&
         computedCR > gcr &&
         !balanceTooLow ? (
           <Button
@@ -283,7 +288,7 @@ const Create = () => {
         </Typography>
         <Typography>
           Resulting CR:{" "}
-          {computedCR && pricedCR !== null && gcr !== null && (
+          {computedCR !== null && pricedCR !== null && gcr !== null && (
             <span style={{ color: computedCR < gcr ? "red" : "unset" }}>
               {pricedCR?.toFixed(4)}
             </span>

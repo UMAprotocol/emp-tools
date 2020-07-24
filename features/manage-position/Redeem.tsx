@@ -49,7 +49,7 @@ const Redeem = () => {
   } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
-  const [tokensToRedeem, setTokensToRedeem] = useState<string>("");
+  const [tokensToRedeem, setTokensToRedeem] = useState<string>("0");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -75,7 +75,7 @@ const Redeem = () => {
   const isEmpty = tokensToRedeem === "";
   const canSendTxn =
     !isNaN(parseFloat(tokensToRedeem)) &&
-    tokensToRedeemFloat >= 0 &&
+    tokensToRedeemFloat > 0 &&
     (tokensToRedeemFloat <= maxRedeem || unwindPosition);
 
   const needAllowance = () => {
@@ -94,8 +94,8 @@ const Redeem = () => {
       setHash(null);
       setSuccess(null);
       setError(null);
-      const tokensToRedeemWei = ethers.utils.parseUnits(tokensToRedeem);
       try {
+        const tokensToRedeemWei = ethers.utils.parseUnits(tokensToRedeem);
         const tx = await emp.redeem([tokensToRedeemWei]);
         setHash(tx.hash as string);
         await tx.wait();
