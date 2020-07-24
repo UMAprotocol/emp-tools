@@ -115,8 +115,9 @@ const Create = () => {
   };
 
   const computeCR = () => {
-    if (collateral === null || tokens === null) return null;
-    return parseFloat(collateral) / parseFloat(tokens);
+    if (collateral === null || tokens === null || latestPrice === null)
+      return null;
+    return parseFloat(collateral) / (parseFloat(tokens) * latestPrice);
   };
   const computedCR = computeCR() || 0;
 
@@ -263,10 +264,10 @@ const Create = () => {
             )}
             {tokens &&
             collateral &&
-            gcr !== null &&
+            pricedGCR !== null &&
             !needAllowance() &&
             computedCR !== null &&
-            computedCR > gcr &&
+            computedCR > pricedGCR &&
             !balanceTooLow ? (
               <Button
                 variant="contained"
@@ -284,9 +285,9 @@ const Create = () => {
       <Box py={4}>
         <Typography>
           CR of newly created tokens:{" "}
-          {resultingCR !== null && gcr !== null && (
-            <span style={{ color: resultingCR < gcr ? "red" : "unset" }}>
-              {resultingCR?.toFixed(4)}
+          {computedCR !== null && pricedGCR !== null && (
+            <span style={{ color: computedCR < pricedGCR ? "red" : "unset" }}>
+              {computedCR?.toFixed(4)}
             </span>
           )}
         </Typography>
