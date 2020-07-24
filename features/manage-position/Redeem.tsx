@@ -82,7 +82,11 @@ const Redeem = () => {
   };
 
   const collateralToReceive =
-    borrowedTokens !== null && borrowedTokens > 0 && collateral !== null
+    borrowedTokens !== null &&
+    borrowedTokens > 0 &&
+    collateral !== null &&
+    syntheticBalance !== null &&
+    tokensToRedeemFloat < borrowedTokens
       ? (tokensToRedeemFloat / borrowedTokens) * collateral
       : null;
 
@@ -225,9 +229,13 @@ const Redeem = () => {
       <Box py={4}>
         <Typography>{`Current borrowed ${syntheticSymbol}: ${borrowedTokens}`}</Typography>
         <Typography>{`Remaining debt after redemption: ${
-          borrowedTokens - tokensToRedeemFloat
+          borrowedTokens - tokensToRedeemFloat > 0
+            ? borrowedTokens - tokensToRedeemFloat
+            : "N/A"
         }`}</Typography>
-        <Typography>{`Collateral you will receive on redemption: ${collateralToReceive} ${collSymbol}`}</Typography>
+        <Typography>{`Collateral you will receive on redemption: ${
+          collateralToReceive !== null ? collateralToReceive : "N/A"
+        } ${collSymbol}`}</Typography>
       </Box>
 
       {hash && (

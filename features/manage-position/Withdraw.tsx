@@ -344,7 +344,7 @@ const Deposit = () => {
         </Grid>
         <Grid item xs={4}>
           <Box py={1}>
-            {collateralToWithdraw && collateralToWithdraw != "0" ? (
+            {withdrawAmountValid ? (
               <Button variant="contained" onClick={handleWithdrawClick}>{`${
                 resultingCRBelowGCR ? "Request Withdrawal of" : "Withdraw"
               } ${collateralToWithdraw} ${collSymbol}`}</Button>
@@ -376,6 +376,11 @@ const Deposit = () => {
         {pricedResultingCR !== null && (
           <Typography>
             Resulting position CR: {pricedResultingCR.toFixed(4) || "N/A"}
+          </Typography>
+        )}
+        {!withdrawUnderbalance && (
+          <Typography style={{ color: "red" }}>
+            Invalid withdrawal amount.
           </Typography>
         )}
         {withdrawAmountValid && resultingPricedCRBelowCRRequirement && (
