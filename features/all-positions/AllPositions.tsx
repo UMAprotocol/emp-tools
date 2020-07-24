@@ -7,7 +7,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Container,
   Typography,
   Tooltip,
 } from "@material-ui/core";
@@ -43,22 +42,7 @@ const AllPositions = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
-
   const { collateralRequirement } = empState;
-  const collReqFromWei =
-    collateralRequirement && collDecimals
-      ? parseFloat(fromWei(collateralRequirement, collDecimals))
-      : null;
-
-  if (tokenSymbol === null || emp === null) {
-    return (
-      <Box>
-        <Typography>
-          <i>Please first connect and select an EMP from the dropdown above.</i>
-        </Typography>
-      </Box>
-    );
-  }
 
   const prettyBalance = (x: BigNumberish | null) => {
     if (!x) return "N/A";
@@ -75,96 +59,114 @@ const AllPositions = () => {
     collateral: BigNumberish,
     tokens: BigNumberish
   ) => {
-    if (!latestPrice) return null;
+    if (latestPrice === 0) return null;
     const tokensScaled = Number(tokens) * Number(latestPrice);
     return (Number(collateral) / tokensScaled).toFixed(4);
   };
 
-  return (
-    <Box>
+  if (
+    collateralRequirement !== null &&
+    collDecimals !== null &&
+    tokenSymbol !== null &&
+    collSymbol !== null &&
+    emp !== null &&
+    latestPrice !== null &&
+    priceId !== null &&
+    sourceUrl !== undefined
+  ) {
+    const collReqFromWei = parseFloat(
+      fromWei(collateralRequirement, collDecimals)
+    );
+    const priceIdUtf8 = utils.parseBytes32String(priceId);
+    return (
+      <Box>
+        <Box>
+          <Typography>
+            {`Estimated price of ${latestPrice} for ${priceIdUtf8} sourced from: `}
+            <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
+              Coinbase Pro.
+            </Link>
+          </Typography>
+        </Box>
+        <Box pt={4}>
+          {activeSponsors && (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Sponsor</TableCell>
+                    <TableCell align="right">
+                      Collateral
+                      <br />({collSymbol})
+                    </TableCell>
+                    <TableCell align="right">
+                      Synthetics
+                      <br />({tokenSymbol})
+                    </TableCell>
+                    <TableCell align="right">Collateral Ratio</TableCell>
+                    <Tooltip
+                      title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
+                      placement="top"
+                    >
+                      <TableCell align="right">Liquidation Price</TableCell>
+                    </Tooltip>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.keys(activeSponsors).map((sponsor: string) => {
+                    const activeSponsor = activeSponsors[sponsor];
+                    return (
+                      activeSponsor?.collateral &&
+                      activeSponsor?.tokensOutstanding && (
+                        <TableRow key={sponsor}>
+                          <TableCell component="th" scope="row">
+                            <a href={getEtherscanUrl(sponsor)} target="_blank">
+                              {prettyAddress(sponsor)}
+                            </a>
+                          </TableCell>
+                          <TableCell align="right">
+                            {prettyBalance(activeSponsor.collateral)}
+                          </TableCell>
+                          <TableCell align="right">
+                            {prettyBalance(activeSponsor.tokensOutstanding)}
+                          </TableCell>
+                          <TableCell align="right">
+                            {prettyBalance(
+                              getCollateralRatio(
+                                activeSponsor.collateral,
+                                activeSponsor.tokensOutstanding
+                              )
+                            )}
+                          </TableCell>
+                          <TableCell align="right">
+                            {prettyBalance(
+                              getLiquidationPrice(
+                                Number(activeSponsor.collateral),
+                                Number(activeSponsor.tokensOutstanding),
+                                collReqFromWei
+                              )
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Box>
+      </Box>
+    );
+  } else {
+    return (
       <Box>
         <Typography>
-          Estimated price of{" "}
-          {latestPrice ? Number(latestPrice).toFixed(4) : "N/A"} for{" "}
-          {priceId ? utils.parseBytes32String(priceId) : "N/A"} sourced from{" "}
-          <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
-            Coinbase Pro.
-          </Link>
+          <i>Please first connect and select an EMP from the dropdown above.</i>
         </Typography>
       </Box>
-      <Box pt={4}>
-        {activeSponsors && (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Sponsor</TableCell>
-                  <TableCell align="right">
-                    Collateral
-                    <br />({collSymbol})
-                  </TableCell>
-                  <TableCell align="right">
-                    Synthetics
-                    <br />({tokenSymbol})
-                  </TableCell>
-                  <TableCell align="right">Collateral Ratio</TableCell>
-                  <Tooltip
-                    title={`This is the price that the identifier (${
-                      priceId ? utils.parseBytes32String(priceId) : "N/A"
-                    }) must increase to in order for the position be liquidatable`}
-                    placement="top"
-                  >
-                    <TableCell align="right">Liquidation Price</TableCell>
-                  </Tooltip>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Object.keys(activeSponsors).map((sponsor: string) => {
-                  const activeSponsor = activeSponsors[sponsor];
-                  return (
-                    activeSponsor?.collateral &&
-                    activeSponsor?.tokensOutstanding &&
-                    collReqFromWei && (
-                      <TableRow key={sponsor}>
-                        <TableCell component="th" scope="row">
-                          <a href={getEtherscanUrl(sponsor)} target="_blank">
-                            {prettyAddress(sponsor)}
-                          </a>
-                        </TableCell>
-                        <TableCell align="right">
-                          {prettyBalance(activeSponsor.collateral)}
-                        </TableCell>
-                        <TableCell align="right">
-                          {prettyBalance(activeSponsor.tokensOutstanding)}
-                        </TableCell>
-                        <TableCell align="right">
-                          {prettyBalance(
-                            getCollateralRatio(
-                              activeSponsor.collateral,
-                              activeSponsor.tokensOutstanding
-                            )
-                          )}
-                        </TableCell>
-                        <TableCell align="right">
-                          {prettyBalance(
-                            getLiquidationPrice(
-                              Number(activeSponsor.collateral),
-                              Number(activeSponsor.tokensOutstanding),
-                              collReqFromWei
-                            )
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Box>
-    </Box>
-  );
+    );
+  }
 };
 
 export default AllPositions;
