@@ -6,6 +6,8 @@ import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 
+import { getExchangeInfo } from "../../utils/getExchangeLinks";
+
 const DataBox = styled(Box)`
   border: 1px solid #434343;
   padding: 1rem 2rem;
@@ -48,6 +50,8 @@ const Totals = () => {
   const { symbol: tokenSymbol, address: tokenAddress } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
+  const exchangeInfo = getExchangeInfo(tokenSymbol);
+
   const loading =
     !totalCollateral || !totalTokens || !collSymbol || !tokenSymbol;
   return (
@@ -73,13 +77,15 @@ const Totals = () => {
                 Etherscan
               </SmallLink>
             )}
-            <SmallLink
-              href={`https://uniswap.info/token/${collAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Uniswap
-            </SmallLink>
+            {exchangeInfo !== undefined && collAddress && (
+              <SmallLink
+                href={exchangeInfo.getExchangeUrl(collAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {exchangeInfo.name}
+              </SmallLink>
+            )}
           </LinksContainer>
         </DataBox>
       </Grid>
@@ -106,13 +112,15 @@ const Totals = () => {
                 Etherscan
               </SmallLink>
             )}
-            <SmallLink
-              href={`https://uniswap.info/token/${tokenAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Uniswap
-            </SmallLink>
+            {exchangeInfo !== undefined && tokenAddress && (
+              <SmallLink
+                href={exchangeInfo.getExchangeUrl(tokenAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {exchangeInfo.name}
+              </SmallLink>
+            )}
           </LinksContainer>
         </DataBox>
       </Grid>
