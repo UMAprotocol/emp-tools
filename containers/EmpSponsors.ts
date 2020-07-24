@@ -57,7 +57,7 @@ const useEmpSponsors = () => {
             utils.getAddress(contract.id) === emp.address
         );
 
-        empData.sponsorPositions.forEach((position: PositionQuery) => {
+        empData.positions.forEach((position: PositionQuery) => {
           const sponsor = utils.getAddress(position.sponsor.id);
 
           newPositions[sponsor] = {
