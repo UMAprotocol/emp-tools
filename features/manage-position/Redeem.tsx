@@ -6,6 +6,7 @@ import {
   TextField,
   Typography,
   InputAdornment,
+  Grid,
 } from "@material-ui/core";
 import { ethers, BigNumberish } from "ethers";
 
@@ -15,10 +16,6 @@ import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
-
-const Container = styled(Box)`
-  max-width: 720px;
-`;
 
 const Link = styled.a`
   color: white;
@@ -123,19 +120,19 @@ const Redeem = () => {
     collateral.toString() === "0"
   ) {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>You need to borrow tokens before redeeming.</i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>
@@ -144,72 +141,80 @@ const Redeem = () => {
             </i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   // User has a position and no withdraw requests, so they can redeem tokens.
   return (
-    <Container>
-      <Box pt={4} pb={2}>
+    <Box>
+      <Box pt={2} pb={4}>
         <Typography>
           By redeeming your synthetic tokens, you will pay back a portion of
-          your debt and receive a proportional part of your collateral. Note:
-          this will not change the collateralization ratio of your position.
+          your debt and receive a proportional part of your collateral.
+          <br></br>
+          <br></br>
+          <strong>Note:</strong> this will not change the collateralization
+          ratio of your position.
         </Typography>
       </Box>
 
-      <Box py={2}>
-        <TextField
-          type="number"
-          label={`Redeeem (${syntheticSymbol})`}
-          placeholder="1234"
-          inputProps={{ min: "0" }}
-          error={!isEmpty && !canSendTxn}
-          helperText={
-            !isEmpty && !canSendTxn
-              ? `Input must be between 0 and ${maxRedeem} or the entire position`
-              : null
-          }
-          value={tokensToRedeem}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setTokensToRedeem(e.target.value)
-          }
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Button onClick={() => handleMax()}>
-                  <MaxLink>Max</MaxLink>
-                </Button>
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Box>
+      <Grid container spacing={3}>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            type="number"
+            label={`Redeeem (${syntheticSymbol})`}
+            placeholder="1234"
+            inputProps={{ min: "0" }}
+            error={!isEmpty && !canSendTxn}
+            helperText={
+              !isEmpty && !canSendTxn
+                ? `Input must be between 0 and ${maxRedeem} or the entire position`
+                : null
+            }
+            value={tokensToRedeem}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setTokensToRedeem(e.target.value)
+            }
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button onClick={() => handleMax()}>
+                    <MaxLink>Max</MaxLink>
+                  </Button>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <Box py={1}>
+            {needAllowance() && (
+              <Button
+                variant="contained"
+                onClick={setMaxAllowance}
+                style={{ marginRight: `12px` }}
+              >
+                Approve
+              </Button>
+            )}
+            {canSendTxn && !needAllowance() ? (
+              <Button
+                variant="contained"
+                onClick={handleRedemptionClick}
+              >{`Redeem ${tokensToRedeem} ${syntheticSymbol}`}</Button>
+            ) : (
+              <Button variant="contained" disabled>
+                Redeem
+              </Button>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
 
-      <Box py={2}>
-        {needAllowance() && (
-          <Button
-            variant="contained"
-            onClick={setMaxAllowance}
-            style={{ marginRight: `12px` }}
-          >
-            Approve
-          </Button>
-        )}
-        {canSendTxn && !needAllowance() ? (
-          <Button
-            variant="contained"
-            onClick={handleRedemptionClick}
-          >{`Redeem ${tokensToRedeem} ${syntheticSymbol}`}</Button>
-        ) : (
-          <Button variant="contained" disabled>
-            Redeem
-          </Button>
-        )}
-      </Box>
-
-      <Box py={2}>
+      <Box py={4}>
         <Typography>{`Current borrowed ${syntheticSymbol}: ${borrowedTokens}`}</Typography>
         <Typography>{`Remaining debt after redemption: ${
           borrowedTokens - tokensToRedeemFloat
@@ -249,7 +254,7 @@ const Redeem = () => {
           </Typography>
         </Box>
       )}
-    </Container>
+    </Box>
   );
 };
 

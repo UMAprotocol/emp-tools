@@ -26,7 +26,7 @@ const Manager = () => {
     return (
       <Box>
         <Typography>
-          <i>Please connect first.</i>
+          <i>Please first connect and select an EMP from the dropdown above.</i>
         </Typography>
       </Box>
     );

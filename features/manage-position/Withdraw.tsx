@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Box, Button, TextField, Typography } from "@material-ui/core";
+import { Box, Button, TextField, Typography, Grid } from "@material-ui/core";
 import { ethers } from "ethers";
 
 import EmpState from "../../containers/EmpState";
@@ -12,10 +12,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
-
-const Container = styled(Box)`
-  max-width: 720px;
-`;
+import { DOCS_MAP } from "../../utils/getDocLinks";
 
 const Important = styled(Typography)`
   color: red;
@@ -139,11 +136,17 @@ const Deposit = () => {
       ? (collateral - parseFloat(collateralToWithdraw)) / tokens
       : startingCR;
   const resultingCRBelowGCR =
-    resultingCR !== null && gcr !== null ? resultingCR < gcr : false;
-  const fastWithdrawableCollateral =
-    collateral !== null && tokens !== null && gcr !== null
-      ? (collateral - gcr * tokens).toFixed(2)
-      : null;
+    resultingCR !== null && gcr !== null ? resultingCR < gcr : null;
+  const fastWithdrawableCollateral = () => {
+    if (collateral !== null && tokens !== null && gcr !== null) {
+      const withdrawableCollat = collateral - gcr * tokens;
+      // Only if there is more than 0 fast withdrawable collateral should we return a value.
+      // Else, there is nothing that can be fast withdrawn.
+      if (withdrawableCollat > 0) return withdrawableCollat.toFixed(2);
+      else return "0";
+    }
+    return null;
+  };
 
   // Calculations of collateral ratios using same units as price feed:
   const pricedStartingCR =
@@ -205,20 +208,20 @@ const Deposit = () => {
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>Create a position before withdrawing collateral.</i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   // User has a position and a pending withdrawal.
   if (collateral !== null && pendingWithdraw === "Yes") {
     return (
-      <Container>
+      <Box>
         <Box pt={4} pb={2}>
           <Typography>
             <i>You have a pending withdraw on your position!</i>
@@ -265,17 +268,17 @@ const Deposit = () => {
             >{`Cancel withdraw request`}</Button>
           </Box>
         </Box>
-      </Container>
+      </Box>
     );
   }
   // User has a position and no pending withdrawal.
   return (
-    <Container>
-      <Box pt={4} pb={2}>
+    <Box>
+      <Box pt={2} pb={2}>
         <Typography>
           <i>
-            By withdrawing excess collateral from your position you will
-            decrease your collateralization ratio.
+            By withdrawing collateral from your position you will decrease your
+            collateralization ratio.
           </i>
         </Typography>
       </Box>
@@ -292,16 +295,16 @@ const Deposit = () => {
           </Typography>
           <ul style={{ fontSize: 16 }}>
             <li>
-              <strong>"Fast" withdrawal: </strong>Instantly withdraw collateral
-              until your positions CR is equal to the GCR. For your position you
-              can instantly withdraw up to {fastWithdrawableCollateral}{" "}
-              {collSymbol}.
+              <strong>"Fast" withdraw: </strong>Instantly withdraw collateral
+              until your collateralization ratio (CR) equals the global
+              collateralization ratio (GCR). For your position you can withdraw{" "}
+              {fastWithdrawableCollateral()} {collSymbol}.
             </li>
             <li>
-              <strong>"Slow" withdrawal: </strong> To withdraw your position CR
-              below the GCR, you will need to wait a liveness period before
-              completing your withdrawal. For this EMP this is{" "}
-              {withdrawalLiveness !== null &&
+              <strong>"Slow" withdraw: </strong> To withdraw below the GCR, you
+              will need to wait a liveness period before completing your
+              withdrawal. For this EMP this is{" "}
+              {withdrawalLiveness &&
                 Math.floor(withdrawalLiveness.toNumber() / (60 * 60))}{" "}
               hours. When preforming this kind of withdrawal you should ensure
               that your position is sufficiently collateralized above the CR
@@ -309,11 +312,11 @@ const Deposit = () => {
             </li>
           </ul>
         </Box>
-        <Box pt={2}>
+        <Box pt={2} pb={2}>
           <Typography>
             For more info on the different kinds of withdrawals see the{" "}
             <a
-              href="https://docs.umaproject.org/uma/synthetic_tokens/explainer.html#_managing_token_sponsor_positions"
+              href={DOCS_MAP.MANAGING_POSITION}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -324,33 +327,37 @@ const Deposit = () => {
         </Box>
       </Box>
 
-      <Box py={2}>
-        <TextField
-          type="number"
-          inputProps={{ min: "0" }}
-          label={`Collateral (${collSymbol})`}
-          placeholder="1234"
-          value={collateralToWithdraw}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setCollateralToWithdraw(e.target.value)
-          }
-          helperText={!withdrawUnderbalance ? `Invalid amount` : null}
-        />
-      </Box>
+      <Grid container spacing={3}>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            type="number"
+            variant="outlined"
+            inputProps={{ min: "0" }}
+            label={`Collateral (${collSymbol})`}
+            placeholder="1234"
+            value={collateralToWithdraw}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setCollateralToWithdraw(e.target.value)
+            }
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <Box py={1}>
+            {collateralToWithdraw && collateralToWithdraw != "0" ? (
+              <Button variant="contained" onClick={handleWithdrawClick}>{`${
+                resultingCRBelowGCR ? "Request Withdrawal of" : "Withdraw"
+              } ${collateralToWithdraw} ${collSymbol}`}</Button>
+            ) : (
+              <Button variant="contained" disabled>
+                Withdraw
+              </Button>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
 
-      <Box py={2}>
-        {withdrawAmountValid && !resultingPricedCRBelowCRRequirement ? (
-          <Button variant="contained" onClick={handleWithdrawClick}>{`${
-            resultingCRBelowGCR ? "Request Withdrawal of" : "Withdraw"
-          } ${collateralToWithdraw} ${collSymbol} from your position`}</Button>
-        ) : (
-          <Button variant="contained" disabled>
-            Withdraw
-          </Button>
-        )}
-      </Box>
-
-      <Box py={2}>
+      <Box py={4}>
         <Typography>
           Current CR: {pricedStartingCR?.toFixed(4) || "N/A"}
         </Typography>
@@ -425,7 +432,7 @@ const Deposit = () => {
           </Typography>
         </Box>
       )}
-    </Container>
+    </Box>
   );
 };
 

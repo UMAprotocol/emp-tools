@@ -56,7 +56,15 @@ export default function Index() {
                 easier, please use at your own risk. The source code can be
                 viewed{" "}
                 <a
-                  href="https://github.com/adrianmcli/emp-tools"
+                  href="https://github.com/UMAprotocol/emp-tools"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  here
+                </a>
+                . UMA's main Github can be viewed{" "}
+                <a
+                  href="https://github.com/UMAprotocol/protocol"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -77,7 +85,7 @@ export default function Index() {
 
         {tabIndex === 4 && <YieldCalculator />}
       </Box>
-      <Box py={4} textAlign="center">
+      <Box py={2} textAlign="center">
         <a
           href="https://vercel.com/?utm_source=uma%2Femp-tools"
           target="_blank"

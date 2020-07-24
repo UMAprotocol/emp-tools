@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Box, Button, TextField, Typography } from "@material-ui/core";
+import { Box, Button, TextField, Typography, Grid } from "@material-ui/core";
 import { ethers } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
@@ -11,10 +11,6 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
-
-const Container = styled(Box)`
-  max-width: 720px;
-`;
 
 const Link = styled.a`
   color: white;
@@ -114,19 +110,19 @@ const Deposit = () => {
   // User does not have a position yet.
   if (collateral === null || collateral.toString() === "0") {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>Create a position before depositing more collateral.</i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   if (pendingWithdraw === null || pendingWithdraw === "Yes") {
     return (
-      <Container>
+      <Box>
         <Box py={2}>
           <Typography>
             <i>
@@ -135,61 +131,70 @@ const Deposit = () => {
             </i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   // User has a position and no pending withdrawal requests so can deposit more collateral.
   return (
-    <Container>
-      <Box pt={4} pb={2}>
+    <Box>
+      <Box pt={2} pb={4}>
         <Typography>
-          By depositing additional collateral into your position you will
-          increase your collateralization ratio.
+          Adding additional collateral into your position will increase your
+          collateralization ratio.
         </Typography>
       </Box>
 
-      <Box py={2}>
-        <TextField
-          type="number"
-          inputProps={{ min: "0" }}
-          label={`Collateral (${collSymbol})`}
-          placeholder="1234"
-          error={balanceTooLow}
-          helperText={balanceTooLow ? `${collSymbol} balance too low` : null}
-          value={collateralToDeposit}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setCollateralToDeposit(e.target.value)
-          }
-        />
-      </Box>
+      <Grid container spacing={3}>
+        <Grid item xs={4}>
+          <Box py={0}>
+            <TextField
+              fullWidth
+              type="number"
+              variant="outlined"
+              inputProps={{ min: "0" }}
+              label={`Collateral (${collSymbol})`}
+              placeholder="1234"
+              error={balanceTooLow}
+              helperText={
+                balanceTooLow ? `${collSymbol} balance too low` : null
+              }
+              value={collateralToDeposit}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setCollateralToDeposit(e.target.value)
+              }
+            />
+          </Box>
+        </Grid>
+        <Grid item xs={4}>
+          <Box py={1}>
+            {needAllowance() && (
+              <Button
+                variant="contained"
+                onClick={setMaxAllowance}
+                style={{ marginRight: `12px` }}
+              >
+                Approve
+              </Button>
+            )}
+            {!needAllowance() &&
+            !isNaN(parseFloat(collateralToDeposit)) &&
+            parseFloat(collateralToDeposit) > 0 &&
+            !balanceTooLow ? (
+              <Button
+                variant="contained"
+                onClick={handleDepositClick}
+              >{`Deposit ${collateralToDeposit} ${collSymbol} into your position`}</Button>
+            ) : (
+              <Button variant="contained" disabled>
+                Deposit
+              </Button>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
 
-      <Box py={2}>
-        {needAllowance() && (
-          <Button
-            variant="contained"
-            onClick={setMaxAllowance}
-            style={{ marginRight: `12px` }}
-          >
-            Approve
-          </Button>
-        )}
-        {!needAllowance() &&
-        !isNaN(parseFloat(collateralToDeposit)) &&
-        parseFloat(collateralToDeposit) > 0 &&
-        !balanceTooLow ? (
-          <Button
-            variant="contained"
-            onClick={handleDepositClick}
-          >{`Deposit ${collateralToDeposit} ${collSymbol} into your position`}</Button>
-        ) : (
-          <Button variant="contained" disabled>
-            Deposit
-          </Button>
-        )}
-      </Box>
-
-      <Box py={2}>
+      <Box py={4}>
         <Typography>
           Current CR: {pricedStartingCR?.toFixed(4) || "N/A"}
         </Typography>
@@ -238,7 +243,7 @@ const Deposit = () => {
           </Typography>
         </Box>
       )}
-    </Container>
+    </Box>
   );
 };
 
