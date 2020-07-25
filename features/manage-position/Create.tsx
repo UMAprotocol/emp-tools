@@ -150,7 +150,7 @@ const Create = () => {
           setError(error);
         }
       } else {
-        setError(new Error("Please check that you are connected."));
+        setError(new Error("Collateral and Token amounts must be positive"));
       }
     };
 
@@ -261,7 +261,8 @@ const Create = () => {
                     transactionCRBelowGCR ||
                     balanceBelowCollateralToDeposit ||
                     resultantCRBelowRequirement ||
-                    resultantTokensBelowMin
+                    resultantTokensBelowMin ||
+                    collateralToDeposit <= 0
                   }
                 >
                   {`Create ${tokensToCreate} ${tokenSymbol} with ${collateralToDeposit} ${collSymbol}`}
@@ -308,7 +309,7 @@ const Create = () => {
                         : "unset",
                   }}
                 >
-                  {resultantLiquidationPrice} {priceIdentifierUtf8}
+                  {resultantLiquidationPrice} ({priceIdentifierUtf8})
                 </span>
               </Tooltip>
             </Typography>

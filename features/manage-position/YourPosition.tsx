@@ -135,33 +135,28 @@ const YourPosition = () => {
           {_latestPrice}
         </Status>
         <Status>
-          <Label>
-            (CR) Collateralization ratio:{" "}
-            {`${pricedCR} (${_collSymbol} / ${_tokenSymbol})`}
-          </Label>
+          <Label>(CR) Collateralization ratio:</Label>
+          {` ${pricedCR} (${_collSymbol} / ${_tokenSymbol})`}
         </Status>
         <Status>
-          <Label>
-            (GCR) Global collateralization ratio:{" "}
-            {`${pricedGCR} (${_collSymbol} / ${_tokenSymbol})`}
-          </Label>
+          <Label>(GCR) Global collateralization ratio:</Label>
+          {` ${pricedGCR} (${_collSymbol} / ${_tokenSymbol})`}
         </Status>
         <Status>
-          <Label>Liquidation Requirement: {`${collReqFromWei}`}</Label>
+          <Label>Liquidation Requirement:</Label>
+          {` ${collReqFromWei}`}
         </Status>
         <Status>
-          <Label>
-            Liquidation Price: {`${liquidationPrice} (${priceIdUtf8})`}
-          </Label>
+          <Label>Liquidation Price:</Label>
+          {` ${liquidationPrice} (${priceIdUtf8})`}
         </Status>
         <Status>
-          <Label>
-            Collateral pending/available to withdraw:{" "}
-            {`${_withdrawAmt} ${_collSymbol}`}
-          </Label>
+          <Label>Collateral pending/available to withdraw:</Label>
+          {` ${_withdrawAmt} ${_collSymbol}`}
         </Status>
         <Status>
-          <Label>Pending withdrawal request: {`${_pendingWithdraw}`}</Label>
+          <Label>Pending withdrawal request:</Label>
+          {` ${_pendingWithdraw}`}
         </Status>
       </Container>
     );
