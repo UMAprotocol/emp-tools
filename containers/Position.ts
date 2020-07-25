@@ -18,6 +18,7 @@ function usePosition() {
 
   const [collateral, setCollateral] = useState<number | null>(null);
   const [tokens, setTokens] = useState<number | null>(null);
+  const [cRatio, setCRatio] = useState<number | null>(null);
   const [withdrawAmt, setWithdrawAmt] = useState<number | null>(null);
   const [withdrawPassTime, setWithdrawPassTime] = useState<number | null>(null);
   const [pendingWithdraw, setPendingWithdraw] = useState<string | null>(null);
@@ -37,6 +38,12 @@ function usePosition() {
       // format data for storage
       const collateral: number = weiToNum(collRaw, collDec);
       const tokens: number = weiToNum(tokensOutstanding, tokenDec);
+      const cRatio =
+        collateral !== null && tokens !== null
+          ? tokens > 0
+            ? collateral / tokens
+            : 0
+          : null;
       const withdrawAmt: number = weiToNum(withdrawReqAmt, collDec);
       const withdrawPassTime: number = withdrawReqPassTime.toNumber();
       const pendingWithdraw: string =
@@ -47,6 +54,7 @@ function usePosition() {
       // set states
       setCollateral(collateral);
       setTokens(tokens);
+      setCRatio(cRatio);
       setWithdrawAmt(withdrawAmt);
       setWithdrawPassTime(withdrawPassTime);
       setPendingWithdraw(pendingWithdraw);
@@ -67,6 +75,7 @@ function usePosition() {
     if (contract === null) {
       setCollateral(null);
       setTokens(null);
+      setCRatio(null);
       setWithdrawAmt(null);
       setWithdrawPassTime(null);
       setPendingWithdraw(null);
@@ -78,6 +87,7 @@ function usePosition() {
   return {
     collateral,
     tokens,
+    cRatio,
     withdrawAmt,
     withdrawPassTime,
     pendingWithdraw,
