@@ -74,12 +74,6 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
               secondary="Redeem synthetic tokens."
             />
           </MenuItem>
-          <MenuItem value={"transfer"}>
-            <ListItemText
-              primary="Transfer"
-              secondary="Transfer a token sponsor position."
-            />
-          </MenuItem>
         </Select>
       </FormWrapper>
     </Box>

@@ -10,11 +10,7 @@ import Withdraw from "./Withdraw";
 import YourPosition from "./YourPosition";
 import YourWallet from "./YourWallet";
 
-export type Method = "create" | "deposit" | "withdraw" | "redeem" | "transfer";
-
-const FalseDoor = () => (
-  <Typography>This feature has not been implemented yet.</Typography>
-);
+export type Method = "create" | "deposit" | "withdraw" | "redeem";
 
 const Manager = () => {
   const { signer } = Connection.useContainer();
@@ -22,7 +18,7 @@ const Manager = () => {
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) =>
     setMethod(e.target.value as Method);
 
-  if (!signer) {
+  if (signer === null) {
     return (
       <Box>
         <Typography>
@@ -42,7 +38,6 @@ const Manager = () => {
       {method === "deposit" && <Deposit />}
       {method === "withdraw" && <Withdraw />}
       {method === "redeem" && <Redeem />}
-      {method === "transfer" && <FalseDoor />}
     </Box>
   );
 };
