@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from "@material-ui/core";
 import styled from "styled-components";
-import { utils, BigNumberish } from "ethers";
+import { utils } from "ethers";
 
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
@@ -44,17 +44,6 @@ const AllPositions = () => {
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { collateralRequirement } = empState;
 
-  const prettyBalance = (x: BigNumberish | null) => {
-    if (x === null) return "N/A";
-    x = Number(x).toFixed(4);
-    return utils.commify(x as string);
-  };
-
-  const prettyAddress = (x: String | null) => {
-    if (x === null) return "N/A";
-    return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
-  };
-
   if (
     collateralRequirement !== null &&
     collDecimals !== null &&
@@ -69,10 +58,20 @@ const AllPositions = () => {
       fromWei(collateralRequirement, collDecimals)
     );
     const priceIdUtf8 = utils.parseBytes32String(priceId);
+
     const getCollateralRatio = (collateral: number, tokens: number) => {
       if (tokens <= 0 || latestPrice <= 0) return 0;
       const tokensScaled = tokens * latestPrice;
-      return (collateral / tokensScaled).toFixed(4);
+      return collateral / tokensScaled;
+    };
+
+    const prettyBalance = (x: number) => {
+      const x_string = x.toFixed(4);
+      return utils.commify(x_string);
+    };
+
+    const prettyAddress = (x: string) => {
+      return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
     };
 
     return (
@@ -122,10 +121,12 @@ const AllPositions = () => {
                             </a>
                           </TableCell>
                           <TableCell align="right">
-                            {prettyBalance(activeSponsor.collateral)}
+                            {prettyBalance(Number(activeSponsor.collateral))}
                           </TableCell>
                           <TableCell align="right">
-                            {prettyBalance(activeSponsor.tokensOutstanding)}
+                            {prettyBalance(
+                              Number(activeSponsor.tokensOutstanding)
+                            )}
                           </TableCell>
                           <TableCell align="right">
                             {prettyBalance(
