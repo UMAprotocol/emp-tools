@@ -45,23 +45,14 @@ const AllPositions = () => {
   const { collateralRequirement } = empState;
 
   const prettyBalance = (x: BigNumberish | null) => {
-    if (!x) return "N/A";
+    if (x === null) return "N/A";
     x = Number(x).toFixed(4);
     return utils.commify(x as string);
   };
 
   const prettyAddress = (x: String | null) => {
-    if (!x) return "N/A";
+    if (x === null) return "N/A";
     return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
-  };
-
-  const getCollateralRatio = (
-    collateral: BigNumberish,
-    tokens: BigNumberish
-  ) => {
-    if (latestPrice === 0) return null;
-    const tokensScaled = Number(tokens) * Number(latestPrice);
-    return (Number(collateral) / tokensScaled).toFixed(4);
   };
 
   if (
@@ -78,6 +69,12 @@ const AllPositions = () => {
       fromWei(collateralRequirement, collDecimals)
     );
     const priceIdUtf8 = utils.parseBytes32String(priceId);
+    const getCollateralRatio = (collateral: number, tokens: number) => {
+      if (tokens <= 0 || latestPrice <= 0) return 0;
+      const tokensScaled = tokens * latestPrice;
+      return (collateral / tokensScaled).toFixed(4);
+    };
+
     return (
       <Box>
         <Box>
@@ -133,8 +130,8 @@ const AllPositions = () => {
                           <TableCell align="right">
                             {prettyBalance(
                               getCollateralRatio(
-                                activeSponsor.collateral,
-                                activeSponsor.tokensOutstanding
+                                Number(activeSponsor.collateral),
+                                Number(activeSponsor.tokensOutstanding)
                               )
                             )}
                           </TableCell>
