@@ -1,182 +1,227 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Box, Button, TextField, Typography } from "@material-ui/core";
-import { ethers } from "ethers";
+import { Box, Button, TextField, Typography, Grid } from "@material-ui/core";
+import { utils } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
+import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
-import { hashMessage } from "ethers/lib/utils";
 
-const Container = styled(Box)`
-  max-width: 720px;
-`;
+import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 
 const Link = styled.a`
   color: white;
   font-size: 14px;
 `;
 
+const {
+  formatUnits: fromWei,
+  parseBytes32String: hexToUtf8,
+  parseUnits: toWei,
+} = utils;
+
 const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
-  const { symbol: collSymbol, balance } = Collateral.useContainer();
-  const { tokens, collateral, pendingWithdraw } = Position.useContainer();
+  const { empState } = EmpState.useContainer();
+  const {
+    symbol: collSymbol,
+    balance: collBalance,
+    decimals: collDec,
+    allowance: collAllowance,
+    setMaxAllowance,
+  } = Collateral.useContainer();
+  const {
+    tokens: posTokens,
+    collateral: posColl,
+    pendingWithdraw,
+  } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
+  const { collateralRequirement: collReq, priceIdentifier } = empState;
 
-  const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
+  const [collateral, setCollateral] = useState<string>("0");
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const balanceTooLow = (balance || 0) < (Number(collateralToDeposit) || 0);
+  if (
+    posColl !== null &&
+    posTokens !== null &&
+    pendingWithdraw !== null &&
+    collAllowance !== null &&
+    collBalance !== null &&
+    latestPrice !== null &&
+    emp !== null &&
+    collReq !== null &&
+    collDec !== null &&
+    priceIdentifier !== null &&
+    posColl !== 0 // If position has no collateral, then don't render deposit component.
+  ) {
+    const collateralToDeposit = Number(collateral) || 0;
+    const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
+    const hasPendingWithdraw = pendingWithdraw === "Yes";
+    const collReqFromWei = parseFloat(fromWei(collReq, collDec));
+    const resultantCollateral = posColl + collateralToDeposit;
+    const resultantCR = posTokens > 0 ? resultantCollateral / posTokens : 0;
+    const pricedResultantCR =
+      latestPrice !== 0 ? (resultantCR / latestPrice).toFixed(4) : "0";
+    const resultantLiquidationPrice = getLiquidationPrice(
+      resultantCollateral,
+      posTokens,
+      collReqFromWei
+    ).toFixed(4);
 
-  const depositCollateral = async () => {
-    if (collateralToDeposit && emp) {
-      setHash(null);
-      setSuccess(null);
-      setError(null);
-      const collateralToDepositWei = ethers.utils.parseUnits(
-        collateralToDeposit
-      );
-      try {
-        const tx = await emp.deposit([collateralToDepositWei]);
-        setHash(tx.hash as string);
-        await tx.wait();
-        setSuccess(true);
-      } catch (error) {
-        console.error(error);
-        setError(error);
+    // Error conditions for calling deposit:
+    const balanceBelowCollateralToDeposit = collBalance < collateralToDeposit;
+    const needAllowance =
+      collAllowance !== "Infinity" && collAllowance < collateralToDeposit;
+
+    const depositCollateral = async () => {
+      if (collateralToDeposit > 0) {
+        setHash(null);
+        setSuccess(null);
+        setError(null);
+        try {
+          const collateralToDepositWei = toWei(collateral);
+          const tx = await emp.deposit([collateralToDepositWei]);
+          setHash(tx.hash as string);
+          await tx.wait();
+          setSuccess(true);
+        } catch (error) {
+          console.error(error);
+          setError(error);
+        }
+      } else {
+        setError(new Error("Collateral amount must be positive."));
       }
-    } else {
-      setError(new Error("Please check that you are connected."));
+    };
+
+    if (hasPendingWithdraw) {
+      return (
+        <Box>
+          <Box py={2}>
+            <Typography>
+              <i>
+                You need to cancel or execute your pending withdrawal request
+                before depositing additional collateral.
+              </i>
+            </Typography>
+          </Box>
+        </Box>
+      );
     }
-  };
 
-  const handleDepositClick = () => depositCollateral();
-
-  const startingCR = collateral && tokens ? collateral / tokens : null;
-  const pricedStartingCR =
-    startingCR && latestPrice ? startingCR / Number(latestPrice) : null;
-
-  const resultingCR =
-    collateral && collateralToDeposit && tokens
-      ? (collateral + parseFloat(collateralToDeposit)) / tokens
-      : startingCR;
-  const pricedResultingCR =
-    resultingCR && latestPrice ? resultingCR / Number(latestPrice) : null;
-
-  // User does not have a position yet.
-  if (collateral === null || collateral.toString() === "0") {
     return (
-      <Container>
+      <Box>
+        <Box pt={2} pb={4}>
+          <Typography>
+            Adding additional collateral into your position will increase your
+            collateralization ratio.
+          </Typography>
+        </Box>
+
+        <Grid container spacing={3}>
+          <Grid item xs={4}>
+            <Box py={0}>
+              <TextField
+                fullWidth
+                type="number"
+                variant="outlined"
+                inputProps={{ min: "0", max: collBalance }}
+                label={`Collateral (${collSymbol})`}
+                error={balanceBelowCollateralToDeposit}
+                helperText={
+                  balanceBelowCollateralToDeposit &&
+                  `Your ${collSymbol} balance too low`
+                }
+                value={collateral}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setCollateral(e.target.value)
+                }
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={4}>
+            <Box py={1}>
+              {needAllowance && (
+                <Button
+                  variant="contained"
+                  onClick={setMaxAllowance}
+                  style={{ marginRight: `12px` }}
+                >
+                  Max Approve
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                onClick={depositCollateral}
+                disabled={
+                  needAllowance ||
+                  balanceBelowCollateralToDeposit ||
+                  collateralToDeposit <= 0
+                }
+              >
+                {`Deposit ${collateralToDeposit} ${collSymbol} into your position`}
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+
+        <Box py={4}>
+          <Typography>{`Resulting CR: ${pricedResultantCR}`}</Typography>
+          <Typography>
+            {`Resulting liquidation price: ${resultantLiquidationPrice} (${priceIdentifierUtf8}`}
+          </Typography>
+        </Box>
+
+        {hash && (
+          <Box py={2}>
+            <Typography>
+              <strong>Tx Hash: </strong>
+              {hash ? (
+                <Link
+                  href={getEtherscanUrl(hash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {hash}
+                </Link>
+              ) : (
+                hash
+              )}
+            </Typography>
+          </Box>
+        )}
+        {success && (
+          <Box py={2}>
+            <Typography>
+              <strong>Transaction successful!</strong>
+            </Typography>
+          </Box>
+        )}
+        {error && (
+          <Box py={2}>
+            <Typography>
+              <span style={{ color: "red" }}>{error.message}</span>
+            </Typography>
+          </Box>
+        )}
+      </Box>
+    );
+  } else {
+    return (
+      <Box>
         <Box py={2}>
           <Typography>
             <i>Create a position before depositing more collateral.</i>
           </Typography>
         </Box>
-      </Container>
+      </Box>
     );
   }
-
-  if (pendingWithdraw === null || pendingWithdraw === "Yes") {
-    return (
-      <Container>
-        <Box py={2}>
-          <Typography>
-            <i>
-              You need to cancel or execute your pending withdrawal request
-              before depositing additional collateral.
-            </i>
-          </Typography>
-        </Box>
-      </Container>
-    );
-  }
-
-  // User has a position and no pending withdrawal requests so can deposit more collateral.
-  return (
-    <Container>
-      <Box pt={4} pb={2}>
-        <Typography>
-          By depositing additional collateral into your position you will
-          increase your collateralization ratio.
-        </Typography>
-      </Box>
-
-      <Box py={2}>
-        <TextField
-          type="number"
-          inputProps={{ min: "0" }}
-          label={`Collateral (${collSymbol})`}
-          placeholder="1234"
-          error={balanceTooLow}
-          helperText={balanceTooLow ? `${collSymbol} balance too low` : null}
-          value={collateralToDeposit}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setCollateralToDeposit(e.target.value)
-          }
-        />
-      </Box>
-
-      <Box py={2}>
-        {collateralToDeposit && collateralToDeposit != "0" && !balanceTooLow ? (
-          <Button
-            variant="contained"
-            onClick={handleDepositClick}
-          >{`Deposit ${collateralToDeposit} ${collSymbol} into your position`}</Button>
-        ) : (
-          <Button variant="contained" disabled>
-            Deposit
-          </Button>
-        )}
-      </Box>
-
-      <Box py={2}>
-        <Typography>
-          Current CR: {pricedStartingCR?.toFixed(4) || "N/A"}
-        </Typography>
-        <Typography>
-          Resulting CR: {pricedResultingCR?.toFixed(4) || "N/A"}
-        </Typography>
-      </Box>
-
-      {hash && (
-        <Box py={2}>
-          <Typography>
-            <strong>Tx Hash: </strong>
-            {hash ? (
-              <Link
-                href={getEtherscanUrl(hash)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {hash}
-              </Link>
-            ) : (
-              hash
-            )}
-          </Typography>
-        </Box>
-      )}
-      {success && (
-        <Box py={2}>
-          <Typography>
-            <strong>Transaction successful!</strong>
-          </Typography>
-        </Box>
-      )}
-      {error && (
-        <Box py={2}>
-          <Typography>
-            <span style={{ color: "red" }}>{error.message}</span>
-          </Typography>
-        </Box>
-      )}
-    </Container>
-  );
 };
 
 export default Deposit;

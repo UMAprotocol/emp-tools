@@ -57,17 +57,19 @@ const useEmpSponsors = () => {
             utils.getAddress(contract.id) === emp.address
         );
 
-        empData.positions.forEach((position: PositionQuery) => {
-          const sponsor = utils.getAddress(position.sponsor.id);
+        if (empData) {
+          empData.positions.forEach((position: PositionQuery) => {
+            const sponsor = utils.getAddress(position.sponsor.id);
 
-          newPositions[sponsor] = {
-            tokensOutstanding: position.tokensOutstanding,
-            collateral: position.collateral,
-            sponsor,
-          };
-        });
+            newPositions[sponsor] = {
+              tokensOutstanding: position.tokensOutstanding,
+              collateral: position.collateral,
+              sponsor,
+            };
+          });
 
-        setActivePositions(newPositions);
+          setActivePositions(newPositions);
+        }
       }
     }
   };
