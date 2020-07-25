@@ -56,6 +56,7 @@ const GeneralInfo = () => {
   ) {
     const expiryTimestamp = expiry.toString();
     const expiryDate = new Date(expiry.toNumber() * 1000).toString();
+    const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const pricedGcr = (gcr / latestPrice).toFixed(4);
     const withdrawalLivenessInMinutes = (
       Number(withdrawalLiveness) / 60
@@ -69,6 +70,7 @@ const GeneralInfo = () => {
     return renderComponent(
       expiryTimestamp,
       expiryDate,
+      prettyLatestPrice,
       pricedGcr,
       withdrawalLivenessInMinutes,
       priceIdUtf8,
@@ -82,6 +84,7 @@ const GeneralInfo = () => {
   function renderComponent(
     expiryTimestamp: string = defaultMissingDataDisplay,
     expiryDate: string = defaultMissingDataDisplay,
+    prettyLatestPrice: string = defaultMissingDataDisplay,
     pricedGcr: string = defaultMissingDataDisplay,
     withdrawalLivenessInMinutes: string = defaultMissingDataDisplay,
     priceIdUtf8: string = defaultMissingDataDisplay,
@@ -120,9 +123,9 @@ const GeneralInfo = () => {
             <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
               Coinbase Pro
             </Link>
-            ):{" "}
+            )
           </Label>
-          {latestPrice ? `${Number(latestPrice).toFixed(4)}` : "N/A"}
+          {`: ${prettyLatestPrice}`}
         </Status>
 
         <Status>

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Box, Grid, Typography, Tooltip } from "@material-ui/core";
+import { Box, Grid, Typography } from "@material-ui/core";
 
 import TotalsContainer from "../../containers/Totals";
 import Collateral from "../../containers/Collateral";
@@ -49,29 +49,60 @@ const Totals = () => {
   } = Collateral.useContainer();
   const { symbol: tokenSymbol, address: tokenAddress } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
-
   const exchangeInfo = getExchangeInfo(tokenSymbol);
+  const defaultMissingDataDisplay = "N/A";
 
-  const loading =
-    totalCollateral === null ||
-    totalTokens === null ||
-    !collSymbol ||
-    !tokenSymbol;
-  return (
-    <>
-      <Grid item xs={6}>
-        <DataBox>
-          <Typography variant="h4">
-            <strong>
-              {loading ? "N/A" : Number(totalCollateral).toLocaleString()}
-            </strong>
-            <Small> {collSymbol}</Small>
-          </Typography>
-          <Label>
-            of <White>collateral</White> supplied
-          </Label>
-          <LinksContainer>
-            {collAddress && (
+  if (
+    totalCollateral !== null &&
+    totalTokens !== null &&
+    collSymbol !== null &&
+    tokenSymbol !== null &&
+    exchangeInfo !== undefined &&
+    collAddress !== null &&
+    tokenAddress !== null
+  ) {
+    const prettyTotalCollateral = Number(totalCollateral).toLocaleString();
+    const prettyTotalTokens = Number(totalTokens).toLocaleString();
+    const prettyCollSymbol = collSymbol;
+    const prettyTokenSymbol = tokenSymbol;
+    const getExchangeLinkCollateral = exchangeInfo.getExchangeUrl(collAddress);
+    const getExchangeLinkToken = exchangeInfo.getExchangeUrl(tokenAddress);
+    const exchangeName = exchangeInfo.name;
+
+    return renderComponent(
+      prettyTotalCollateral,
+      prettyTotalTokens,
+      prettyCollSymbol,
+      prettyTokenSymbol,
+      getExchangeLinkCollateral,
+      getExchangeLinkToken,
+      exchangeName
+    );
+  } else {
+    return renderComponent();
+  }
+
+  function renderComponent(
+    prettyTotalCollateral: string = defaultMissingDataDisplay,
+    prettyTotalTokens: string = defaultMissingDataDisplay,
+    prettyCollSymbol: string = "",
+    prettyTokenSymbol: string = "",
+    getExchangeLinkCollateral: string = "https://app.uniswap.org/#/swap",
+    getExchangeLinkToken: string = "https://app.uniswap.org/#/swap",
+    exchangeName: string = "Uniswap"
+  ) {
+    return (
+      <>
+        <Grid item xs={6}>
+          <DataBox>
+            <Typography variant="h4">
+              <strong>{prettyTotalCollateral}</strong>
+              <Small> {prettyCollSymbol}</Small>
+            </Typography>
+            <Label>
+              of <White>collateral</White> supplied
+            </Label>
+            <LinksContainer>
               <SmallLink
                 href={getEtherscanUrl(collAddress)}
                 target="_blank"
@@ -79,34 +110,27 @@ const Totals = () => {
               >
                 Etherscan
               </SmallLink>
-            )}
-            {exchangeInfo !== undefined && collAddress && (
               <SmallLink
-                href={exchangeInfo.getExchangeUrl(collAddress)}
+                href={getExchangeLinkCollateral}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {exchangeInfo.name}
+                {exchangeName}
               </SmallLink>
-            )}
-          </LinksContainer>
-        </DataBox>
-      </Grid>
+            </LinksContainer>
+          </DataBox>
+        </Grid>
 
-      <Grid item xs={6}>
-        <DataBox>
-          <Typography variant="h4">
-            <strong>
-              {loading ? "N/A" : Number(totalTokens).toLocaleString()}
-            </strong>
-
-            <Small> {tokenSymbol}</Small>
-          </Typography>
-          <Label>
-            of <White>synthetic tokens</White> outstanding
-          </Label>
-          <LinksContainer>
-            {tokenAddress && (
+        <Grid item xs={6}>
+          <DataBox>
+            <Typography variant="h4">
+              <strong>{prettyTotalTokens}</strong>
+              <Small> {prettyTokenSymbol}</Small>
+            </Typography>
+            <Label>
+              of <White>synthetic tokens</White> outstanding
+            </Label>
+            <LinksContainer>
               <SmallLink
                 href={getEtherscanUrl(tokenAddress)}
                 target="_blank"
@@ -114,21 +138,19 @@ const Totals = () => {
               >
                 Etherscan
               </SmallLink>
-            )}
-            {exchangeInfo !== undefined && tokenAddress && (
               <SmallLink
-                href={exchangeInfo.getExchangeUrl(tokenAddress)}
+                href={getExchangeLinkToken}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {exchangeInfo.name}
+                {exchangeName}
               </SmallLink>
-            )}
-          </LinksContainer>
-        </DataBox>
-      </Grid>
-    </>
-  );
+            </LinksContainer>
+          </DataBox>
+        </Grid>
+      </>
+    );
+  }
 };
 
 export default Totals;
