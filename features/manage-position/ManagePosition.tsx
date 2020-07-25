@@ -12,17 +12,13 @@ import YourWallet from "./YourWallet";
 
 export type Method = "create" | "deposit" | "withdraw" | "redeem";
 
-const FalseDoor = () => (
-  <Typography>This feature has not been implemented yet.</Typography>
-);
-
 const Manager = () => {
   const { signer } = Connection.useContainer();
   const [method, setMethod] = useState<Method>("create");
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) =>
     setMethod(e.target.value as Method);
 
-  if (!signer) {
+  if (signer === null) {
     return (
       <Box>
         <Typography>

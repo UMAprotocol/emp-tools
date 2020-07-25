@@ -293,6 +293,7 @@ const Create = () => {
                 placement="right"
                 title={
                   liquidationPriceDangerouslyFarBelowCurrentPrice &&
+                  parseFloat(resultantLiquidationPrice) > 0 &&
                   `This is ${
                     liquidationPriceWarningThreshold * 100
                   }% below the current price: ${prettyLatestPrice}`
@@ -300,9 +301,11 @@ const Create = () => {
               >
                 <span
                   style={{
-                    color: liquidationPriceDangerouslyFarBelowCurrentPrice
-                      ? "red"
-                      : "unset",
+                    color:
+                      liquidationPriceDangerouslyFarBelowCurrentPrice &&
+                      parseFloat(resultantLiquidationPrice) > 0
+                        ? "red"
+                        : "unset",
                   }}
                 >
                   {resultantLiquidationPrice} {priceIdentifierUtf8}
