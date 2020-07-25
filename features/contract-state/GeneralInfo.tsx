@@ -43,6 +43,7 @@ const GeneralInfo = () => {
     withdrawalLiveness,
   } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
+  const defaultMissingDataDisplay = "N/A";
 
   if (
     expiry !== null &&
@@ -78,7 +79,6 @@ const GeneralInfo = () => {
     return renderComponent();
   }
 
-  const defaultMissingDataDisplay = "N/A";
   function renderComponent(
     expiryTimestamp: string = defaultMissingDataDisplay,
     expiryDate: string = defaultMissingDataDisplay,
