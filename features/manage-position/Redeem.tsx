@@ -209,7 +209,7 @@ const Redeem = () => {
                 onClick={setMaxAllowance}
                 style={{ marginRight: `12px` }}
               >
-                Approve
+                Max Approve
               </Button>
             )}
             {canSendTxn && !needAllowance() ? (

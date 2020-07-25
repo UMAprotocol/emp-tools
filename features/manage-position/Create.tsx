@@ -129,7 +129,7 @@ const Create = () => {
       collAllowance !== "Infinity" && collAllowance < collateralToDeposit;
     const resultantTokensBelowMin = resultantTokens < minSponsorTokensFromWei;
     const resultantCRBelowRequirement =
-      parseFloat(pricedResultantCR) > 0 &&
+      parseFloat(pricedResultantCR) >= 0 &&
       parseFloat(pricedResultantCR) < collReqFromWei;
     const transactionCRBelowGCR = transactionCR < gcr;
 
@@ -262,7 +262,8 @@ const Create = () => {
                     balanceBelowCollateralToDeposit ||
                     resultantCRBelowRequirement ||
                     resultantTokensBelowMin ||
-                    collateralToDeposit <= 0
+                    collateralToDeposit <= 0 ||
+                    tokensToCreate <= 0
                   }
                 >
                   {`Create ${tokensToCreate} ${tokenSymbol} with ${collateralToDeposit} ${collSymbol}`}
@@ -295,7 +296,7 @@ const Create = () => {
                 title={
                   liquidationPriceDangerouslyFarBelowCurrentPrice &&
                   parseFloat(resultantLiquidationPrice) > 0 &&
-                  `This is ${
+                  `This is >${
                     liquidationPriceWarningThreshold * 100
                   }% below the current price: ${prettyLatestPrice}`
                 }

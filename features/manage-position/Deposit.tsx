@@ -152,7 +152,7 @@ const Deposit = () => {
                   onClick={setMaxAllowance}
                   style={{ marginRight: `12px` }}
                 >
-                  Approve
+                  Max Approve
                 </Button>
               )}
               <Button
