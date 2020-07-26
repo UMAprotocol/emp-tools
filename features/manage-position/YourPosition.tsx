@@ -147,7 +147,7 @@ const YourPosition = () => {
           {` ${collReqFromWei}`}
         </Status>
         <Status>
-          <Label>Liquidation Price:</Label>
+          <Label>Liquidation price:</Label>
           {` ${liquidationPrice}(${priceIdUtf8})`}
         </Status>
         <Status>
@@ -158,7 +158,7 @@ const YourPosition = () => {
           {` ${_withdrawAmt} ${_collSymbol}`}
         </Status>
         <Status>
-          <Label>Pending Withdrawal Request:</Label>
+          <Label>Pending withdrawal request:</Label>
           {` ${_pendingWithdraw}`}
         </Status>
       </Container>
