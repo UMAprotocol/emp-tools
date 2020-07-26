@@ -121,26 +121,26 @@ const YourPosition = () => {
           {`${_collateral} ${_collSymbol}`}
         </Status>
         <Status>
-          <Label>Tokens outstanding: </Label>
+          <Label>Tokens created: </Label>
           {`${_tokens} ${_tokenSymbol}`}
         </Status>
         <Status>
           <Label>
-            Estimated identifier price (
+            Identifier price(
             <Link href={pricefeedUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase Pro
+              Coinbase
             </Link>
             ):{" "}
           </Label>
-          {_latestPrice}
+          {Number(_latestPrice).toFixed(4)}
         </Status>
         <Status>
-          <Label>(CR) Collateralization ratio:</Label>
-          {` ${pricedCR} (${_collSymbol} / ${_tokenSymbol})`}
+          <Label>Collateralization ratio(CR):</Label>
+          {` ${pricedCR}`}
         </Status>
         <Status>
-          <Label>(GCR) Global collateralization ratio:</Label>
-          {` ${pricedGCR} (${_collSymbol} / ${_tokenSymbol})`}
+          <Label>Global collateralization ratio(GCR):</Label>
+          {` ${pricedGCR}`}
         </Status>
         <Status>
           <Label>Liquidation Requirement:</Label>
@@ -148,14 +148,17 @@ const YourPosition = () => {
         </Status>
         <Status>
           <Label>Liquidation Price:</Label>
-          {` ${liquidationPrice} (${priceIdUtf8})`}
+          {` ${liquidationPrice}(${priceIdUtf8})`}
         </Status>
         <Status>
-          <Label>Collateral pending/available to withdraw:</Label>
+          <Label>
+            Collateral {_pendingWithdraw == "No" ? "pending " : "available "}
+            To Withdraw:
+          </Label>
           {` ${_withdrawAmt} ${_collSymbol}`}
         </Status>
         <Status>
-          <Label>Pending withdrawal request:</Label>
+          <Label>Pending Withdrawal Request:</Label>
           {` ${_pendingWithdraw}`}
         </Status>
       </Container>

@@ -206,7 +206,7 @@ const Create = () => {
           </Box>
 
           <Grid container spacing={3}>
-            <Grid item xs={4}>
+            <Grid item md={4} xs={6}>
               <TextField
                 fullWidth
                 type="number"
@@ -224,7 +224,7 @@ const Create = () => {
                 }
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item md={4} xs={6}>
               <TextField
                 fullWidth
                 type="number"
@@ -242,8 +242,8 @@ const Create = () => {
                 }
               />
             </Grid>
-            <Grid item xs={4}>
-              <Box py={1}>
+            <Grid item md={4} xs={6}>
+              <Box py={0}>
                 {needAllowance && (
                   <Button
                     variant="contained"
@@ -254,6 +254,7 @@ const Create = () => {
                   </Button>
                 )}
                 <Button
+                  fullWidth
                   variant="contained"
                   onClick={mintTokens}
                   disabled={
@@ -272,7 +273,7 @@ const Create = () => {
             </Grid>
           </Grid>
 
-          <Box py={4}>
+          <Box pt={4}>
             <Typography>
               {`Transaction CR: `}
               <Tooltip
@@ -361,7 +362,7 @@ const Create = () => {
             </Box>
           )}
           {error && (
-            <Box py={2}>
+            <Box pt={2}>
               <Typography>
                 <span style={{ color: "red" }}>{error.message}</span>
               </Typography>

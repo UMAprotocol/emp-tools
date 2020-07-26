@@ -55,7 +55,7 @@ const GeneralInfo = () => {
     tokenSymbol !== null
   ) {
     const expiryTimestamp = expiry.toString();
-    const expiryDate = new Date(expiry.toNumber() * 1000).toString();
+    const expiryDate = new Date(expiry.toNumber() * 1000).toLocaleDateString();
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const pricedGcr = (gcr / latestPrice).toFixed(4);
     const withdrawalLivenessInMinutes = (
@@ -113,15 +113,15 @@ const GeneralInfo = () => {
         </Status>
 
         <Status>
-          <Label>Price Feed Identifier: </Label>
+          <Label>Price Identifier: </Label>
           {priceIdUtf8}
         </Status>
 
         <Status>
           <Label>
-            Estimated Identifier Price (
+            Identifier Price: (
             <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase Pro
+              Coinbase
             </Link>
             )
           </Label>
@@ -149,7 +149,7 @@ const GeneralInfo = () => {
 
         <Status>
           <Label>
-            Withdrawal Liveness (minutes) (
+            Withdraw Liveness (mins) (
             <Link
               href={DOCS_MAP.SLOW_WITHDRAW}
               target="_blank"

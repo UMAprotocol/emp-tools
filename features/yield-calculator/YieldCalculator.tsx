@@ -1,4 +1,4 @@
-import { Box, TextField, Typography, Grid } from "@material-ui/core";
+import { Box, TextField, Typography, Grid, Hidden } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import EmpState from "../../containers/EmpState";
@@ -71,7 +71,7 @@ const YieldCalculator = () => {
 
   const prettyPercentage = (x: number | null) => {
     if (x === null) return "";
-    return (x * 100).toFixed(4);
+    return (x * 100).toFixed(2);
   };
 
   // Update the yield whenever the parameters change.
@@ -101,7 +101,7 @@ const YieldCalculator = () => {
         <Typography variant="h5">yUSD Yield Calculator</Typography>
         <form noValidate autoComplete="off">
           <Grid container spacing={3}>
-            <Grid item xs={4}>
+            <Grid item md={4} xs={6}>
               <FormInput>
                 <TextField
                   fullWidth
@@ -111,14 +111,14 @@ const YieldCalculator = () => {
                   onChange={(e) => setTokenPrice(e.target.value)}
                   variant="outlined"
                   inputProps={{ min: "0", max: "10", step: "0.01" }}
-                  helperText={`Enter the market observable price`}
+                  helperText={`Enter the market price`}
                   InputLabelProps={{
                     shrink: true,
                   }}
                 />
               </FormInput>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item md={4} xs={6}>
               <FormInput>
                 <TextField
                   fullWidth
@@ -129,7 +129,7 @@ const YieldCalculator = () => {
                   inputProps={{ min: "0", max: "10", step: "1" }}
                   helperText={
                     calculateDaysToExpiry()
-                      ? `Days to expiry for chosen EMP: ${calculateDaysToExpiry()}`
+                      ? `Days to expiry for EMP: ${calculateDaysToExpiry()}`
                       : ""
                   }
                   variant="outlined"
@@ -139,12 +139,21 @@ const YieldCalculator = () => {
                 />
               </FormInput>
             </Grid>
-            <Grid item xs={4}>
-              <Box pt={4}>
-                <Typography variant="h6">
-                  Yearly APR: {prettyPercentage(yieldAmount)}%
-                </Typography>
-              </Box>
+            <Grid item md={4} xs={12}>
+              <Hidden only={["sm", "xs"]}>
+                <Box pt={4}>
+                  <Typography variant="h6">
+                    Yearly APR: {prettyPercentage(yieldAmount)}%
+                  </Typography>
+                </Box>
+              </Hidden>
+              <Hidden only={["md", "lg", "xl"]}>
+                <Box pt={0} textAlign="center">
+                  <Typography variant="h6">
+                    Yearly APR: {prettyPercentage(yieldAmount)}%
+                  </Typography>
+                </Box>
+              </Hidden>
             </Grid>
           </Grid>
         </form>

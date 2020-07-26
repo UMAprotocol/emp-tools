@@ -124,7 +124,7 @@ const Deposit = () => {
         </Box>
 
         <Grid container spacing={3}>
-          <Grid item xs={4}>
+          <Grid item xs={6} md={4}>
             <Box py={0}>
               <TextField
                 fullWidth
@@ -144,10 +144,11 @@ const Deposit = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={4}>
-            <Box py={1}>
+          <Grid item xs={6} md={4}>
+            <Box py={0}>
               {needAllowance && (
                 <Button
+                  fullWidth
                   variant="contained"
                   onClick={setMaxAllowance}
                   style={{ marginRight: `12px` }}
@@ -156,6 +157,7 @@ const Deposit = () => {
                 </Button>
               )}
               <Button
+                fullWidth
                 variant="contained"
                 onClick={depositCollateral}
                 disabled={

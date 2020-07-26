@@ -5,7 +5,7 @@ import Totals from "./Totals";
 
 const ContractState = () => {
   return (
-    <Box py={4}>
+    <Box pt={4}>
       <Grid container spacing={4}>
         <Totals />
       </Grid>
