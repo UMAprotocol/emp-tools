@@ -30,7 +30,7 @@ function useTotals() {
       // use multiplier to find real total collateral in EMP
       const totalColl = weiToNum(multiplier) * weiToNum(rawColl, collDec);
       const totalTokens = weiToNum(totalTokensWei, tokenDec);
-      const gcr = totalColl / totalTokens;
+      const gcr = totalTokens > 0 ? totalColl / totalTokens : 0;
 
       // set states
       setTotalCollateral(totalColl);

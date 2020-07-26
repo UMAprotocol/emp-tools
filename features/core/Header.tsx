@@ -49,9 +49,7 @@ const Header = () => {
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
       <Box>
-        <Typography variant="h4">
-          <i>EMP Tools</i>
-        </Typography>
+        <Typography variant="h4">⚒️⚡️EMP Tools</Typography>
       </Box>
       <Box display="flex" alignItems="center">
         {address && (

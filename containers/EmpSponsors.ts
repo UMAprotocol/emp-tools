@@ -66,9 +66,8 @@ const useEmpSponsors = () => {
               sponsor,
             };
           });
+          setActivePositions(newPositions);
         }
-
-        setActivePositions(newPositions);
       }
     }
   };
