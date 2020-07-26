@@ -238,7 +238,7 @@ const Create = () => {
                 error={resultantTokensBelowMin}
                 helperText={
                   resultantTokensBelowMin &&
-                  `You must maintain at least ${minSponsorTokensFromWei} ${tokenSymbol} in your position`
+                  `You must create at least ${minSponsorTokensFromWei} ${tokenSymbol} from your position`
                 }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setTokens(e.target.value)

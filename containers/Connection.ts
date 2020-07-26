@@ -37,7 +37,7 @@ function useConnection() {
       networkId: 1, // Default to main net. If on a different network will change with the subscription.
       subscriptions: {
         address: setAddress,
-        network: async (networkId: number) => {
+        network: async (networkId: any) => {
           onboard.config({ networkId: networkId });
         },
         wallet: async (wallet: Wallet) => {
