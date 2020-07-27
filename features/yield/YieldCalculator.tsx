@@ -67,7 +67,7 @@ const YieldCalculator = () => {
 
   const prettyPercentage = (x: number | null) => {
     if (x === null) return "";
-    return (x * 100).toFixed(4);
+    return (x * 100).toFixed(2);
   };
 
   // Update the yield whenever the parameters change.
@@ -79,8 +79,8 @@ const YieldCalculator = () => {
     <span>
       <Typography variant="h5">yUSD Yield Calculator</Typography>
       <form noValidate autoComplete="off">
-        <Grid container spacing={3}>
-          <Grid item xs={4}>
+        <Grid container spacing={2}>
+          <Grid item md={4} sm={6} xs={12}>
             <FormInput>
               <TextField
                 fullWidth
@@ -97,7 +97,7 @@ const YieldCalculator = () => {
               />
             </FormInput>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item md={4} sm={6} xs={12}>
             <FormInput>
               <TextField
                 fullWidth
@@ -118,8 +118,8 @@ const YieldCalculator = () => {
               />
             </FormInput>
           </Grid>
-          <Grid item xs={4}>
-            <Box pt={4}>
+          <Grid item md={4} sm={12} xs={12}>
+            <Box pt={1} textAlign="center">
               <Typography variant="h6">
                 Yearly APR for <strong>buyers</strong>:{" "}
                 {prettyPercentage(yieldAmount)}%

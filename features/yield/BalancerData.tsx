@@ -1,5 +1,4 @@
-import { Box, TextField, Typography, Grid } from "@material-ui/core";
-import { useState, useEffect } from "react";
+import { Typography, Grid } from "@material-ui/core";
 import styled from "styled-components";
 
 import Balancer from "../../containers/Balancer";
@@ -63,46 +62,53 @@ const BalancerData = () => {
             (Balancer)
           </Link>
         </Typography>
-        <Status>
-          <Label>Pool liquidity: </Label>
-          {poolLiquidity}
-        </Status>
-        <Status>
-          <Label>
-            - <i>yUSD</i>:{" "}
-          </Label>
-          {poolBalanceToken}
-        </Status>
-        <Status>
-          <Label>
-            - <i>USDC</i>:{" "}
-          </Label>
-          {poolBalanceOther}
-        </Status>
-        <Status>
-          <Label>Swap fee: </Label>
-          {poolSwapFee}
-        </Status>
-        <Status>
-          <Label>Current price: </Label>
-          {usdPrice}
-        </Status>
-        <Status>
-          <Label>Trade volume: </Label>
-          {poolSwapVolume}
-        </Status>
-        <Status>
-          <Label>Trade count: </Label>
-          {poolSwapCount}
-        </Status>
-        <Status>
-          <Label>Joins count: </Label>
-          {poolJoinsCount}
-        </Status>
-        <Status>
-          <Label>Exits count: </Label>
-          {poolExitsCount}
-        </Status>
+        <Grid container spacing={3}>
+          <Grid item md={6} sm={6} xs={12}>
+            <Status>
+              <Label>Pool liquidity: </Label>
+              {poolLiquidity}
+            </Status>
+            <Status>
+              <Label>
+                - <i>yUSD</i>:{" "}
+              </Label>
+              {poolBalanceToken}
+            </Status>
+            <Status>
+              <Label>
+                - <i>USDC</i>:{" "}
+              </Label>
+              {poolBalanceOther}
+            </Status>
+
+            <Status>
+              <Label>Trade volume: </Label>
+              {poolSwapVolume}
+            </Status>
+            <Status>
+              <Label>Swap fee: </Label>
+              {poolSwapFee}
+            </Status>
+          </Grid>
+          <Grid item md={6} sm={6} xs={12}>
+            <Status>
+              <Label>Current price: </Label>
+              {usdPrice}
+            </Status>
+            <Status>
+              <Label>Trade count: </Label>
+              {poolSwapCount}
+            </Status>
+            <Status>
+              <Label>Joins count: </Label>
+              {poolJoinsCount}
+            </Status>
+            <Status>
+              <Label>Exits count: </Label>
+              {poolExitsCount}
+            </Status>
+          </Grid>
+        </Grid>
       </span>
     );
   }
