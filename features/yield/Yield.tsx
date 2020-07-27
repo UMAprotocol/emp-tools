@@ -24,7 +24,7 @@ const Yield = () => {
           , like yUSD, are expiring tokens that have fixed-rate returns because
           they will be redeemable for exactly 1 USD worth of collateral at
           expiry. To use this calculator enter in the current yToken price and
-          the Days to expiry. An implied yearly APR is shown. To learn more
+          the days to expiry. An implied yearly APR is shown. To learn more
           about yUSD specifically, read the UMA Medium post{" "}
           <a
             href="https://medium.com/uma-project/the-yield-dollar-on-uma-3a492e79069f"
