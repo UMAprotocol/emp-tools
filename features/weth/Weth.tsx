@@ -14,11 +14,6 @@ import WethContract from "../../containers/WethContract";
 import Connection from "../../containers/Connection";
 import Etherscan from "../../containers/Etherscan";
 
-enum ACTION_TYPE {
-  WRAP,
-  UNWRAP,
-}
-
 const ETHEREUM_LOGO_URL =
   "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png";
 
@@ -109,21 +104,18 @@ const Weth = () => {
     // Error conditions for WETH unwrapping
     const wethAmountAboveBalance = wethAmountToUnwrap > Number(wethBalance);
 
-    const _submitTxn = async (amount: number, action: ACTION_TYPE) => {
-      if (amount > 0) {
+    const wrapEth = async (e: FormEvent) => {
+      e.preventDefault();
+
+      if (ethAmountToWrap > 0) {
         setHash(null);
         setSuccess(null);
         setError(null);
         try {
-          const amountWei = toWei(amount.toString());
-          let tx;
-          if (action === ACTION_TYPE.WRAP) {
-            tx = await weth.deposit({
-              value: amountWei,
-            });
-          } else {
-            tx = await weth.withdraw(amountWei);
-          }
+          const amountWei = toWei(ethAmountToWrap.toString());
+          let tx = await weth.deposit({
+            value: amountWei,
+          });
           setHash(tx.hash as string);
           await tx.wait();
           setSuccess(true);
@@ -136,18 +128,25 @@ const Weth = () => {
       }
     };
 
-    const handleClick = (e: FormEvent, action: ACTION_TYPE) => {
+    const unwrapWeth = async (e: FormEvent) => {
       e.preventDefault();
 
-      switch (action) {
-        case ACTION_TYPE.WRAP:
-          _submitTxn(ethAmountToWrap, ACTION_TYPE.WRAP);
-          break;
-        case ACTION_TYPE.UNWRAP:
-          _submitTxn(wethAmountToUnwrap, ACTION_TYPE.UNWRAP);
-          break;
-        default:
-          alert("Invalid action!");
+      if (wethAmountToUnwrap > 0) {
+        setHash(null);
+        setSuccess(null);
+        setError(null);
+        try {
+          const amountWei = toWei(wethAmountToUnwrap.toString());
+          let tx = await weth.withdraw(amountWei);
+          setHash(tx.hash as string);
+          await tx.wait();
+          setSuccess(true);
+        } catch (error) {
+          console.error(error);
+          setError(error);
+        }
+      } else {
+        setError(new Error("Amount must be positive"));
       }
     };
 
@@ -202,7 +201,7 @@ const Weth = () => {
                     style={{ width: "100%" }}
                     noValidate
                     autoComplete="off"
-                    onSubmit={(e) => handleClick(e, ACTION_TYPE.WRAP)}
+                    onSubmit={(e) => wrapEth(e)}
                   >
                     <TextField
                       fullWidth
@@ -242,7 +241,7 @@ const Weth = () => {
                     style={{ width: "100%" }}
                     noValidate
                     autoComplete="off"
-                    onSubmit={(e) => handleClick(e, ACTION_TYPE.UNWRAP)}
+                    onSubmit={(e) => unwrapWeth(e)}
                   >
                     <TextField
                       fullWidth
