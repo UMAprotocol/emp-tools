@@ -163,7 +163,7 @@ const Weth = () => {
         </Typography>
       </Box>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item md={6} sm={6} xs={12}>
           <Box style={{ height: "100%" }}>
             <Container style={{ height: "100%" }}>
               <Typography variant="h5">Your Wallet</Typography>
@@ -188,10 +188,10 @@ const Weth = () => {
             </Container>
           </Box>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item md={6} sm={6} xs={12}>
           <Box>
             <Container>
-              <Typography variant="h5">Wrap and Unwrap</Typography>
+              <Typography variant="h5">Wrap & Unwrap</Typography>
               <InputElement>
                 <form
                   style={{ width: "100%" }}

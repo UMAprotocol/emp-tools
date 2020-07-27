@@ -314,7 +314,7 @@ const Deposit = () => {
         </Box>
 
         <Grid container spacing={3}>
-          <Grid item xs={4}>
+          <Grid item md={4} sm={6} xs={12}>
             <TextField
               fullWidth
               type="number"
@@ -331,9 +331,10 @@ const Deposit = () => {
               }
             />
           </Grid>
-          <Grid item xs={4}>
-            <Box py={1}>
+          <Grid item md={4} sm={6} xs={12}>
+            <Box>
               <Button
+                fullWidth
                 variant="contained"
                 onClick={withdrawCollateral}
                 disabled={

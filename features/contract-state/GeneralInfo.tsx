@@ -55,7 +55,9 @@ const GeneralInfo = () => {
     tokenSymbol !== null
   ) {
     const expiryTimestamp = expiry.toString();
-    const expiryDate = new Date(expiry.toNumber() * 1000).toString();
+    const expiryDate = new Date(
+      expiry.toNumber() * 1000
+    ).toLocaleString("en-GB", { timeZone: "UTC" });
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const pricedGcr = (gcr / latestPrice).toFixed(4);
     const withdrawalLivenessInMinutes = (
@@ -106,22 +108,22 @@ const GeneralInfo = () => {
           )}
         </Typography>
         <Status>
-          <Label>Expiry Date: </Label>
+          <Label>Expiry date: </Label>
           <Tooltip title={`Timestamp: ${expiryTimestamp}`} interactive>
-            <span>{expiryDate}</span>
+            <span>{expiryDate} UTC</span>
           </Tooltip>
         </Status>
 
         <Status>
-          <Label>Price Feed Identifier: </Label>
+          <Label>Price identifier: </Label>
           {priceIdUtf8}
         </Status>
 
         <Status>
           <Label>
-            Estimated Identifier Price (
+            Identifier price: (
             <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase Pro
+              Coinbase
             </Link>
             )
           </Label>
@@ -129,17 +131,17 @@ const GeneralInfo = () => {
         </Status>
 
         <Status>
-          <Label>Collateral Requirement: </Label>
+          <Label>Collateral requirement: </Label>
           {collReqPct}
         </Status>
 
         <Status>
-          <Label>Minimum Sponsor Tokens: </Label>
+          <Label>Minimum sponsor tokens: </Label>
           {minSponsorTokensSymbol}
         </Status>
 
         <Status>
-          <Label>GCR (collateral / tokens): </Label>
+          <Label>Global collateral ratio: </Label>
           <Tooltip
             title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
           >
@@ -149,7 +151,7 @@ const GeneralInfo = () => {
 
         <Status>
           <Label>
-            Withdrawal Liveness (minutes) (
+            Withdraw liveness (mins) (
             <Link
               href={DOCS_MAP.SLOW_WITHDRAW}
               target="_blank"

@@ -19,6 +19,7 @@ const muiTheme = createMuiTheme({
     secondary: { main: "#ff4a4a" },
   },
   typography: {
+    fontSize: 16,
     fontFamily: [
       `IBM Plex Mono`,
       `-apple-system`,
@@ -28,6 +29,23 @@ const muiTheme = createMuiTheme({
     ].join(","),
   },
 });
+
+muiTheme.typography.body1 = {
+  [muiTheme.breakpoints.down("sm")]: {
+    fontSize: 15,
+  },
+  [muiTheme.breakpoints.down("xs")]: {
+    fontSize: 14,
+  },
+};
+muiTheme.typography.h4 = {
+  [muiTheme.breakpoints.down("sm")]: {
+    fontSize: "1.4em",
+  },
+  [muiTheme.breakpoints.up("sm")]: {
+    fontSize: "2.1em",
+  },
+};
 
 interface IProps {
   children: React.ReactNode;
