@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Typography } from "@material-ui/core";
+import { Typography, Grid } from "@material-ui/core";
 import { utils } from "ethers";
 
 import Position from "../../containers/Position";
@@ -115,52 +115,64 @@ const YourPosition = () => {
   ) {
     return (
       <Container>
-        <Typography variant="h5">Your Position</Typography>
-        <Status>
-          <Label>Collateral supplied: </Label>
-          {`${_collateral} ${_collSymbol}`}
-        </Status>
-        <Status>
-          <Label>Tokens outstanding: </Label>
-          {`${_tokens} ${_tokenSymbol}`}
-        </Status>
-        <Status>
-          <Label>
-            Identifier price(
-            <Link href={pricefeedUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase
-            </Link>
-            ):{" "}
-          </Label>
-          {Number(_latestPrice).toFixed(4)}
-        </Status>
-        <Status>
-          <Label>Collateralization ratio (CR):</Label>
-          {` ${pricedCR}`}
-        </Status>
-        <Status>
-          <Label>Global collateralization ratio (GCR):</Label>
-          {` ${pricedGCR}`}
-        </Status>
-        <Status>
-          <Label>Liquidation Requirement:</Label>
-          {` ${collReqFromWei}`}
-        </Status>
-        <Status>
-          <Label>Liquidation price:</Label>
-          {` ${liquidationPrice} (${priceIdUtf8})`}
-        </Status>
-        <Status>
-          <Label>
-            Collateral {_pendingWithdraw == "No" ? "pending " : "available "}
-            To Withdraw:
-          </Label>
-          {` ${_withdrawAmt} ${_collSymbol}`}
-        </Status>
-        <Status>
-          <Label>Pending withdrawal request:</Label>
-          {` ${_pendingWithdraw}`}
-        </Status>
+        <Grid container spacing={4}>
+          <Grid item md={6} xs={12}>
+            <Typography variant="h5">Your Position</Typography>
+            <Status>
+              <Label>Collateral supplied: </Label>
+              {`${_collateral} ${_collSymbol}`}
+            </Status>
+            <Status>
+              <Label>Tokens outstanding: </Label>
+              {`${_tokens} ${_tokenSymbol}`}
+            </Status>
+            <Status>
+              <Label>Collateral ratio(CR):</Label>
+              {` ${pricedCR}`}
+            </Status>
+            <Status>
+              <Label>Liquidation price:</Label>
+              {` ${liquidationPrice} (${priceIdUtf8})`}
+            </Status>
+
+            <Status>
+              <Label>Pending withdrawal request:</Label>
+              {` ${_pendingWithdraw}`}
+            </Status>
+            {_pendingWithdraw == "available" && (
+              <Status>
+                <Label>Collateral available to Withdraw:</Label>
+                {` ${_withdrawAmt}`}
+              </Status>
+            )}
+          </Grid>
+          <Grid item md={6} xs={12}>
+            <Typography variant="h5">Contract Info</Typography>
+            <Status>
+              <Label>
+                Identifier price(
+                <Link
+                  href={pricefeedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Coinbase
+                </Link>
+                ):{" "}
+              </Label>
+              {Number(_latestPrice).toFixed(4)}
+            </Status>
+
+            <Status>
+              <Label>Global collateral ratio(GCR):</Label>
+              {` ${pricedGCR}`}
+            </Status>
+            <Status>
+              <Label>Liquidation Requirement:</Label>
+              {` ${collReqFromWei}`}
+            </Status>
+          </Grid>
+        </Grid>
       </Container>
     );
   }
