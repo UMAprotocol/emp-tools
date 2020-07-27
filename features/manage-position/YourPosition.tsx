@@ -121,7 +121,7 @@ const YourPosition = () => {
           {`${_collateral} ${_collSymbol}`}
         </Status>
         <Status>
-          <Label>Tokens created: </Label>
+          <Label>Tokens outstanding: </Label>
           {`${_tokens} ${_tokenSymbol}`}
         </Status>
         <Status>
@@ -135,11 +135,11 @@ const YourPosition = () => {
           {Number(_latestPrice).toFixed(4)}
         </Status>
         <Status>
-          <Label>Collateralization ratio(CR):</Label>
+          <Label>Collateralization ratio (CR):</Label>
           {` ${pricedCR}`}
         </Status>
         <Status>
-          <Label>Global collateralization ratio(GCR):</Label>
+          <Label>Global collateralization ratio (GCR):</Label>
           {` ${pricedGCR}`}
         </Status>
         <Status>
@@ -148,7 +148,7 @@ const YourPosition = () => {
         </Status>
         <Status>
           <Label>Liquidation price:</Label>
-          {` ${liquidationPrice}(${priceIdUtf8})`}
+          {` ${liquidationPrice} (${priceIdUtf8})`}
         </Status>
         <Status>
           <Label>

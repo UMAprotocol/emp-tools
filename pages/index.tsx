@@ -12,6 +12,7 @@ import {
   MenuItem,
   Grid,
 } from "@material-ui/core";
+import MenuOpenIcon from "@material-ui/icons/MenuOpen";
 
 import Header from "../features/core/Header";
 import ContractState from "../features/contract-state/ContractState";
@@ -84,7 +85,7 @@ export default function Index() {
               <Grid container spacing={2}>
                 <Grid item>
                   <Button variant="contained" onClick={handleClickListItem}>
-                    Menu
+                    <MenuOpenIcon />
                   </Button>
                 </Grid>
                 <Grid item>

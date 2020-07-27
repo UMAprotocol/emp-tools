@@ -111,7 +111,7 @@ const YieldCalculator = () => {
                   onChange={(e) => setTokenPrice(e.target.value)}
                   variant="outlined"
                   inputProps={{ min: "0", max: "10", step: "0.01" }}
-                  helperText={`Enter the market price`}
+                  helperText={`Enter the price of yUSD in $`}
                   InputLabelProps={{
                     shrink: true,
                   }}
