@@ -21,6 +21,11 @@ import EmpSponsors from "../../containers/EmpSponsors";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
+interface SortableTableHeaderProps {
+  children: React.ReactNode;
+  sortField: number;
+}
+
 const Link = styled.a`
   color: white;
   font-size: 18px;
@@ -152,6 +157,25 @@ const AllPositions = () => {
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE);
 
+    const SortableTableColumnHeader = ({
+      children,
+      sortField,
+    }: SortableTableHeaderProps) => {
+      return (
+        <ClickableText
+          onClick={(e) => {
+            setSortedColumn(sortField);
+            setSortDirection(
+              sortedColumn !== sortField ? true : !sortDirection
+            );
+          }}
+        >
+          {children}
+          {sortedColumn === sortField ? (!sortDirection ? "↑" : "↓") : ""}
+        </ClickableText>
+      );
+    };
+
     return (
       <Box>
         <Box>
@@ -169,86 +193,32 @@ const AllPositions = () => {
                 <TableRow>
                   <TableCell>Sponsor</TableCell>
                   <TableCell align="right">
-                    <ClickableText
-                      onClick={(e) => {
-                        setSortedColumn(SORT_FIELD.COLLATERAL);
-                        setSortDirection(
-                          sortedColumn !== SORT_FIELD.COLLATERAL
-                            ? true
-                            : !sortDirection
-                        );
-                      }}
+                    <SortableTableColumnHeader
+                      sortField={SORT_FIELD.COLLATERAL}
                     >
                       Collateral
                       <br />({collSymbol}){" "}
-                      {sortedColumn === SORT_FIELD.COLLATERAL
-                        ? !sortDirection
-                          ? "↑"
-                          : "↓"
-                        : ""}
-                    </ClickableText>
+                    </SortableTableColumnHeader>
                   </TableCell>
                   <TableCell align="right">
-                    <ClickableText
-                      onClick={(e) => {
-                        setSortedColumn(SORT_FIELD.TOKENS);
-                        setSortDirection(
-                          sortedColumn !== SORT_FIELD.TOKENS
-                            ? true
-                            : !sortDirection
-                        );
-                      }}
-                    >
+                    <SortableTableColumnHeader sortField={SORT_FIELD.TOKENS}>
                       Synthetics
                       <br />({tokenSymbol}){" "}
-                      {sortedColumn === SORT_FIELD.TOKENS
-                        ? !sortDirection
-                          ? "↑"
-                          : "↓"
-                        : ""}
-                    </ClickableText>
+                    </SortableTableColumnHeader>
                   </TableCell>
                   <TableCell align="right">
-                    <ClickableText
-                      onClick={(e) => {
-                        setSortedColumn(SORT_FIELD.CRATIO);
-                        setSortDirection(
-                          sortedColumn !== SORT_FIELD.CRATIO
-                            ? true
-                            : !sortDirection
-                        );
-                      }}
-                    >
+                    <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
                       Collateral Ratio{" "}
-                      {sortedColumn === SORT_FIELD.CRATIO
-                        ? !sortDirection
-                          ? "↑"
-                          : "↓"
-                        : ""}
-                    </ClickableText>
+                    </SortableTableColumnHeader>
                   </TableCell>
                   <Tooltip
                     title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
                     placement="top"
                   >
                     <TableCell align="right">
-                      <ClickableText
-                        onClick={(e) => {
-                          setSortedColumn(SORT_FIELD.LIQ_PRICE);
-                          setSortDirection(
-                            sortedColumn !== SORT_FIELD.LIQ_PRICE
-                              ? true
-                              : !sortDirection
-                          );
-                        }}
-                      >
+                      <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
                         Liquidation Price{" "}
-                        {sortedColumn === SORT_FIELD.LIQ_PRICE
-                          ? !sortDirection
-                            ? "↑"
-                            : "↓"
-                          : ""}
-                      </ClickableText>
+                      </SortableTableColumnHeader>
                     </TableCell>
                   </Tooltip>
                 </TableRow>
