@@ -113,7 +113,9 @@ const AllPositions = () => {
     collSymbol !== null &&
     latestPrice !== null &&
     priceId !== null &&
-    sourceUrl !== undefined
+    sourceUrl !== undefined &&
+    activeSponsors &&
+    Object.keys(activeSponsors).length > 0
   ) {
     const priceIdUtf8 = utils.parseBytes32String(priceId);
 
@@ -126,191 +128,176 @@ const AllPositions = () => {
       return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
     };
 
+    // First filters out sponsor data missing field values,
+    // then sorts the positions according to selected sort column,
+    // and finally slices the array based on pagination selection.
+    const reformattedSponsorData = Object.keys(activeSponsors)
+      .filter((sponsor: string) => {
+        return (
+          activeSponsors[sponsor]?.collateral &&
+          activeSponsors[sponsor]?.tokensOutstanding &&
+          activeSponsors[sponsor]?.cRatio &&
+          activeSponsors[sponsor]?.liquidationPrice
+        );
+      })
+      .sort((sponsorA: string, sponsorB: string) => {
+        const fieldValueA =
+          activeSponsors[sponsorA][FIELD_TO_VALUE[sortedColumn]];
+        const fieldValueB =
+          activeSponsors[sponsorB][FIELD_TO_VALUE[sortedColumn]];
+        return Number(fieldValueA) > Number(fieldValueB)
+          ? (sortDirection ? -1 : 1) * 1
+          : (sortDirection ? -1 : 1) * -1;
+      })
+      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE);
+
     return (
       <Box>
-        {activeSponsors && Object.keys(activeSponsors).length > 0 && (
-          <>
-            <Box>
-              <Typography>
-                {`Estimated price of ${latestPrice} for ${priceIdUtf8} sourced from: `}
-                <Link
-                  href={sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Coinbase Pro.
-                </Link>
-              </Typography>
-            </Box>
-            <Box pt={4}>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Sponsor</TableCell>
-                      <TableCell align="right">
-                        <ClickableText
-                          onClick={(e) => {
-                            setSortedColumn(SORT_FIELD.COLLATERAL);
-                            setSortDirection(
-                              sortedColumn !== SORT_FIELD.COLLATERAL
-                                ? true
-                                : !sortDirection
-                            );
-                          }}
-                        >
-                          Collateral
-                          <br />({collSymbol}){" "}
-                          {sortedColumn === SORT_FIELD.COLLATERAL
-                            ? !sortDirection
-                              ? "↑"
-                              : "↓"
-                            : ""}
-                        </ClickableText>
-                      </TableCell>
-                      <TableCell align="right">
-                        <ClickableText
-                          onClick={(e) => {
-                            setSortedColumn(SORT_FIELD.TOKENS);
-                            setSortDirection(
-                              sortedColumn !== SORT_FIELD.TOKENS
-                                ? true
-                                : !sortDirection
-                            );
-                          }}
-                        >
-                          Synthetics
-                          <br />({tokenSymbol}){" "}
-                          {sortedColumn === SORT_FIELD.TOKENS
-                            ? !sortDirection
-                              ? "↑"
-                              : "↓"
-                            : ""}
-                        </ClickableText>
-                      </TableCell>
-                      <TableCell align="right">
-                        <ClickableText
-                          onClick={(e) => {
-                            setSortedColumn(SORT_FIELD.CRATIO);
-                            setSortDirection(
-                              sortedColumn !== SORT_FIELD.CRATIO
-                                ? true
-                                : !sortDirection
-                            );
-                          }}
-                        >
-                          Collateral Ratio{" "}
-                          {sortedColumn === SORT_FIELD.CRATIO
-                            ? !sortDirection
-                              ? "↑"
-                              : "↓"
-                            : ""}
-                        </ClickableText>
-                      </TableCell>
-                      <Tooltip
-                        title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
-                        placement="top"
+        <Box>
+          <Typography>
+            {`Estimated price of ${latestPrice} for ${priceIdUtf8} sourced from: `}
+            <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
+              Coinbase Pro.
+            </Link>
+          </Typography>
+        </Box>
+        <Box pt={4}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Sponsor</TableCell>
+                  <TableCell align="right">
+                    <ClickableText
+                      onClick={(e) => {
+                        setSortedColumn(SORT_FIELD.COLLATERAL);
+                        setSortDirection(
+                          sortedColumn !== SORT_FIELD.COLLATERAL
+                            ? true
+                            : !sortDirection
+                        );
+                      }}
+                    >
+                      Collateral
+                      <br />({collSymbol}){" "}
+                      {sortedColumn === SORT_FIELD.COLLATERAL
+                        ? !sortDirection
+                          ? "↑"
+                          : "↓"
+                        : ""}
+                    </ClickableText>
+                  </TableCell>
+                  <TableCell align="right">
+                    <ClickableText
+                      onClick={(e) => {
+                        setSortedColumn(SORT_FIELD.TOKENS);
+                        setSortDirection(
+                          sortedColumn !== SORT_FIELD.TOKENS
+                            ? true
+                            : !sortDirection
+                        );
+                      }}
+                    >
+                      Synthetics
+                      <br />({tokenSymbol}){" "}
+                      {sortedColumn === SORT_FIELD.TOKENS
+                        ? !sortDirection
+                          ? "↑"
+                          : "↓"
+                        : ""}
+                    </ClickableText>
+                  </TableCell>
+                  <TableCell align="right">
+                    <ClickableText
+                      onClick={(e) => {
+                        setSortedColumn(SORT_FIELD.CRATIO);
+                        setSortDirection(
+                          sortedColumn !== SORT_FIELD.CRATIO
+                            ? true
+                            : !sortDirection
+                        );
+                      }}
+                    >
+                      Collateral Ratio{" "}
+                      {sortedColumn === SORT_FIELD.CRATIO
+                        ? !sortDirection
+                          ? "↑"
+                          : "↓"
+                        : ""}
+                    </ClickableText>
+                  </TableCell>
+                  <Tooltip
+                    title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
+                    placement="top"
+                  >
+                    <TableCell align="right">
+                      <ClickableText
+                        onClick={(e) => {
+                          setSortedColumn(SORT_FIELD.LIQ_PRICE);
+                          setSortDirection(
+                            sortedColumn !== SORT_FIELD.LIQ_PRICE
+                              ? true
+                              : !sortDirection
+                          );
+                        }}
                       >
-                        <TableCell align="right">
-                          <ClickableText
-                            onClick={(e) => {
-                              setSortedColumn(SORT_FIELD.LIQ_PRICE);
-                              setSortDirection(
-                                sortedColumn !== SORT_FIELD.LIQ_PRICE
-                                  ? true
-                                  : !sortDirection
-                              );
-                            }}
-                          >
-                            Liquidation Price{" "}
-                            {sortedColumn === SORT_FIELD.LIQ_PRICE
-                              ? !sortDirection
-                                ? "↑"
-                                : "↓"
-                              : ""}
-                          </ClickableText>
-                        </TableCell>
-                      </Tooltip>
+                        Liquidation Price{" "}
+                        {sortedColumn === SORT_FIELD.LIQ_PRICE
+                          ? !sortDirection
+                            ? "↑"
+                            : "↓"
+                          : ""}
+                      </ClickableText>
+                    </TableCell>
+                  </Tooltip>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {reformattedSponsorData.map((sponsor: string) => {
+                  const activeSponsor = activeSponsors[sponsor];
+                  return (
+                    <TableRow key={sponsor}>
+                      <TableCell component="th" scope="row">
+                        <a href={getEtherscanUrl(sponsor)} target="_blank">
+                          {prettyAddress(sponsor)}
+                        </a>
+                      </TableCell>
+                      <TableCell align="right">
+                        {prettyBalance(Number(activeSponsor.collateral))}
+                      </TableCell>
+                      <TableCell align="right">
+                        {prettyBalance(Number(activeSponsor.tokensOutstanding))}
+                      </TableCell>
+                      <TableCell align="right">
+                        {prettyBalance(Number(activeSponsor.cRatio))}
+                      </TableCell>
+                      <TableCell align="right">
+                        {prettyBalance(Number(activeSponsor.liquidationPrice))}
+                      </TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {Object.keys(activeSponsors)
-                      .filter((sponsor: string) => {
-                        return (
-                          activeSponsors[sponsor]?.collateral &&
-                          activeSponsors[sponsor]?.tokensOutstanding &&
-                          activeSponsors[sponsor]?.cRatio &&
-                          activeSponsors[sponsor]?.liquidationPrice
-                        );
-                      })
-                      .sort((sponsorA: string, sponsorB: string) => {
-                        const fieldValueA =
-                          activeSponsors[sponsorA][
-                            FIELD_TO_VALUE[sortedColumn]
-                          ];
-                        const fieldValueB =
-                          activeSponsors[sponsorB][
-                            FIELD_TO_VALUE[sortedColumn]
-                          ];
-                        return Number(fieldValueA) > Number(fieldValueB)
-                          ? (sortDirection ? -1 : 1) * 1
-                          : (sortDirection ? -1 : 1) * -1;
-                      })
-                      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-                      .map((sponsor: string) => {
-                        const activeSponsor = activeSponsors[sponsor];
-                        return (
-                          <TableRow key={sponsor}>
-                            <TableCell component="th" scope="row">
-                              <a
-                                href={getEtherscanUrl(sponsor)}
-                                target="_blank"
-                              >
-                                {prettyAddress(sponsor)}
-                              </a>
-                            </TableCell>
-                            <TableCell align="right">
-                              {prettyBalance(Number(activeSponsor.collateral))}
-                            </TableCell>
-                            <TableCell align="right">
-                              {prettyBalance(
-                                Number(activeSponsor.tokensOutstanding)
-                              )}
-                            </TableCell>
-                            <TableCell align="right">
-                              {prettyBalance(Number(activeSponsor.cRatio))}
-                            </TableCell>
-                            <TableCell align="right">
-                              {prettyBalance(
-                                Number(activeSponsor.liquidationPrice)
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                  </TableBody>
-                </Table>
-                <PageButtons>
-                  <div
-                    onClick={() => {
-                      setPage(page === 1 ? page : page - 1);
-                    }}
-                  >
-                    <Arrow faded={page === 1 ? true : false}>←</Arrow>
-                  </div>
-                  {"Page " + page + " of " + maxPage}
-                  <div
-                    onClick={() => {
-                      setPage(page === maxPage ? page : page + 1);
-                    }}
-                  >
-                    <Arrow faded={page === maxPage ? true : false}>→</Arrow>
-                  </div>
-                </PageButtons>
-              </TableContainer>
-            </Box>
-          </>
-        )}
+                  );
+                })}
+              </TableBody>
+            </Table>
+            <PageButtons>
+              <div
+                onClick={() => {
+                  setPage(page === 1 ? page : page - 1);
+                }}
+              >
+                <Arrow faded={page === 1 ? true : false}>←</Arrow>
+              </div>
+              {"Page " + page + " of " + maxPage}
+              <div
+                onClick={() => {
+                  setPage(page === maxPage ? page : page + 1);
+                }}
+              >
+                <Arrow faded={page === maxPage ? true : false}>→</Arrow>
+              </div>
+            </PageButtons>
+          </TableContainer>
+        </Box>
       </Box>
     );
   } else {
