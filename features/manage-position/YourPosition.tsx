@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Typography } from "@material-ui/core";
+import { Typography, Grid } from "@material-ui/core";
 import { utils } from "ethers";
 
 import Position from "../../containers/Position";
@@ -10,6 +10,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import EmpState from "../../containers/EmpState";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
 const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
@@ -73,9 +74,11 @@ const YourPosition = () => {
     const liquidationPrice = getLiquidationPrice(
       collateral,
       tokens,
-      collReqFromWei
+      collReqFromWei,
+      isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
     const priceIdUtf8 = hexToUtf8(priceIdentifier);
+    const prettyLatestPrice = Number(latestPrice).toFixed(6);
 
     return renderComponent(
       pricedCR,
@@ -86,7 +89,7 @@ const YourPosition = () => {
       collSymbol,
       tokens.toFixed(4),
       tokenSymbol,
-      Number(latestPrice).toFixed(6),
+      prettyLatestPrice,
       priceIdUtf8,
       withdrawAmt.toFixed(4),
       pendingWithdraw,
@@ -115,49 +118,64 @@ const YourPosition = () => {
   ) {
     return (
       <Container>
-        <Typography variant="h5">Your Position</Typography>
-        <Status>
-          <Label>Collateral supplied: </Label>
-          {`${_collateral} ${_collSymbol}`}
-        </Status>
-        <Status>
-          <Label>Tokens outstanding: </Label>
-          {`${_tokens} ${_tokenSymbol}`}
-        </Status>
-        <Status>
-          <Label>
-            Estimated identifier price (
-            <Link href={pricefeedUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase Pro
-            </Link>
-            ):{" "}
-          </Label>
-          {_latestPrice}
-        </Status>
-        <Status>
-          <Label>(CR) Collateralization ratio:</Label>
-          {` ${pricedCR} (${_collSymbol} / ${_tokenSymbol})`}
-        </Status>
-        <Status>
-          <Label>(GCR) Global collateralization ratio:</Label>
-          {` ${pricedGCR} (${_collSymbol} / ${_tokenSymbol})`}
-        </Status>
-        <Status>
-          <Label>Liquidation Requirement:</Label>
-          {` ${collReqFromWei}`}
-        </Status>
-        <Status>
-          <Label>Liquidation Price:</Label>
-          {` ${liquidationPrice} (${priceIdUtf8})`}
-        </Status>
-        <Status>
-          <Label>Collateral pending/available to withdraw:</Label>
-          {` ${_withdrawAmt} ${_collSymbol}`}
-        </Status>
-        <Status>
-          <Label>Pending withdrawal request:</Label>
-          {` ${_pendingWithdraw}`}
-        </Status>
+        <Grid container spacing={4}>
+          <Grid item md={6} xs={12}>
+            <Typography variant="h5">Your Position</Typography>
+            <Status>
+              <Label>Collateral supplied: </Label>
+              {`${_collateral} ${_collSymbol}`}
+            </Status>
+            <Status>
+              <Label>Tokens outstanding: </Label>
+              {`${_tokens} ${_tokenSymbol}`}
+            </Status>
+            <Status>
+              <Label>Collateral ratio (CR): </Label>
+              {`${pricedCR}`}
+            </Status>
+            <Status>
+              <Label>Liquidation price: </Label>
+              {`${liquidationPrice} (${priceIdUtf8})`}
+            </Status>
+
+            <Status>
+              <Label>Pending withdrawal request: </Label>
+              {`${_pendingWithdraw}`}
+            </Status>
+            {_pendingWithdraw == "available" && (
+              <Status>
+                <Label>Collateral available to withdraw: </Label>
+                {`${_withdrawAmt}`}
+              </Status>
+            )}
+          </Grid>
+          <Grid item md={6} xs={12}>
+            <Typography variant="h5">Contract Info</Typography>
+            <Status>
+              <Label>
+                Identifier price(
+                <Link
+                  href={pricefeedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Coinbase
+                </Link>
+                ):{" "}
+              </Label>
+              {_latestPrice}
+            </Status>
+
+            <Status>
+              <Label>Global collateral ratio (GCR): </Label>
+              {`${pricedGCR}`}
+            </Status>
+            <Status>
+              <Label>Collateral requirement: </Label>
+              {`${collReqFromWei}`}
+            </Status>
+          </Grid>
+        </Grid>
       </Container>
     );
   }

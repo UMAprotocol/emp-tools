@@ -22,6 +22,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
 const fromWei = utils.formatUnits;
 
@@ -58,6 +59,7 @@ const AllPositions = () => {
       fromWei(collateralRequirement, collDecimals)
     );
     const priceIdUtf8 = utils.parseBytes32String(priceId);
+    const prettyLatestPrice = Number(latestPrice).toFixed(6);
 
     const getCollateralRatio = (collateral: number, tokens: number) => {
       if (tokens <= 0 || latestPrice <= 0) return 0;
@@ -78,7 +80,7 @@ const AllPositions = () => {
       <Box>
         <Box>
           <Typography>
-            {`Estimated price of ${latestPrice} for ${priceIdUtf8} sourced from: `}
+            {`Estimated price of ${prettyLatestPrice} for ${priceIdUtf8} sourced from: `}
             <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
               Coinbase Pro.
             </Link>
@@ -141,7 +143,8 @@ const AllPositions = () => {
                               getLiquidationPrice(
                                 Number(activeSponsor.collateral),
                                 Number(activeSponsor.tokensOutstanding),
-                                collReqFromWei
+                                collReqFromWei,
+                                isPricefeedInvertedFromTokenSymbol(tokenSymbol)
                               )
                             )}
                           </TableCell>
