@@ -6,8 +6,10 @@ const fromWei = utils.formatUnits;
 import EmpContract from "./EmpContract";
 import EmpState from "./EmpState";
 import Collateral from "./Collateral";
+import Token from "./Token";
 import PriceFeed from "./PriceFeed";
 import { getLiquidationPrice } from "../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../utils/getOffchainPrice";
 
 import { useQuery } from "@apollo/client";
 import { ACTIVE_POSITIONS } from "../apollo/uma/queries";
@@ -39,6 +41,7 @@ const useEmpSponsors = () => {
   const { collateralRequirement } = empState;
   const { latestPrice } = PriceFeed.useContainer();
   const { decimals: collDecs } = Collateral.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   // Because apollo caches results of queries, we will poll/refresh this query periodically.
   // We set the poll interval to a very slow 5 seconds for now since the position states
@@ -70,7 +73,8 @@ const useEmpSponsors = () => {
       emp !== null &&
       latestPrice !== null &&
       collateralRequirement !== null &&
-      collDecs !== null
+      collDecs !== null &&
+      tokenSymbol !== null
     ) {
       if (error) {
         console.error(`Apollo client failed to fetch graph data:`, error);
@@ -99,7 +103,8 @@ const useEmpSponsors = () => {
             const liquidationPrice = getLiquidationPrice(
               Number(position.collateral),
               Number(position.tokensOutstanding),
-              collReqFromWei
+              collReqFromWei,
+              isPricefeedInvertedFromTokenSymbol(tokenSymbol)
             );
 
             newPositions[sponsor] = {

@@ -13,12 +13,14 @@ import { utils } from "ethers";
 import EmpState from "../../containers/EmpState";
 import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
+import Token from "../../containers/Token";
 import Position from "../../containers/Position";
 import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../utils/getDocLinks";
 
 const Important = styled(Typography)`
@@ -48,6 +50,7 @@ const Deposit = () => {
   } = empState;
 
   const { contract: emp } = EmpContract.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
   const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const {
     tokens: posTokens,
@@ -81,6 +84,8 @@ const Deposit = () => {
     currentTime !== null &&
     latestPrice !== null &&
     priceIdentifier !== null &&
+    collSymbol !== null &&
+    tokenSymbol !== null &&
     posColl !== 0 // If position has no collateral, then don't render withdraw component.
   ) {
     const collateralToWithdraw = Number(collateral) || 0;
@@ -98,7 +103,8 @@ const Deposit = () => {
     const resultantLiquidationPrice = getLiquidationPrice(
       resultantCollateral,
       posTokens,
-      collReqFromWei
+      collReqFromWei,
+      isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
     const liquidationPriceDangerouslyFarBelowCurrentPrice =
       parseFloat(resultantLiquidationPrice) <

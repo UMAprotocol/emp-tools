@@ -118,6 +118,7 @@ const AllPositions = () => {
     Object.keys(activeSponsors).length > 0
   ) {
     const priceIdUtf8 = utils.parseBytes32String(priceId);
+    const prettyLatestPrice = Number(latestPrice).toFixed(6);
 
     const prettyBalance = (x: number) => {
       const x_string = x.toFixed(4);
@@ -155,7 +156,7 @@ const AllPositions = () => {
       <Box>
         <Box>
           <Typography>
-            {`Estimated price of ${latestPrice} for ${priceIdUtf8} sourced from: `}
+            {`Estimated price of ${prettyLatestPrice} for ${priceIdUtf8} sourced from: `}
             <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
               Coinbase Pro.
             </Link>
