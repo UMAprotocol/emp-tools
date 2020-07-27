@@ -108,20 +108,20 @@ const GeneralInfo = () => {
           )}
         </Typography>
         <Status>
-          <Label>Expiry Date: </Label>
+          <Label>Expiry date: </Label>
           <Tooltip title={`Timestamp: ${expiryTimestamp}`} interactive>
             <span>{expiryDate} UTC</span>
           </Tooltip>
         </Status>
 
         <Status>
-          <Label>Price Identifier: </Label>
+          <Label>Price identifier: </Label>
           {priceIdUtf8}
         </Status>
 
         <Status>
           <Label>
-            Identifier Price: (
+            Identifier price: (
             <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
               Coinbase
             </Link>
@@ -131,17 +131,17 @@ const GeneralInfo = () => {
         </Status>
 
         <Status>
-          <Label>Collateral Requirement: </Label>
+          <Label>Collateral requirement: </Label>
           {collReqPct}
         </Status>
 
         <Status>
-          <Label>Minimum Sponsor Tokens: </Label>
+          <Label>Minimum sponsor tokens: </Label>
           {minSponsorTokensSymbol}
         </Status>
 
         <Status>
-          <Label>Global Collateral ratio: </Label>
+          <Label>Global collateral ratio: </Label>
           <Tooltip
             title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
           >
@@ -151,7 +151,7 @@ const GeneralInfo = () => {
 
         <Status>
           <Label>
-            Withdraw Liveness (mins) (
+            Withdraw liveness (mins) (
             <Link
               href={DOCS_MAP.SLOW_WITHDRAW}
               target="_blank"

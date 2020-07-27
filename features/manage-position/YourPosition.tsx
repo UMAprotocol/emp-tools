@@ -141,7 +141,7 @@ const YourPosition = () => {
             </Status>
             {_pendingWithdraw == "available" && (
               <Status>
-                <Label>Collateral available to Withdraw:</Label>
+                <Label>Collateral available to withdraw:</Label>
                 {` ${_withdrawAmt}`}
               </Status>
             )}
@@ -168,7 +168,7 @@ const YourPosition = () => {
               {` ${pricedGCR}`}
             </Status>
             <Status>
-              <Label>Liquidation Requirement:</Label>
+              <Label>Collateral requirement:</Label>
               {` ${collReqFromWei}`}
             </Status>
           </Grid>
