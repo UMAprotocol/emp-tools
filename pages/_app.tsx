@@ -32,21 +32,21 @@ const WithStateContainerProviders = ({ children }: IProps) => (
         <EmpContract.Provider>
           <WethContract.Provider>
             <EmpState.Provider>
-              <EmpSponsors.Provider>
+              <Token.Provider>
                 <Collateral.Provider>
-                  <Token.Provider>
-                    <Totals.Provider>
-                      <PriceFeed.Provider>
+                  <PriceFeed.Provider>
+                    <EmpSponsors.Provider>
+                      <Totals.Provider>
                         <Etherscan.Provider>
                           <Position.Provider>
                             <Balancer.Provider>{children}</Balancer.Provider>
                           </Position.Provider>
                         </Etherscan.Provider>
-                      </PriceFeed.Provider>
-                    </Totals.Provider>
-                  </Token.Provider>
+                      </Totals.Provider>
+                    </EmpSponsors.Provider>
+                  </PriceFeed.Provider>
                 </Collateral.Provider>
-              </EmpSponsors.Provider>
+              </Token.Provider>
             </EmpState.Provider>
           </WethContract.Provider>
         </EmpContract.Provider>

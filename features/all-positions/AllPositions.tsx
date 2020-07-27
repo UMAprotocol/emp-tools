@@ -12,19 +12,14 @@ import {
 } from "@material-ui/core";
 import styled from "styled-components";
 import { utils } from "ethers";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
-import EmpContract from "../../containers/EmpContract";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
-
-import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
-
-const fromWei = utils.formatUnits;
 
 const Link = styled.a`
   color: white;
@@ -40,57 +35,86 @@ const ClickableText = styled.span`
   user-select: none;
 `;
 
+const PageButtons = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+`;
+
+type FadedDiv = {
+  faded: boolean;
+};
+
+const Arrow = styled.div<FadedDiv>`
+  color: ${({ theme }) => theme.primary1};
+  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  padding: 0 20px;
+  user-select: none;
+  :hover {
+    cursor: pointer;
+  }
+`;
+
 enum SORT_FIELD {
   COLLATERAL,
   TOKENS,
-  // CRATIO,
-  // LIQ_PRICE
+  CRATIO,
+  LIQ_PRICE,
 }
 
-const FIELD_TO_VALUE = {
+const FIELD_TO_VALUE: { [sortField: number]: string } = {
   [SORT_FIELD.COLLATERAL]: "collateral",
   [SORT_FIELD.TOKENS]: "tokensOutstanding",
-  // [SORT_FIELD.CRATIO]: 'oneDayTxns',
-  // [SORT_FIELD.LIQ_PRICE]: 'oneWeekVolumeUSD'
+  [SORT_FIELD.CRATIO]: "cRatio",
+  [SORT_FIELD.LIQ_PRICE]: "liquidationPrice",
 };
+
+const ITEMS_PER_PAGE = 10;
 
 const AllPositions = () => {
   const { empState } = EmpState.useContainer();
   const { priceIdentifier: priceId } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
-  const {
-    symbol: collSymbol,
-    decimals: collDecimals,
-  } = Collateral.useContainer();
+  const { symbol: collSymbol } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
-  const { contract: emp } = EmpContract.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
-  const { collateralRequirement } = empState;
 
+  // Pagination
+  const [page, setPage] = useState<number>(1);
+  const [maxPage, setMaxPage] = useState<number>(1);
+
+  // Sorting
   const [sortDirection, setSortDirection] = useState<boolean>(true);
   const [sortedColumn, setSortedColumn] = useState<number>(SORT_FIELD.TOKENS);
 
+  // Set max page depending on # of sponsors
+  useEffect(() => {
+    setMaxPage(1);
+    setPage(1);
+
+    if (activeSponsors) {
+      let extraPages = 1;
+      if (Object.keys(activeSponsors).length % ITEMS_PER_PAGE === 0) {
+        extraPages = 0;
+      }
+      setMaxPage(
+        Math.floor(Object.keys(activeSponsors).length / ITEMS_PER_PAGE) +
+          extraPages
+      );
+    }
+  }, [activeSponsors]);
+
   if (
-    collateralRequirement !== null &&
-    collDecimals !== null &&
     tokenSymbol !== null &&
     collSymbol !== null &&
-    emp !== null &&
     latestPrice !== null &&
     priceId !== null &&
     sourceUrl !== undefined
   ) {
-    const collReqFromWei = parseFloat(
-      fromWei(collateralRequirement, collDecimals)
-    );
     const priceIdUtf8 = utils.parseBytes32String(priceId);
-
-    const getCollateralRatio = (collateral: number, tokens: number) => {
-      if (tokens <= 0 || latestPrice <= 0) return 0;
-      const tokensScaled = tokens * latestPrice;
-      return collateral / tokensScaled;
-    };
 
     const prettyBalance = (x: number) => {
       const x_string = x.toFixed(4);
@@ -130,7 +154,12 @@ const AllPositions = () => {
                         }}
                       >
                         Collateral
-                        <br />({collSymbol})
+                        <br />({collSymbol}){" "}
+                        {sortedColumn === SORT_FIELD.COLLATERAL
+                          ? !sortDirection
+                            ? "↑"
+                            : "↓"
+                          : ""}
                       </ClickableText>
                     </TableCell>
                     <TableCell align="right">
@@ -145,15 +174,56 @@ const AllPositions = () => {
                         }}
                       >
                         Synthetics
-                        <br />({tokenSymbol})
+                        <br />({tokenSymbol}){" "}
+                        {sortedColumn === SORT_FIELD.TOKENS
+                          ? !sortDirection
+                            ? "↑"
+                            : "↓"
+                          : ""}
                       </ClickableText>
                     </TableCell>
-                    <TableCell align="right">Collateral Ratio</TableCell>
+                    <TableCell align="right">
+                      <ClickableText
+                        onClick={(e) => {
+                          setSortedColumn(SORT_FIELD.CRATIO);
+                          setSortDirection(
+                            sortedColumn !== SORT_FIELD.CRATIO
+                              ? true
+                              : !sortDirection
+                          );
+                        }}
+                      >
+                        Collateral Ratio{" "}
+                        {sortedColumn === SORT_FIELD.CRATIO
+                          ? !sortDirection
+                            ? "↑"
+                            : "↓"
+                          : ""}
+                      </ClickableText>
+                    </TableCell>
                     <Tooltip
                       title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
                       placement="top"
                     >
-                      <TableCell align="right">Liquidation Price</TableCell>
+                      <TableCell align="right">
+                        <ClickableText
+                          onClick={(e) => {
+                            setSortedColumn(SORT_FIELD.LIQ_PRICE);
+                            setSortDirection(
+                              sortedColumn !== SORT_FIELD.LIQ_PRICE
+                                ? true
+                                : !sortDirection
+                            );
+                          }}
+                        >
+                          Liquidation Price{" "}
+                          {sortedColumn === SORT_FIELD.LIQ_PRICE
+                            ? !sortDirection
+                              ? "↑"
+                              : "↓"
+                            : ""}
+                        </ClickableText>
+                      </TableCell>
                     </Tooltip>
                   </TableRow>
                 </TableHead>
@@ -162,18 +232,21 @@ const AllPositions = () => {
                     .filter((sponsor: string) => {
                       return (
                         activeSponsors[sponsor]?.collateral &&
-                        activeSponsors[sponsor]?.tokensOutstanding
+                        activeSponsors[sponsor]?.tokensOutstanding &&
+                        activeSponsors[sponsor]?.cRatio &&
+                        activeSponsors[sponsor]?.liquidationPrice
                       );
                     })
                     .sort((sponsorA: string, sponsorB: string) => {
                       const fieldValueA =
-                        activeSponsors[sponsorA]["collateral"];
+                        activeSponsors[sponsorA][FIELD_TO_VALUE[sortedColumn]];
                       const fieldValueB =
-                        activeSponsors[sponsorB]["collateral"];
+                        activeSponsors[sponsorB][FIELD_TO_VALUE[sortedColumn]];
                       return Number(fieldValueA) > Number(fieldValueB)
                         ? (sortDirection ? -1 : 1) * 1
                         : (sortDirection ? -1 : 1) * -1;
                     })
+                    .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
                     .map((sponsor: string) => {
                       const activeSponsor = activeSponsors[sponsor];
                       return (
@@ -192,20 +265,11 @@ const AllPositions = () => {
                             )}
                           </TableCell>
                           <TableCell align="right">
-                            {prettyBalance(
-                              getCollateralRatio(
-                                Number(activeSponsor.collateral),
-                                Number(activeSponsor.tokensOutstanding)
-                              )
-                            )}
+                            {prettyBalance(Number(activeSponsor.cRatio))}
                           </TableCell>
                           <TableCell align="right">
                             {prettyBalance(
-                              getLiquidationPrice(
-                                Number(activeSponsor.collateral),
-                                Number(activeSponsor.tokensOutstanding),
-                                collReqFromWei
-                              )
+                              Number(activeSponsor.liquidationPrice)
                             )}
                           </TableCell>
                         </TableRow>
@@ -213,6 +277,23 @@ const AllPositions = () => {
                     })}
                 </TableBody>
               </Table>
+              <PageButtons>
+                <div
+                  onClick={(e) => {
+                    setPage(page === 1 ? page : page - 1);
+                  }}
+                >
+                  <Arrow faded={page === 1 ? true : false}>←</Arrow>
+                </div>
+                {"Page " + page + " of " + maxPage}
+                <div
+                  onClick={(e) => {
+                    setPage(page === maxPage ? page : page + 1);
+                  }}
+                >
+                  <Arrow faded={page === maxPage ? true : false}>→</Arrow>
+                </div>
+              </PageButtons>
             </TableContainer>
           )}
         </Box>
