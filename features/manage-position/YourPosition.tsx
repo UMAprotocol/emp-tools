@@ -127,7 +127,7 @@ const YourPosition = () => {
               {`${_tokens} ${_tokenSymbol}`}
             </Status>
             <Status>
-              <Label>Collateral ratio(CR):</Label>
+              <Label>Collateral ratio (CR):</Label>
               {` ${pricedCR}`}
             </Status>
             <Status>
@@ -164,7 +164,7 @@ const YourPosition = () => {
             </Status>
 
             <Status>
-              <Label>Global collateral ratio(GCR):</Label>
+              <Label>Global collateral ratio (GCR):</Label>
               {` ${pricedGCR}`}
             </Status>
             <Status>

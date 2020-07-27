@@ -139,7 +139,7 @@ const GeneralInfo = () => {
         </Status>
 
         <Status>
-          <Label>GCR (collateral / tokens): </Label>
+          <Label>Global Collateral ratio: </Label>
           <Tooltip
             title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
           >

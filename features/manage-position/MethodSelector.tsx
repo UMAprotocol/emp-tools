@@ -59,19 +59,19 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
           <MenuItem value={"deposit"}>
             <ListItemText
               primary="Deposit"
-              secondary="Deposit additional collateral."
+              secondary="Top up your position's collateral."
             />
           </MenuItem>
           <MenuItem value={"withdraw"}>
             <ListItemText
               primary="Withdraw"
-              secondary="Withdraw excess collateral."
+              secondary="Remove excess collateral."
             />
           </MenuItem>
           <MenuItem value={"redeem"}>
             <ListItemText
               primary="Redeem"
-              secondary="Redeem synthetic tokens."
+              secondary="Redeem synthetics for collateral."
             />
           </MenuItem>
         </Select>

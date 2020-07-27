@@ -326,7 +326,7 @@ const Deposit = () => {
             />
           </Grid>
           <Grid item xs={6} md={4}>
-            <Box py={1}>
+            <Box>
               <Button
                 fullWidth
                 variant="contained"

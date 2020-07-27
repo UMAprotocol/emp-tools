@@ -217,7 +217,7 @@ const Create = () => {
                 error={balanceBelowCollateralToDeposit}
                 helperText={
                   balanceBelowCollateralToDeposit &&
-                  `Your ${collSymbol} balance is too low`
+                  `${collSymbol} balance is too low`
                 }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setCollateral(e.target.value)
@@ -235,7 +235,7 @@ const Create = () => {
                 error={resultantTokensBelowMin}
                 helperText={
                   resultantTokensBelowMin &&
-                  `You must maintain at least ${minSponsorTokensFromWei} ${tokenSymbol} in your position`
+                  `Below minimum of ${minSponsorTokensFromWei}`
                 }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setTokens(e.target.value)
