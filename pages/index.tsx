@@ -8,7 +8,7 @@ import ManagePosition from "../features/manage-position/ManagePosition";
 import EmpSelector from "../features/emp-selector/EmpSelector";
 import AllPositions from "../features/all-positions/AllPositions";
 import Weth from "../features/weth/Weth";
-import YieldCalculator from "../features/yield-calculator/YieldCalculator";
+import Yield from "../features/yield/Yield";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -37,7 +37,7 @@ export default function Index() {
           <Tab label="Manage Position" disableRipple />
           <Tab label="All Positions" disableRipple />
           <Tab label="Wrap/Unwrap WETH" disableRipple />
-          <Tab label="Yield Calculator" disableRipple />
+          <Tab label="yUSD Yield" disableRipple />
         </StyledTabs>
         {tabIndex === 0 && (
           <>
@@ -83,7 +83,7 @@ export default function Index() {
 
         {tabIndex === 3 && <Weth />}
 
-        {tabIndex === 4 && <YieldCalculator />}
+        {tabIndex === 4 && <Yield />}
       </Box>
       <Box py={2} textAlign="center">
         <a
