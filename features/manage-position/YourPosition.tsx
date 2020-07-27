@@ -128,21 +128,21 @@ const YourPosition = () => {
             </Status>
             <Status>
               <Label>Collateral ratio (CR): </Label>
-              {` ${pricedCR}`}
+              {`${pricedCR}`}
             </Status>
             <Status>
               <Label>Liquidation price: </Label>
-              {` ${liquidationPrice} (${priceIdUtf8})`}
+              {`${liquidationPrice} (${priceIdUtf8})`}
             </Status>
 
             <Status>
               <Label>Pending withdrawal request: </Label>
-              {` ${_pendingWithdraw}`}
+              {`${_pendingWithdraw}`}
             </Status>
             {_pendingWithdraw == "available" && (
               <Status>
                 <Label>Collateral available to withdraw: </Label>
-                {` ${_withdrawAmt}`}
+                {`${_withdrawAmt}`}
               </Status>
             )}
           </Grid>
@@ -165,11 +165,11 @@ const YourPosition = () => {
 
             <Status>
               <Label>Global collateral ratio (GCR): </Label>
-              {` ${pricedGCR}`}
+              {`${pricedGCR}`}
             </Status>
             <Status>
               <Label>Collateral requirement: </Label>
-              {` ${collReqFromWei}`}
+              {`${collReqFromWei}`}
             </Status>
           </Grid>
         </Grid>

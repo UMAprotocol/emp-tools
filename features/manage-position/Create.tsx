@@ -128,7 +128,7 @@ const Create = () => {
     const needAllowance =
       collAllowance !== "Infinity" && collAllowance < collateralToDeposit;
     const resultantTokensBelowMin =
-      resultantTokens < minSponsorTokensFromWei && resultantTokens != 0;
+      resultantTokens < minSponsorTokensFromWei && resultantTokens !== 0;
     const resultantCRBelowRequirement =
       parseFloat(pricedResultantCR) >= 0 &&
       parseFloat(pricedResultantCR) < collReqFromWei;

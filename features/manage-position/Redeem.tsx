@@ -200,7 +200,6 @@ const Redeem = () => {
                   fullWidth
                   variant="contained"
                   disabled={
-                    needAllowance ||
                     balanceBelowTokensToRedeem ||
                     invalidRedeemAmount ||
                     tokensToRedeem <= 0
