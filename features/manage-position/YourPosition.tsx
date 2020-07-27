@@ -78,6 +78,7 @@ const YourPosition = () => {
       isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
     const priceIdUtf8 = hexToUtf8(priceIdentifier);
+    const prettyLatestPrice = latestPrice.toFixed(6);
 
     return renderComponent(
       pricedCR,
@@ -88,7 +89,7 @@ const YourPosition = () => {
       collSymbol,
       tokens.toFixed(4),
       tokenSymbol,
-      Number(latestPrice).toFixed(6),
+      prettyLatestPrice,
       priceIdUtf8,
       withdrawAmt.toFixed(4),
       pendingWithdraw,
