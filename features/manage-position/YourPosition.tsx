@@ -78,7 +78,7 @@ const YourPosition = () => {
       isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
     const priceIdUtf8 = hexToUtf8(priceIdentifier);
-    const prettyLatestPrice = latestPrice.toFixed(6);
+    const prettyLatestPrice = Number(latestPrice).toFixed(6);
 
     return renderComponent(
       pricedCR,
