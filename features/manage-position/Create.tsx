@@ -207,7 +207,7 @@ const Create = () => {
           </Box>
 
           <Grid container spacing={3}>
-            <Grid item md={4} xs={12} sm={6}>
+            <Grid item md={4} sm={6} xs={12}>
               <TextField
                 fullWidth
                 type="number"
@@ -225,7 +225,7 @@ const Create = () => {
                 }
               />
             </Grid>
-            <Grid item md={4} xs={12} sm={6}>
+            <Grid item md={4} sm={6} xs={12}>
               <TextField
                 fullWidth
                 type="number"
@@ -243,7 +243,7 @@ const Create = () => {
                 }
               />
             </Grid>
-            <Grid item md={4} xs={12} sm={6}>
+            <Grid item md={4} sm={6} xs={12}>
               <Box py={0}>
                 {needAllowance && (
                   <Button

@@ -63,7 +63,7 @@ const BalancerData = () => {
           </Link>
         </Typography>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid item md={6} sm={6} xs={12}>
             <Status>
               <Label>Pool liquidity: </Label>
               {poolLiquidity}
@@ -90,7 +90,7 @@ const BalancerData = () => {
               {poolSwapFee}
             </Status>
           </Grid>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid item md={6} sm={6} xs={12}>
             <Status>
               <Label>Current price: </Label>
               {usdPrice}

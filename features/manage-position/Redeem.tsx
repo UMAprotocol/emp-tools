@@ -156,7 +156,7 @@ const Redeem = () => {
         </Box>
 
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item md={4} sm={6} xs={12}>
             <TextField
               fullWidth
               variant="outlined"
@@ -183,7 +183,7 @@ const Redeem = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item md={4} sm={6} xs={12}>
             <Box>
               {needAllowance && (
                 <Button
