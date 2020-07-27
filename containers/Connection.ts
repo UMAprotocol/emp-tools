@@ -107,10 +107,6 @@ function useConnection() {
         networkId: network?.chainId || 1,
       })
     );
-
-    if (window.ethereum === undefined) {
-      throw Error("MetaMask not found, please visit https://metamask.io/");
-    }
   };
 
   const connect = async () => {
