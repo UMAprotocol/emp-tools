@@ -12,6 +12,7 @@ import {
 } from "@material-ui/core";
 import styled from "styled-components";
 import { utils } from "ethers";
+import { useState } from "react";
 
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
@@ -30,6 +31,29 @@ const Link = styled.a`
   font-size: 18px;
 `;
 
+const ClickableText = styled.span`
+  &:hover {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+  text-align: end;
+  user-select: none;
+`;
+
+enum SORT_FIELD {
+  COLLATERAL,
+  TOKENS,
+  // CRATIO,
+  // LIQ_PRICE
+}
+
+const FIELD_TO_VALUE = {
+  [SORT_FIELD.COLLATERAL]: "collateral",
+  [SORT_FIELD.TOKENS]: "tokensOutstanding",
+  // [SORT_FIELD.CRATIO]: 'oneDayTxns',
+  // [SORT_FIELD.LIQ_PRICE]: 'oneWeekVolumeUSD'
+};
+
 const AllPositions = () => {
   const { empState } = EmpState.useContainer();
   const { priceIdentifier: priceId } = empState;
@@ -43,6 +67,9 @@ const AllPositions = () => {
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { collateralRequirement } = empState;
+
+  const [sortDirection, setSortDirection] = useState<boolean>(true);
+  const [sortedColumn, setSortedColumn] = useState<number>(SORT_FIELD.TOKENS);
 
   if (
     collateralRequirement !== null &&
@@ -92,12 +119,34 @@ const AllPositions = () => {
                   <TableRow>
                     <TableCell>Sponsor</TableCell>
                     <TableCell align="right">
-                      Collateral
-                      <br />({collSymbol})
+                      <ClickableText
+                        onClick={(e) => {
+                          setSortedColumn(SORT_FIELD.COLLATERAL);
+                          setSortDirection(
+                            sortedColumn !== SORT_FIELD.COLLATERAL
+                              ? true
+                              : !sortDirection
+                          );
+                        }}
+                      >
+                        Collateral
+                        <br />({collSymbol})
+                      </ClickableText>
                     </TableCell>
                     <TableCell align="right">
-                      Synthetics
-                      <br />({tokenSymbol})
+                      <ClickableText
+                        onClick={(e) => {
+                          setSortedColumn(SORT_FIELD.TOKENS);
+                          setSortDirection(
+                            sortedColumn !== SORT_FIELD.TOKENS
+                              ? true
+                              : !sortDirection
+                          );
+                        }}
+                      >
+                        Synthetics
+                        <br />({tokenSymbol})
+                      </ClickableText>
                     </TableCell>
                     <TableCell align="right">Collateral Ratio</TableCell>
                     <Tooltip
@@ -109,11 +158,25 @@ const AllPositions = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {Object.keys(activeSponsors).map((sponsor: string) => {
-                    const activeSponsor = activeSponsors[sponsor];
-                    return (
-                      activeSponsor?.collateral &&
-                      activeSponsor?.tokensOutstanding && (
+                  {Object.keys(activeSponsors)
+                    .filter((sponsor: string) => {
+                      return (
+                        activeSponsors[sponsor]?.collateral &&
+                        activeSponsors[sponsor]?.tokensOutstanding
+                      );
+                    })
+                    .sort((sponsorA: string, sponsorB: string) => {
+                      const fieldValueA =
+                        activeSponsors[sponsorA]["collateral"];
+                      const fieldValueB =
+                        activeSponsors[sponsorB]["collateral"];
+                      return Number(fieldValueA) > Number(fieldValueB)
+                        ? (sortDirection ? -1 : 1) * 1
+                        : (sortDirection ? -1 : 1) * -1;
+                    })
+                    .map((sponsor: string) => {
+                      const activeSponsor = activeSponsors[sponsor];
+                      return (
                         <TableRow key={sponsor}>
                           <TableCell component="th" scope="row">
                             <a href={getEtherscanUrl(sponsor)} target="_blank">
@@ -146,9 +209,8 @@ const AllPositions = () => {
                             )}
                           </TableCell>
                         </TableRow>
-                      )
-                    );
-                  })}
+                      );
+                    })}
                 </TableBody>
               </Table>
             </TableContainer>
