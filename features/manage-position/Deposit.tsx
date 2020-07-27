@@ -6,11 +6,13 @@ import { utils } from "ethers";
 import EmpContract from "../../containers/EmpContract";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
+import Token from "../../containers/Token";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
 const Link = styled.a`
   color: white;
@@ -26,6 +28,7 @@ const {
 const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
   const {
     symbol: collSymbol,
     balance: collBalance,
@@ -58,6 +61,8 @@ const Deposit = () => {
     collReq !== null &&
     collDec !== null &&
     priceIdentifier !== null &&
+    tokenSymbol !== null &&
+    collSymbol !== null &&
     posColl !== 0 // If position has no collateral, then don't render deposit component.
   ) {
     const collateralToDeposit = Number(collateral) || 0;
@@ -71,7 +76,8 @@ const Deposit = () => {
     const resultantLiquidationPrice = getLiquidationPrice(
       resultantCollateral,
       posTokens,
-      collReqFromWei
+      collReqFromWei,
+      isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
 
     // Error conditions for calling deposit:

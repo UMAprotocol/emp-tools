@@ -20,6 +20,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../utils/getDocLinks";
 
 const Important = styled(Typography)`
@@ -115,7 +116,8 @@ const Create = () => {
     const resultantLiquidationPrice = getLiquidationPrice(
       resultantCollateral,
       resultantTokens,
-      collReqFromWei
+      collReqFromWei,
+      isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
     const liquidationPriceDangerouslyFarBelowCurrentPrice =
       parseFloat(resultantLiquidationPrice) <

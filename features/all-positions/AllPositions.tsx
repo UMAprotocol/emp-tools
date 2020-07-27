@@ -22,6 +22,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
 const fromWei = utils.formatUnits;
 
@@ -141,7 +142,8 @@ const AllPositions = () => {
                               getLiquidationPrice(
                                 Number(activeSponsor.collateral),
                                 Number(activeSponsor.tokensOutstanding),
-                                collReqFromWei
+                                collReqFromWei,
+                                isPricefeedInvertedFromTokenSymbol(tokenSymbol)
                               )
                             )}
                           </TableCell>

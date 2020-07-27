@@ -10,6 +10,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import EmpState from "../../containers/EmpState";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
 const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
@@ -73,7 +74,8 @@ const YourPosition = () => {
     const liquidationPrice = getLiquidationPrice(
       collateral,
       tokens,
-      collReqFromWei
+      collReqFromWei,
+      isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
     const priceIdUtf8 = hexToUtf8(priceIdentifier);
 
