@@ -195,19 +195,21 @@ const Redeem = () => {
                   Max Approve
                 </Button>
               )}
-              <Button
-                fullWidth
-                variant="contained"
-                disabled={
-                  needAllowance ||
-                  balanceBelowTokensToRedeem ||
-                  invalidRedeemAmount ||
-                  tokensToRedeem <= 0
-                }
-                onClick={redeemTokens}
-              >
-                {`Redeem ${tokensToRedeem} ${tokenSymbol}`}
-              </Button>
+              {!needAllowance && (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  disabled={
+                    needAllowance ||
+                    balanceBelowTokensToRedeem ||
+                    invalidRedeemAmount ||
+                    tokensToRedeem <= 0
+                  }
+                  onClick={redeemTokens}
+                >
+                  {`Redeem ${tokensToRedeem} ${tokenSymbol}`}
+                </Button>
+              )}
             </Box>
           </Grid>
         </Grid>

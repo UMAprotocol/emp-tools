@@ -246,29 +246,31 @@ const Create = () => {
               <Box py={0}>
                 {needAllowance && (
                   <Button
+                    fullWidth
                     variant="contained"
                     onClick={setMaxAllowance}
-                    style={{ marginRight: `12px` }}
                   >
                     Max Approve
                   </Button>
                 )}
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={mintTokens}
-                  disabled={
-                    needAllowance ||
-                    transactionCRBelowGCR ||
-                    balanceBelowCollateralToDeposit ||
-                    resultantCRBelowRequirement ||
-                    resultantTokensBelowMin ||
-                    collateralToDeposit <= 0 ||
-                    tokensToCreate <= 0
-                  }
-                >
-                  {`Create ${tokensToCreate} ${tokenSymbol} with ${collateralToDeposit} ${collSymbol}`}
-                </Button>
+                {!needAllowance && (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={mintTokens}
+                    disabled={
+                      needAllowance ||
+                      transactionCRBelowGCR ||
+                      balanceBelowCollateralToDeposit ||
+                      resultantCRBelowRequirement ||
+                      resultantTokensBelowMin ||
+                      collateralToDeposit <= 0 ||
+                      tokensToCreate <= 0
+                    }
+                  >
+                    {`Create ${tokensToCreate} ${tokenSymbol} with ${collateralToDeposit} ${collSymbol}`}
+                  </Button>
+                )}
               </Box>
             </Grid>
           </Grid>

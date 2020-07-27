@@ -156,18 +156,20 @@ const Deposit = () => {
                   Max Approve
                 </Button>
               )}
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={depositCollateral}
-                disabled={
-                  needAllowance ||
-                  balanceBelowCollateralToDeposit ||
-                  collateralToDeposit <= 0
-                }
-              >
-                {`Deposit ${collateralToDeposit} ${collSymbol} into your position`}
-              </Button>
+              {!needAllowance && (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={depositCollateral}
+                  disabled={
+                    needAllowance ||
+                    balanceBelowCollateralToDeposit ||
+                    collateralToDeposit <= 0
+                  }
+                >
+                  {`Deposit ${collateralToDeposit} ${collSymbol} into your position`}
+                </Button>
+              )}
             </Box>
           </Grid>
         </Grid>
