@@ -5,7 +5,7 @@ import { BigNumberish, utils } from "ethers";
 import EmpContract from "./EmpContract";
 
 import { useQuery } from "@apollo/client";
-import { ACTIVE_POSITIONS } from "../apollo/queries";
+import { ACTIVE_POSITIONS } from "../apollo/uma/queries";
 
 // Interfaces for dApp state storage.
 interface PositionState {
@@ -38,6 +38,7 @@ const useEmpSponsors = () => {
   // are not expected to change much.
   // Source: https://www.apollographql.com/docs/react/data/queries/#polling
   const { loading, error, data } = useQuery(ACTIVE_POSITIONS, {
+    context: { clientName: "UMA" },
     pollInterval: 5000,
   });
 
