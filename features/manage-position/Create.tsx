@@ -259,7 +259,6 @@ const Create = () => {
                     variant="contained"
                     onClick={mintTokens}
                     disabled={
-                      needAllowance ||
                       transactionCRBelowGCR ||
                       balanceBelowCollateralToDeposit ||
                       resultantCRBelowRequirement ||

@@ -162,9 +162,7 @@ const Deposit = () => {
                   variant="contained"
                   onClick={depositCollateral}
                   disabled={
-                    needAllowance ||
-                    balanceBelowCollateralToDeposit ||
-                    collateralToDeposit <= 0
+                    balanceBelowCollateralToDeposit || collateralToDeposit <= 0
                   }
                 >
                   {`Deposit ${collateralToDeposit} ${collSymbol} into your position`}
