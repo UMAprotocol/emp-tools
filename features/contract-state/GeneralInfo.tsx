@@ -55,7 +55,9 @@ const GeneralInfo = () => {
     tokenSymbol !== null
   ) {
     const expiryTimestamp = expiry.toString();
-    const expiryDate = new Date(expiry.toNumber() * 1000).toLocaleDateString();
+    const expiryDate = new Date(
+      expiry.toNumber() * 1000
+    ).toLocaleString("en-GB", { timeZone: "UTC" });
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const pricedGcr = (gcr / latestPrice).toFixed(4);
     const withdrawalLivenessInMinutes = (
@@ -108,7 +110,7 @@ const GeneralInfo = () => {
         <Status>
           <Label>Expiry Date: </Label>
           <Tooltip title={`Timestamp: ${expiryTimestamp}`} interactive>
-            <span>{expiryDate}</span>
+            <span>{expiryDate} UTC</span>
           </Tooltip>
         </Status>
 
