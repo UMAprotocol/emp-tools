@@ -25,12 +25,12 @@ function useConnection() {
   const [block$, setBlock$] = useState<Observable<Block> | null>(null);
 
   const attemptConnection = async () => {
-    const rpcUrl =
-      "https://mainnet.infura.io/v3/d5e29c9b9a9d4116a7348113f57770a8";
-
     const apiKey = process.env.REACT_APP_ONBOARD_API_KEY
       ? process.env.REACT_APP_ONBOARD_API_KEY
       : "12153f55-f29e-4f11-aa07-90f10da5d778";
+    const infuraId =
+      process.env.REACT_APP_INFURA_ID || "d5e29c9b9a9d4116a7348113f57770a8";
+    const infuraRpc = `https://${network?.name}.infura.io/v3/${infuraId}`;
     const onboard = Onboard({
       dappId: apiKey,
       hideBranding: true,
@@ -58,46 +58,44 @@ function useConnection() {
       },
       walletSelect: {
         wallets: [
-          { walletName: "metamask" },
+          { walletName: "metamask", preferred: true },
           {
-            walletName: "trezor",
-            appUrl: "https://reactdemo.blocknative.com",
-            email: "aaron@blocknative.com",
-            rpcUrl,
+            walletName: "imToken",
+            rpcUrl:
+              !!network && network.chainId === 1
+                ? "https://mainnet-eth.token.im"
+                : "https://eth-testnet.tokenlon.im",
+            preferred: true,
           },
+          { walletName: "coinbase", preferred: true },
           {
-            walletName: "ledger",
-            rpcUrl,
+            walletName: "portis",
+            apiKey: process.env.REACT_APP_PORTIS_API_KEY,
           },
+          { walletName: "trust", rpcUrl: infuraRpc },
           { walletName: "dapper" },
-          { walletName: "coinbase" },
-          { walletName: "status" },
-          // { walletName: "walletLink", rpcUrl },
-          // {
-          //   walletName: "portis",
-          //   apiKey: "b2b7586f-2b1e-4c30-a7fb-c2d1533b153b",
-          // },
-          // { walletName: "fortmatic", apiKey: "pk_test_886ADCAB855632AA" },
-          { walletName: "unilogin" },
-          { walletName: "torus" },
-          // { walletName: "squarelink", apiKey: "87288b677f8cfb09a986" },
-          { walletName: "authereum", disableNotifications: true },
-          { walletName: "trust", rpcUrl },
-          // {
-          //   walletName: "walletConnect",
-          //   infuraKey: "d5e29c9b9a9d4116a7348113f57770a8",
-          // },
+          {
+            walletName: "walletConnect",
+            rpc: { [network?.chainId || 1]: infuraRpc },
+          },
+          { walletName: "walletLink", rpcUrl: infuraRpc },
           { walletName: "opera" },
           { walletName: "operaTouch" },
-          { walletName: "imToken", rpcUrl },
+          { walletName: "torus" },
+          { walletName: "status" },
+          { walletName: "unilogin" },
+          // { walletName: "authereum" },
+          {
+            walletName: "ledger",
+            rpcUrl: infuraRpc,
+          },
         ],
       },
       walletCheck: [
-        { checkName: "derivationPath" },
         { checkName: "connect" },
         { checkName: "accounts" },
         { checkName: "network" },
-        { checkName: "balance", minimumBalance: "100000" },
+        { checkName: "balance", minimumBalance: "0" },
       ],
     });
 
