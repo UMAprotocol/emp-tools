@@ -10,8 +10,14 @@ const ContractState = () => {
         <Totals />
       </Grid>
       <Box pt={4}>
-        <GeneralInfo />
-        <DisputeParams />
+        <Grid container spacing={3}>
+          <Grid item md={6} xs={12}>
+            <GeneralInfo />
+          </Grid>
+          <Grid item md={6} xs={12}>
+            <DisputeParams />
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

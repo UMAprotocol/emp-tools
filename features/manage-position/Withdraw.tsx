@@ -308,7 +308,7 @@ const Deposit = () => {
         </Box>
 
         <Grid container spacing={3}>
-          <Grid item xs={6} md={4}>
+          <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
               type="number"
@@ -325,7 +325,7 @@ const Deposit = () => {
               }
             />
           </Grid>
-          <Grid item xs={6} md={4}>
+          <Grid item xs={12} sm={6} md={4}>
             <Box>
               <Button
                 fullWidth

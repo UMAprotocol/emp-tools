@@ -20,7 +20,7 @@ import ManagePosition from "../features/manage-position/ManagePosition";
 import EmpSelector from "../features/emp-selector/EmpSelector";
 import AllPositions from "../features/all-positions/AllPositions";
 import Weth from "../features/weth/Weth";
-import YieldCalculator from "../features/yield-calculator/YieldCalculator";
+import Yield from "../features/yield/Yield";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -47,7 +47,7 @@ export default function Index() {
     "Manage Position",
     "All Positions",
     "Wrap/Unwrap WETH",
-    "Yield Calculator",
+    "yUSD Yield",
   ];
 
   const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
@@ -158,7 +158,7 @@ export default function Index() {
 
         {tabIndex === 3 && <Weth />}
 
-        {tabIndex === 4 && <YieldCalculator />}
+        {tabIndex === 4 && <Yield />}
       </Box>
       <Box py={4} textAlign="center">
         <a

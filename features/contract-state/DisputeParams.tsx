@@ -26,7 +26,7 @@ const DisputeParams = () => {
   } = empState;
 
   return (
-    <Box pt={3}>
+    <Box>
       <Typography variant="h5">Dispute Params</Typography>
       <Status>
         <Label>Dispute bond: </Label>

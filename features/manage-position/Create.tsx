@@ -127,7 +127,8 @@ const Create = () => {
     const balanceBelowCollateralToDeposit = balance < collateralToDeposit;
     const needAllowance =
       collAllowance !== "Infinity" && collAllowance < collateralToDeposit;
-    const resultantTokensBelowMin = resultantTokens < minSponsorTokensFromWei;
+    const resultantTokensBelowMin =
+      resultantTokens < minSponsorTokensFromWei && resultantTokens != 0;
     const resultantCRBelowRequirement =
       parseFloat(pricedResultantCR) >= 0 &&
       parseFloat(pricedResultantCR) < collReqFromWei;
@@ -206,7 +207,7 @@ const Create = () => {
           </Box>
 
           <Grid container spacing={3}>
-            <Grid item md={4} xs={6}>
+            <Grid item md={4} xs={12} sm={6}>
               <TextField
                 fullWidth
                 type="number"
@@ -224,7 +225,7 @@ const Create = () => {
                 }
               />
             </Grid>
-            <Grid item md={4} xs={6}>
+            <Grid item md={4} xs={12} sm={6}>
               <TextField
                 fullWidth
                 type="number"
@@ -242,7 +243,7 @@ const Create = () => {
                 }
               />
             </Grid>
-            <Grid item md={4} xs={6}>
+            <Grid item md={4} xs={12} sm={6}>
               <Box py={0}>
                 {needAllowance && (
                   <Button
