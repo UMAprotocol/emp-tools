@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Box, Hidden } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
