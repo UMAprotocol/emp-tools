@@ -59,7 +59,7 @@ const AllPositions = () => {
       fromWei(collateralRequirement, collDecimals)
     );
     const priceIdUtf8 = utils.parseBytes32String(priceId);
-    const prettyLatestPrice = latestPrice.toFixed(6);
+    const prettyLatestPrice = Number(latestPrice).toFixed(6);
 
     const getCollateralRatio = (collateral: number, tokens: number) => {
       if (tokens <= 0 || latestPrice <= 0) return 0;
