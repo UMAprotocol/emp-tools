@@ -123,26 +123,29 @@ const GeneralInfo = () => {
         </Status>
 
         <Status>
-          <Label>
-            Identifier price: (
-            {sourceUrls.map((url: string, index: number) => {
-              return (
-                <Link
-                  key={index}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {((url.includes("coinbase") && "Coinbase") ||
+          <Label>Identifier price: </Label>
+          {`${prettyLatestPrice}`}
+        </Status>
+
+        <Status>
+          <Label>Identifier sources: </Label>
+          {sourceUrls.map((url: string, index: number) => {
+            return (
+              <Link
+                key={index}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {(index === 0 ? " [" : "") +
+                  ((url.includes("coinbase") && "Coinbase") ||
                     (url.includes("kraken") && "Kraken") ||
                     (url.includes("binance") && "Binance") ||
-                    "") + (index < sourceUrls.length - 1 ? ", " : "")}
-                </Link>
-              );
-            })}
-            )
-          </Label>
-          {`: ${prettyLatestPrice}`}
+                    "") +
+                  (index < sourceUrls.length - 1 ? ", " : "]")}
+              </Link>
+            );
+          })}
         </Status>
 
         <Status>
