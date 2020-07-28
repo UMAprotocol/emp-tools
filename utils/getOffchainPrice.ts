@@ -43,6 +43,16 @@ export const getPricefeedParamsFromTokenSymbol = (symbol: string | null) => {
   }
 };
 
+// Wrapper around `getPricefeedParamsFromTokenSymbol.invertedPrice` so that it never returns null
+export const isPricefeedInvertedFromTokenSymbol = (symbol: string | null) => {
+  const pricefeedParams = getPricefeedParamsFromTokenSymbol(symbol);
+  if (pricefeedParams === null) {
+    return false;
+  } else {
+    return pricefeedParams.invertedPrice;
+  }
+};
+
 export const getOffchainPriceFromTokenSymbol = async (symbol: string) => {
   let identifierParams = getPricefeedParamsFromTokenSymbol(symbol);
   if (!identifierParams) {
