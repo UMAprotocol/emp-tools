@@ -216,7 +216,9 @@ const AllPositions = () => {
                     placement="top"
                   >
                     <TableCell align="right">
-                      <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
+                      <SortableTableColumnHeader
+                        sortField={SORT_FIELD.LIQ_PRICE}
+                      >
                         Liquidation Price{" "}
                       </SortableTableColumnHeader>
                     </TableCell>
