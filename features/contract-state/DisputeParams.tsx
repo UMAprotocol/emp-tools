@@ -59,7 +59,7 @@ const DisputeParams = () => {
       </Status>
       <Status>
         <Label>
-          Withdraw liveness (mins) (
+          Withdraw liveness in mins (
           <Link
             href={DOCS_MAP.SLOW_WITHDRAW}
             target="_blank"
