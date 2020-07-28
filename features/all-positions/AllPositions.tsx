@@ -84,7 +84,7 @@ const AllPositions = () => {
   const { symbol: tokenSymbol } = Token.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
-  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { latestPrice, sourceUrls } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
   // Pagination
@@ -118,7 +118,7 @@ const AllPositions = () => {
     collSymbol !== null &&
     latestPrice !== null &&
     priceId !== null &&
-    sourceUrl !== undefined &&
+    sourceUrls !== undefined &&
     activeSponsors &&
     Object.keys(activeSponsors).length > 0
   ) {
@@ -181,9 +181,18 @@ const AllPositions = () => {
         <Box>
           <Typography>
             {`Estimated price of ${prettyLatestPrice} for ${priceIdUtf8} sourced from: `}
-            <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase Pro.
-            </Link>
+            {sourceUrls.map((url: string, index: number) => {
+              return (
+                <Link href={url} target="_blank" rel="noopener noreferrer">
+                  {(index === 0 ? "[" : "") +
+                    ((url.includes("coinbase") && "Coinbase") ||
+                      (url.includes("kraken") && "Kraken") ||
+                      (url.includes("binance") && "Binance") ||
+                      "") +
+                    (index < sourceUrls.length - 1 ? ", " : "].")}
+                </Link>
+              );
+            })}
           </Typography>
         </Box>
         <Box pt={4}>

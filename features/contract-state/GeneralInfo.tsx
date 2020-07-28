@@ -33,7 +33,7 @@ const GeneralInfo = () => {
   const { contract } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const { gcr } = Totals.useContainer();
-  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { latestPrice, sourceUrls } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
   const {
     expirationTimestamp: expiry,
@@ -52,7 +52,8 @@ const GeneralInfo = () => {
     priceId !== null &&
     collReq !== null &&
     minSponsorTokens !== null &&
-    tokenSymbol !== null
+    tokenSymbol !== null &&
+    sourceUrls !== undefined
   ) {
     const expiryTimestamp = expiry.toString();
     const expiryDate = new Date(
@@ -77,7 +78,8 @@ const GeneralInfo = () => {
       withdrawalLivenessInMinutes,
       priceIdUtf8,
       collReqPct,
-      minSponsorTokensSymbol
+      minSponsorTokensSymbol,
+      sourceUrls
     );
   } else {
     return renderComponent();
@@ -91,7 +93,8 @@ const GeneralInfo = () => {
     withdrawalLivenessInMinutes: string = defaultMissingDataDisplay,
     priceIdUtf8: string = defaultMissingDataDisplay,
     collReqPct: string = defaultMissingDataDisplay,
-    minSponsorTokensSymbol: string = defaultMissingDataDisplay
+    minSponsorTokensSymbol: string = defaultMissingDataDisplay,
+    sourceUrls: string[] = []
   ) {
     return (
       <Box>
@@ -122,9 +125,21 @@ const GeneralInfo = () => {
         <Status>
           <Label>
             Identifier price: (
-            <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase
-            </Link>
+            {sourceUrls.map((url: string, index: number) => {
+              return (
+                <Link
+                  key={index}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {((url.includes("coinbase") && "Coinbase") ||
+                    (url.includes("kraken") && "Kraken") ||
+                    (url.includes("binance") && "Binance") ||
+                    "") + (index < sourceUrls.length - 1 ? ", " : "")}
+                </Link>
+              );
+            })}
             )
           </Label>
           {`: ${prettyLatestPrice}`}
