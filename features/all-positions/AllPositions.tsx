@@ -13,6 +13,7 @@ import {
   Paper,
   Typography,
   Tooltip,
+  Dialog,
 } from "@material-ui/core";
 
 import styled from "styled-components";
@@ -23,6 +24,8 @@ import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
+
+import PositionActionsDialog from "./PositionActionsDialog";
 
 interface SortableTableHeaderProps {
   children: React.ReactNode;
@@ -43,6 +46,20 @@ const ClickableText = styled.span`
   }
   text-align: end;
   user-select: none;
+`;
+
+const MoreInfo = styled.a`
+  height: 23px;
+  width: 23px;
+  background-color: #303030;
+  border-radius: 50%;
+  display: inline-block;
+  text-align: center;
+  &:hover {
+    background-color: white;
+    transition: 0.5s;
+    cursor: pointer;
+  }
 `;
 
 const PageButtons = styled.div`
@@ -99,7 +116,8 @@ const AllPositions = () => {
   // Sorting
   const [sortDirection, setSortDirection] = useState<boolean>(true);
   const [sortedColumn, setSortedColumn] = useState<number>(SORT_FIELD.TOKENS);
-
+  const [isDialogShowing, setIsDialogShowing] = useState<boolean>(false);
+  const [selectedSponsor, setSelectedSponsor] = useState<string | null>(null);
   // Set max page depending on # of sponsors
   useEffect(() => {
     setMaxPage(1);
@@ -137,6 +155,16 @@ const AllPositions = () => {
 
     const prettyAddress = (x: string) => {
       return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
+    };
+
+    const toggleDialog = () => {
+      setIsDialogShowing(!isDialogShowing);
+    };
+
+    const handleOpenActionsDialog = (address: string) => {
+      console.log("open", address);
+      setSelectedSponsor(address);
+      setIsDialogShowing(true);
     };
 
     // First filters out sponsor data missing field values,
@@ -228,6 +256,7 @@ const AllPositions = () => {
                       </SortableTableColumnHeader>
                     </TableCell>
                   </Tooltip>
+                  <TableCell align="right"></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -251,6 +280,13 @@ const AllPositions = () => {
                       </TableCell>
                       <TableCell align="right">
                         {prettyBalance(Number(activeSponsor.liquidationPrice))}
+                      </TableCell>
+                      <TableCell align="right">
+                        <MoreInfo
+                          onClick={() => handleOpenActionsDialog(sponsor)}
+                        >
+                          ⋮
+                        </MoreInfo>
                       </TableCell>
                     </TableRow>
                   );
@@ -276,6 +312,11 @@ const AllPositions = () => {
             </PageButtons>
           </TableContainer>
         </Box>
+        <PositionActionsDialog
+          isDialogShowing={isDialogShowing}
+          handleClose={toggleDialog}
+          selectedSponsor={selectedSponsor}
+        />
       </Box>
     );
   } else {

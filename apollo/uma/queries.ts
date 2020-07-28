@@ -7,6 +7,12 @@ export const ACTIVE_POSITIONS = gql`
       positions(where: { collateral_gt: 0 }) {
         collateral
         tokensOutstanding
+        withdrawalRequestPassTimestamp
+        withdrawalRequestAmount
+        transferPositionRequestPassTimestamp
+        liquidations {
+          id
+        }
         sponsor {
           id
         }
