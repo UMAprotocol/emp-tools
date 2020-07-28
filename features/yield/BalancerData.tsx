@@ -34,7 +34,7 @@ const BalancerData = () => {
       `$${pool.totalSwapVolume.toLocaleString()}`,
       `$${pool.tokenBalanceEmp.toLocaleString()}`,
       `$${pool.tokenBalanceOther.toLocaleString()}`,
-      `${pool.swapFee}%`,
+      `${pool.swapFeePct}%`,
       `${pool.swapsCount}`,
       `${pool.exitsCount}`,
       `${pool.joinsCount}`,
