@@ -44,14 +44,10 @@ const GeneralInfo = () => {
   } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
 
-  const [sponsorCount, setSponsorCount] = useState<string | null>(null);
   const defaultMissingDataDisplay = "N/A";
 
-  useEffect(() => {
-    setSponsorCount(Object.keys(activeSponsors).length.toString());
-  }, [activeSponsors]);
-
   if (
+    activeSponsors !== null &&
     expiry !== null &&
     gcr !== null &&
     latestPrice !== null &&
@@ -73,6 +69,7 @@ const GeneralInfo = () => {
       minSponsorTokens
     )} ${tokenSymbol}`;
 
+    const sponsorCount = Object.keys(activeSponsors).length.toString();
     return renderComponent(
       expiryTimestamp,
       expiryDate,
@@ -80,7 +77,8 @@ const GeneralInfo = () => {
       pricedGcr,
       priceIdUtf8,
       collReqPct,
-      minSponsorTokensSymbol
+      minSponsorTokensSymbol,
+      sponsorCount
     );
   } else {
     return renderComponent();
@@ -93,7 +91,8 @@ const GeneralInfo = () => {
     pricedGcr: string = defaultMissingDataDisplay,
     priceIdUtf8: string = defaultMissingDataDisplay,
     collReqPct: string = defaultMissingDataDisplay,
-    minSponsorTokensSymbol: string = defaultMissingDataDisplay
+    minSponsorTokensSymbol: string = defaultMissingDataDisplay,
+    sponsorCount: string = defaultMissingDataDisplay
   ) {
     return (
       <Box>
