@@ -23,6 +23,11 @@ export const POOL = (stringifiedTokenList: String) => gql`
       joinsCount
       exitsCount
       swapsCount
+      shares(first:1000) {
+        userAddress {
+          id
+        }
+      }
     }
   }
 `;

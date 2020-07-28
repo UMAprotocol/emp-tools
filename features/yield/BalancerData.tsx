@@ -18,9 +18,14 @@ const Link = styled.a`
 `;
 
 const BalancerData = () => {
-  const { poolAddress, usdPrice, pool } = Balancer.useContainer();
+  const { poolAddress, usdPrice, pool, shares } = Balancer.useContainer();
 
-  if (poolAddress !== null && usdPrice !== null && pool !== null) {
+  if (
+    poolAddress !== null &&
+    usdPrice !== null &&
+    pool !== null &&
+    shares !== null
+  ) {
     const balancerPoolUrl = `https://pools.balancer.exchange/#/pool/${poolAddress}`;
     return renderComponent(
       balancerPoolUrl,
@@ -32,7 +37,8 @@ const BalancerData = () => {
       `${pool.swapFee}%`,
       `${pool.swapsCount}`,
       `${pool.exitsCount}`,
-      `${pool.joinsCount}`
+      `${pool.joinsCount}`,
+      `${Object.keys(shares).length}`
     );
   } else {
     return renderComponent();
@@ -48,7 +54,8 @@ const BalancerData = () => {
     poolSwapFee: string = "",
     poolSwapCount: string = "",
     poolExitsCount: string = "",
-    poolJoinsCount: string = ""
+    poolJoinsCount: string = "",
+    uniqueShareholders: string = ""
   ) {
     return (
       <span>
@@ -106,6 +113,12 @@ const BalancerData = () => {
             <Status>
               <Label>Exits count: </Label>
               {poolExitsCount}
+            </Status>
+          </Grid>
+          <Grid item md={6} sm={6} xs={12}>
+            <Status>
+              <Label>Unique LPs: </Label>
+              {uniqueShareholders}
             </Status>
           </Grid>
         </Grid>

@@ -15,7 +15,16 @@ interface PoolState {
   totalSwapVolume: number;
 }
 
-interface PoolTokenState {
+interface SharesState {
+  [address: string]: string;
+}
+
+interface SharesQuery {
+  [address: string]: {
+    id: string;
+  };
+}
+interface PoolTokenQuery {
   address: string;
   balance: string;
 }
@@ -51,6 +60,7 @@ const useBalancer = () => {
   const [usdPrice, setUsdPrice] = useState<number | null>(null);
   const [poolAddress, setPoolAddress] = useState<string | null>(null);
   const [pool, setPool] = useState<PoolState | null>(null);
+  const [shares, setShares] = useState<SharesState | null>(null);
 
   const queryTokenData = () => {
     setUsdPrice(null);
@@ -73,12 +83,22 @@ const useBalancer = () => {
 
   const queryPoolData = () => {
     setPool(null);
+    setShares(null);
 
     if (poolError) {
       console.error(`Apollo client failed to fetch graph data:`, poolError);
     }
     if (!poolLoading && poolData) {
       const data = poolData.pools[0];
+
+      const shareHolders: SharesState = {};
+      data.shares.forEach((share: SharesQuery) => {
+        if (!shareHolders[share.userAddress.id]) {
+          shareHolders[share.userAddress.id] = share.userAddress.id;
+        }
+      });
+      setShares(shareHolders);
+
       setPool({
         exitsCount: Number(data.exitsCount),
         joinsCount: Number(data.joinsCount),
@@ -86,11 +106,11 @@ const useBalancer = () => {
         liquidity: Number(data.liquidity),
         swapFee: Number(data.swapFee),
         tokenBalanceEmp: Number(
-          data.tokens.find((t: PoolTokenState) => t.address === empAddress)
+          data.tokens.find((t: PoolTokenQuery) => t.address === empAddress)
             .balance
         ),
         tokenBalanceOther: Number(
-          data.tokens.find((t: PoolTokenState) => t.address === usdcAddress)
+          data.tokens.find((t: PoolTokenQuery) => t.address === usdcAddress)
             .balance
         ),
         totalSwapVolume: Number(data.totalSwapVolume),
@@ -108,6 +128,7 @@ const useBalancer = () => {
     pool,
     poolAddress,
     usdPrice,
+    shares,
   };
 };
 
