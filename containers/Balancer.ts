@@ -9,7 +9,7 @@ interface PoolState {
   joinsCount: number;
   swapsCount: number;
   liquidity: number;
-  swapFee: number;
+  swapFeePct: number;
   tokenBalanceEmp: number;
   tokenBalanceOther: number;
   totalSwapVolume: number;
@@ -104,7 +104,7 @@ const useBalancer = () => {
         joinsCount: Number(data.joinsCount),
         swapsCount: Number(data.swapsCount),
         liquidity: Number(data.liquidity),
-        swapFee: Number(data.swapFee),
+        swapFeePct: Number(data.swapFee) * 100,
         tokenBalanceEmp: Number(
           data.tokens.find((t: PoolTokenQuery) => t.address === empAddress)
             .balance
