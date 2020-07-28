@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import YieldCalculator from "./YieldCalculator";
 import BalancerData from "./BalancerData";
+import FarmingCalculator from "./FarmingCalculator";
 
 const OutlinedContainer = styled.div`
   padding: 1rem;
@@ -21,11 +22,9 @@ const Yield = () => {
           >
             yTokens
           </a>
-          , like yUSD, are expiring tokens that have fixed-rate returns because
-          they will be redeemable for exactly 1 USD worth of collateral at
-          expiry. To use this calculator enter in the current yToken price and
-          the days to expiry. An implied yearly APR is shown. To learn more
-          about yUSD specifically, read the UMA Medium post{" "}
+          , like yUSD, are expiring tokens with a fixed-rate return and are
+          redeemable for exactly 1 USD worth of collateral at expiry. To learn
+          more about yUSD see the UMA Medium post{" "}
           <a
             href="https://medium.com/uma-project/the-yield-dollar-on-uma-3a492e79069f"
             target="_blank"
@@ -39,6 +38,11 @@ const Yield = () => {
       <Box pb={4}>
         <OutlinedContainer>
           <BalancerData />
+        </OutlinedContainer>
+      </Box>
+      <Box pb={4}>
+        <OutlinedContainer>
+          <FarmingCalculator />
         </OutlinedContainer>
       </Box>
       <Box pb={4}>
