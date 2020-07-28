@@ -4,7 +4,7 @@ export const ACTIVE_POSITIONS = gql`
   query activePositions {
     financialContracts {
       id
-      positions(where: { collateral_gt: 0 }) {
+      positions(first: 1000, where: { collateral_gt: 0 }) {
         collateral
         tokensOutstanding
         sponsor {
