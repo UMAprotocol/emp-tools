@@ -167,7 +167,6 @@ const AllPositions = () => {
     };
 
     const handleOpenActionsDialog = (address: string) => {
-      console.log("open", address);
       setSelectedSponsor(address);
       setIsDialogShowing(true);
     };
@@ -259,7 +258,7 @@ const AllPositions = () => {
                     </strong>
                   </TableCell>
                   <Tooltip
-                    title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
+                    title={`This is the price that the identifier (${priceIdUtf8}) must decrease to in order for the position be liquidatable`}
                     placement="top"
                   >
                     <TableCell align="right">

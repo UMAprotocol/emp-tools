@@ -570,6 +570,11 @@ const PositionActionsDialog = (props: DialogProps) => {
                   )}
                 </Box>
               )}
+              {dialogTabIndex === "dispute" && (
+                <Box>
+                  You can only dispute a position with a pending liquidation.
+                </Box>
+              )}
             </Box>
           </Box>
         </Container>
