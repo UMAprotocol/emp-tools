@@ -53,6 +53,10 @@ function useConnection() {
             setSelectedWallet(wallet.name);
           } else {
             setProvider(null);
+            setNetwork(null);
+            setSigner(null);
+            setAddress(null);
+            setSelectedWallet(null);
           }
         },
       },
