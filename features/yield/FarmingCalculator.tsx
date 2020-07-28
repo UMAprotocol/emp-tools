@@ -115,6 +115,18 @@ const YieldCalculator = () => {
             </Grid>
           </Grid>
         </form>
+        <Typography>
+          <strong>Note: </strong>Providing liquidity on Balancer will also yield
+          BAL rewards. To calculate your BAL rewards use{" "}
+          <a
+            href="https://www.predictions.exchange/balancer/None"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            this
+          </a>{" "}
+          calculator.
+        </Typography>
       </Box>
     </span>
   );
