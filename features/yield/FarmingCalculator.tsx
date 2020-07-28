@@ -132,7 +132,7 @@ const YieldCalculator = () => {
               </Box>
             </Grid>
             <Grid item md={6} sm={6} xs={12}>
-              <Box pt={1} textAlign="center">
+              <Box textAlign="center">
                 <Typography variant="h6">
                   Weekly rewards: <strong>{umaYieldAmount} $UMA</strong>
                 </Typography>
@@ -140,7 +140,7 @@ const YieldCalculator = () => {
               </Box>
             </Grid>
             <Grid item md={6} sm={6} xs={12}>
-              <Box pt={1} textAlign="center">
+              <Box textAlign="center">
                 <Typography variant="h6">
                   Yearly APR in USD <strong>{apr}%</strong>
                 </Typography>
