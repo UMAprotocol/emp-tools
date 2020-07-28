@@ -1,4 +1,6 @@
+import { useState, MouseEvent } from "react";
 import { Box, Typography } from "@material-ui/core";
+import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import styled from "styled-components";
 
 import YieldCalculator from "./YieldCalculator";
@@ -11,6 +13,15 @@ const OutlinedContainer = styled.div`
 `;
 
 const Yield = () => {
+  const [dialogTabIndex, setDialogTabIndex] = useState<string | null>(
+    "farming-calculator"
+  );
+  const handleAlignment = (
+    event: MouseEvent<HTMLElement>,
+    newAlignment: string | null
+  ) => {
+    setDialogTabIndex(newAlignment);
+  };
   return (
     <Box>
       <Box pb={4}>
@@ -35,21 +46,37 @@ const Yield = () => {
           .
         </Typography>
       </Box>
-      <Box pb={4}>
+      <Box pb={2}>
         <OutlinedContainer>
           <BalancerData />
         </OutlinedContainer>
       </Box>
-      <Box pb={4}>
-        <OutlinedContainer>
-          <FarmingCalculator />
-        </OutlinedContainer>
+      <Box py={1} textAlign="center">
+        <ToggleButtonGroup
+          value={dialogTabIndex}
+          exclusive
+          onChange={handleAlignment}
+        >
+          <ToggleButton value="farming-calculator">
+            Farming calculator
+          </ToggleButton>
+          <ToggleButton value="yusd-calculator">yusd calculator</ToggleButton>
+        </ToggleButtonGroup>
       </Box>
-      <Box pb={4}>
-        <OutlinedContainer>
-          <YieldCalculator />
-        </OutlinedContainer>
-      </Box>
+      {dialogTabIndex === "farming-calculator" && (
+        <Box py={2}>
+          <OutlinedContainer>
+            <FarmingCalculator />
+          </OutlinedContainer>
+        </Box>
+      )}
+      {dialogTabIndex === "yusd-calculator" && (
+        <Box py={2}>
+          <OutlinedContainer>
+            <YieldCalculator />
+          </OutlinedContainer>
+        </Box>
+      )}
     </Box>
   );
 };
