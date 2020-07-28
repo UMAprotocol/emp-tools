@@ -1,9 +1,12 @@
 import styled from "styled-components";
-import { Box, Grid, Typography, Tooltip } from "@material-ui/core";
+import { Box, Grid, Typography } from "@material-ui/core";
 
 import TotalsContainer from "../../containers/Totals";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
+import Etherscan from "../../containers/Etherscan";
+
+import { getExchangeInfo } from "../../utils/getExchangeLinks";
 
 const DataBox = styled(Box)`
   border: 1px solid #434343;
@@ -45,77 +48,109 @@ const Totals = () => {
     address: collAddress,
   } = Collateral.useContainer();
   const { symbol: tokenSymbol, address: tokenAddress } = Token.useContainer();
-  const loading =
-    !totalCollateral || !totalTokens || !collSymbol || !tokenSymbol;
-  return (
-    <>
-      <Grid item xs={6}>
-        <DataBox>
-          <Typography variant="h4">
-            <strong>
-              {loading ? "N/A" : Number(totalCollateral).toLocaleString()}
-            </strong>
-            <Tooltip title="Etherscan Link">
-              <Small> {collSymbol}</Small>
-            </Tooltip>
-          </Typography>
-          <Label>
-            of <White>collateral</White> supplied
-          </Label>
-          <LinksContainer>
-            <SmallLink
-              href={`https://etherscan.io/address/${collAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </SmallLink>
-            <SmallLink
-              href={`https://uniswap.info/token/${collAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Uniswap
-            </SmallLink>
-          </LinksContainer>
-        </DataBox>
-      </Grid>
+  const { getEtherscanUrl } = Etherscan.useContainer();
+  const exchangeInfo = getExchangeInfo(tokenSymbol);
+  const defaultMissingDataDisplay = "N/A";
 
-      <Grid item xs={6}>
-        <DataBox>
-          <Typography variant="h4">
-            <strong>
-              {loading ? "N/A" : Number(totalTokens).toLocaleString()}
-            </strong>
-            <Tooltip title="Etherscan Link">
-              <Small> {tokenSymbol}</Small>
-            </Tooltip>
-          </Typography>
-          <Tooltip title="This is the total number of tokens minted minus the total number of tokens redeemed.">
+  if (
+    totalCollateral !== null &&
+    totalTokens !== null &&
+    collSymbol !== null &&
+    tokenSymbol !== null &&
+    exchangeInfo !== undefined &&
+    collAddress !== null &&
+    tokenAddress !== null
+  ) {
+    const prettyTotalCollateral = Number(totalCollateral).toLocaleString();
+    const prettyTotalTokens = Number(totalTokens).toLocaleString();
+    const prettyCollSymbol = collSymbol;
+    const prettyTokenSymbol = tokenSymbol;
+    const getExchangeLinkCollateral = exchangeInfo.getExchangeUrl(collAddress);
+    const getExchangeLinkToken = exchangeInfo.getExchangeUrl(tokenAddress);
+    const exchangeName = exchangeInfo.name;
+
+    return renderComponent(
+      prettyTotalCollateral,
+      prettyTotalTokens,
+      prettyCollSymbol,
+      prettyTokenSymbol,
+      getExchangeLinkCollateral,
+      getExchangeLinkToken,
+      exchangeName
+    );
+  } else {
+    return renderComponent();
+  }
+
+  function renderComponent(
+    prettyTotalCollateral: string = defaultMissingDataDisplay,
+    prettyTotalTokens: string = defaultMissingDataDisplay,
+    prettyCollSymbol: string = "",
+    prettyTokenSymbol: string = "",
+    getExchangeLinkCollateral: string = "https://app.uniswap.org/#/swap",
+    getExchangeLinkToken: string = "https://app.uniswap.org/#/swap",
+    exchangeName: string = "Uniswap"
+  ) {
+    return (
+      <>
+        <Grid item md={6} xs={12}>
+          <DataBox>
+            <Typography variant="h4">
+              <strong>{prettyTotalCollateral}</strong>
+              <Small> {prettyCollSymbol}</Small>
+            </Typography>
+            <Label>
+              of <White>collateral</White> supplied
+            </Label>
+            <LinksContainer>
+              <SmallLink
+                href={getEtherscanUrl(collAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan
+              </SmallLink>
+              <SmallLink
+                href={getExchangeLinkCollateral}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {exchangeName}
+              </SmallLink>
+            </LinksContainer>
+          </DataBox>
+        </Grid>
+
+        <Grid item md={6} xs={12}>
+          <DataBox>
+            <Typography variant="h4">
+              <strong>{prettyTotalTokens}</strong>
+              <Small> {prettyTokenSymbol}</Small>
+            </Typography>
             <Label>
               of <White>synthetic tokens</White> outstanding
             </Label>
-          </Tooltip>
-          <LinksContainer>
-            <SmallLink
-              href={`https://etherscan.io/address/${tokenAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </SmallLink>
-            <SmallLink
-              href={`https://uniswap.info/token/${tokenAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Uniswap
-            </SmallLink>
-          </LinksContainer>
-        </DataBox>
-      </Grid>
-    </>
-  );
+            <LinksContainer>
+              <SmallLink
+                href={getEtherscanUrl(tokenAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan
+              </SmallLink>
+              <SmallLink
+                href={getExchangeLinkToken}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {exchangeName}
+              </SmallLink>
+            </LinksContainer>
+          </DataBox>
+        </Grid>
+      </>
+    );
+  }
 };
 
 export default Totals;

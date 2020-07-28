@@ -2,7 +2,10 @@
 
 _Expiring Multi Party is UMA's most current financial smart contract template. This UI is a community-made tool to make interfacing with the protocol easier, please use at your own risk._
 
-Live frontend: https://emp-tools.vercel.app/
+Live frontend:
+
+- Staging: https://emp-tools.vercel.app/
+- Production: https://tools.umaproject.org/
 
 ## Manual testing
 

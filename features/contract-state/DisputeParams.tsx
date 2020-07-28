@@ -26,22 +26,22 @@ const DisputeParams = () => {
   } = empState;
 
   return (
-    <Box pt={3}>
+    <Box>
       <Typography variant="h5">Dispute Params</Typography>
       <Status>
-        <Label>Dispute Bond: </Label>
+        <Label>Dispute bond: </Label>
         {disputeBondPct
           ? `${parseFloat(fromWei(disputeBondPct)) * 100}%`
           : "N/A"}
       </Status>
       <Status>
-        <Label>Dispute Reward (for Sponsor): </Label>
+        <Label>Dispute reward (for sponsor): </Label>
         {sponsorDisputeRewardPct
           ? `${parseFloat(fromWei(sponsorDisputeRewardPct)) * 100}%`
           : "N/A"}
       </Status>
       <Status>
-        <Label>Dispute Reward (for Disputer): </Label>
+        <Label>Dispute reward (for disputer): </Label>
         {disputerDisputeRewardPct
           ? `${parseFloat(fromWei(disputerDisputeRewardPct)) * 100}%`
           : "N/A"}

@@ -1,12 +1,15 @@
 import styled from "styled-components";
-import { ethers } from "ethers";
+import { utils } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
-import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpContract from "../../containers/EmpContract";
 import Totals from "../../containers/Totals";
+import PriceFeed from "../../containers/PriceFeed";
+import Etherscan from "../../containers/Etherscan";
+
+import { DOCS_MAP } from "../../utils/getDocLinks";
 
 const Label = styled.span`
   color: #999999;
@@ -23,77 +26,150 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
-const fromWei = ethers.utils.formatUnits;
+const fromWei = utils.formatUnits;
+const parseBytes32String = utils.parseBytes32String;
 
 const GeneralInfo = () => {
   const { contract } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const { gcr } = Totals.useContainer();
-
+  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { getEtherscanUrl } = Etherscan.useContainer();
   const {
     expirationTimestamp: expiry,
     priceIdentifier: priceId,
     collateralRequirement: collReq,
     minSponsorTokens,
+    withdrawalLiveness,
   } = empState;
-  const { symbol: collSymbol } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
+  const defaultMissingDataDisplay = "N/A";
 
-  // format nice date
-  const expiryDate = expiry ? new Date(expiry.toNumber() * 1000) : "N/A";
+  if (
+    expiry !== null &&
+    gcr !== null &&
+    latestPrice !== null &&
+    priceId !== null &&
+    collReq !== null &&
+    minSponsorTokens !== null &&
+    tokenSymbol !== null
+  ) {
+    const expiryTimestamp = expiry.toString();
+    const expiryDate = new Date(
+      expiry.toNumber() * 1000
+    ).toLocaleString("en-GB", { timeZone: "UTC" });
+    const prettyLatestPrice = Number(latestPrice).toFixed(4);
+    const pricedGcr = (gcr / latestPrice).toFixed(4);
+    const withdrawalLivenessInMinutes = (
+      Number(withdrawalLiveness) / 60
+    ).toFixed(2);
+    const priceIdUtf8 = parseBytes32String(priceId);
+    const collReqPct = parseFloat(fromWei(collReq)).toString();
+    const minSponsorTokensSymbol = `${fromWei(
+      minSponsorTokens
+    )} ${tokenSymbol}`;
 
-  return (
-    <Box>
-      <Typography variant="h5">
-        General Info{" "}
-        {contract && (
-          <Link
-            href={`https://etherscan.io/address/${contract.address}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            etherscan
-          </Link>
-        )}
-      </Typography>
-      <Status>
-        <Label>Expiry Date: </Label>
-        {expiry ? (
-          <Tooltip title={`Timestamp: ${expiry.toString()}`} interactive>
-            <span>{expiryDate.toString()}</span>
+    return renderComponent(
+      expiryTimestamp,
+      expiryDate,
+      prettyLatestPrice,
+      pricedGcr,
+      withdrawalLivenessInMinutes,
+      priceIdUtf8,
+      collReqPct,
+      minSponsorTokensSymbol
+    );
+  } else {
+    return renderComponent();
+  }
+
+  function renderComponent(
+    expiryTimestamp: string = defaultMissingDataDisplay,
+    expiryDate: string = defaultMissingDataDisplay,
+    prettyLatestPrice: string = defaultMissingDataDisplay,
+    pricedGcr: string = defaultMissingDataDisplay,
+    withdrawalLivenessInMinutes: string = defaultMissingDataDisplay,
+    priceIdUtf8: string = defaultMissingDataDisplay,
+    collReqPct: string = defaultMissingDataDisplay,
+    minSponsorTokensSymbol: string = defaultMissingDataDisplay
+  ) {
+    return (
+      <Box>
+        <Typography variant="h5">
+          {`General Info `}
+          {contract?.address && (
+            <Link
+              href={getEtherscanUrl(contract.address)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Etherscan
+            </Link>
+          )}
+        </Typography>
+        <Status>
+          <Label>Expiry date: </Label>
+          <Tooltip title={`Timestamp: ${expiryTimestamp}`} interactive>
+            <span>{expiryDate} UTC</span>
           </Tooltip>
-        ) : (
-          "N/A"
-        )}
-      </Status>
+        </Status>
 
-      <Status>
-        <Label>Price Feed Identifier: </Label>
-        {priceId ? ethers.utils.parseBytes32String(priceId) : "N/A"}
-      </Status>
+        <Status>
+          <Label>Price identifier: </Label>
+          {priceIdUtf8}
+        </Status>
 
-      <Status>
-        <Label>Collateral Requirement: </Label>
-        {collReq ? `${parseFloat(fromWei(collReq)) * 100}%` : "N/A"}
-      </Status>
+        <Status>
+          <Label>
+            Identifier price: (
+            <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
+              Coinbase
+            </Link>
+            )
+          </Label>
+          {`: ${prettyLatestPrice}`}
+        </Status>
 
-      <Status>
-        <Label>Minimum Sponsor Tokens: </Label>
-        {minSponsorTokens
-          ? `${fromWei(minSponsorTokens)} ${tokenSymbol}`
-          : "N/A"}
-      </Status>
+        <Status>
+          <Label>Collateral requirement: </Label>
+          {collReqPct}
+        </Status>
 
-      <Status>
-        <Label>GCR (collateral / tokens): </Label>
-        <Tooltip
-          title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
-        >
-          <span>{gcr ? gcr : "N/A"}</span>
-        </Tooltip>
-      </Status>
-    </Box>
-  );
+        <Status>
+          <Label>Minimum sponsor tokens: </Label>
+          {minSponsorTokensSymbol}
+        </Status>
+
+        <Status>
+          <Label>Global collateral ratio: </Label>
+          <Tooltip
+            title={`The Global Collateralization Ratio (GCR) is the ratio of the total amount of collateral to total number of outstanding tokens.`}
+          >
+            <span>{pricedGcr}</span>
+          </Tooltip>
+        </Status>
+
+        <Status>
+          <Label>
+            Withdraw liveness (mins) (
+            <Link
+              href={DOCS_MAP.SLOW_WITHDRAW}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Docs
+            </Link>
+            ){`: `}
+          </Label>
+          <Tooltip
+            title={`To withdraw past the global collateralization ratio, you will need to wait a liveness period before completing your withdrawal.`}
+          >
+            <span>{withdrawalLivenessInMinutes}</span>
+          </Tooltip>
+        </Status>
+      </Box>
+    );
+  }
 };
 
 export default GeneralInfo;

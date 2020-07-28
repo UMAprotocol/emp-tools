@@ -14,6 +14,9 @@ import Token from "../containers/Token";
 import Position from "../containers/Position";
 import Totals from "../containers/Totals";
 import PriceFeed from "../containers/PriceFeed";
+import WethContract from "../containers/WethContract";
+import Etherscan from "../containers/Etherscan";
+import Balancer from "../containers/Balancer";
 
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../apollo/client";
@@ -27,19 +30,25 @@ const WithStateContainerProviders = ({ children }: IProps) => (
     <Connection.Provider>
       <EmpAddress.Provider>
         <EmpContract.Provider>
-          <EmpState.Provider>
-            <EmpSponsors.Provider>
-              <Collateral.Provider>
-                <Token.Provider>
-                  <Totals.Provider>
-                    <PriceFeed.Provider>
-                      <Position.Provider>{children}</Position.Provider>
-                    </PriceFeed.Provider>
-                  </Totals.Provider>
-                </Token.Provider>
-              </Collateral.Provider>
-            </EmpSponsors.Provider>
-          </EmpState.Provider>
+          <WethContract.Provider>
+            <EmpState.Provider>
+              <Token.Provider>
+                <Collateral.Provider>
+                  <PriceFeed.Provider>
+                    <EmpSponsors.Provider>
+                      <Totals.Provider>
+                        <Etherscan.Provider>
+                          <Position.Provider>
+                            <Balancer.Provider>{children}</Balancer.Provider>
+                          </Position.Provider>
+                        </Etherscan.Provider>
+                      </Totals.Provider>
+                    </EmpSponsors.Provider>
+                  </PriceFeed.Provider>
+                </Collateral.Provider>
+              </Token.Provider>
+            </EmpState.Provider>
+          </WethContract.Provider>
         </EmpContract.Provider>
       </EmpAddress.Provider>
     </Connection.Provider>

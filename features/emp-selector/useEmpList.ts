@@ -8,6 +8,7 @@ import { EMPs } from "./EMPs";
 
 export interface Emp {
   name: string;
+  symbol: string;
   address: string;
 }
 
@@ -29,8 +30,10 @@ const useEmpList = () => {
         const tokenAddr = await emp.tokenCurrency();
         const token = new ethers.Contract(tokenAddr, erc20.abi, signer);
         const tokenName = await token.name();
+        const tokenSymbol = await token.symbol();
         return {
           name: tokenName,
+          symbol: tokenSymbol,
           address: empAddress,
         };
       });
