@@ -156,7 +156,7 @@ const Redeem = () => {
         </Box>
 
         <Grid container spacing={3}>
-          <Grid item xs={4}>
+          <Grid item md={4} sm={6} xs={12}>
             <TextField
               fullWidth
               variant="outlined"
@@ -175,7 +175,7 @@ const Redeem = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <Button onClick={() => setTokensToRedeemToMax()}>
+                    <Button fullWidth onClick={() => setTokensToRedeemToMax()}>
                       <MaxLink>Max</MaxLink>
                     </Button>
                   </InputAdornment>
@@ -183,10 +183,11 @@ const Redeem = () => {
               }}
             />
           </Grid>
-          <Grid item xs={4}>
-            <Box py={1}>
+          <Grid item md={4} sm={6} xs={12}>
+            <Box>
               {needAllowance && (
                 <Button
+                  fullWidth
                   variant="contained"
                   onClick={setMaxAllowance}
                   style={{ marginRight: `12px` }}
@@ -194,18 +195,20 @@ const Redeem = () => {
                   Max Approve
                 </Button>
               )}
-              <Button
-                variant="contained"
-                disabled={
-                  needAllowance ||
-                  balanceBelowTokensToRedeem ||
-                  invalidRedeemAmount ||
-                  tokensToRedeem <= 0
-                }
-                onClick={redeemTokens}
-              >
-                {`Redeem ${tokensToRedeem} ${tokenSymbol}`}
-              </Button>
+              {!needAllowance && (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  disabled={
+                    balanceBelowTokensToRedeem ||
+                    invalidRedeemAmount ||
+                    tokensToRedeem <= 0
+                  }
+                  onClick={redeemTokens}
+                >
+                  {`Redeem ${tokensToRedeem} ${tokenSymbol}`}
+                </Button>
+              )}
             </Box>
           </Grid>
         </Grid>

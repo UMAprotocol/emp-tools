@@ -1,13 +1,15 @@
 import styled from "styled-components";
-import Box from "@material-ui/core/Box";
-import { withStyles } from "@material-ui/core/styles";
+import {
+  Box,
+  useMediaQuery,
+  InputBase,
+  MenuItem,
+  FormControl,
+  ListItemText,
+  Select,
+} from "@material-ui/core";
+import { withStyles, useTheme } from "@material-ui/core/styles";
 
-import InputBase from "@material-ui/core/InputBase";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-
-import ListItemText from "@material-ui/core/ListItemText";
 import useEmpList from "./useEmpList";
 import EmpAddress from "../../containers/EmpAddress";
 import Connection from "../../containers/Connection";
@@ -34,6 +36,9 @@ const FormWrapper = styled(FormControl)`
 `;
 
 const EmpSelector = () => {
+  const theme = useTheme();
+  const largeScreen = useMediaQuery(theme.breakpoints.up("sm"));
+
   const { signer } = Connection.useContainer();
   const { empAddress, setEmpAddress } = EmpAddress.useContainer();
   const { emps, loading } = useEmpList();
@@ -41,6 +46,10 @@ const EmpSelector = () => {
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const value = e.target.value;
     setEmpAddress(value === 0 ? null : (value as string));
+  };
+
+  const prettyAddress = (x: string) => {
+    return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
   };
 
   const noEmpsOrLoading = emps.length < 1 || loading;
@@ -75,7 +84,12 @@ const EmpSelector = () => {
           {emps.map((emp) => {
             return (
               <MenuItem value={emp.address} key={emp.address}>
-                <ListItemText primary={emp.name} secondary={emp.address} />
+                <ListItemText
+                  primary={largeScreen ? emp.name : emp.symbol}
+                  secondary={
+                    largeScreen ? emp.address : prettyAddress(emp.address)
+                  }
+                />
               </MenuItem>
             );
           })}
