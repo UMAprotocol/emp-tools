@@ -132,7 +132,7 @@ const YieldCalculator = () => {
               </Box>
             </Grid>
             <Grid item md={6} sm={6} xs={12}>
-              <Box textAlign="center">
+              <Box pt={1} textAlign="center">
                 <Typography variant="h6">
                   Weekly rewards: <strong>{umaYieldAmount} $UMA</strong>
                 </Typography>
@@ -140,7 +140,7 @@ const YieldCalculator = () => {
               </Box>
             </Grid>
             <Grid item md={6} sm={6} xs={12}>
-              <Box textAlign="center">
+              <Box pt={1} textAlign="center">
                 <Typography variant="h6">
                   Yearly APR in USD <strong>{apr}%</strong>
                 </Typography>
@@ -149,7 +149,7 @@ const YieldCalculator = () => {
             </Grid>
           </Grid>
         </form>
-        <Box pt={3}>
+        <Box pt={4}>
           <Typography>
             <strong>Note: </strong>Providing liquidity on Balancer will{" "}
             <i>also</i> yield BAL rewards over and above $UMA. To calculate your
