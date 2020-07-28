@@ -32,8 +32,6 @@ interface SortableTableHeaderProps {
   sortField: number;
 }
 
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
-
 const Link = styled.a`
   color: white;
   font-size: 18px;
@@ -57,8 +55,15 @@ const MoreInfo = styled.a`
   text-align: center;
   &:hover {
     background-color: white;
-    transition: 0.5s;
+    transition: 0.3s;
     cursor: pointer;
+  }
+`;
+
+const StyledTableRow = styled(TableRow)`
+  &:hover {
+    transition: 0.1s;
+    background-color: #636363;
   }
 `;
 
@@ -224,36 +229,48 @@ const AllPositions = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Sponsor</TableCell>
-                  <TableCell align="right">
-                    <SortableTableColumnHeader
-                      sortField={SORT_FIELD.COLLATERAL}
-                    >
-                      Collateral
-                      <br />({collSymbol}){" "}
-                    </SortableTableColumnHeader>
+                  <TableCell>
+                    <strong>Sponsor</strong>
                   </TableCell>
                   <TableCell align="right">
-                    <SortableTableColumnHeader sortField={SORT_FIELD.TOKENS}>
-                      Synthetics
-                      <br />({tokenSymbol}){" "}
-                    </SortableTableColumnHeader>
+                    <strong>
+                      <SortableTableColumnHeader
+                        sortField={SORT_FIELD.COLLATERAL}
+                      >
+                        Collateral
+                        <br />({collSymbol}){" "}
+                      </SortableTableColumnHeader>
+                    </strong>
                   </TableCell>
                   <TableCell align="right">
-                    <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
-                      Collateral Ratio{" "}
-                    </SortableTableColumnHeader>
+                    <strong>
+                      <SortableTableColumnHeader sortField={SORT_FIELD.TOKENS}>
+                        Synthetics
+                        <br />({tokenSymbol}){" "}
+                      </SortableTableColumnHeader>
+                    </strong>
+                  </TableCell>
+                  <TableCell align="right">
+                    <strong>
+                      <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
+                        Collateral
+                        <br /> Ratio{" "}
+                      </SortableTableColumnHeader>
+                    </strong>
                   </TableCell>
                   <Tooltip
                     title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
                     placement="top"
                   >
                     <TableCell align="right">
-                      <SortableTableColumnHeader
-                        sortField={SORT_FIELD.LIQ_PRICE}
-                      >
-                        Liquidation Price{" "}
-                      </SortableTableColumnHeader>
+                      <strong>
+                        <SortableTableColumnHeader
+                          sortField={SORT_FIELD.LIQ_PRICE}
+                        >
+                          Liquidation
+                          <br /> Price{" "}
+                        </SortableTableColumnHeader>
+                      </strong>
                     </TableCell>
                   </Tooltip>
                   <TableCell align="right"></TableCell>
@@ -263,7 +280,7 @@ const AllPositions = () => {
                 {reformattedSponsorData.map((sponsor: string) => {
                   const activeSponsor = activeSponsors[sponsor];
                   return (
-                    <TableRow key={sponsor}>
+                    <StyledTableRow key={sponsor}>
                       <TableCell component="th" scope="row">
                         <a href={getEtherscanUrl(sponsor)} target="_blank">
                           {prettyAddress(sponsor)}
@@ -288,7 +305,7 @@ const AllPositions = () => {
                           ⋮
                         </MoreInfo>
                       </TableCell>
-                    </TableRow>
+                    </StyledTableRow>
                   );
                 })}
               </TableBody>

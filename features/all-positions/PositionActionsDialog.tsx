@@ -33,8 +33,7 @@ import EmpSponsors from "../../containers/EmpSponsors";
 import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import PriceFeed from "../../containers/PriceFeed";
-
-import { useEtherscanUrl } from "../../utils/useEtherscanUrl";
+import Etherscan from "../../containers/Etherscan";
 
 const Label = styled.span`
   color: #999999;
@@ -67,22 +66,8 @@ interface DialogProps {
 }
 
 const PositionActionsDialog = (props: DialogProps) => {
-  const [dialogTabIndex, setDialogTabIndex] = useState<string | null>("top-up");
-  const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
-  const [minCollPerToken, setMinCollPerToken] = useState<string>("");
-  const [maxCollPerToken, setMaxCollPerToken] = useState<string>("");
-  const [maxTokensToLiquidate, setMaxTokensToLiquidate] = useState<string>("");
-  const [deadline, setDeadline] = useState<string>("");
-
-  const [hash, setHash] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean | null>(null);
-  const [error, setError] = useState<Error | null>(null);
   const { empState } = EmpState.useContainer();
-  const {
-    priceIdentifier: priceId,
-    collateralRequirement: collReq,
-    currentTime,
-  } = empState;
+  const { getEtherscanUrl } = Etherscan.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice, sourceUrl } = PriceFeed.useContainer();
   const {
@@ -98,6 +83,25 @@ const PositionActionsDialog = (props: DialogProps) => {
     setMaxAllowance: setMaxCollateralAllowance,
   } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
+
+  const [dialogTabIndex, setDialogTabIndex] = useState<string | null>(
+    "deposit"
+  );
+  const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
+  const [minCollPerToken, setMinCollPerToken] = useState<string>("");
+  const [maxCollPerToken, setMaxCollPerToken] = useState<string>("");
+  const [maxTokensToLiquidate, setMaxTokensToLiquidate] = useState<string>("");
+  const [deadline, setDeadline] = useState<string>("");
+
+  const [hash, setHash] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+
+  const {
+    priceIdentifier: priceId,
+    collateralRequirement: collReq,
+    currentTime,
+  } = empState;
 
   const setDialogTab = (
     event: MouseEvent<HTMLElement>,
@@ -235,7 +239,7 @@ const PositionActionsDialog = (props: DialogProps) => {
   };
 
   const collBalanceTooLow = () => {
-    if (dialogTabIndex == "top-up") {
+    if (dialogTabIndex == "deposit") {
       return (collBalance || 0) < (Number(collateralToDeposit) || 0);
     }
     if (dialogTabIndex == "liquidate") {
@@ -248,14 +252,14 @@ const PositionActionsDialog = (props: DialogProps) => {
     (tokenBalance || 0) < (Number(maxTokensToLiquidate) || 0);
 
   const needCollateralAllowance = () => {
-    if (dialogTabIndex == "top-up") {
+    if (dialogTabIndex == "deposit") {
       if (collAllowance === null || collateralToDeposit === null) return true;
       if (collAllowance === "Infinity") return false;
       return collAllowance < parseFloat(collateralToDeposit);
     }
     if (dialogTabIndex == "liquidate") {
       const finalFee = "10"; // TODO: replace this with the actual final fee for the given contract.
-      if (collAllowance === null || finalFee === null) return true;
+      if (collAllowance === null) return true;
       if (collAllowance === "Infinity") return false;
       return collAllowance < parseFloat(finalFee);
     }
@@ -307,9 +311,10 @@ const PositionActionsDialog = (props: DialogProps) => {
                 <a
                   href={
                     props.selectedSponsor
-                      ? useEtherscanUrl(props.selectedSponsor)
+                      ? getEtherscanUrl(props.selectedSponsor)
                       : "N/A"
                   }
+                  target="_blank"
                 >
                   {prettyAddress(props.selectedSponsor)}
                 </a>
@@ -338,7 +343,9 @@ const PositionActionsDialog = (props: DialogProps) => {
                   "No" && (
                   <Status>
                     <Label>Withdraw liveness time remaining: </Label>
-                    {props.selectedSponsor && pendingWithdrawTimeString}
+                    {props.selectedSponsor &&
+                      activeSponsors[props.selectedSponsor]
+                        .pendingWithdrawTimeString}
                   </Status>
                 )}
               <Status>
@@ -351,7 +358,9 @@ const PositionActionsDialog = (props: DialogProps) => {
                   "No" && (
                   <Status>
                     <Label>Transfer liveness time remaining: </Label>
-                    {props.selectedSponsor && pendingTransferTimeString}
+                    {props.selectedSponsor &&
+                      activeSponsors[props.selectedSponsor]
+                        .pendingTransferTimeString}
                   </Status>
                 )}
               <Status>
@@ -376,18 +385,20 @@ const PositionActionsDialog = (props: DialogProps) => {
                 exclusive
                 onChange={setDialogTab}
               >
-                <ToggleButton value="top-up">top up</ToggleButton>
+                <ToggleButton value="deposit">deposit</ToggleButton>
                 <ToggleButton value="liquidate">liquidate</ToggleButton>
                 <ToggleButton value="dispute">dispute</ToggleButton>
               </ToggleButtonGroup>
             </Box>
             <Box>
-              {dialogTabIndex === "top-up" && (
+              {dialogTabIndex === "deposit" && (
                 <Box pt={2}>
                   <Typography>
-                    <strong>Top up this sponsor position</strong>
+                    <strong>
+                      Deposit collateral into this sponsor position
+                    </strong>
                     <br></br>
-                    You can deposit additional collateral to this sponsor's
+                    You can add additional collateral to this sponsor's
                     position, even if it's not yours.
                   </Typography>
                   <Box pt={2}>

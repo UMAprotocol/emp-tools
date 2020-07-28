@@ -28,8 +28,8 @@ interface PositionQuery {
   sponsor: { id: string };
   tokensOutstanding: string;
   collateral: string;
-  pendingWithdraw: boolean;
-  pendingTransfer: boolean;
+  pendingWithdraw: string;
+  pendingTransfer: string;
   withdrawalRequestPassTimestamp: string;
   withdrawalRequestAmount: string;
   transferPositionRequestPassTimestamp: string;
@@ -91,7 +91,6 @@ const useEmpSponsors = () => {
         );
 
         if (empData) {
-          console.log("empData.positions", empData.positions);
           let newPositions: SponsorMap = {};
 
           const collReqFromWei = parseFloat(
