@@ -1,13 +1,4 @@
-import {
-  Box,
-  TextField,
-  Typography,
-  Grid,
-  Menu,
-  MenuItem,
-  Button,
-} from "@material-ui/core";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import { Box, TextField, Typography, Grid, Radio } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import EmpState from "../../containers/EmpState";
@@ -36,31 +27,14 @@ const YieldCalculator = () => {
   const [tokenPrice, setTokenPrice] = useState<string | null>(
     usdPrice ? usdPrice.toString() : null
   );
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUserMode, setSelectedUserMode] = useState<string | null>(
     "buyer"
   );
 
-  const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedUserMode(event.target.value);
   };
 
-  const handleMenuItemClick = (
-    event: React.MouseEvent<HTMLElement>,
-    index: string
-  ) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedUserMode(index);
-    setAnchorEl(null);
-  };
-
-  const handelOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
   const [yieldAmount, setYieldAmount] = useState<number | null>(null);
 
   const calculateDaysToExpiry = () => {
@@ -120,35 +94,18 @@ const YieldCalculator = () => {
       <Box pt={2}>
         <Typography>
           <strong>Calculator mode: </strong>
-          <Button
-            variant="outlined"
-            aria-controls="simple-menu"
-            aria-haspopup="true"
-            onClick={handelOpenMenu}
-            style={{ paddingRight: "5px" }}
-          >
-            {selectedUserMode}
-            <ArrowDropDownIcon />
-          </Button>
-          <Menu
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <MenuItem
-              selected={selectedUserMode === "buyer"}
-              onClick={(event) => handleMenuItemClick(event, "buyer")}
-            >
-              buyer
-            </MenuItem>
-            <MenuItem
-              selected={selectedUserMode === "seller"}
-              onClick={(event) => handleMenuItemClick(event, "seller")}
-            >
-              seller
-            </MenuItem>
-          </Menu>
+          <Radio
+            checked={selectedUserMode === "buyer"}
+            onChange={handleRadioChange}
+            value="buyer"
+          />
+          buyer{" "}
+          <Radio
+            checked={selectedUserMode === "seller"}
+            onChange={handleRadioChange}
+            value="seller"
+          />
+          seller
         </Typography>
       </Box>
       <form noValidate autoComplete="off">

@@ -2,7 +2,6 @@ import { Box, TextField, Typography, Grid } from "@material-ui/core";
 
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import EmpState from "../../containers/EmpState";
 import Balancer from "../../containers/Balancer";
 
 import { getUmaPrice } from "./UmaTokenPrice";
@@ -15,7 +14,6 @@ const FormInput = styled.div`
 const WEEKS_PER_YEAR = 52;
 
 const YieldCalculator = () => {
-  const { empState } = EmpState.useContainer();
   const { usdPrice, pool } = Balancer.useContainer();
   const [umaPrice, setUmaPrice] = useState<number | null>(4.0);
   const [yUSDAdded, setyUSDAdded] = useState<string | null>("1000");
@@ -28,7 +26,6 @@ const YieldCalculator = () => {
   getUmaPrice().then((price) => {
     setUmaPrice(price);
   });
-  //   console.log("PRICE", umaPrice);
 
   const calculateYield = () => {
     if (!yUSDAdded || Number(yUSDAdded) < 0) {
@@ -73,9 +70,9 @@ const YieldCalculator = () => {
 
   return (
     <span>
-      <Typography variant="h5">$UMA Farming calculator</Typography>
+      <Typography variant="h5">UMA Liquidity Mining</Typography>
       <Typography>
-        During the liquidity mining program 25k $UMA rewards will be paid out to
+        During the liquidity mining program 25k UMA rewards will be paid out to
         LP providers in the yUSD balancer pool. Rewards are calculated as a
         pro-rata contribution to the liquidity pool. To learn more about the
         liquidity mining program see UMA Medium post{" "}
@@ -134,7 +131,7 @@ const YieldCalculator = () => {
             <Grid item md={6} sm={6} xs={12}>
               <Box textAlign="center">
                 <Typography variant="h6">
-                  Weekly rewards: <strong>{umaYieldAmount} $UMA</strong>
+                  Weekly rewards: <strong>{umaYieldAmount} UMA</strong>
                 </Typography>
                 <Typography>~{usdYieldAmount} USD per week</Typography>
               </Box>
@@ -144,7 +141,7 @@ const YieldCalculator = () => {
                 <Typography variant="h6">
                   Yearly APR in USD <strong>{apr}%</strong>
                 </Typography>
-                <Typography>At current $UMA price of {umaPrice}</Typography>
+                <Typography>At current UMA price of {umaPrice}</Typography>
               </Box>
             </Grid>
           </Grid>
@@ -152,7 +149,7 @@ const YieldCalculator = () => {
         <Box pt={4}>
           <Typography>
             <strong>Note: </strong>Providing liquidity on Balancer will{" "}
-            <i>also</i> yield BAL rewards over and above $UMA. To calculate your
+            <i>also</i> yield BAL rewards over and above UMA. To calculate your
             BAL rewards use{" "}
             <a
               href="https://www.predictions.exchange/balancer/None"

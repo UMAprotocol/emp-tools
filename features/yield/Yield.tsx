@@ -58,9 +58,9 @@ const Yield = () => {
           onChange={handleAlignment}
         >
           <ToggleButton value="farming-calculator">
-            Farming calculator
+            Liquidity Mining
           </ToggleButton>
-          <ToggleButton value="yusd-calculator">yusd calculator</ToggleButton>
+          <ToggleButton value="yusd-calculator">yusd Yield</ToggleButton>
         </ToggleButtonGroup>
       </Box>
       {dialogTabIndex === "farming-calculator" && (
