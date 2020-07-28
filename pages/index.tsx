@@ -75,7 +75,7 @@ export default function Index() {
         <Hidden only={["sm", "xs"]}>
           <StyledTabs value={tabIndex} onChange={(_, i) => setTabIndex(i)}>
             {options.map((option, index) => (
-              <Tab label={option} disableRipple />
+              <Tab key={option} label={option} disableRipple />
             ))}
           </StyledTabs>
         </Hidden>
