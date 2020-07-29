@@ -23,7 +23,7 @@ export const POOL = (stringifiedTokenList: String) => gql`
       joinsCount
       exitsCount
       swapsCount
-      shares(first:1000) {
+      shares(first:1000, where: { balance_gt: 0}) {
         userAddress {
           id
         }
