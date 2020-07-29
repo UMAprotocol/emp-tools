@@ -34,6 +34,7 @@ function useConnection() {
     );
     const signer = provider.getSigner();
     const network = await provider.getNetwork();
+
     // get address
     await provider.send("eth_requestAccounts", []);
     const address = await signer.getAddress();
