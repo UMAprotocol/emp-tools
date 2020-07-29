@@ -23,6 +23,7 @@ interface ContractState {
   withdrawalLiveness: BigNumber | null;
   currentTime: BigNumber | null;
   isExpired: boolean | null;
+  contractState: number | null;
 }
 
 const initState = {
@@ -43,6 +44,7 @@ const initState = {
   withdrawalLiveness: null,
   currentTime: null,
   isExpired: null,
+  contractState: null,
 };
 
 const useContractState = () => {
@@ -75,6 +77,7 @@ const useContractState = () => {
         emp.liquidationLiveness(),
         emp.withdrawalLiveness(),
         emp.getCurrentTime(),
+        emp.contractState(),
       ]);
 
       const newState: ContractState = {
@@ -95,6 +98,7 @@ const useContractState = () => {
         withdrawalLiveness: res[14] as BigNumber,
         currentTime: res[15] as BigNumber,
         isExpired: Number(res[15]) >= Number(res[0]),
+        contractState: Number(res[16]),
       };
 
       setState(newState);

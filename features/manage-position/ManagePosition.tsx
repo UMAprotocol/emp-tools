@@ -8,6 +8,7 @@ import Create from "./Create";
 import Deposit from "./Deposit";
 import Redeem from "./Redeem";
 import Withdraw from "./Withdraw";
+import SettleExpired from "./SettleExpired";
 import YourPosition from "./YourPosition";
 import YourWallet from "./YourWallet";
 
@@ -41,7 +42,7 @@ const Manager = () => {
         {method === "deposit" && <Deposit />}
         {method === "withdraw" && <Withdraw />}
         {method === "redeem" && <Redeem />}
-        {method === "settle" && <div>EXPIRY STUFF</div>}
+        {method === "settle" && <SettleExpired />}
       </Box>
     );
   } else {
