@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography } from "@material-ui/core";
 
 import Connection from "../../containers/Connection";
+import EmpState from "../../containers/EmpState";
 import MethodSelector from "./MethodSelector";
 import Create from "./Create";
 import Deposit from "./Deposit";
@@ -10,15 +11,40 @@ import Withdraw from "./Withdraw";
 import YourPosition from "./YourPosition";
 import YourWallet from "./YourWallet";
 
-export type Method = "create" | "deposit" | "withdraw" | "redeem";
+export type Method = "create" | "deposit" | "withdraw" | "redeem" | "settle";
+const DEFAULT_METHOD = "create";
 
 const Manager = () => {
   const { signer } = Connection.useContainer();
-  const [method, setMethod] = useState<Method>("create");
+  const { empState } = EmpState.useContainer();
+  const { isExpired } = empState;
+  const [method, setMethod] = useState<Method>(DEFAULT_METHOD);
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) =>
     setMethod(e.target.value as Method);
 
-  if (signer === null) {
+  if (signer !== null && isExpired !== null) {
+    // Whenever the expiry state changes, check if we should change the default method.
+    useEffect(() => {
+      setMethod(DEFAULT_METHOD);
+      if (isExpired) {
+        setMethod("settle");
+      }
+    }, [isExpired]);
+
+    return (
+      <Box my={0}>
+        <YourWallet />
+        <YourPosition />
+        <MethodSelector method={method} handleChange={handleChange} />
+
+        {method === "create" && <Create />}
+        {method === "deposit" && <Deposit />}
+        {method === "withdraw" && <Withdraw />}
+        {method === "redeem" && <Redeem />}
+        {method === "settle" && <div>EXPIRY STUFF</div>}
+      </Box>
+    );
+  } else {
     return (
       <Box>
         <Typography>
@@ -27,19 +53,6 @@ const Manager = () => {
       </Box>
     );
   }
-
-  return (
-    <Box my={0}>
-      <YourWallet />
-      <YourPosition />
-      <MethodSelector method={method} handleChange={handleChange} />
-
-      {method === "create" && <Create />}
-      {method === "deposit" && <Deposit />}
-      {method === "withdraw" && <Withdraw />}
-      {method === "redeem" && <Redeem />}
-    </Box>
-  );
 };
 
 export default Manager;
