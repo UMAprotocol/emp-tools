@@ -1,11 +1,12 @@
 import styled from "styled-components";
-import { Box, Grid, Typography } from "@material-ui/core";
+import { Box, Grid, Typography, Button } from "@material-ui/core";
 
 import TotalsContainer from "../../containers/Totals";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 
+import Connection from "../../containers/Connection";
 import { getExchangeInfo } from "../../utils/getExchangeLinks";
 
 const DataBox = styled(Box)`
@@ -42,6 +43,7 @@ const White = styled.span`
 `;
 
 const Totals = () => {
+  const { provider } = Connection.useContainer();
   const { totalCollateral, totalTokens } = TotalsContainer.useContainer();
   const {
     symbol: collSymbol,
@@ -87,10 +89,29 @@ const Totals = () => {
     prettyTotalTokens: string = defaultMissingDataDisplay,
     prettyCollSymbol: string = "",
     prettyTokenSymbol: string = "",
-    getExchangeLinkCollateral: string = "https://app.uniswap.org/#/swap",
-    getExchangeLinkToken: string = "https://app.uniswap.org/#/swap",
+    getExchangeLinkCollateral: string = "",
+    getExchangeLinkToken: string = "",
     exchangeName: string = "Uniswap"
   ) {
+    const addTokenToMetamask = async () => {
+      // Add token to users metamask wallet.
+      if (provider == null) return;
+
+      // @ts-ignore
+      provider.send("wallet_watchAsset", {
+        // @ts-ignore
+        type: "ERC20",
+        options: {
+          address: tokenAddress,
+          symbol: tokenSymbol?.substring(0, 6),
+          name: "test",
+          decimals: 18,
+          image:
+            "https://etherscan.io/token/images/yusdsynthetictokenexpiring1september2020_32.png",
+        },
+        id: Math.round(Math.random() * 100000),
+      });
+    };
     return (
       <>
         <Grid item md={6} xs={12}>
@@ -103,20 +124,24 @@ const Totals = () => {
               of <White>collateral</White> supplied
             </Label>
             <LinksContainer>
-              <SmallLink
-                href={getEtherscanUrl(collAddress)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Etherscan
-              </SmallLink>
-              <SmallLink
-                href={getExchangeLinkCollateral}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {exchangeName}
-              </SmallLink>
+              {collAddress && (
+                <SmallLink
+                  href={getEtherscanUrl(collAddress)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Etherscan
+                </SmallLink>
+              )}
+              {getExchangeLinkCollateral != "" && (
+                <SmallLink
+                  href={getExchangeLinkCollateral}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {exchangeName}
+                </SmallLink>
+              )}
             </LinksContainer>
           </DataBox>
         </Grid>
@@ -131,20 +156,31 @@ const Totals = () => {
               of <White>synthetic tokens</White> outstanding
             </Label>
             <LinksContainer>
-              <SmallLink
-                href={getEtherscanUrl(tokenAddress)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Etherscan
-              </SmallLink>
-              <SmallLink
-                href={getExchangeLinkToken}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {exchangeName}
-              </SmallLink>
+              {tokenAddress && (
+                <SmallLink
+                  href={getEtherscanUrl(tokenAddress)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Etherscan
+                </SmallLink>
+              )}
+
+              {getExchangeLinkToken != "" && (
+                <SmallLink
+                  href={getExchangeLinkToken}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {exchangeName}
+                </SmallLink>
+              )}
+
+              {tokenAddress && (
+                <SmallLink href="#" onClick={addTokenToMetamask}>
+                  Add to Metamask
+                </SmallLink>
+              )}
             </LinksContainer>
           </DataBox>
         </Grid>
