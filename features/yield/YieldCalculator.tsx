@@ -30,7 +30,7 @@ const YieldCalculator = () => {
     USER_MODE.BUY
   );
 
-  function setEmpValues() {
+  function setDefaultValues() {
     if (expirationTimestamp !== null && usdPrice !== null) {
       const calculateDaysToExpiry = () => {
         const currentTimestamp = Math.round(Date.now() / MS_PER_S);
@@ -71,7 +71,7 @@ const YieldCalculator = () => {
 
   // Update state whenever EMP selection changes.
   useEffect(() => {
-    setEmpValues();
+    setDefaultValues();
   }, [empState]);
 
   // Update yield amount whenever inputs change.
