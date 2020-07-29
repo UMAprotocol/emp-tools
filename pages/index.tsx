@@ -96,7 +96,6 @@ export default function Index() {
               </Grid>
             </Box>
             <Menu
-              id="lock-menu"
               anchorEl={anchorEl}
               keepMounted
               open={Boolean(anchorEl)}

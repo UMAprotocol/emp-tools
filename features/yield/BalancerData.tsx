@@ -114,8 +114,6 @@ const BalancerData = () => {
               <Label>Exits count: </Label>
               {poolExitsCount}
             </Status>
-          </Grid>
-          <Grid item md={6} sm={6} xs={12}>
             <Status>
               <Label>Unique LPs: </Label>
               {uniqueShareholders}
