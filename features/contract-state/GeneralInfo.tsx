@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { utils } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
-import { useState, useEffect } from "react";
 
 import EmpState from "../../containers/EmpState";
 import Token from "../../containers/Token";
