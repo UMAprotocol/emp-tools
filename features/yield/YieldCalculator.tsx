@@ -1,4 +1,4 @@
-import { Box, TextField, Typography, Grid, Radio } from "@material-ui/core";
+import { Box, TextField, Typography, Grid } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import EmpState from "../../containers/EmpState";
@@ -24,17 +24,10 @@ const YieldCalculator = () => {
   const { empState } = EmpState.useContainer();
   const { expirationTimestamp } = empState;
   const { usdPrice } = Balancer.useContainer();
+
   const [tokenPrice, setTokenPrice] = useState<string | null>(
     usdPrice ? usdPrice.toString() : null
   );
-  const [selectedUserMode, setSelectedUserMode] = useState<string | null>(
-    "buyer"
-  );
-
-  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedUserMode(event.target.value);
-  };
-
   const [yieldAmount, setYieldAmount] = useState<number | null>(null);
 
   const calculateDaysToExpiry = () => {
@@ -69,8 +62,7 @@ const YieldCalculator = () => {
         1 / Number(tokenPrice),
         1 / (Number(daysToExpiry) / DAYS_PER_YEAR)
       ) - 1;
-    const flipSign = selectedUserMode === "buyer" ? 1 : -1;
-    return yieldPerUnit * flipSign;
+    return yieldPerUnit;
   };
 
   const prettyPercentage = (x: number | null) => {
@@ -81,33 +73,11 @@ const YieldCalculator = () => {
   // Update the yield whenever the parameters change.
   useEffect(() => {
     setYieldAmount(calculateYield());
-  }, [selectedUserMode, tokenPrice, daysToExpiry]);
+  }, [tokenPrice, daysToExpiry]);
 
   return (
     <span>
       <Typography variant="h5">yUSD Yield Calculator</Typography>
-      <Typography>
-        The Yield for yUSD changes if you plan on <i>buying</i> it as a
-        borrower, looking for a stable yield or <i>selling</i> it as a lender,
-        looking to gain levered exposure on your ETH.
-      </Typography>
-      <Box pt={2}>
-        <Typography>
-          <strong>Calculator mode: </strong>
-          <Radio
-            checked={selectedUserMode === "buyer"}
-            onChange={handleRadioChange}
-            value="buyer"
-          />
-          buyer{" "}
-          <Radio
-            checked={selectedUserMode === "seller"}
-            onChange={handleRadioChange}
-            value="seller"
-          />
-          seller
-        </Typography>
-      </Box>
       <form noValidate autoComplete="off">
         <Grid container spacing={2}>
           <Grid item md={4} sm={6} xs={12}>
@@ -138,7 +108,7 @@ const YieldCalculator = () => {
                 inputProps={{ min: "0", max: "10", step: "1" }}
                 helperText={
                   calculateDaysToExpiry()
-                    ? `Days to expiry for EMP: ${calculateDaysToExpiry()}`
+                    ? `Days to expiry for chosen EMP: ${calculateDaysToExpiry()}`
                     : ""
                 }
                 variant="outlined"
@@ -151,8 +121,8 @@ const YieldCalculator = () => {
           <Grid item md={4} sm={12} xs={12}>
             <Box pt={1} textAlign="center">
               <Typography variant="h6">
-                Yearly APR for {selectedUserMode}:{" "}
-                <strong>{prettyPercentage(yieldAmount)}%</strong>
+                Yearly APR for <strong>buyers</strong>:{" "}
+                {prettyPercentage(yieldAmount)}%
               </Typography>
             </Box>
           </Grid>
