@@ -22,6 +22,7 @@ interface ContractState {
   liquidationLiveness: BigNumber | null;
   withdrawalLiveness: BigNumber | null;
   currentTime: BigNumber | null;
+  isExpired: boolean | null;
 }
 
 const initState = {
@@ -41,6 +42,7 @@ const initState = {
   liquidationLiveness: null,
   withdrawalLiveness: null,
   currentTime: null,
+  isExpired: null,
 };
 
 const useContractState = () => {
@@ -92,6 +94,7 @@ const useContractState = () => {
         liquidationLiveness: res[13] as BigNumber,
         withdrawalLiveness: res[14] as BigNumber,
         currentTime: res[15] as BigNumber,
+        isExpired: Number(res[15]) >= Number(res[0]),
       };
 
       setState(newState);
