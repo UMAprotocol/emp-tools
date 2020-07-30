@@ -8,6 +8,8 @@ import Notify from "bnc-notify";
 import { Observable } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 
+import { config } from "./Config";
+
 type Provider = ethers.providers.Provider;
 type Block = ethers.providers.Block;
 type Network = ethers.providers.Network;
@@ -25,14 +27,8 @@ function useConnection() {
   const [block$, setBlock$] = useState<Observable<Block> | null>(null);
 
   const attemptConnection = async () => {
-    const apiKey = process.env.REACT_APP_ONBOARD_API_KEY
-      ? process.env.REACT_APP_ONBOARD_API_KEY
-      : "12153f55-f29e-4f11-aa07-90f10da5d778";
-    const infuraId =
-      process.env.REACT_APP_INFURA_ID || "d5e29c9b9a9d4116a7348113f57770a8";
-    const infuraRpc = `https://${network?.name}.infura.io/v3/${infuraId}`;
     const onboard = Onboard({
-      dappId: apiKey,
+      dappId: config(network).apiKey,
       hideBranding: true,
       networkId: 1, // Default to main net. If on a different network will change with the subscription.
       subscriptions: {
@@ -60,54 +56,15 @@ function useConnection() {
           }
         },
       },
-      walletSelect: {
-        wallets: [
-          { walletName: "metamask", preferred: true },
-          {
-            walletName: "imToken",
-            rpcUrl:
-              !!network && network.chainId === 1
-                ? "https://mainnet-eth.token.im"
-                : "https://eth-testnet.tokenlon.im",
-            preferred: true,
-          },
-          { walletName: "coinbase", preferred: true },
-          {
-            walletName: "portis",
-            apiKey: process.env.REACT_APP_PORTIS_API_KEY,
-          },
-          { walletName: "trust", rpcUrl: infuraRpc },
-          { walletName: "dapper" },
-          {
-            walletName: "walletConnect",
-            rpc: { [network?.chainId || 1]: infuraRpc },
-          },
-          { walletName: "walletLink", rpcUrl: infuraRpc },
-          { walletName: "opera" },
-          { walletName: "operaTouch" },
-          { walletName: "torus" },
-          { walletName: "status" },
-          { walletName: "unilogin" },
-          // { walletName: "authereum" },
-          {
-            walletName: "ledger",
-            rpcUrl: infuraRpc,
-          },
-        ],
-      },
-      walletCheck: [
-        { checkName: "connect" },
-        { checkName: "accounts" },
-        { checkName: "network" },
-        { checkName: "balance", minimumBalance: "0" },
-      ],
+      walletSelect: config(network).onboardWalletSelect,
+      walletCheck: config(network).walletCheck,
     });
 
     await onboard.walletSelect();
     setOnboard(onboard);
     setNotify(
       Notify({
-        dappId: apiKey ? apiKey : "",
+        dappId: config(network).apiKey ? config(network).apiKey : "",
         networkId: network?.chainId || 1,
       })
     );
