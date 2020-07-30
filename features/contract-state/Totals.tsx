@@ -82,11 +82,11 @@ const Totals = () => {
         type: "ERC20",
         options: {
           address: tokenAddress,
-          symbol: tokenSymbol.substring(0, 6),
+          symbol: tokenSymbol.substring(0, 4),
           name: "test",
           decimals: 18,
           image:
-            "https://etherscan.io/token/images/yusdsynthetictokenexpiring1september2020_32.png",
+            "https://raw.githubusercontent.com/UMAprotocol/website/master/src/assets/images/yusd-round.png",
         },
         id: Math.round(Math.random() * 100000),
       });
