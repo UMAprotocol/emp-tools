@@ -2,11 +2,14 @@ import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 import { utils } from "ethers";
 
+import { useQuery } from "@apollo/client";
+import { PRICE_REQUESTS } from "../apollo/uma/queries";
+
 import Connection from "./Connection";
 import DvmContract from "./DvmContract";
 import EmpState from "./EmpState";
 
-const { formatUnits: fromWei } = utils;
+const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
 interface ContractState {
   hasEmpPrice: boolean | null;
@@ -26,6 +29,13 @@ enum PRICE_REQUEST_STATUSES {
   FUTURE, // Is scheduled to be voted on in a future round.
 }
 
+interface PriceRequestQuery {
+  identifier: {
+    id: string;
+  };
+  time: string;
+}
+
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
   const { contract: dvm } = DvmContract.useContainer();
@@ -33,6 +43,15 @@ const useContractState = () => {
   const { priceIdentifier, expirationTimestamp } = empState;
 
   const [state, setState] = useState<ContractState>(initState);
+
+  // Because apollo caches results of queries, we will poll/refresh this query periodically.
+  // We set the poll interval to a very slow 5 seconds for now since the position states
+  // are not expected to change much.
+  // Source: https://www.apollographql.com/docs/react/data/queries/#polling
+  const { loading, error, data } = useQuery(PRICE_REQUESTS, {
+    context: { clientName: "UMA" },
+    pollInterval: 5000,
+  });
 
   // get state from EMP
   const queryState = async () => {
@@ -53,21 +72,40 @@ const useContractState = () => {
       const hasPrice = res[0][0].status === PRICE_REQUEST_STATUSES.RESOLVED;
 
       let resolvedPrice = null;
-      if (hasPrice) {
-        try {
-          const postResolutionRes = await Promise.all([
-            // `getPrice()` will fail on mainnet because the deployed `Voting.getPrice()` is required to be called from a registered contract, such as this EMP!
-            // TODO: Figure out a way to spoof the `from` parameter in this contract call and set to `emp.address`. One possibility is via the UMA subgraph
-            dvm.getPrice(
-              priceIdentifier.toString(),
-              expirationTimestamp.toNumber()
-            ),
-          ]);
 
-          resolvedPrice = parseFloat(fromWei(postResolutionRes.toString()));
-        } catch (err) {
-          console.error(`getPrice failed:`, err);
+      // Fetch price from graph if available.
+      if (error) {
+        console.error(`Apollo client failed to fetch graph data:`, error);
+      } else if (hasPrice && !loading && data) {
+        // Implementation 1: Use subgraph data. This works for mainnet but not Kovan since the UMA subgraph does not currently index Kovan data.
+        const matchingPriceRequest = data.priceRequests.find(
+          (request: PriceRequestQuery) => {
+            return (
+              request.identifier.id === "ETH/BTC" && //hexToUtf8(priceIdentifier)
+              request.time === "1592952397" //expirationTimestamp.toString()
+            );
+          }
+        );
+        if (matchingPriceRequest && matchingPriceRequest.isResolved) {
+          resolvedPrice = parseFloat(
+            fromWei(matchingPriceRequest.price.toString())
+          );
         }
+
+        // // Implementation 2: Call contract. This works for Kovan/MockOracle and is therefore useful for testing, but not mainnet since `getPrice` must be called with the overrideL `{from: emp.address}`.
+        // try {
+        //   const postResolutionRes = await Promise.all([
+        //     // `getPrice()` will fail on mainnet because the deployed `Voting.getPrice()` is required to be called from a registered contract, such as this EMP!
+        //     // TODO: Figure out a way to spoof the `from` parameter in this contract call and set to `emp.address`.
+        //     dvm.getPrice(
+        //       priceIdentifier.toString(),
+        //       expirationTimestamp.toNumber()
+        //     ),
+        //   ]);
+        //   resolvedPrice = parseFloat(fromWei(postResolutionRes.toString()));
+        // } catch (err) {
+        //   console.error(`getPrice failed:`, err);
+        // }
       }
 
       const newState: ContractState = {

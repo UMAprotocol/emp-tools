@@ -14,3 +14,16 @@ export const ACTIVE_POSITIONS = gql`
     }
   }
 `;
+
+export const PRICE_REQUESTS = gql`
+  query priceRequests {
+    priceRequests {
+      price
+      isResolved
+      time
+      identifier {
+        id
+      }
+    }
+  }
+`;
