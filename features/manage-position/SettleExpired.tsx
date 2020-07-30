@@ -76,7 +76,6 @@ const SettleExpired = () => {
     const expiryDate = new Date(
       Number(expirationTimestamp) * 1000
     ).toLocaleString("en-GB", { timeZone: "UTC" });
-    const remainingTokens = Math.max(posTokens - tokenBalance, 0);
 
     const needsToRequestSettlementPrice = contractState === CONTRACT_STATE.OPEN;
 
@@ -234,16 +233,17 @@ const SettleExpired = () => {
         {collateralToReceive !== null && (
           <Box py={4}>
             <Typography>{`Resolved price (${priceIdUtf8} @ ${expiryDate}): ${resolvedPrice}`}</Typography>
-            <Typography>{`Total ${collSymbol} you will receive: ${collateralToReceive}`}</Typography>
-            <Typography>{`Redemption value of outstanding tokens in position: ${positionTRV}`}</Typography>
             <Typography>{`Collateral in position: ${posColl}`}</Typography>
+            <Typography>{`Redemption value of outstanding tokens in position: ${positionTRV}`}</Typography>
             <Typography>
               <strong>{`Excess collateral in position that you will receive: ${excessCollateral}`}</strong>
             </Typography>
             <Typography>
               <strong>{`Redemption value of tokens in your wallet: ${balanceTRV}`}</strong>
             </Typography>
-            <Typography>{`Tokens that will remain in position: ${remainingTokens}`}</Typography>
+            <br></br>
+            <br></br>
+            <Typography>{`Total ${collSymbol} you will receive: ${collateralToReceive}`}</Typography>
           </Box>
         )}
 
