@@ -33,8 +33,6 @@ function useContract() {
     }
   };
   useEffect(() => {
-    setContract(null);
-
     setDvmContract();
   }, [finderAddress, provider]);
 
