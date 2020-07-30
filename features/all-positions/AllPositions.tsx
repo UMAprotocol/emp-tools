@@ -84,7 +84,7 @@ const AllPositions = () => {
   const { symbol: tokenSymbol } = Token.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
-  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
   // Pagination
@@ -118,7 +118,6 @@ const AllPositions = () => {
     collSymbol !== null &&
     latestPrice !== null &&
     priceId !== null &&
-    sourceUrl !== undefined &&
     activeSponsors &&
     Object.keys(activeSponsors).length > 0
   ) {
@@ -180,10 +179,7 @@ const AllPositions = () => {
       <Box>
         <Box>
           <Typography>
-            {`Estimated price of ${prettyLatestPrice} for ${priceIdUtf8} sourced from: `}
-            <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase Pro.
-            </Link>
+            {`Estimated price of ${prettyLatestPrice} for ${priceIdUtf8}`}
           </Typography>
         </Box>
         <Box pt={4}>

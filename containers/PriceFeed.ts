@@ -12,7 +12,7 @@ function usePriceFeed() {
   const { symbol: tokenSymbol } = Token.useContainer();
 
   const [latestPrice, setLatestPrice] = useState<number | null>(null);
-  const [source, setSource] = useState<string | undefined>(undefined);
+  const [source, setSource] = useState<string[] | undefined>(undefined);
 
   const queryPrice = async () => {
     setLatestPrice(null);
@@ -31,7 +31,7 @@ function usePriceFeed() {
 
   return {
     latestPrice,
-    sourceUrl: source,
+    sourceUrls: source,
   };
 }
 
