@@ -61,46 +61,40 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
             onChange={handleChange}
             input={<BootstrapInput />}
           >
-            {_isExpired && (
-              <MenuItem value={"settle"}>
+            {_isExpired && [
+              <MenuItem key={"settle"} value={"settle"}>
                 <ListItemText
                   primary="Settle"
                   secondary="Settle expired tokens."
                 />
-              </MenuItem>
-            )}
-            {!_isExpired && (
-              <MenuItem value={"create"}>
+              </MenuItem>,
+            ]}
+            {!_isExpired && [
+              <MenuItem key={"create"} value={"create"}>
                 <ListItemText
                   primary="Create"
                   secondary="Mint new synthetic tokens."
                 />
-              </MenuItem>
-            )}
-            {!_isExpired && (
-              <MenuItem value={"deposit"}>
+              </MenuItem>,
+              <MenuItem key={"deposit"} value={"deposit"}>
                 <ListItemText
                   primary="Deposit"
                   secondary="Add to position collateral."
                 />
-              </MenuItem>
-            )}
-            {!_isExpired && (
-              <MenuItem value={"withdraw"}>
+              </MenuItem>,
+              <MenuItem key={"withdraw"} value={"withdraw"}>
                 <ListItemText
                   primary="Withdraw"
                   secondary="Remove position collateral"
                 />
-              </MenuItem>
-            )}
-            {!_isExpired && (
-              <MenuItem value={"redeem"}>
+              </MenuItem>,
+              <MenuItem key={"redeem"} value={"redeem"}>
                 <ListItemText
                   primary="Redeem"
                   secondary="Redeem synthetics for collateral."
                 />
-              </MenuItem>
-            )}
+              </MenuItem>,
+            ]}
           </Select>
         </FormWrapper>
       </Box>

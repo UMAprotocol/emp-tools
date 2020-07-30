@@ -9,18 +9,26 @@ import Connection from "./Connection";
 const { formatBytes32String: utf8ToHex } = ethers.utils;
 
 function useContract() {
-  const { signer } = Connection.useContainer();
+  const { provider } = Connection.useContainer();
   const { empState } = EmpState.useContainer();
   const { finderAddress } = empState;
   const [contract, setContract] = useState<ethers.Contract | null>(null);
 
   const setDvmContract = async () => {
-    if (finderAddress !== null && signer !== null) {
-      const finder = new ethers.Contract(finderAddress, uma.finder.abi, signer);
+    if (finderAddress !== null && provider !== null) {
+      const finder = new ethers.Contract(
+        finderAddress,
+        uma.finder.abi,
+        provider
+      );
       const dvmAddress = await finder.getImplementationAddress(
         utf8ToHex("Oracle")
       );
-      const dvm = new ethers.Contract(dvmAddress, uma.voting.abi, signer);
+
+      // Do not inject a signer into this contract so that we can make calls from the EMP's address.
+      // We will only have read-only access to the Contract, but overriding the `from` address is neccessary for `getPrice` or `hasPrice`.
+      // Moreover, we won't be submitting any txns to the DVM.
+      const dvm = new ethers.Contract(dvmAddress, uma.voting.abi, provider);
       setContract(dvm);
     }
   };
@@ -28,7 +36,7 @@ function useContract() {
     setContract(null);
 
     setDvmContract();
-  }, [finderAddress, signer]);
+  }, [finderAddress, provider]);
 
   return { contract };
 }
