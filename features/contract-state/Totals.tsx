@@ -82,7 +82,7 @@ const Totals = () => {
         type: "ERC20",
         options: {
           address: tokenAddress,
-          symbol: tokenSymbol?.substring(0, 6),
+          symbol: tokenSymbol.substring(0, 6),
           name: "test",
           decimals: 18,
           image:
