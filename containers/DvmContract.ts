@@ -12,25 +12,38 @@ function useContract() {
   const { signer } = Connection.useContainer();
   const { empState } = EmpState.useContainer();
   const { finderAddress } = empState;
-  const [contract, setContract] = useState<ethers.Contract | null>(null);
+  const [votingContract, setVotingContract] = useState<ethers.Contract | null>(
+    null
+  );
+  const [storeContract, setStoreContract] = useState<ethers.Contract | null>(
+    null
+  );
 
-  const setDvmContract = async () => {
+  const setDvmContracts = async () => {
     if (finderAddress !== null && signer !== null) {
       const finder = new ethers.Contract(finderAddress, uma.finder.abi, signer);
-      const dvmAddress = await finder.getImplementationAddress(
-        utf8ToHex("Oracle")
-      );
+      const res = await Promise.all([
+        finder.getImplementationAddress(utf8ToHex("Oracle")),
+        finder.getImplementationAddress(utf8ToHex("Store")),
+      ]);
+
+      const dvmAddress = res[0];
+      const storeAddress = res[1];
       const dvm = new ethers.Contract(dvmAddress, uma.voting.abi, signer);
-      setContract(dvm);
+      setVotingContract(dvm);
+
+      const store = new ethers.Contract(storeAddress, uma.store.abi, signer);
+      setStoreContract(store);
     }
   };
   useEffect(() => {
-    setContract(null);
+    setVotingContract(null);
+    setStoreContract(null);
 
-    setDvmContract();
+    setDvmContracts();
   }, [finderAddress, signer]);
 
-  return { contract };
+  return { votingContract, storeContract };
 }
 
 const Contract = createContainer(useContract);

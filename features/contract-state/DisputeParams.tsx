@@ -3,6 +3,8 @@ import { ethers } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
+import DvmState from "../../containers/DvmState";
+import Collateral from "../../containers/Collateral";
 
 import { DOCS_MAP } from "../../utils/getDocLinks";
 
@@ -25,13 +27,17 @@ const fromWei = ethers.utils.formatUnits;
 
 const DisputeParams = () => {
   const { empState } = EmpState.useContainer();
-
   const {
     disputeBondPct,
     disputerDisputeRewardPct,
     sponsorDisputeRewardPct,
     withdrawalLiveness,
   } = empState;
+
+  const { dvmState } = DvmState.useContainer();
+  const { finalFee } = dvmState;
+  const { symbol: collSymbol } = Collateral.useContainer();
+
   const withdrawalLivenessInMinutes = (Number(withdrawalLiveness) / 60).toFixed(
     2
   );
@@ -39,6 +45,20 @@ const DisputeParams = () => {
   return (
     <Box>
       <Typography variant="h5">Dispute Params</Typography>
+      <Status>
+        <Label>
+          Liquidation bond (
+          <Link
+            href={DOCS_MAP.FINAL_FEE}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Docs
+          </Link>
+          ){`: `}
+        </Label>
+        {finalFee ? finalFee : "N/A"} {collSymbol}
+      </Status>
       <Status>
         <Label>Dispute bond: </Label>
         {disputeBondPct

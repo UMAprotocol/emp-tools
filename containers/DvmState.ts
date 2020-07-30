@@ -6,6 +6,7 @@ import { useQuery } from "@apollo/client";
 import { PRICE_REQUESTS } from "../apollo/uma/queries";
 
 import Connection from "./Connection";
+import Collateral from "./Collateral";
 import DvmContract from "./DvmContract";
 import EmpState from "./EmpState";
 
@@ -14,11 +15,13 @@ const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 interface ContractState {
   hasEmpPrice: boolean | null;
   resolvedPrice: number | null;
+  finalFee: number | null;
 }
 
 const initState = {
   hasEmpPrice: null,
   resolvedPrice: null,
+  finalFee: null,
 };
 
 // Taken from Voting.sol implementation.
@@ -38,7 +41,11 @@ interface PriceRequestQuery {
 
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
-  const { contract: dvm } = DvmContract.useContainer();
+  const {
+    votingContract: dvm,
+    storeContract: store,
+  } = DvmContract.useContainer();
+  const { address: collAddress } = Collateral.useContainer();
   const { empState } = EmpState.useContainer();
   const { priceIdentifier, expirationTimestamp } = empState;
 
@@ -57,6 +64,8 @@ const useContractState = () => {
   const queryState = async () => {
     if (
       dvm !== null &&
+      store !== null &&
+      collAddress !== null &&
       priceIdentifier !== null &&
       expirationTimestamp !== null
     ) {
@@ -67,9 +76,11 @@ const useContractState = () => {
             time: expirationTimestamp.toNumber(),
           },
         ]),
+        store.computeFinalFee(collAddress),
       ]);
 
       const hasPrice = res[0][0].status === PRICE_REQUEST_STATUSES.RESOLVED;
+      const finalFee = parseFloat(fromWei(res[1][0].toString()));
 
       let resolvedPrice = null;
 
@@ -111,6 +122,7 @@ const useContractState = () => {
       const newState: ContractState = {
         hasEmpPrice: hasPrice,
         resolvedPrice: resolvedPrice,
+        finalFee: finalFee,
       };
 
       setState(newState);
@@ -119,7 +131,7 @@ const useContractState = () => {
 
   // get state on setting of contract
   useEffect(() => {
-    setState(initState);
+    // setState(initState);
 
     queryState();
   }, [dvm, priceIdentifier, expirationTimestamp]);
