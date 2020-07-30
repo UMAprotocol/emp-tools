@@ -25,7 +25,7 @@ function useConnection() {
 
   const attemptConnection = async () => {
     const onboard = Onboard({
-      dappId: config(network).apiKey,
+      dappId: config(network).onboardConfig.apiKey,
       hideBranding: true,
       networkId: 1, // Default to main net. If on a different network will change with the subscription.
       subscriptions: {
@@ -53,8 +53,8 @@ function useConnection() {
           }
         },
       },
-      walletSelect: config(network).onboardWalletSelect,
-      walletCheck: config(network).walletCheck,
+      walletSelect: config(network).onboardConfig.onboardWalletSelect,
+      walletCheck: config(network).onboardConfig.walletCheck,
     });
 
     await onboard.walletSelect();
