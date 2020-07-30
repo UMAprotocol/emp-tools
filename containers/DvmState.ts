@@ -81,8 +81,8 @@ const useContractState = () => {
         const matchingPriceRequest = data.priceRequests.find(
           (request: PriceRequestQuery) => {
             return (
-              request.identifier.id === "ETH/BTC" && //hexToUtf8(priceIdentifier)
-              request.time === "1592952397" //expirationTimestamp.toString()
+              request.identifier.id === hexToUtf8(priceIdentifier) &&
+              request.time === expirationTimestamp.toString()
             );
           }
         );
