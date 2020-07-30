@@ -61,7 +61,8 @@ const Totals = () => {
     tokenSymbol !== null &&
     exchangeInfo !== undefined &&
     collAddress !== null &&
-    tokenAddress !== null
+    tokenAddress !== null &&
+    provider !== null
   ) {
     const prettyTotalCollateral = Number(totalCollateral).toLocaleString();
     const prettyTotalTokens = Number(totalTokens).toLocaleString();
@@ -71,29 +72,7 @@ const Totals = () => {
     const getExchangeLinkToken = exchangeInfo.getExchangeUrl(tokenAddress);
     const exchangeName = exchangeInfo.name;
 
-    return renderComponent(
-      prettyTotalCollateral,
-      prettyTotalTokens,
-      prettyCollSymbol,
-      prettyTokenSymbol,
-      getExchangeLinkCollateral,
-      getExchangeLinkToken,
-      exchangeName
-    );
-  } else {
-    return renderComponent();
-  }
-
-  function renderComponent(
-    prettyTotalCollateral: string = defaultMissingDataDisplay,
-    prettyTotalTokens: string = defaultMissingDataDisplay,
-    prettyCollSymbol: string = "",
-    prettyTokenSymbol: string = "",
-    getExchangeLinkCollateral: string = "",
-    getExchangeLinkToken: string = "",
-    exchangeName: string = "Uniswap"
-  ) {
-    const addTokenToMetamask = async () => {
+    const addTokenToMetamask = () => {
       // Add token to users metamask wallet.
       if (provider == null) return;
 
@@ -112,6 +91,35 @@ const Totals = () => {
         id: Math.round(Math.random() * 100000),
       });
     };
+
+    return renderComponent(
+      prettyTotalCollateral,
+      prettyTotalTokens,
+      prettyCollSymbol,
+      prettyTokenSymbol,
+      collAddress,
+      tokenAddress,
+      getExchangeLinkCollateral,
+      getExchangeLinkToken,
+      exchangeName,
+      addTokenToMetamask
+    );
+  } else {
+    return renderComponent();
+  }
+
+  function renderComponent(
+    prettyTotalCollateral: string = defaultMissingDataDisplay,
+    prettyTotalTokens: string = defaultMissingDataDisplay,
+    prettyCollSymbol: string = "",
+    prettyTokenSymbol: string = "",
+    collAddress: string = "",
+    tokenAddress: string = "",
+    getExchangeLinkCollateral: string = "",
+    getExchangeLinkToken: string = "",
+    exchangeName: string = "Uniswap",
+    addTokenToMetamask: any = null
+  ) {
     return (
       <>
         <Grid item md={6} xs={12}>
@@ -124,7 +132,7 @@ const Totals = () => {
               of <White>collateral</White> supplied
             </Label>
             <LinksContainer>
-              {collAddress && (
+              {collAddress !== "" && (
                 <SmallLink
                   href={getEtherscanUrl(collAddress)}
                   target="_blank"
@@ -133,7 +141,7 @@ const Totals = () => {
                   Etherscan
                 </SmallLink>
               )}
-              {getExchangeLinkCollateral != "" && (
+              {getExchangeLinkCollateral !== "" && (
                 <SmallLink
                   href={getExchangeLinkCollateral}
                   target="_blank"
@@ -156,7 +164,7 @@ const Totals = () => {
               of <White>synthetic tokens</White> outstanding
             </Label>
             <LinksContainer>
-              {tokenAddress && (
+              {tokenAddress !== "" && (
                 <SmallLink
                   href={getEtherscanUrl(tokenAddress)}
                   target="_blank"
@@ -166,7 +174,7 @@ const Totals = () => {
                 </SmallLink>
               )}
 
-              {getExchangeLinkToken != "" && (
+              {getExchangeLinkToken !== "" && (
                 <SmallLink
                   href={getExchangeLinkToken}
                   target="_blank"
@@ -176,7 +184,7 @@ const Totals = () => {
                 </SmallLink>
               )}
 
-              {tokenAddress && (
+              {tokenAddress !== "" && (
                 <SmallLink href="#" onClick={addTokenToMetamask}>
                   Add to Metamask
                 </SmallLink>
