@@ -12,6 +12,7 @@
     "@apollo/client": "^3.0.1",
     "@material-ui/core": "^4.10.2",
     "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
     "@studydefi/money-legos": "^2.3.2",
     "bnc-notify": "^1.2.4",
     "bnc-onboard": "^1.10.3",

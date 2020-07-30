@@ -21,6 +21,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../utils/getDocLinks";
 
 const Important = styled(Typography)`
@@ -117,7 +118,8 @@ const Create = () => {
     const resultantLiquidationPrice = getLiquidationPrice(
       resultantCollateral,
       resultantTokens,
-      collReqFromWei
+      collReqFromWei,
+      isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
     const liquidationPriceDangerouslyFarBelowCurrentPrice =
       parseFloat(resultantLiquidationPrice) <
@@ -129,7 +131,8 @@ const Create = () => {
     const balanceBelowCollateralToDeposit = balance < collateralToDeposit;
     const needAllowance =
       collAllowance !== "Infinity" && collAllowance < collateralToDeposit;
-    const resultantTokensBelowMin = resultantTokens < minSponsorTokensFromWei;
+    const resultantTokensBelowMin =
+      resultantTokens < minSponsorTokensFromWei && resultantTokens !== 0;
     const resultantCRBelowRequirement =
       parseFloat(pricedResultantCR) >= 0 &&
       parseFloat(pricedResultantCR) < collReqFromWei;
@@ -209,7 +212,7 @@ const Create = () => {
           </Box>
 
           <Grid container spacing={3}>
-            <Grid item xs={4}>
+            <Grid item md={4} sm={6} xs={12}>
               <TextField
                 fullWidth
                 type="number"
@@ -220,14 +223,14 @@ const Create = () => {
                 error={balanceBelowCollateralToDeposit}
                 helperText={
                   balanceBelowCollateralToDeposit &&
-                  `Your ${collSymbol} balance is too low`
+                  `${collSymbol} balance is too low`
                 }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setCollateral(e.target.value)
                 }
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item md={4} sm={6} xs={12}>
               <TextField
                 fullWidth
                 type="number"
@@ -238,44 +241,46 @@ const Create = () => {
                 error={resultantTokensBelowMin}
                 helperText={
                   resultantTokensBelowMin &&
-                  `You must create at least ${minSponsorTokensFromWei} ${tokenSymbol} from your position`
+                  `Below minimum of ${minSponsorTokensFromWei}`
                 }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setTokens(e.target.value)
                 }
               />
             </Grid>
-            <Grid item xs={4}>
-              <Box py={1}>
+            <Grid item md={4} sm={6} xs={12}>
+              <Box py={0}>
                 {needAllowance && (
                   <Button
+                    fullWidth
                     variant="contained"
                     onClick={setMaxAllowance}
-                    style={{ marginRight: `12px` }}
                   >
                     Max Approve
                   </Button>
                 )}
-                <Button
-                  variant="contained"
-                  onClick={mintTokens}
-                  disabled={
-                    needAllowance ||
-                    transactionCRBelowGCR ||
-                    balanceBelowCollateralToDeposit ||
-                    resultantCRBelowRequirement ||
-                    resultantTokensBelowMin ||
-                    collateralToDeposit <= 0 ||
-                    tokensToCreate <= 0
-                  }
-                >
-                  {`Create ${tokensToCreate} ${tokenSymbol} with ${collateralToDeposit} ${collSymbol}`}
-                </Button>
+                {!needAllowance && (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={mintTokens}
+                    disabled={
+                      transactionCRBelowGCR ||
+                      balanceBelowCollateralToDeposit ||
+                      resultantCRBelowRequirement ||
+                      resultantTokensBelowMin ||
+                      collateralToDeposit <= 0 ||
+                      tokensToCreate <= 0
+                    }
+                  >
+                    {`Create ${tokensToCreate} ${tokenSymbol} with ${collateralToDeposit} ${collSymbol}`}
+                  </Button>
+                )}
               </Box>
             </Grid>
           </Grid>
 
-          <Box py={4}>
+          <Box pt={4}>
             <Typography>
               {`Transaction CR: `}
               <Tooltip
@@ -364,7 +369,7 @@ const Create = () => {
             </Box>
           )}
           {error && (
-            <Box py={2}>
+            <Box pt={2}>
               <Typography>
                 <span style={{ color: "red" }}>{error.message}</span>
               </Typography>

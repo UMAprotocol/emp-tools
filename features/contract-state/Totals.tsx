@@ -93,7 +93,7 @@ const Totals = () => {
   ) {
     return (
       <>
-        <Grid item xs={6}>
+        <Grid item md={6} xs={12}>
           <DataBox>
             <Typography variant="h4">
               <strong>{prettyTotalCollateral}</strong>
@@ -121,7 +121,7 @@ const Totals = () => {
           </DataBox>
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid item md={6} xs={12}>
           <DataBox>
             <Typography variant="h4">
               <strong>{prettyTotalTokens}</strong>

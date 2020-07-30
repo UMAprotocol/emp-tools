@@ -18,6 +18,8 @@ interface IProps {
 }
 
 const ConnectButton = styled(Button)`
+  padding-top: 8px;
+  padding-bottom: 8px;
   pointer-events: ${({ styled }: IProps) =>
     styled.connected ? "none" : "unset"};
   ${({ styled }: IProps) => styled.connected && "background-color: #303030;"}
@@ -28,7 +30,7 @@ const AddressBox = styled.div`
   align-self: stretch;
   border-right: none;
   margin-right: -2px;
-  padding-right: 14px;
+  padding-right: 12px;
   padding-left: 12px;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;

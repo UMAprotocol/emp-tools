@@ -7,11 +7,13 @@ import EmpContract from "../../containers/EmpContract";
 import Connection from "../../containers/Connection";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
+import Token from "../../containers/Token";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
 const Link = styled.a`
   color: white;
@@ -28,6 +30,7 @@ const Deposit = () => {
   const { notify } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
   const {
     symbol: collSymbol,
     balance: collBalance,
@@ -60,6 +63,8 @@ const Deposit = () => {
     collReq !== null &&
     collDec !== null &&
     priceIdentifier !== null &&
+    tokenSymbol !== null &&
+    collSymbol !== null &&
     posColl !== 0 // If position has no collateral, then don't render deposit component.
   ) {
     const collateralToDeposit = Number(collateral) || 0;
@@ -73,7 +78,8 @@ const Deposit = () => {
     const resultantLiquidationPrice = getLiquidationPrice(
       resultantCollateral,
       posTokens,
-      collReqFromWei
+      collReqFromWei,
+      isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
 
     // Error conditions for calling deposit:
@@ -127,7 +133,7 @@ const Deposit = () => {
         </Box>
 
         <Grid container spacing={3}>
-          <Grid item xs={4}>
+          <Grid item md={4} sm={6} xs={12}>
             <Box py={0}>
               <TextField
                 fullWidth
@@ -147,10 +153,11 @@ const Deposit = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={4}>
-            <Box py={1}>
+          <Grid item md={4} sm={6} xs={12}>
+            <Box py={0}>
               {needAllowance && (
                 <Button
+                  fullWidth
                   variant="contained"
                   onClick={setMaxAllowance}
                   style={{ marginRight: `12px` }}
@@ -158,17 +165,18 @@ const Deposit = () => {
                   Max Approve
                 </Button>
               )}
-              <Button
-                variant="contained"
-                onClick={depositCollateral}
-                disabled={
-                  needAllowance ||
-                  balanceBelowCollateralToDeposit ||
-                  collateralToDeposit <= 0
-                }
-              >
-                {`Deposit ${collateralToDeposit} ${collSymbol} into your position`}
-              </Button>
+              {!needAllowance && (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={depositCollateral}
+                  disabled={
+                    balanceBelowCollateralToDeposit || collateralToDeposit <= 0
+                  }
+                >
+                  {`Deposit ${collateralToDeposit} ${collSymbol} into your position`}
+                </Button>
+              )}
             </Box>
           </Grid>
         </Grid>
