@@ -47,7 +47,7 @@ const YourPosition = () => {
   const { empState } = EmpState.useContainer();
   const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
-  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
   const { collateralRequirement: collReq, priceIdentifier } = empState;
   const defaultMissingDataDisplay = "N/A";
 
@@ -61,7 +61,6 @@ const YourPosition = () => {
     tokenSymbol !== null &&
     latestPrice !== null &&
     collReq !== null &&
-    sourceUrl !== undefined &&
     priceIdentifier !== null &&
     withdrawAmt !== null &&
     pendingWithdraw !== null &&
@@ -93,8 +92,7 @@ const YourPosition = () => {
       priceIdUtf8,
       withdrawAmt.toFixed(4),
       pendingWithdraw,
-      pendingTransfer,
-      sourceUrl
+      pendingTransfer
     );
   } else {
     return renderComponent();
@@ -113,8 +111,7 @@ const YourPosition = () => {
     priceIdUtf8: string = defaultMissingDataDisplay,
     _withdrawAmt: string = "0",
     _pendingWithdraw: string = defaultMissingDataDisplay,
-    _pendingTransfer: string = defaultMissingDataDisplay,
-    pricefeedUrl: string = "https://api.pro.coinbase.com/products/"
+    _pendingTransfer: string = defaultMissingDataDisplay
   ) {
     return (
       <Container>
@@ -152,17 +149,7 @@ const YourPosition = () => {
           <Grid item md={6} xs={12}>
             <Typography variant="h5">Contract Info</Typography>
             <Status>
-              <Label>
-                Identifier price(
-                <Link
-                  href={pricefeedUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Coinbase
-                </Link>
-                ):{" "}
-              </Label>
+              <Label>Identifier price: </Label>
               {_latestPrice}
             </Status>
 
