@@ -13,12 +13,12 @@ const OutlinedContainer = styled.div`
 `;
 
 const Yield = () => {
-  const [dialogTabIndex, setDialogTabIndex] = useState<string | null>(
+  const [dialogTabIndex, setDialogTabIndex] = useState<string>(
     "farming-calculator"
   );
   const handleAlignment = (
     event: MouseEvent<HTMLElement>,
-    newAlignment: string | null
+    newAlignment: string
   ) => {
     setDialogTabIndex(newAlignment);
   };

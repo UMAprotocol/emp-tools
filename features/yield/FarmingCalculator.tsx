@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Balancer from "../../containers/Balancer";
 
-import { getUmaPrice } from "./UmaTokenPrice";
+import { getUmaPrice } from "../../utils/getUmaTokenPrice";
 
 const FormInput = styled.div`
   margin-top: 20px;
@@ -12,61 +12,89 @@ const FormInput = styled.div`
 `;
 
 const WEEKS_PER_YEAR = 52;
+const WEEKLY_UMA_REWARDS = 25000;
 
-const YieldCalculator = () => {
+const FarmingCalculator = () => {
   const { usdPrice, pool } = Balancer.useContainer();
-  const [umaPrice, setUmaPrice] = useState<number | null>(4.0);
-  const [yUSDAdded, setyUSDAdded] = useState<string | null>("1000");
-  const [USDCAdded, setUSDCAdded] = useState<string | null>("1000");
-  const [fracLiquidity, setFracLiquidity] = useState<string | null>(null);
-  const [umaYieldAmount, setUmaYieldAmount] = useState<string | null>(null);
-  const [usdYieldAmount, setUsdYieldAmount] = useState<string | null>(null);
-  const [apr, setApr] = useState<string | null>(null);
 
-  getUmaPrice().then((price) => {
-    setUmaPrice(price);
-  });
+  // Yield inputs:
+  const [umaPrice, setUmaPrice] = useState<string>("");
+  const [yUSDPrice, setyUSDPrice] = useState<string>("");
+  const [yUSDAdded, setyUSDAdded] = useState<string>("");
+  const [USDCAdded, setUSDCAdded] = useState<string>("");
+  const [poolLiquidity, setPoolLiquidity] = useState<string>("");
 
-  const calculateYield = () => {
-    if (!yUSDAdded || Number(yUSDAdded) < 0) {
-      return null;
-    }
-    if (!USDCAdded || Number(USDCAdded) < 0) {
-      return null;
-    }
-    if (!usdPrice || Number(usdPrice) < 0) {
-      return null;
-    }
-    if (!pool) {
-      return null;
-    }
-    if (!umaPrice) {
-      return null;
-    }
-    const totalValueAddedToPool =
-      Number(USDCAdded) + Number(yUSDAdded) * Number(usdPrice);
-    if (!totalValueAddedToPool || totalValueAddedToPool == 0) {
-      return null;
-    }
-    const fracLiquidityProvided =
-      totalValueAddedToPool / Number(pool.liquidity);
-    setFracLiquidity((fracLiquidityProvided * 100).toFixed(4));
-    const weeklyUMARewarded = 25000;
-    const umaPaidPerWeek = fracLiquidityProvided * weeklyUMARewarded;
-    setUmaYieldAmount(umaPaidPerWeek.toFixed(4));
-    const usdYieldPerWeek = umaPaidPerWeek * umaPrice;
-    setUsdYieldAmount(usdYieldPerWeek.toFixed(4));
+  // Yield outputs:
+  const [fracLiquidity, setFracLiquidity] = useState<string>("");
+  const [umaYieldAmount, setUmaYieldAmount] = useState<string>("");
+  const [usdYieldAmount, setUsdYieldAmount] = useState<string>("");
+  const [apr, setApr] = useState<string>("");
 
-    const apr =
-      ((umaPaidPerWeek * WEEKS_PER_YEAR * umaPrice) / totalValueAddedToPool) *
-      100;
-    setApr(apr.toFixed(4));
+  async function setDefaultValues() {
+    if (usdPrice !== null && pool !== null) {
+      setyUSDPrice(usdPrice.toString());
+      setPoolLiquidity(pool.liquidity.toString());
+      setUmaPrice(await getUmaPrice());
+    }
+  }
+
+  const calculateYield = (
+    _yUSDAdded: number,
+    _USDCAdded: number,
+    _yUSDPrice: number,
+    _poolLiquidity: number,
+    _umaPrice: number
+  ) => {
+    if (
+      _yUSDAdded < 0 ||
+      _USDCAdded < 0 ||
+      _yUSDPrice < 0 ||
+      _poolLiquidity <= 0 ||
+      _umaPrice < 0
+    ) {
+      return null;
+    }
+
+    const totalValueAddedToPool = _USDCAdded + _yUSDPrice * _yUSDAdded;
+    const fracLiquidityProvided = totalValueAddedToPool / _poolLiquidity;
+    const umaPaidPerWeek = fracLiquidityProvided * WEEKLY_UMA_REWARDS;
+    const usdYieldPerWeek = umaPaidPerWeek * _umaPrice;
+
+    let apr = 0;
+    if (totalValueAddedToPool > 0) {
+      apr = (usdYieldPerWeek * WEEKS_PER_YEAR) / totalValueAddedToPool;
+    }
+
+    return {
+      fracLiquidityProvided,
+      umaPaidPerWeek,
+      usdYieldPerWeek,
+      apr,
+    };
   };
 
-  // Update the yield whenever the parameters change.
+  // Update state whenever container data changes.
   useEffect(() => {
-    calculateYield();
-  }, [usdPrice, yUSDAdded, USDCAdded]);
+    setDefaultValues();
+  }, [usdPrice, pool]);
+
+  // Update yield amount whenever inputs change.
+  useEffect(() => {
+    const updatedYield = calculateYield(
+      Number(yUSDAdded) || 0,
+      Number(USDCAdded) || 0,
+      Number(yUSDPrice) || 0,
+      Number(poolLiquidity) || 0,
+      Number(umaPrice) || 0
+    );
+
+    if (updatedYield !== null) {
+      setFracLiquidity((updatedYield.fracLiquidityProvided * 100).toFixed(4));
+      setUmaYieldAmount(updatedYield.umaPaidPerWeek.toFixed(4));
+      setUsdYieldAmount(updatedYield.usdYieldPerWeek.toFixed(4));
+      setApr((updatedYield.apr * 100).toFixed(4));
+    }
+  }, [yUSDAdded, USDCAdded, yUSDPrice, poolLiquidity, umaPrice]);
 
   return (
     <span>
@@ -95,7 +123,7 @@ const YieldCalculator = () => {
                   fullWidth
                   type="number"
                   label="yUSD added to pool"
-                  value={yUSDAdded?.toString() || ""}
+                  value={yUSDAdded}
                   onChange={(e) => setyUSDAdded(e.target.value)}
                   variant="outlined"
                   inputProps={{ min: "0", step: "1" }}
@@ -111,7 +139,7 @@ const YieldCalculator = () => {
                   fullWidth
                   type="number"
                   label="USDC added to pool"
-                  value={USDCAdded?.toString() || ""}
+                  value={USDCAdded}
                   onChange={(e) => setUSDCAdded(e.target.value)}
                   inputProps={{ min: "0" }}
                   variant="outlined"
@@ -166,4 +194,4 @@ const YieldCalculator = () => {
   );
 };
 
-export default YieldCalculator;
+export default FarmingCalculator;
