@@ -10,7 +10,7 @@ import EmpState from "./EmpState";
 const fromWei = ethers.utils.formatUnits;
 
 function useToken() {
-  const { signer, address, notify, block$ } = Connection.useContainer();
+  const { signer, address, block$ } = Connection.useContainer();
   const { empAddress } = EmpAddress.useContainer();
   const { empState } = EmpState.useContainer();
   const tokenAddress = empState.tokenCurrency;
@@ -51,11 +51,7 @@ function useToken() {
   const setMaxAllowance = async () => {
     if (contract && empAddress) {
       try {
-        const tx = await contract.approve(
-          empAddress,
-          ethers.constants.MaxUint256
-        );
-        notify?.hash(tx.hash);
+        await contract.approve(empAddress, ethers.constants.MaxUint256);
       } catch (error) {
         console.error(error);
       }

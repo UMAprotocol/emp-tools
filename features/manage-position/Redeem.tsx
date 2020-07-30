@@ -12,7 +12,6 @@ import {
 import { utils } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
-import Connection from "../../containers/Connection";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
@@ -36,7 +35,6 @@ const {
 
 const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
-  const { notify } = Connection.useContainer();
   const { empState } = EmpState.useContainer();
   const { minSponsorTokens } = empState;
   const { symbol: collSymbol } = Collateral.useContainer();
@@ -110,7 +108,6 @@ const Redeem = () => {
           const tokensToRedeemWei = toWei(tokensToRedeem.toString());
           const tx = await emp.redeem([tokensToRedeemWei]);
           setHash(tx.hash as string);
-          notify?.hash(tx.hash);
           await tx.wait();
           setSuccess(true);
         } catch (error) {

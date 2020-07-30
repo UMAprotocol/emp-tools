@@ -18,7 +18,6 @@ import Position from "../../containers/Position";
 import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
-import Connection from "../../containers/Connection";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
@@ -41,8 +40,7 @@ const {
   parseUnits: toWei,
 } = utils;
 
-const Withdraw = () => {
-  const { notify } = Connection.useContainer();
+const Deposit = () => {
   const { empState } = EmpState.useContainer();
   const {
     collateralRequirement: collReq,
@@ -149,12 +147,10 @@ const Withdraw = () => {
           if (resultantCRBelowGCR) {
             const tx = await emp.requestWithdrawal([collateralToWithdrawWei]);
             setHash(tx.hash as string);
-            notify?.hash(tx.hash);
             await tx.wait();
           } else {
             const tx = await emp.withdraw([collateralToWithdrawWei]);
             setHash(tx.hash as string);
-            notify?.hash(tx.hash);
             await tx.wait();
           }
           setSuccess(true);
@@ -175,7 +171,6 @@ const Withdraw = () => {
         try {
           const tx = await emp.withdrawPassedRequest();
           setHash(tx.hash as string);
-          notify?.hash(tx.hash);
           await tx.wait();
           setSuccess(true);
         } catch (error) {
@@ -452,4 +447,4 @@ const Withdraw = () => {
   }
 };
 
-export default Withdraw;
+export default Deposit;

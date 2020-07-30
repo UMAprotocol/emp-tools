@@ -78,7 +78,7 @@ const Weth = () => {
     wethBalance,
     ethBalance,
   } = WethContract.useContainer();
-  const { signer, notify } = Connection.useContainer();
+  const { signer } = Connection.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
   const [ethAmount, setEthAmount] = useState<string>("0");
@@ -117,7 +117,6 @@ const Weth = () => {
             value: amountWei,
           });
           setHash(tx.hash as string);
-          notify?.hash(tx.hash);
           await tx.wait();
           setSuccess(true);
         } catch (error) {

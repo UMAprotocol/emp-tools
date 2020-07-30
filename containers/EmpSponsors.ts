@@ -84,6 +84,7 @@ const useEmpSponsors = () => {
           (contract: FinancialContractQuery) =>
             utils.getAddress(contract.id) === emp.address
         );
+
         if (empData) {
           let newPositions: SponsorMap = {};
 
@@ -114,6 +115,7 @@ const useEmpSponsors = () => {
               sponsor,
             };
           });
+
           setActivePositions(newPositions);
         }
       }

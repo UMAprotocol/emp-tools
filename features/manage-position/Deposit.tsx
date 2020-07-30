@@ -4,7 +4,6 @@ import { Box, Button, TextField, Typography, Grid } from "@material-ui/core";
 import { utils } from "ethers";
 
 import EmpContract from "../../containers/EmpContract";
-import Connection from "../../containers/Connection";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
@@ -27,7 +26,6 @@ const {
 } = utils;
 
 const Deposit = () => {
-  const { notify } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
@@ -96,7 +94,6 @@ const Deposit = () => {
           const collateralToDepositWei = toWei(collateral);
           const tx = await emp.deposit([collateralToDepositWei]);
           setHash(tx.hash as string);
-          notify?.hash(tx.hash);
           await tx.wait();
           setSuccess(true);
         } catch (error) {

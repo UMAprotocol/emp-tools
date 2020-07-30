@@ -2,9 +2,7 @@ import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { API as OnboardApi, Wallet } from "bnc-onboard/dist/src/interfaces";
-import { API as NotifyApi } from "bnc-notify/dist/src/interfaces";
 import Onboard from "bnc-onboard";
-import Notify from "bnc-notify";
 import { Observable } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 
@@ -18,7 +16,6 @@ type Signer = ethers.Signer;
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
   const [onboard, setOnboard] = useState<OnboardApi | null>(null);
-  const [notify, setNotify] = useState<NotifyApi | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
   const [network, setNetwork] = useState<Network | null>(null);
   const [address, setAddress] = useState<string | null>(null);
@@ -62,12 +59,6 @@ function useConnection() {
 
     await onboard.walletSelect();
     setOnboard(onboard);
-    setNotify(
-      Notify({
-        dappId: config(network).apiKey ? config(network).apiKey : "",
-        networkId: network?.chainId || 1,
-      })
-    );
   };
 
   const connect = async () => {
@@ -99,7 +90,7 @@ function useConnection() {
   return {
     provider,
     onboard,
-    notify,
+
     signer,
     network,
     address,

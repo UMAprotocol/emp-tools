@@ -10,7 +10,6 @@ import {
 } from "@material-ui/core";
 
 import EmpContract from "../../containers/EmpContract";
-import Connection from "../../containers/Connection";
 import { useState } from "react";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
@@ -42,7 +41,6 @@ const {
 } = utils;
 
 const Create = () => {
-  const { notify } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const {
@@ -148,7 +146,6 @@ const Create = () => {
           const tokensWei = toWei(tokens);
           const tx = await emp.create([collateralWei], [tokensWei]);
           setHash(tx.hash as string);
-          notify?.hash(tx.hash);
           await tx.wait();
           setSuccess(true);
         } catch (error) {
