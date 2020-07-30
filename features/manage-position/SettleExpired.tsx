@@ -7,6 +7,7 @@ import EmpContract from "../../containers/EmpContract";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
+import DvmState from "../../containers/DvmState";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 import { DOCS_MAP } from "../../utils/getDocLinks";
@@ -49,6 +50,8 @@ const SettleExpired = () => {
     balance: tokenBalance,
   } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
+  const { dvmState } = DvmState.useContainer();
+  const { hasEmpPrice, resolvedPrice } = dvmState;
 
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
@@ -65,6 +68,7 @@ const SettleExpired = () => {
     priceIdentifier !== null &&
     expirationTimestamp !== null &&
     contractState !== null &&
+    hasEmpPrice !== null &&
     isExpired !== null &&
     isExpired // If contract has not expired, then do not render this component
   ) {
@@ -72,6 +76,7 @@ const SettleExpired = () => {
     const expiryDate = new Date(
       Number(expirationTimestamp) * 1000
     ).toLocaleString("en-GB", { timeZone: "UTC" });
+    const remainingTokens = Math.max(posTokens - tokenBalance, 0);
 
     const needsToRequestSettlementPrice = contractState === CONTRACT_STATE.OPEN;
 
@@ -79,6 +84,18 @@ const SettleExpired = () => {
     const needAllowance =
       tokenAllowance !== "Infinity" && tokenAllowance < tokenBalance;
     const canSettleTokens = tokenBalance > 0 || posTokens > 0;
+
+    // Calculate collateral to receive if price was resolved.
+    let positionTRV: number = -1;
+    let excessCollateral: number = -1;
+    let balanceTRV: number = -1;
+    let collateralToReceive: number | null = null;
+    if (resolvedPrice !== null) {
+      positionTRV = posTokens * resolvedPrice;
+      excessCollateral = Math.max(posColl - positionTRV, 0);
+      balanceTRV = tokenBalance * resolvedPrice;
+      collateralToReceive = excessCollateral + balanceTRV;
+    }
 
     const settleExpired = async () => {
       if (canSettleTokens) {
@@ -176,39 +193,58 @@ const SettleExpired = () => {
 
         {!needsToRequestSettlementPrice && (
           <>
-            <Box pb={4}>
-              <Important>
-                You cannot settle your tokens until a settlement price has been
-                resolved by the DVM.
-              </Important>
-            </Box>
-            <Grid container spacing={3}>
-              <Grid item md={4} sm={6} xs={12}>
-                <Box>
-                  {needAllowance && (
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      onClick={setMaxAllowance}
-                      style={{ marginRight: `12px` }}
-                    >
-                      Max Approve
-                    </Button>
-                  )}
-                  {!needAllowance && (
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      disabled={!canSettleTokens}
-                      onClick={settleExpired}
-                    >
-                      {`Settle ${tokenSymbol}`}
-                    </Button>
-                  )}
-                </Box>
+            {hasEmpPrice ? (
+              <Grid container spacing={3}>
+                <Grid item md={4} sm={6} xs={12}>
+                  <Box>
+                    {needAllowance && (
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={setMaxAllowance}
+                        style={{ marginRight: `12px` }}
+                      >
+                        Max Approve
+                      </Button>
+                    )}
+                    {!needAllowance && (
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        disabled={!canSettleTokens}
+                        onClick={settleExpired}
+                      >
+                        {`Settle ${tokenSymbol}`}
+                      </Button>
+                    )}
+                  </Box>
+                </Grid>
               </Grid>
-            </Grid>
+            ) : (
+              <Box pb={4}>
+                <Important>
+                  You cannot settle your tokens until a settlement price has
+                  been resolved by the DVM.
+                </Important>
+              </Box>
+            )}
           </>
+        )}
+
+        {collateralToReceive !== null && (
+          <Box py={4}>
+            <Typography>{`Resolved price (${priceIdUtf8} @ ${expiryDate}): ${resolvedPrice}`}</Typography>
+            <Typography>{`Total ${collSymbol} you will receive: ${collateralToReceive}`}</Typography>
+            <Typography>{`Redemption value of outstanding tokens in position: ${positionTRV}`}</Typography>
+            <Typography>{`Collateral in position: ${posColl}`}</Typography>
+            <Typography>
+              <strong>{`Excess collateral in position that you will receive: ${excessCollateral}`}</strong>
+            </Typography>
+            <Typography>
+              <strong>{`Redemption value of tokens in your wallet: ${balanceTRV}`}</strong>
+            </Typography>
+            <Typography>{`Tokens that will remain in position: ${remainingTokens}`}</Typography>
+          </Box>
         )}
 
         {hash && (

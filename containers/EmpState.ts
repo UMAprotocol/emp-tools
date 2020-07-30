@@ -24,6 +24,7 @@ interface ContractState {
   currentTime: BigNumber | null;
   isExpired: boolean | null;
   contractState: number | null;
+  finderAddress: string | null;
 }
 
 const initState = {
@@ -45,6 +46,7 @@ const initState = {
   currentTime: null,
   isExpired: null,
   contractState: null,
+  finderAddress: null,
 };
 
 const useContractState = () => {
@@ -78,6 +80,7 @@ const useContractState = () => {
         emp.withdrawalLiveness(),
         emp.getCurrentTime(),
         emp.contractState(),
+        emp.finder(),
       ]);
 
       const newState: ContractState = {
@@ -99,6 +102,7 @@ const useContractState = () => {
         currentTime: res[15] as BigNumber,
         isExpired: Number(res[15]) >= Number(res[0]),
         contractState: Number(res[16]),
+        finderAddress: res[17] as string, // address
       };
 
       setState(newState);
