@@ -73,9 +73,6 @@ const Totals = () => {
     const exchangeName = exchangeInfo.name;
 
     const addTokenToMetamask = () => {
-      // Add token to users metamask wallet.
-      if (provider == null) return;
-
       // @ts-ignore
       provider.send("wallet_watchAsset", {
         // @ts-ignore
@@ -184,7 +181,7 @@ const Totals = () => {
                 </SmallLink>
               )}
 
-              {tokenAddress !== "" && (
+              {tokenAddress !== "" && tokenSymbol === "yUSD-SEP20" && (
                 <SmallLink href="#" onClick={addTokenToMetamask}>
                   Add to Metamask
                 </SmallLink>
