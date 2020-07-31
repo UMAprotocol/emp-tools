@@ -10,6 +10,8 @@ import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
+import { DOCS_MAP } from "../../utils/getDocLinks";
+
 const Label = styled.span`
   color: #999999;
 `;
@@ -33,13 +35,14 @@ const GeneralInfo = () => {
   const { empState } = EmpState.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { gcr } = Totals.useContainer();
-  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { latestPrice, sourceUrls } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
   const {
     expirationTimestamp: expiry,
     priceIdentifier: priceId,
     collateralRequirement: collReq,
     minSponsorTokens,
+    isExpired,
   } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
 
@@ -53,7 +56,9 @@ const GeneralInfo = () => {
     priceId !== null &&
     collReq !== null &&
     minSponsorTokens !== null &&
-    tokenSymbol !== null
+    tokenSymbol !== null &&
+    isExpired !== null &&
+    sourceUrls !== undefined
   ) {
     const expiryTimestamp = expiry.toString();
     const expiryDate = new Date(
@@ -77,6 +82,8 @@ const GeneralInfo = () => {
       priceIdUtf8,
       collReqPct,
       minSponsorTokensSymbol,
+      isExpired ? "YES" : "NO",
+      sourceUrls,
       sponsorCount
     );
   } else {
@@ -91,6 +98,8 @@ const GeneralInfo = () => {
     priceIdUtf8: string = defaultMissingDataDisplay,
     collReqPct: string = defaultMissingDataDisplay,
     minSponsorTokensSymbol: string = defaultMissingDataDisplay,
+    isExpired: string = defaultMissingDataDisplay,
+    sourceUrls: string[] = [],
     sponsorCount: string = defaultMissingDataDisplay
   ) {
     return (
@@ -115,19 +124,45 @@ const GeneralInfo = () => {
         </Status>
 
         <Status>
+          <Label>Is Expired: </Label>
+          <Link
+            href={DOCS_MAP.EXPIRY_SETTLEMENT}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <strong>{isExpired}</strong>
+          </Link>
+        </Status>
+
+        <Status>
           <Label>Price identifier: </Label>
           {priceIdUtf8}
         </Status>
 
         <Status>
-          <Label>
-            Identifier price: (
-            <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase
-            </Link>
-            )
-          </Label>
-          {`: ${prettyLatestPrice}`}
+          <Label>Identifier price: </Label>
+          {`${prettyLatestPrice}`}
+        </Status>
+
+        <Status>
+          <Label>Identifier sources: </Label>
+          {sourceUrls.map((url: string, index: number) => {
+            return (
+              <Link
+                key={index}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {(index === 0 ? " [" : "") +
+                  ((url.includes("coinbase") && "Coinbase") ||
+                    (url.includes("kraken") && "Kraken") ||
+                    (url.includes("binance") && "Binance") ||
+                    "") +
+                  (index < sourceUrls.length - 1 ? ", " : "]")}
+              </Link>
+            );
+          })}
         </Status>
         <Status>
           <Label>Global collateral ratio: </Label>
