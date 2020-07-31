@@ -17,6 +17,8 @@ import PriceFeed from "../containers/PriceFeed";
 import WethContract from "../containers/WethContract";
 import Etherscan from "../containers/Etherscan";
 import Balancer from "../containers/Balancer";
+import DvmContract from "../containers/DvmContract";
+import DvmState from "../containers/DvmState";
 
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../apollo/client";
@@ -39,7 +41,13 @@ const WithStateContainerProviders = ({ children }: IProps) => (
                       <Totals.Provider>
                         <Etherscan.Provider>
                           <Position.Provider>
-                            <Balancer.Provider>{children}</Balancer.Provider>
+                            <Balancer.Provider>
+                              <DvmContract.Provider>
+                                <DvmState.Provider>
+                                  {children}
+                                </DvmState.Provider>
+                              </DvmContract.Provider>
+                            </Balancer.Provider>
                           </Position.Provider>
                         </Etherscan.Provider>
                       </Totals.Provider>

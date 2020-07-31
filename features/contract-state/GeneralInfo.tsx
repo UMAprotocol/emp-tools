@@ -10,6 +10,8 @@ import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
+import { DOCS_MAP } from "../../utils/getDocLinks";
+
 const Label = styled.span`
   color: #999999;
 `;
@@ -40,6 +42,7 @@ const GeneralInfo = () => {
     priceIdentifier: priceId,
     collateralRequirement: collReq,
     minSponsorTokens,
+    isExpired,
   } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
 
@@ -54,6 +57,7 @@ const GeneralInfo = () => {
     collReq !== null &&
     minSponsorTokens !== null &&
     tokenSymbol !== null &&
+    isExpired !== null &&
     sourceUrls !== undefined
   ) {
     const expiryTimestamp = expiry.toString();
@@ -78,6 +82,7 @@ const GeneralInfo = () => {
       priceIdUtf8,
       collReqPct,
       minSponsorTokensSymbol,
+      isExpired ? "YES" : "NO",
       sourceUrls,
       sponsorCount
     );
@@ -93,6 +98,7 @@ const GeneralInfo = () => {
     priceIdUtf8: string = defaultMissingDataDisplay,
     collReqPct: string = defaultMissingDataDisplay,
     minSponsorTokensSymbol: string = defaultMissingDataDisplay,
+    isExpired: string = defaultMissingDataDisplay,
     sourceUrls: string[] = [],
     sponsorCount: string = defaultMissingDataDisplay
   ) {
@@ -115,6 +121,17 @@ const GeneralInfo = () => {
           <Tooltip title={`Timestamp: ${expiryTimestamp}`} interactive>
             <span>{expiryDate} UTC</span>
           </Tooltip>
+        </Status>
+
+        <Status>
+          <Label>Is Expired: </Label>
+          <Link
+            href={DOCS_MAP.EXPIRY_SETTLEMENT}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <strong>{isExpired}</strong>
+          </Link>
         </Status>
 
         <Status>
