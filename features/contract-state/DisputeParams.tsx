@@ -57,7 +57,8 @@ const DisputeParams = () => {
           </Link>
           ){`: `}
         </Label>
-        {finalFee ? finalFee : "N/A"} {collSymbol}
+        {finalFee !== null ? finalFee : "N/A"}{" "}
+        {collSymbol !== null ? collSymbol : ""}
       </Status>
       <Status>
         <Label>Dispute bond: </Label>

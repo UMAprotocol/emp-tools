@@ -26,13 +26,10 @@ function useContracts() {
         uma.finder.abi,
         provider
       );
-      const res = await Promise.all([
+      const [votingAddress, storeAddress] = await Promise.all([
         finder.getImplementationAddress(utf8ToHex("Oracle")),
         finder.getImplementationAddress(utf8ToHex("Store")),
       ]);
-
-      const votingAddress = res[0];
-      const storeAddress = res[1];
       // Do not inject a provider into this contract so that we can make calls from the EMP's address.
       // We will only have read-only access to the Contract, but overriding the `from` address is neccessary for `getPrice` or `hasPrice`.
       // Moreover, we won't be submitting any txns to the DVM.
