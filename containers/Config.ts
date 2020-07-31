@@ -5,7 +5,6 @@
 import { ethers } from "ethers";
 type Network = ethers.providers.Network;
 export const config = (network: Network | null) => {
-  console.log("ENV", process.env);
   const infuraId =
     process.env.NEXT_PUBLIC_INFURA_ID || "d5e29c9b9a9d4116a7348113f57770a8";
   const infuraRpc = `https://${

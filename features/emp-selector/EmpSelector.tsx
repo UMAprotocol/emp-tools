@@ -66,7 +66,7 @@ const EmpSelector = () => {
             <MenuItem value={0}>
               <ListItemText
                 primary="Not connected"
-                secondary="You must connect to MetaMask before selecting an EMP"
+                secondary="You must connect your wallet first"
               />
             </MenuItem>
           ) : (
