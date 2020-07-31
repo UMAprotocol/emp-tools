@@ -5,14 +5,15 @@
 import { ethers } from "ethers";
 type Network = ethers.providers.Network;
 export const config = (network: Network | null) => {
+  console.log("ENV", process.env);
   const infuraId =
-    process.env.REACT_APP_INFURA_ID || "d5e29c9b9a9d4116a7348113f57770a8";
+    process.env.NEXT_PUBLIC_INFURA_ID || "d5e29c9b9a9d4116a7348113f57770a8";
   const infuraRpc = `https://${network?.name}.infura.io/v3/${infuraId}`;
 
   return {
     onboardConfig: {
       apiKey:
-        process.env.REACT_APP_ONBOARD_API_KEY ||
+        process.env.NEXT_PUBLIC_ONBOARD_API_KEY ||
         "12153f55-f29e-4f11-aa07-90f10da5d778",
       onboardWalletSelect: {
         wallets: [
@@ -28,7 +29,7 @@ export const config = (network: Network | null) => {
           { walletName: "coinbase", preferred: true },
           {
             walletName: "portis",
-            apiKey: process.env.REACT_APP_PORTIS_API_KEY,
+            apiKey: process.env.NEXT_PUBLIC_PORTIS_API_KEY,
           },
           { walletName: "trust", rpcUrl: infuraRpc },
           { walletName: "dapper" },
