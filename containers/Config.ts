@@ -7,10 +7,9 @@ export const config = (network: Network | null) => {
 
   return {
     onboardConfig: {
-      apiKey: process.env.REACT_APP_ONBOARD_API_KEY
-        ? process.env.REACT_APP_ONBOARD_API_KEY
-        : "12153f55-f29e-4f11-aa07-90f10da5d778",
-      portisKey: process.env.REACT_APP_PORTIS_API_KEY,
+      apiKey:
+        process.env.REACT_APP_ONBOARD_API_KEY ||
+        "12153f55-f29e-4f11-aa07-90f10da5d778",
       onboardWalletSelect: {
         wallets: [
           { walletName: "metamask", preferred: true },
