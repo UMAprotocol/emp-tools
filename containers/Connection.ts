@@ -24,14 +24,14 @@ function useConnection() {
   const [block$, setBlock$] = useState<Observable<Block> | null>(null);
 
   const attemptConnection = async () => {
-    const onboard = Onboard({
+    const onboardInstance = Onboard({
       dappId: config(network).onboardConfig.apiKey,
       hideBranding: true,
       networkId: 1, // Default to main net. If on a different network will change with the subscription.
       subscriptions: {
         address: setAddress,
         network: async (networkId: any) => {
-          onboard.config({ networkId: networkId });
+          onboard?.config({ networkId: networkId });
         },
         wallet: async (wallet: Wallet) => {
           if (wallet.provider) {
@@ -57,8 +57,8 @@ function useConnection() {
       walletCheck: config(network).onboardConfig.walletCheck,
     });
 
-    await onboard.walletSelect();
-    setOnboard(onboard);
+    await onboardInstance.walletSelect();
+    setOnboard(onboardInstance);
   };
 
   const connect = async () => {
@@ -90,7 +90,6 @@ function useConnection() {
   return {
     provider,
     onboard,
-
     signer,
     network,
     address,
