@@ -35,7 +35,7 @@ const GeneralInfo = () => {
   const { empState } = EmpState.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { gcr } = Totals.useContainer();
-  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { latestPrice, sourceUrls } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
   const {
     expirationTimestamp: expiry,
@@ -57,7 +57,8 @@ const GeneralInfo = () => {
     collReq !== null &&
     minSponsorTokens !== null &&
     tokenSymbol !== null &&
-    isExpired !== null
+    isExpired !== null &&
+    sourceUrls !== undefined
   ) {
     const expiryTimestamp = expiry.toString();
     const expiryDate = new Date(
@@ -81,8 +82,9 @@ const GeneralInfo = () => {
       priceIdUtf8,
       collReqPct,
       minSponsorTokensSymbol,
-      sponsorCount,
-      isExpired ? "YES" : "NO"
+      isExpired ? "YES" : "NO",
+      sourceUrls,
+      sponsorCount
     );
   } else {
     return renderComponent();
@@ -96,8 +98,9 @@ const GeneralInfo = () => {
     priceIdUtf8: string = defaultMissingDataDisplay,
     collReqPct: string = defaultMissingDataDisplay,
     minSponsorTokensSymbol: string = defaultMissingDataDisplay,
-    sponsorCount: string = defaultMissingDataDisplay,
-    isExpired: string = defaultMissingDataDisplay
+    isExpired: string = defaultMissingDataDisplay,
+    sourceUrls: string[] = [],
+    sponsorCount: string = defaultMissingDataDisplay
   ) {
     return (
       <Box>
@@ -141,14 +144,29 @@ const GeneralInfo = () => {
         </Status>
 
         <Status>
-          <Label>
-            Identifier price: (
-            <Link href={sourceUrl} target="_blank" rel="noopener noreferrer">
-              Coinbase
-            </Link>
-            )
-          </Label>
-          {`: ${prettyLatestPrice}`}
+          <Label>Identifier price: </Label>
+          {`${prettyLatestPrice}`}
+        </Status>
+
+        <Status>
+          <Label>Identifier sources: </Label>
+          {sourceUrls.map((url: string, index: number) => {
+            return (
+              <Link
+                key={index}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {(index === 0 ? " [" : "") +
+                  ((url.includes("coinbase") && "Coinbase") ||
+                    (url.includes("kraken") && "Kraken") ||
+                    (url.includes("binance") && "Binance") ||
+                    "") +
+                  (index < sourceUrls.length - 1 ? ", " : "]")}
+              </Link>
+            );
+          })}
         </Status>
         <Status>
           <Label>Global collateral ratio: </Label>

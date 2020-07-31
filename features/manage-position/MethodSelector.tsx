@@ -50,7 +50,7 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
     return renderComponent();
   }
 
-  function renderComponent(_isExpired: boolean = false) {
+  function renderComponent(contractHasExpired: boolean = false) {
     return (
       <Box py={2}>
         <FormWrapper>
@@ -61,46 +61,41 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
             onChange={handleChange}
             input={<BootstrapInput />}
           >
-            {_isExpired && (
-              <MenuItem value={"settle"}>
-                <ListItemText
-                  primary="Settle"
-                  secondary="Settle expired tokens."
-                />
-              </MenuItem>
-            )}
-            {!_isExpired && (
-              <MenuItem value={"create"}>
-                <ListItemText
-                  primary="Create"
-                  secondary="Mint new synthetic tokens."
-                />
-              </MenuItem>
-            )}
-            {!_isExpired && (
-              <MenuItem value={"deposit"}>
-                <ListItemText
-                  primary="Deposit"
-                  secondary="Add to position collateral."
-                />
-              </MenuItem>
-            )}
-            {!_isExpired && (
-              <MenuItem value={"withdraw"}>
-                <ListItemText
-                  primary="Withdraw"
-                  secondary="Remove position collateral"
-                />
-              </MenuItem>
-            )}
-            {!_isExpired && (
-              <MenuItem value={"redeem"}>
-                <ListItemText
-                  primary="Redeem"
-                  secondary="Redeem synthetics for collateral."
-                />
-              </MenuItem>
-            )}
+            {contractHasExpired
+              ? [
+                  <MenuItem key={"settle"} value={"settle"}>
+                    <ListItemText
+                      primary="Settle"
+                      secondary="Settle expired tokens."
+                    />
+                  </MenuItem>,
+                ]
+              : [
+                  <MenuItem key={"create"} value={"create"}>
+                    <ListItemText
+                      primary="Create"
+                      secondary="Mint new synthetic tokens."
+                    />
+                  </MenuItem>,
+                  <MenuItem key={"deposit"} value={"deposit"}>
+                    <ListItemText
+                      primary="Deposit"
+                      secondary="Add to position collateral."
+                    />
+                  </MenuItem>,
+                  <MenuItem key={"withdraw"} value={"withdraw"}>
+                    <ListItemText
+                      primary="Withdraw"
+                      secondary="Remove position collateral"
+                    />
+                  </MenuItem>,
+                  <MenuItem key={"redeem"} value={"redeem"}>
+                    <ListItemText
+                      primary="Redeem"
+                      secondary="Redeem synthetics for collateral."
+                    />
+                  </MenuItem>,
+                ]}
           </Select>
         </FormWrapper>
       </Box>

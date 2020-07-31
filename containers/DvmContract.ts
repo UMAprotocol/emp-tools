@@ -9,7 +9,7 @@ import Connection from "./Connection";
 const { formatBytes32String: utf8ToHex } = ethers.utils;
 
 function useContract() {
-  const { signer } = Connection.useContainer();
+  const { provider } = Connection.useContainer();
   const { empState } = EmpState.useContainer();
   const { finderAddress } = empState;
   const [votingContract, setVotingContract] = useState<ethers.Contract | null>(
@@ -20,8 +20,12 @@ function useContract() {
   );
 
   const setDvmContracts = async () => {
-    if (finderAddress !== null && signer !== null) {
-      const finder = new ethers.Contract(finderAddress, uma.finder.abi, signer);
+    if (finderAddress !== null && provider !== null) {
+      const finder = new ethers.Contract(
+        finderAddress,
+        uma.finder.abi,
+        provider
+      );
       const res = await Promise.all([
         finder.getImplementationAddress(utf8ToHex("Oracle")),
         finder.getImplementationAddress(utf8ToHex("Store")),
@@ -29,10 +33,13 @@ function useContract() {
 
       const dvmAddress = res[0];
       const storeAddress = res[1];
-      const dvm = new ethers.Contract(dvmAddress, uma.voting.abi, signer);
+      // Do not inject a provider into this contract so that we can make calls from the EMP's address.
+      // We will only have read-only access to the Contract, but overriding the `from` address is neccessary for `getPrice` or `hasPrice`.
+      // Moreover, we won't be submitting any txns to the DVM.
+      const dvm = new ethers.Contract(dvmAddress, uma.voting.abi, provider);
       setVotingContract(dvm);
 
-      const store = new ethers.Contract(storeAddress, uma.store.abi, signer);
+      const store = new ethers.Contract(storeAddress, uma.store.abi, provider);
       setStoreContract(store);
     }
   };
@@ -41,7 +48,7 @@ function useContract() {
     setStoreContract(null);
 
     setDvmContracts();
-  }, [finderAddress, signer]);
+  }, [finderAddress, provider]);
 
   return { votingContract, storeContract };
 }

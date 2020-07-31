@@ -85,9 +85,9 @@ const SettleExpired = () => {
     const canSettleTokens = tokenBalance > 0 || posTokens > 0;
 
     // Calculate collateral to receive if price was resolved.
-    let positionTRV: number = -1;
-    let excessCollateral: number = -1;
-    let balanceTRV: number = -1;
+    let positionTRV: number | null = null;
+    let excessCollateral: number | null = null;
+    let balanceTRV: number | null = null;
     let collateralToReceive: number | null = null;
     if (resolvedPrice !== null) {
       positionTRV = posTokens * resolvedPrice;
@@ -114,7 +114,7 @@ const SettleExpired = () => {
       } else {
         setError(
           new Error(
-            "You have no yUSD in your wallet or your position to settle"
+            "You have no tokens in your wallet or your position to settle"
           )
         );
       }
@@ -230,22 +230,26 @@ const SettleExpired = () => {
           </>
         )}
 
-        {collateralToReceive !== null && (
-          <Box py={4}>
-            <Typography>{`Resolved price (${priceIdUtf8} @ ${expiryDate}): ${resolvedPrice}`}</Typography>
-            <Typography>{`Collateral in position: ${posColl}`}</Typography>
-            <Typography>{`Redemption value of outstanding tokens in position: ${positionTRV}`}</Typography>
-            <Typography>
-              <strong>{`Excess collateral in position that you will receive: ${excessCollateral}`}</strong>
-            </Typography>
-            <Typography>
-              <strong>{`Redemption value of tokens in your wallet: ${balanceTRV}`}</strong>
-            </Typography>
-            <br></br>
-            <br></br>
-            <Typography>{`Total ${collSymbol} you will receive: ${collateralToReceive}`}</Typography>
-          </Box>
-        )}
+        {resolvedPrice !== null &&
+          positionTRV !== null &&
+          excessCollateral !== null &&
+          balanceTRV !== null &&
+          collateralToReceive !== null && (
+            <Box py={4}>
+              <Typography>{`Resolved price (${priceIdUtf8} @ ${expiryDate}): ${resolvedPrice}`}</Typography>
+              <Typography>{`Collateral in position: ${posColl}`}</Typography>
+              <Typography>{`Redemption value of outstanding tokens in position: ${positionTRV}`}</Typography>
+              <Typography>
+                <strong>{`Excess collateral in position that you will receive: ${excessCollateral}`}</strong>
+              </Typography>
+              <Typography>
+                <strong>{`Redemption value of tokens in your wallet: ${balanceTRV}`}</strong>
+              </Typography>
+              <br></br>
+              <br></br>
+              <Typography>{`Total ${collSymbol} you will receive: ${collateralToReceive}`}</Typography>
+            </Box>
+          )}
 
         {hash && (
           <Box py={2}>
