@@ -8,7 +8,7 @@ import Connection from "./Connection";
 
 const { formatBytes32String: utf8ToHex } = ethers.utils;
 
-function useContract() {
+function useContracts() {
   const { provider } = Connection.useContainer();
   const { empState } = EmpState.useContainer();
   const { finderAddress } = empState;
@@ -57,6 +57,6 @@ function useContract() {
   return { votingContract, storeContract };
 }
 
-const Contract = createContainer(useContract);
+const Contracts = createContainer(useContracts);
 
-export default Contract;
+export default Contracts;

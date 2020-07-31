@@ -17,7 +17,7 @@ import PriceFeed from "../containers/PriceFeed";
 import WethContract from "../containers/WethContract";
 import Etherscan from "../containers/Etherscan";
 import Balancer from "../containers/Balancer";
-import DvmContract from "../containers/DvmContract";
+import DvmContract from "../containers/DvmContracts";
 import DvmState from "../containers/DvmState";
 
 import { ApolloProvider } from "@apollo/client";

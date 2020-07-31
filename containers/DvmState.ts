@@ -5,7 +5,7 @@ import { utils } from "ethers";
 import Connection from "./Connection";
 import Collateral from "./Collateral";
 
-import DvmContract from "./DvmContract";
+import DvmContracts from "./DvmContracts";
 import EmpState from "./EmpState";
 import EmpAddress from "./EmpAddress";
 
@@ -25,7 +25,7 @@ const initState = {
 
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
-  const { votingContract, storeContract } = DvmContract.useContainer();
+  const { votingContract, storeContract } = DvmContracts.useContainer();
   const { address: collAddress } = Collateral.useContainer();
   const { empState } = EmpState.useContainer();
   const { priceIdentifier, expirationTimestamp } = empState;
