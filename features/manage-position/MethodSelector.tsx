@@ -11,6 +11,8 @@ import Select from "@material-ui/core/Select";
 import ListItemText from "@material-ui/core/ListItemText";
 import { Method } from "./ManagePosition";
 
+import EmpState from "../../containers/EmpState";
+
 const BootstrapInput = withStyles((theme) => ({
   root: {
     "label + &": {
@@ -40,44 +42,65 @@ interface IProps {
 }
 
 const MethodSelector = ({ method, handleChange }: IProps) => {
-  return (
-    <Box py={2}>
-      <FormWrapper>
-        <InputLabel id="demo-simple-select-label">Actions</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          value={method}
-          onChange={handleChange}
-          input={<BootstrapInput />}
-        >
-          <MenuItem value={"create"}>
-            <ListItemText
-              primary="Create"
-              secondary="Mint new synthetic tokens."
-            />
-          </MenuItem>
-          <MenuItem value={"deposit"}>
-            <ListItemText
-              primary="Deposit"
-              secondary="Add to position collateral."
-            />
-          </MenuItem>
-          <MenuItem value={"withdraw"}>
-            <ListItemText
-              primary="Withdraw"
-              secondary="Remove position collateral"
-            />
-          </MenuItem>
-          <MenuItem value={"redeem"}>
-            <ListItemText
-              primary="Redeem"
-              secondary="Redeem synthetics for collateral."
-            />
-          </MenuItem>
-        </Select>
-      </FormWrapper>
-    </Box>
-  );
+  const { empState } = EmpState.useContainer();
+  const { isExpired } = empState;
+  if (isExpired !== null) {
+    return renderComponent(isExpired);
+  } else {
+    return renderComponent();
+  }
+
+  function renderComponent(contractHasExpired: boolean = false) {
+    return (
+      <Box py={2}>
+        <FormWrapper>
+          <InputLabel id="demo-simple-select-label">Actions</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            value={method}
+            onChange={handleChange}
+            input={<BootstrapInput />}
+          >
+            {contractHasExpired
+              ? [
+                  <MenuItem key={"settle"} value={"settle"}>
+                    <ListItemText
+                      primary="Settle"
+                      secondary="Settle expired tokens."
+                    />
+                  </MenuItem>,
+                ]
+              : [
+                  <MenuItem key={"create"} value={"create"}>
+                    <ListItemText
+                      primary="Create"
+                      secondary="Mint new synthetic tokens."
+                    />
+                  </MenuItem>,
+                  <MenuItem key={"deposit"} value={"deposit"}>
+                    <ListItemText
+                      primary="Deposit"
+                      secondary="Add to position collateral."
+                    />
+                  </MenuItem>,
+                  <MenuItem key={"withdraw"} value={"withdraw"}>
+                    <ListItemText
+                      primary="Withdraw"
+                      secondary="Remove position collateral"
+                    />
+                  </MenuItem>,
+                  <MenuItem key={"redeem"} value={"redeem"}>
+                    <ListItemText
+                      primary="Redeem"
+                      secondary="Redeem synthetics for collateral."
+                    />
+                  </MenuItem>,
+                ]}
+          </Select>
+        </FormWrapper>
+      </Box>
+    );
+  }
 };
 
 export default MethodSelector;
