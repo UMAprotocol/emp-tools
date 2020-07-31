@@ -8,7 +8,9 @@ export const config = (network: Network | null) => {
   console.log("ENV", process.env);
   const infuraId =
     process.env.NEXT_PUBLIC_INFURA_ID || "d5e29c9b9a9d4116a7348113f57770a8";
-  const infuraRpc = `https://${network?.name}.infura.io/v3/${infuraId}`;
+  const infuraRpc = `https://${
+    network ? network?.name : "mainnet"
+  }.infura.io/v3/${infuraId}`;
 
   return {
     onboardConfig: {

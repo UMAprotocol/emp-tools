@@ -8,7 +8,7 @@ import { debounceTime } from "rxjs/operators";
 
 import { config } from "./Config";
 
-type Provider = ethers.providers.Provider;
+type Provider = ethers.providers.Web3Provider;
 type Block = ethers.providers.Block;
 type Network = ethers.providers.Network;
 type Signer = ethers.Signer;
@@ -19,7 +19,6 @@ function useConnection() {
   const [signer, setSigner] = useState<Signer | null>(null);
   const [network, setNetwork] = useState<Network | null>(null);
   const [address, setAddress] = useState<string | null>(null);
-  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [block$, setBlock$] = useState<Observable<Block> | null>(null);
 
@@ -29,7 +28,9 @@ function useConnection() {
       hideBranding: true,
       networkId: 1, // Default to main net. If on a different network will change with the subscription.
       subscriptions: {
-        address: setAddress,
+        address: (address: string | null) => {
+          setAddress(address);
+        },
         network: async (networkId: any) => {
           onboard?.config({ networkId: networkId });
         },
@@ -40,16 +41,9 @@ function useConnection() {
             );
             setProvider(ethersProvider);
             setNetwork(await ethersProvider.getNetwork());
-            setSigner(ethersProvider.getSigner());
-            await ethersProvider.send("eth_requestAccounts", []);
-            setAddress(await ethersProvider.getSigner().getAddress());
-            setSelectedWallet(wallet.name);
           } else {
             setProvider(null);
             setNetwork(null);
-            setSigner(null);
-            setAddress(null);
-            setSelectedWallet(null);
           }
         },
       },
@@ -58,6 +52,7 @@ function useConnection() {
     });
 
     await onboardInstance.walletSelect();
+    await onboardInstance.walletCheck();
     setOnboard(onboardInstance);
   };
 
@@ -85,7 +80,11 @@ function useConnection() {
       const block$ = observable.pipe(debounceTime(1000));
       setBlock$(block$);
     }
-  }, [provider]);
+
+    if (provider && address) {
+      setSigner(provider.getSigner());
+    }
+  }, [provider, address]);
 
   return {
     provider,
@@ -93,7 +92,6 @@ function useConnection() {
     signer,
     network,
     address,
-    selectedWallet,
     connect,
     error,
     block$,
