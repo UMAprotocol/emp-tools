@@ -58,7 +58,7 @@ const useContractState = () => {
       if (hasPrice) {
         try {
           const postResolutionRes = await Promise.all([
-            storeContract.getPrice(
+            votingContract.getPrice(
               priceIdentifier.toString(),
               expirationTimestamp.toNumber(),
               { from: empAddress }
@@ -83,15 +83,15 @@ const useContractState = () => {
   // get state on setting of contract
   useEffect(() => {
     queryState();
-  }, [storeContract, priceIdentifier, expirationTimestamp]);
+  }, [votingContract, priceIdentifier, expirationTimestamp]);
 
   // get state on each block
   useEffect(() => {
-    if (block$ && storeContract) {
+    if (block$ && votingContract) {
       const sub = block$.subscribe(() => queryState());
       return () => sub.unsubscribe();
     }
-  }, [block$, storeContract]);
+  }, [block$, votingContract]);
 
   return { dvmState: state };
 };
