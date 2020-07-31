@@ -25,10 +25,7 @@ const initState = {
 
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
-  const {
-    votingContract: dvm,
-    storeContract: store,
-  } = DvmContract.useContainer();
+  const { votingContract, storeContract } = DvmContract.useContainer();
   const { address: collAddress } = Collateral.useContainer();
   const { empState } = EmpState.useContainer();
   const { priceIdentifier, expirationTimestamp } = empState;
@@ -39,19 +36,19 @@ const useContractState = () => {
   // get state from EMP
   const queryState = async () => {
     if (
-      dvm !== null &&
-      store !== null &&
+      votingContract !== null &&
+      storeContract !== null &&
       collAddress !== null &&
       priceIdentifier !== null &&
       expirationTimestamp !== null
     ) {
       const res = await Promise.all([
-        dvm.hasPrice(
+        votingContract.hasPrice(
           priceIdentifier.toString(),
           expirationTimestamp.toNumber(),
           { from: empAddress }
         ),
-        store.computeFinalFee(collAddress, { from: empAddress }),
+        storeContract.computeFinalFee(collAddress, { from: empAddress }),
       ]);
 
       const hasPrice = res[0] as boolean;
@@ -61,7 +58,7 @@ const useContractState = () => {
       if (hasPrice) {
         try {
           const postResolutionRes = await Promise.all([
-            dvm.getPrice(
+            storeContract.getPrice(
               priceIdentifier.toString(),
               expirationTimestamp.toNumber(),
               { from: empAddress }
@@ -86,15 +83,15 @@ const useContractState = () => {
   // get state on setting of contract
   useEffect(() => {
     queryState();
-  }, [dvm, priceIdentifier, expirationTimestamp]);
+  }, [storeContract, priceIdentifier, expirationTimestamp]);
 
   // get state on each block
   useEffect(() => {
-    if (block$ && dvm) {
+    if (block$ && storeContract) {
       const sub = block$.subscribe(() => queryState());
       return () => sub.unsubscribe();
     }
-  }, [block$, dvm]);
+  }, [block$, storeContract]);
 
   return { dvmState: state };
 };

@@ -31,13 +31,17 @@ function useContract() {
         finder.getImplementationAddress(utf8ToHex("Store")),
       ]);
 
-      const dvmAddress = res[0];
+      const votingAddress = res[0];
       const storeAddress = res[1];
       // Do not inject a provider into this contract so that we can make calls from the EMP's address.
       // We will only have read-only access to the Contract, but overriding the `from` address is neccessary for `getPrice` or `hasPrice`.
       // Moreover, we won't be submitting any txns to the DVM.
-      const dvm = new ethers.Contract(dvmAddress, uma.voting.abi, provider);
-      setVotingContract(dvm);
+      const voting = new ethers.Contract(
+        votingAddress,
+        uma.voting.abi,
+        provider
+      );
+      setVotingContract(voting);
 
       const store = new ethers.Contract(storeAddress, uma.store.abi, provider);
       setStoreContract(store);
