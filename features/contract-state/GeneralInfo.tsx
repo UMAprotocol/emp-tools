@@ -124,14 +124,18 @@ const GeneralInfo = () => {
         </Status>
 
         <Status>
-          <Label>Is Expired: </Label>
-          <Link
-            href={DOCS_MAP.EXPIRY_SETTLEMENT}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <strong>{isExpired}</strong>
-          </Link>
+          <Label>
+            Is expired (
+            <Link
+              href={DOCS_MAP.EXPIRY_SETTLEMENT}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Docs
+            </Link>
+            ){`: `}
+          </Label>
+          {isExpired}
         </Status>
 
         <Status>

@@ -11,4 +11,6 @@ export const DOCS_MAP: DocLinkMap = {
     "https://docs.umaproject.org/synthetic-tokens/glossary#global-collateralization-ratio-gcr",
   EXPIRY_SETTLEMENT:
     "https://docs.umaproject.org/synthetic-tokens/explainer#redeeming-after-expiry",
+  FINAL_FEE:
+    "https://docs.umaproject.org/synthetic-tokens/explainer#liquidation-and-dispute",
 };
