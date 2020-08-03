@@ -10,6 +10,7 @@ import Redeem from "./Redeem";
 import Withdraw from "./Withdraw";
 import SettleExpired from "./SettleExpired";
 import YourPosition from "./YourPosition";
+import YourLiquidations from "./YourLiquidations";
 import YourWallet from "./YourWallet";
 
 export type Method = "create" | "deposit" | "withdraw" | "redeem" | "settle";
@@ -35,6 +36,7 @@ const Manager = () => {
     return (
       <Box my={0}>
         <YourWallet />
+        <YourLiquidations />
         <YourPosition />
         <MethodSelector method={method} handleChange={handleChange} />
 
