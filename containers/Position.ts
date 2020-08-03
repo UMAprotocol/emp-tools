@@ -4,6 +4,7 @@ import { ethers, BigNumber, BigNumberish } from "ethers";
 
 import Connection from "./Connection";
 import EmpContract from "./EmpContract";
+import EmpState from "./EmpState";
 import Collateral from "./Collateral";
 import Token from "./Token";
 
@@ -15,6 +16,8 @@ export interface LiquidationState {
   liquidatedCollateral: number;
   lockedCollateral: number;
   liquidationTime: number;
+  liquidationTimeRemaining: number;
+  liquidationId: number;
   tokensOutstanding: number;
   state: number;
 }
@@ -24,6 +27,8 @@ function usePosition() {
   const { contract } = EmpContract.useContainer();
   const { decimals: collDec } = Collateral.useContainer();
   const { decimals: tokenDec } = Token.useContainer();
+  const { empState } = EmpState.useContainer();
+  const { liquidationLiveness } = empState;
 
   const [collateral, setCollateral] = useState<number | null>(null);
   const [tokens, setTokens] = useState<number | null>(null);
@@ -37,7 +42,14 @@ function usePosition() {
   );
 
   const getPositionInfo = async () => {
-    if (address && signer && contract && collDec && tokenDec) {
+    if (
+      address &&
+      signer &&
+      contract &&
+      collDec &&
+      tokenDec &&
+      liquidationLiveness
+    ) {
       // Position Data:
       const collRaw: BigNumber = (await contract.getCollateral(address))[0];
       const position = await contract.positions(address);
@@ -63,18 +75,29 @@ function usePosition() {
       const pendingTransfer: string =
         xferTime.toString() !== "0" ? "Yes" : "No";
 
-      // Liquidation Data:
+      // Liquidation Data: Only include active liquidations
       const liquidations = await contract.getLiquidations(address);
       const updatedLiquidations: LiquidationState[] = [];
-      liquidations.forEach((liq: any) => {
-        updatedLiquidations.push({
-          liquidationTime: liq.liquidationTime.toNumber(),
-          liquidator: liq.liquidator,
-          liquidatedCollateral: weiToNum(liq.liquidatedCollateral[0], collDec),
-          lockedCollateral: weiToNum(liq.lockedCollateral[0], collDec),
-          tokensOutstanding: weiToNum(liq.tokensOutstanding[0], tokenDec),
-          state: liq.state,
-        });
+      liquidations.forEach((liq: any, id: number) => {
+        const liquidationTimeRemaining =
+          liq.liquidationTime.toNumber() +
+          liquidationLiveness.toNumber() -
+          Math.floor(Date.now() / 1000);
+        if (liquidationTimeRemaining > 0) {
+          updatedLiquidations.push({
+            liquidationId: id,
+            liquidationTime: liq.liquidationTime.toNumber(),
+            liquidationTimeRemaining: liquidationTimeRemaining,
+            liquidator: liq.liquidator,
+            liquidatedCollateral: weiToNum(
+              liq.liquidatedCollateral[0],
+              collDec
+            ),
+            lockedCollateral: weiToNum(liq.lockedCollateral[0], collDec),
+            tokensOutstanding: weiToNum(liq.tokensOutstanding[0], tokenDec),
+            state: liq.state,
+          });
+        }
       });
 
       // set states

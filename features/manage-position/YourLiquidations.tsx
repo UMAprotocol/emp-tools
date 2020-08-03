@@ -8,7 +8,7 @@ import {
   ListSubheader,
   Divider,
 } from "@material-ui/core";
-import { utils, constants } from "ethers";
+import { utils } from "ethers";
 
 import Position, { LiquidationState } from "../../containers/Position";
 import Collateral from "../../containers/Collateral";
@@ -66,10 +66,6 @@ const YourLiquidations = () => {
       if (invertedDisputablePrice) {
         maxDisputablePrice = 1 / maxDisputablePrice;
       }
-      const liquidationTimeRemaining =
-        liq.liquidationTime +
-        liquidationLiveness.toNumber() -
-        Math.floor(Date.now() / 1000);
 
       liquidationPretty.push({
         ...liq,
@@ -77,13 +73,11 @@ const YourLiquidations = () => {
           liq.liquidationTime * 1000
         ).toLocaleString("en-GB", { timeZone: "UTC" }),
         prettyTimeRemainingString:
-          liquidationTimeRemaining > 0
-            ? Math.max(0, Math.floor(liquidationTimeRemaining / 3600)) +
-              ":" +
-              Math.max(0, Math.floor((liquidationTimeRemaining % 3600) / 60)) +
-              ":" +
-              Math.max(0, (liquidationTimeRemaining % 3600) % 60)
-            : "None",
+          Math.floor(liq.liquidationTimeRemaining / 3600) +
+          ":" +
+          Math.floor((liq.liquidationTimeRemaining % 3600) / 60) +
+          ":" +
+          ((liq.liquidationTimeRemaining % 3600) % 60),
         maxDisputablePrice: maxDisputablePrice.toFixed(2),
       });
     });
@@ -111,77 +105,72 @@ const YourLiquidations = () => {
         <Container>
           <Grid container spacing={4}>
             <Grid item md={6} xs={12}>
-              <Typography variant="h5">Your Liquidations</Typography>
+              <Typography variant="h5">Your Active Liquidations</Typography>
               {liquidations.map((liq: any, id: number) => {
-                //   Once the liquidation state is 0, then all of its rewards have been withdrawn and its liquidation data has been deleted. The user
-                // can view such liquidations in the a historical liquidations table, which will query data from a subgraph that stores historical liquidation information.
-                if (liq.state !== 0) {
-                  return (
-                    <>
-                      <Divider style={{ marginTop: "20px" }} />
-                      <List
-                        dense
-                        disablePadding
-                        subheader={
-                          <ListSubheader>Liquidation ID #{id}</ListSubheader>
-                        }
-                      >
-                        <ListItem key={id + "-timestamp"}>
-                          <ListItemText
-                            inset
-                            primary={`Liquidation timestamp:`}
-                            secondary={`- ${liq.prettyLiqTimestamp}`}
-                          />
-                        </ListItem>
-                        <ListItem key={id + "-expiry"}>
-                          <ListItemText
-                            inset
-                            primary={`Remaining time until liquidation expires:`}
-                            secondary={`- ${liq.prettyTimeRemainingString}`}
-                          />
-                        </ListItem>
-                        {/* If the liquidator address is the zero address, then the liquidator has withdrawn rewards already. For now, don't show this data for this case. */}
-                        {liq.liquidator !== constants.AddressZero && (
-                          <ListItem key={id + "-liquidator"}>
-                            <ListItemText
-                              inset
-                              primary={`Liquidated by:`}
-                              secondary={
-                                <a
-                                  href={getEtherscanUrl(liq.liquidator)}
-                                  target="_blank"
-                                >{`- ${prettyAddress(liq.liquidator)}`}</a>
-                              }
-                            />
-                          </ListItem>
-                        )}
-                        <ListItem key={id + "-collateral"}>
-                          <ListItemText
-                            inset
-                            primary={`Liquidated collateral:`}
-                            secondary={`- ${liq.liquidatedCollateral}`}
-                          />
-                        </ListItem>
-                        <ListItem key={id + "-tokens"}>
-                          <ListItemText
-                            inset
-                            primary={`Liquidated tokens:`}
-                            secondary={`- ${liq.tokensOutstanding}`}
-                          />
-                        </ListItem>
-                        <ListItem key={id + "-disputeprice"}>
-                          <ListItemText
-                            inset
-                            primary={`Disputable at a historical ${priceIdUtf8} price (@  ${
-                              liq.prettyLiqTimestamp
-                            }) ${invertedDisputablePrice ? `above` : `below`}:`}
-                            secondary={`- ${liq.maxDisputablePrice}`}
-                          />
-                        </ListItem>
-                      </List>
-                    </>
-                  );
-                }
+                return (
+                  <>
+                    <Divider style={{ marginTop: "20px" }} />
+                    <List
+                      dense
+                      disablePadding
+                      subheader={
+                        <ListSubheader>
+                          Liquidation ID #{liq.liquidationId + 1}
+                        </ListSubheader>
+                      }
+                    >
+                      <ListItem key={id + "-timestamp"}>
+                        <ListItemText
+                          inset
+                          primary={`Liquidation timestamp:`}
+                          secondary={`- ${liq.prettyLiqTimestamp}`}
+                        />
+                      </ListItem>
+                      <ListItem key={id + "-expiry"}>
+                        <ListItemText
+                          inset
+                          primary={`Remaining time until liquidation expires:`}
+                          secondary={`- ${liq.prettyTimeRemainingString}`}
+                        />
+                      </ListItem>
+                      <ListItem key={id + "-liquidator"}>
+                        <ListItemText
+                          inset
+                          primary={`Liquidated by:`}
+                          secondary={
+                            <a
+                              href={getEtherscanUrl(liq.liquidator)}
+                              target="_blank"
+                            >{`- ${prettyAddress(liq.liquidator)}`}</a>
+                          }
+                        />
+                      </ListItem>
+                      <ListItem key={id + "-collateral"}>
+                        <ListItemText
+                          inset
+                          primary={`Liquidated collateral:`}
+                          secondary={`- ${liq.liquidatedCollateral}`}
+                        />
+                      </ListItem>
+                      <ListItem key={id + "-tokens"}>
+                        <ListItemText
+                          inset
+                          primary={`Liquidated tokens:`}
+                          secondary={`- ${liq.tokensOutstanding}`}
+                        />
+                      </ListItem>
+                      <ListItem key={id + "-disputeprice"}>
+                        <ListItemText
+                          inset
+                          primary={`Disputable at a historical ${priceIdUtf8} price (@  ${
+                            liq.prettyLiqTimestamp
+                          }) ${invertedDisputablePrice ? `above` : `below`}:`}
+                          secondary={`- ${liq.maxDisputablePrice}`}
+                        />
+                      </ListItem>
+                    </List>
+                  </>
+                );
               })}
             </Grid>
           </Grid>
