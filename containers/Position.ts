@@ -50,10 +50,15 @@ function usePosition() {
       tokenDec &&
       liquidationLiveness
     ) {
-      // Position Data:
-      const collRaw: BigNumber = (await contract.getCollateral(address))[0];
-      const position = await contract.positions(address);
+      // Make contract calls in parallel
+      const [collRawFixedPoint, position, liquidations] = await Promise.all([
+        contract.getCollateral(address),
+        contract.positions(address),
+        contract.getLiquidations(address),
+      ]);
+      const collRaw: BigNumber = collRawFixedPoint[0];
 
+      // Reformat data
       const tokensOutstanding: BigNumber = position.tokensOutstanding[0];
       const withdrawReqAmt: BigNumber = position.withdrawalRequestAmount[0];
       const withdrawReqPassTime: BigNumber =
@@ -75,8 +80,7 @@ function usePosition() {
       const pendingTransfer: string =
         xferTime.toString() !== "0" ? "Yes" : "No";
 
-      // Liquidation Data: Only include active liquidations
-      const liquidations = await contract.getLiquidations(address);
+      // Only store unexpired liquidations in state
       const updatedLiquidations: LiquidationState[] = [];
       liquidations.forEach((liq: any, id: number) => {
         const liquidationTimeRemaining =
@@ -133,7 +137,7 @@ function usePosition() {
       setLiquidations(null);
     }
     getPositionInfo();
-  }, [address, signer, contract, collDec, tokenDec]);
+  }, [address, signer, contract, collDec, tokenDec, liquidationLiveness]);
 
   return {
     collateral,
