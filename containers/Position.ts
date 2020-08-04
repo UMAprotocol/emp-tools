@@ -4,17 +4,31 @@ import { ethers, BigNumber, BigNumberish } from "ethers";
 
 import Connection from "./Connection";
 import EmpContract from "./EmpContract";
+import EmpState from "./EmpState";
 import Collateral from "./Collateral";
 import Token from "./Token";
 
 const fromWei = ethers.utils.formatUnits;
 const weiToNum = (x: BigNumberish, u = 18) => parseFloat(fromWei(x, u));
 
+export interface LiquidationState {
+  liquidator: string;
+  liquidatedCollateral: number;
+  lockedCollateral: number;
+  liquidationTime: number;
+  liquidationTimeRemaining: number;
+  liquidationId: number;
+  tokensOutstanding: number;
+  state: number;
+}
+
 function usePosition() {
   const { block$, signer, address } = Connection.useContainer();
   const { contract } = EmpContract.useContainer();
   const { decimals: collDec } = Collateral.useContainer();
   const { decimals: tokenDec } = Token.useContainer();
+  const { empState } = EmpState.useContainer();
+  const { liquidationLiveness } = empState;
 
   const [collateral, setCollateral] = useState<number | null>(null);
   const [tokens, setTokens] = useState<number | null>(null);
@@ -23,19 +37,34 @@ function usePosition() {
   const [withdrawPassTime, setWithdrawPassTime] = useState<number | null>(null);
   const [pendingWithdraw, setPendingWithdraw] = useState<string | null>(null);
   const [pendingTransfer, setPendingTransfer] = useState<string | null>(null);
+  const [liquidations, setLiquidations] = useState<LiquidationState[] | null>(
+    null
+  );
 
   const getPositionInfo = async () => {
-    if (address && signer && contract && collDec && tokenDec) {
-      const collRaw: BigNumber = (await contract.getCollateral(address))[0];
-      const position = await contract.positions(address);
+    if (
+      address &&
+      signer &&
+      contract &&
+      collDec &&
+      tokenDec &&
+      liquidationLiveness
+    ) {
+      // Make contract calls in parallel
+      const [collRawFixedPoint, position, liquidations] = await Promise.all([
+        contract.getCollateral(address),
+        contract.positions(address),
+        contract.getLiquidations(address),
+      ]);
+      const collRaw: BigNumber = collRawFixedPoint[0];
 
+      // Reformat data
       const tokensOutstanding: BigNumber = position.tokensOutstanding[0];
       const withdrawReqAmt: BigNumber = position.withdrawalRequestAmount[0];
       const withdrawReqPassTime: BigNumber =
         position.withdrawalRequestPassTimestamp;
       const xferTime: BigNumber = position.transferPositionRequestPassTimestamp;
 
-      // format data for storage
       const collateral: number = weiToNum(collRaw, collDec);
       const tokens: number = weiToNum(tokensOutstanding, tokenDec);
       const cRatio =
@@ -51,6 +80,30 @@ function usePosition() {
       const pendingTransfer: string =
         xferTime.toString() !== "0" ? "Yes" : "No";
 
+      // Only store unexpired liquidations in state
+      const updatedLiquidations: LiquidationState[] = [];
+      liquidations.forEach((liq: any, id: number) => {
+        const liquidationTimeRemaining =
+          liq.liquidationTime.toNumber() +
+          liquidationLiveness.toNumber() -
+          Math.floor(Date.now() / 1000);
+        if (liquidationTimeRemaining > 0) {
+          updatedLiquidations.push({
+            liquidationId: id,
+            liquidationTime: liq.liquidationTime.toNumber(),
+            liquidationTimeRemaining: liquidationTimeRemaining,
+            liquidator: liq.liquidator,
+            liquidatedCollateral: weiToNum(
+              liq.liquidatedCollateral[0],
+              collDec
+            ),
+            lockedCollateral: weiToNum(liq.lockedCollateral[0], collDec),
+            tokensOutstanding: weiToNum(liq.tokensOutstanding[0], tokenDec),
+            state: liq.state,
+          });
+        }
+      });
+
       // set states
       setCollateral(collateral);
       setTokens(tokens);
@@ -59,6 +112,7 @@ function usePosition() {
       setWithdrawPassTime(withdrawPassTime);
       setPendingWithdraw(pendingWithdraw);
       setPendingTransfer(pendingTransfer);
+      setLiquidations(updatedLiquidations);
     }
   };
 
@@ -80,9 +134,10 @@ function usePosition() {
       setWithdrawPassTime(null);
       setPendingWithdraw(null);
       setPendingTransfer(null);
+      setLiquidations(null);
     }
     getPositionInfo();
-  }, [address, signer, contract, collDec, tokenDec]);
+  }, [address, signer, contract, collDec, tokenDec, liquidationLiveness]);
 
   return {
     collateral,
@@ -92,6 +147,7 @@ function usePosition() {
     withdrawPassTime,
     pendingWithdraw,
     pendingTransfer,
+    liquidations,
   };
 }
 
