@@ -147,6 +147,12 @@ const useEmpSponsors = () => {
                   ? parseFloat(liquidation.liquidatedCollateral) /
                     parseFloat(liquidation.tokensLiquidated)
                   : 0;
+              const maxDisputablePrice =
+                parseFloat(liquidation.tokensLiquidated) > 0 &&
+                collReqFromWei > 0
+                  ? parseFloat(liquidation.liquidatedCollateral) /
+                    (parseFloat(liquidation.tokensLiquidated) * collReqFromWei)
+                  : 0;
               // There should always be a LiquidationCreatedEvent associated with each liquidation object, but if not then
               // we will just ignore this strange edge case.
               newLiquidations[sponsor] = {
@@ -155,6 +161,7 @@ const useEmpSponsors = () => {
                 disputer: liquidation.disputer?.address,
                 liquidationId: liquidation.liquidationId,
                 liquidatedCR: liquidatedCR.toString(),
+                maxDisputablePrice: maxDisputablePrice.toString(),
                 tokensLiquidated: liquidation.tokensLiquidated,
                 lockedCollateral: liquidation.lockedCollateral,
                 status: liquidation.status,

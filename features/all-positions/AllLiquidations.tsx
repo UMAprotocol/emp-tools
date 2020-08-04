@@ -18,6 +18,8 @@ import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import Etherscan from "../../containers/Etherscan";
 
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
+
 interface SortableTableHeaderProps {
   children: React.ReactNode;
   sortField: number;
@@ -61,6 +63,7 @@ const Arrow = styled.div<FadedDiv>`
 
 enum SORT_FIELD {
   LIQUIDATED_CR,
+  MAX_DISPUTABLE_PRICE,
   LOCKED_COLLATERAL,
   TOKENS_LIQUIDATED,
   LIQUIDATION_TIMESTAMP,
@@ -68,6 +71,7 @@ enum SORT_FIELD {
 
 const FIELD_TO_VALUE: { [sortField: number]: string } = {
   [SORT_FIELD.LIQUIDATED_CR]: "liquidatedCR",
+  [SORT_FIELD.MAX_DISPUTABLE_PRICE]: "maxDisputablePrice",
   [SORT_FIELD.LOCKED_COLLATERAL]: "lockedCollateral",
   [SORT_FIELD.TOKENS_LIQUIDATED]: "tokensLiquidated",
   [SORT_FIELD.LIQUIDATION_TIMESTAMP]: "liquidationTimestamp",
@@ -133,6 +137,15 @@ const AllLiquidations = () => {
       return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
     };
 
+    const invertDisputablePrice = isPricefeedInvertedFromTokenSymbol(
+      tokenSymbol
+    );
+    const getDisputablePrice = (x: string) => {
+      return invertDisputablePrice && parseFloat(x) !== 0
+        ? 1 / Number(x)
+        : Number(x);
+    };
+
     // First filters out liq. data missing field values,
     // then sorts the positions according to selected sort column,
     // and finally slices the array based on pagination selection.
@@ -140,6 +153,7 @@ const AllLiquidations = () => {
       .filter((sponsor: string) => {
         return (
           liquidations[sponsor]?.liquidatedCR &&
+          liquidations[sponsor]?.maxDisputablePrice &&
           liquidations[sponsor]?.tokensLiquidated &&
           liquidations[sponsor]?.lockedCollateral &&
           liquidations[sponsor]?.liquidationTimestamp
@@ -209,6 +223,20 @@ const AllLiquidations = () => {
                   </SortableTableColumnHeader>
                 </TableCell>
               </Tooltip>
+              <Tooltip
+                title={`If the index price at the liquidation timestamp was ${
+                  invertDisputablePrice ? `above` : `below`
+                } this, then the liquidation would be disputable`}
+                placement="top"
+              >
+                <TableCell align="right">
+                  <SortableTableColumnHeader
+                    sortField={SORT_FIELD.MAX_DISPUTABLE_PRICE}
+                  >
+                    {invertDisputablePrice ? `Min` : `Max`} Disputable Price{" "}
+                  </SortableTableColumnHeader>
+                </TableCell>
+              </Tooltip>
               <TableCell align="right">
                 <SortableTableColumnHeader
                   sortField={SORT_FIELD.LIQUIDATION_TIMESTAMP}
@@ -241,6 +269,11 @@ const AllLiquidations = () => {
                   </TableCell>
                   <TableCell align="right">
                     {prettyBalance(Number(liquidation.liquidatedCR))}
+                  </TableCell>
+                  <TableCell align="right">
+                    {prettyBalance(
+                      getDisputablePrice(liquidation.maxDisputablePrice)
+                    )}
                   </TableCell>
                   <TableCell align="right">
                     {prettyDate(Number(liquidation.liquidationTimestamp))}
