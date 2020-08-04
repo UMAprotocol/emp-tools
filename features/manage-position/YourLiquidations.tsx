@@ -6,7 +6,6 @@ import {
   ListItem,
   ListItemText,
   ListSubheader,
-  Divider,
 } from "@material-ui/core";
 import { utils } from "ethers";
 
@@ -24,10 +23,6 @@ const Container = styled.div`
   margin-top: 20px;
   padding: 1rem;
   border: 1px solid #434343;
-`;
-
-const Link = styled.a`
-  font-size: 14px;
 `;
 
 const YourLiquidations = () => {
@@ -108,8 +103,7 @@ const YourLiquidations = () => {
               <Typography variant="h5">Your Active Liquidations</Typography>
               {liquidations.map((liq: any, id: number) => {
                 return (
-                  <>
-                    <Divider style={{ marginTop: "20px" }} />
+                  <Container key={id}>
                     <List
                       dense
                       disablePadding
@@ -119,21 +113,21 @@ const YourLiquidations = () => {
                         </ListSubheader>
                       }
                     >
-                      <ListItem key={id + "-timestamp"}>
+                      <ListItem>
                         <ListItemText
                           inset
                           primary={`Liquidation timestamp:`}
                           secondary={`- ${liq.prettyLiqTimestamp}`}
                         />
                       </ListItem>
-                      <ListItem key={id + "-expiry"}>
+                      <ListItem>
                         <ListItemText
                           inset
                           primary={`Remaining time until liquidation expires:`}
                           secondary={`- ${liq.prettyTimeRemainingString}`}
                         />
                       </ListItem>
-                      <ListItem key={id + "-liquidator"}>
+                      <ListItem>
                         <ListItemText
                           inset
                           primary={`Liquidated by:`}
@@ -145,21 +139,21 @@ const YourLiquidations = () => {
                           }
                         />
                       </ListItem>
-                      <ListItem key={id + "-collateral"}>
+                      <ListItem>
                         <ListItemText
                           inset
                           primary={`Liquidated collateral:`}
                           secondary={`- ${liq.liquidatedCollateral}`}
                         />
                       </ListItem>
-                      <ListItem key={id + "-tokens"}>
+                      <ListItem>
                         <ListItemText
                           inset
                           primary={`Liquidated tokens:`}
                           secondary={`- ${liq.tokensOutstanding}`}
                         />
                       </ListItem>
-                      <ListItem key={id + "-disputeprice"}>
+                      <ListItem>
                         <ListItemText
                           inset
                           primary={`Disputable at a historical ${priceIdUtf8} price (@  ${
@@ -169,7 +163,7 @@ const YourLiquidations = () => {
                         />
                       </ListItem>
                     </List>
-                  </>
+                  </Container>
                 );
               })}
             </Grid>

@@ -54,6 +54,7 @@ function usePosition() {
       const [collRawFixedPoint, position, liquidations] = await Promise.all([
         contract.getCollateral(address),
         contract.positions(address),
+        contract.getLiquidations(address),
       ]);
       const collRaw: BigNumber = collRawFixedPoint[0];
 
