@@ -101,15 +101,12 @@ const AllLiquidations = () => {
     setPage(1);
 
     if (liquidations) {
-      let extraPages = 1;
-      if (Object.keys(liquidations).length % ITEMS_PER_PAGE === 0) {
-        extraPages = 0;
-      }
+      const extraPages =
+        Object.keys(liquidations).length % ITEMS_PER_PAGE === 0 ? 0 : 1;
       setMaxPage(
         Math.floor(Object.keys(liquidations).length / ITEMS_PER_PAGE) +
           extraPages
       );
-      // This will set maxPage to 0 if there are no liqs.
     }
   }, [liquidations]);
 

@@ -92,15 +92,12 @@ const AllSponsors = () => {
     setPage(1);
 
     if (activeSponsors) {
-      let extraPages = 1;
-      if (Object.keys(activeSponsors).length % ITEMS_PER_PAGE === 0) {
-        extraPages = 0;
-      }
+      const extraPages =
+        Object.keys(activeSponsors).length % ITEMS_PER_PAGE === 0 ? 0 : 1;
       setMaxPage(
         Math.floor(Object.keys(activeSponsors).length / ITEMS_PER_PAGE) +
           extraPages
       );
-      // This will set maxPage to 0 if there are no sponsors.
     }
   }, [activeSponsors]);
 

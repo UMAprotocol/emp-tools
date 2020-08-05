@@ -127,13 +127,18 @@ const useEmpSponsors = () => {
               isPricefeedInvertedFromTokenSymbol(tokenSymbol)
             );
 
-            newPositions[sponsor] = {
-              tokensOutstanding: position.tokensOutstanding,
-              collateral: position.collateral,
-              cRatio: cRatio.toString(),
-              liquidationPrice: liquidationPrice.toString(),
-              sponsor,
-            };
+            if (
+              position.tokensOutstanding !== "0" &&
+              position.collateral !== "0"
+            ) {
+              newPositions[sponsor] = {
+                tokensOutstanding: position.tokensOutstanding,
+                collateral: position.collateral,
+                cRatio: cRatio.toString(),
+                liquidationPrice: liquidationPrice.toString(),
+                sponsor,
+              };
+            }
           });
 
           empData.liquidations.forEach((liquidation: LiquidationQuery) => {
@@ -141,6 +146,9 @@ const useEmpSponsors = () => {
             const liquidationCreatedEvent = liquidation.events.find(
               (e) => e.__typename === "LiquidationCreatedEvent"
             );
+
+            // There should always be a LiquidationCreatedEvent associated with each liquidation object, but if not then
+            // we will just ignore this strange edge case.
             if (liquidationCreatedEvent) {
               const liquidatedCR =
                 parseFloat(liquidation.tokensLiquidated) > 0
@@ -153,21 +161,25 @@ const useEmpSponsors = () => {
                   ? parseFloat(liquidation.liquidatedCollateral) /
                     (parseFloat(liquidation.tokensLiquidated) * collReqFromWei)
                   : 0;
-              // There should always be a LiquidationCreatedEvent associated with each liquidation object, but if not then
-              // we will just ignore this strange edge case.
-              newLiquidations[sponsor] = {
-                sponsor,
-                liquidator: liquidation.liquidator?.address,
-                disputer: liquidation.disputer?.address,
-                liquidationId: liquidation.liquidationId,
-                liquidatedCR: liquidatedCR.toString(),
-                maxDisputablePrice: maxDisputablePrice.toString(),
-                tokensLiquidated: liquidation.tokensLiquidated,
-                lockedCollateral: liquidation.lockedCollateral,
-                status: liquidation.status,
-                liquidationTimestamp: liquidationCreatedEvent.timestamp,
-                liquidationReceipt: liquidationCreatedEvent.tx_hash,
-              };
+
+              if (
+                liquidation.tokensLiquidated !== "0" &&
+                liquidation.lockedCollateral !== "0"
+              ) {
+                newLiquidations[sponsor] = {
+                  sponsor,
+                  liquidator: liquidation.liquidator?.address,
+                  disputer: liquidation.disputer?.address,
+                  liquidationId: liquidation.liquidationId,
+                  liquidatedCR: liquidatedCR.toString(),
+                  maxDisputablePrice: maxDisputablePrice.toString(),
+                  tokensLiquidated: liquidation.tokensLiquidated,
+                  lockedCollateral: liquidation.lockedCollateral,
+                  status: liquidation.status,
+                  liquidationTimestamp: liquidationCreatedEvent.timestamp,
+                  liquidationReceipt: liquidationCreatedEvent.tx_hash,
+                };
+              }
             }
           });
 
