@@ -62,7 +62,6 @@ const Arrow = styled.div<FadedDiv>`
 `;
 
 enum SORT_FIELD {
-  LIQUIDATED_CR,
   MAX_DISPUTABLE_PRICE,
   LOCKED_COLLATERAL,
   TOKENS_LIQUIDATED,
@@ -70,7 +69,6 @@ enum SORT_FIELD {
 }
 
 const FIELD_TO_VALUE: { [sortField: number]: string } = {
-  [SORT_FIELD.LIQUIDATED_CR]: "liquidatedCR",
   [SORT_FIELD.MAX_DISPUTABLE_PRICE]: "maxDisputablePrice",
   [SORT_FIELD.LOCKED_COLLATERAL]: "lockedCollateral",
   [SORT_FIELD.TOKENS_LIQUIDATED]: "tokensLiquidated",
@@ -179,7 +177,6 @@ const AllLiquidations = () => {
     const reformattedLiquidationData = Object.keys(liquidations)
       .filter((sponsor: string) => {
         return (
-          liquidations[sponsor]?.liquidatedCR &&
           liquidations[sponsor]?.maxDisputablePrice &&
           liquidations[sponsor]?.tokensLiquidated &&
           liquidations[sponsor]?.lockedCollateral &&
@@ -239,18 +236,6 @@ const AllLiquidations = () => {
                 </SortableTableColumnHeader>
               </TableCell>
               <Tooltip
-                title={`This is the number of collateral (including any withdrawal requests) divided by the number of tokens liquidated`}
-                placement="top"
-              >
-                <TableCell align="right">
-                  <SortableTableColumnHeader
-                    sortField={SORT_FIELD.LIQUIDATED_CR}
-                  >
-                    Liquidated Collateral Ratio{" "}
-                  </SortableTableColumnHeader>
-                </TableCell>
-              </Tooltip>
-              <Tooltip
                 title={`If the index price at the liquidation timestamp was ${
                   invertDisputablePrice ? `above` : `below`
                 } this, then the liquidation would be disputable`}
@@ -272,9 +257,6 @@ const AllLiquidations = () => {
                 </SortableTableColumnHeader>
               </TableCell>
               <TableCell align="right">Liquidation Receipt </TableCell>
-              <TableCell align="right">Liquidator </TableCell>
-              <TableCell align="right">Disputer </TableCell>
-              <TableCell align="right">Liquidation ID for sponsor </TableCell>
               <TableCell align="right">Status </TableCell>
             </TableRow>
           </TableHead>
@@ -295,9 +277,6 @@ const AllLiquidations = () => {
                     {prettyBalance(Number(liquidation.tokensLiquidated))}
                   </TableCell>
                   <TableCell align="right">
-                    {prettyBalance(Number(liquidation.liquidatedCR))}
-                  </TableCell>
-                  <TableCell align="right">
                     {prettyBalance(
                       getDisputablePrice(liquidation.maxDisputablePrice)
                     )}
@@ -312,29 +291,6 @@ const AllLiquidations = () => {
                     >
                       {prettyAddress(liquidation.liquidationReceipt)}
                     </a>
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {liquidation.liquidator && (
-                      <a
-                        href={getEtherscanUrl(liquidation.liquidator)}
-                        target="_blank"
-                      >
-                        {prettyAddress(liquidation.liquidator)}
-                      </a>
-                    )}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {liquidation.disputer && (
-                      <a
-                        href={getEtherscanUrl(liquidation.disputer)}
-                        target="_blank"
-                      >
-                        {prettyAddress(liquidation.disputer)}
-                      </a>
-                    )}
-                  </TableCell>
-                  <TableCell align="right">
-                    {liquidation.liquidationId}
                   </TableCell>
                   <TableCell align="right">
                     {translateLiquidationStatus(
