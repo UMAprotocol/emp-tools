@@ -81,7 +81,7 @@ const ITEMS_PER_PAGE = 10;
 
 const AllLiquidations = () => {
   const { empState } = EmpState.useContainer();
-  const { priceIdentifier: priceId } = empState;
+  const { priceIdentifier: priceId, liquidationLiveness } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
   const { liquidations } = EmpSponsors.useContainer();
@@ -120,6 +120,7 @@ const AllLiquidations = () => {
     collSymbol !== null &&
     priceId !== null &&
     liquidations &&
+    liquidationLiveness !== null &&
     Object.keys(liquidations).length > 0
   ) {
     const prettyBalance = (x: number) => {
@@ -144,6 +145,32 @@ const AllLiquidations = () => {
       return invertDisputablePrice && parseFloat(x) !== 0
         ? 1 / Number(x)
         : Number(x);
+    };
+
+    const translateLiquidationStatus = (
+      liquidationTimestamp: number,
+      liquidationStatus: string
+    ) => {
+      const liquidationTimeRemaining =
+        liquidationTimestamp +
+        liquidationLiveness.toNumber() -
+        Math.floor(Date.now() / 1000);
+      if (liquidationTimeRemaining > 0 && liquidationStatus === "PreDispute") {
+        return "Liquidation Pending";
+      } else if (
+        liquidationTimeRemaining <= 0 &&
+        liquidationStatus === "PreDispute"
+      ) {
+        return "Liquidation Succeeded";
+      } else if (liquidationStatus === "PendingDispute") {
+        return "Dispute Pending";
+      } else if (liquidationStatus === "DisputeSucceeded") {
+        return "Dispute Succeeded";
+      } else if (liquidationStatus === "DisputeFailed") {
+        return "Dispute Failed";
+      } else {
+        return "Unknown";
+      }
     };
 
     // First filters out liq. data missing field values,
@@ -309,7 +336,12 @@ const AllLiquidations = () => {
                   <TableCell align="right">
                     {liquidation.liquidationId}
                   </TableCell>
-                  <TableCell align="right">{liquidation.status}</TableCell>
+                  <TableCell align="right">
+                    {translateLiquidationStatus(
+                      Number(liquidation.liquidationTimestamp),
+                      liquidation.status
+                    )}
+                  </TableCell>
                 </TableRow>
               );
             })}
