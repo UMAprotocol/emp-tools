@@ -1,9 +1,7 @@
 import { useState, MouseEvent, useEffect } from "react";
 import { ethers, utils } from "ethers";
-const fromWei = ethers.utils.formatUnits;
 import {
   Box,
-  Grid,
   Table,
   TableBody,
   TableCell,
