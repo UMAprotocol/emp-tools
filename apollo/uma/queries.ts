@@ -10,9 +10,6 @@ export const ACTIVE_POSITIONS = gql`
         withdrawalRequestPassTimestamp
         withdrawalRequestAmount
         transferPositionRequestPassTimestamp
-        liquidations {
-          id
-        }
         sponsor {
           id
         }
