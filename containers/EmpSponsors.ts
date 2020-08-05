@@ -28,11 +28,6 @@ interface PositionQuery {
   sponsor: { id: string };
   tokensOutstanding: string;
   collateral: string;
-  pendingWithdraw: string;
-  pendingTransfer: string;
-  withdrawalRequestPassTimestamp: string;
-  withdrawalRequestAmount: string;
-  transferPositionRequestPassTimestamp: string;
 }
 
 interface FinancialContractQuery {
@@ -111,23 +106,12 @@ const useEmpSponsors = () => {
               collReqFromWei,
               isPricefeedInvertedFromTokenSymbol(tokenSymbol)
             );
-            const pendingWithdraw =
-              position.withdrawalRequestPassTimestamp === "0" ? "No" : "Yes";
-
-            const pendingTransfer =
-              position.transferPositionRequestPassTimestamp === "0"
-                ? "No"
-                : "Yes";
 
             newPositions[sponsor] = {
               tokensOutstanding: position.tokensOutstanding,
               collateral: position.collateral,
               cRatio: cRatio.toString(),
               liquidationPrice: liquidationPrice.toString(),
-              pendingWithdraw: pendingWithdraw,
-              pendingTransfer: pendingTransfer,
-              withdrawalTimestamp: position.withdrawalRequestPassTimestamp,
-              transferTimestamp: position.transferPositionRequestPassTimestamp,
               sponsor,
             };
           });

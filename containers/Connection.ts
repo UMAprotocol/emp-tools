@@ -1,17 +1,21 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
+import { API as OnboardApi, Wallet } from "bnc-onboard/dist/src/interfaces";
+import Onboard from "bnc-onboard";
 import { Observable } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 
-type Provider = ethers.providers.Provider;
+import { config } from "./Config";
+
+type Provider = ethers.providers.Web3Provider;
 type Block = ethers.providers.Block;
 type Network = ethers.providers.Network;
-type ExternalProvider = ethers.providers.ExternalProvider;
 type Signer = ethers.Signer;
 
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
+  const [onboard, setOnboard] = useState<OnboardApi | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
   const [network, setNetwork] = useState<Network | null>(null);
   const [address, setAddress] = useState<string | null>(null);
@@ -19,36 +23,37 @@ function useConnection() {
   const [block$, setBlock$] = useState<Observable<Block> | null>(null);
 
   const attemptConnection = async () => {
-    if (window.ethereum === undefined) {
-      throw Error("MetaMask not found, please visit https://metamask.io/");
-    }
+    const onboardInstance = Onboard({
+      dappId: config(network).onboardConfig.apiKey,
+      hideBranding: true,
+      networkId: 1, // Default to main net. If on a different network will change with the subscription.
+      subscriptions: {
+        address: (address: string | null) => {
+          setAddress(address);
+        },
+        network: async (networkId: any) => {
+          onboard?.config({ networkId: networkId });
+        },
+        wallet: async (wallet: Wallet) => {
+          if (wallet.provider) {
+            const ethersProvider = new ethers.providers.Web3Provider(
+              wallet.provider
+            );
+            setProvider(ethersProvider);
+            setNetwork(await ethersProvider.getNetwork());
+          } else {
+            setProvider(null);
+            setNetwork(null);
+          }
+        },
+      },
+      walletSelect: config(network).onboardConfig.onboardWalletSelect,
+      walletCheck: config(network).onboardConfig.walletCheck,
+    });
 
-    // // for testing
-    // const provider = new ethers.providers.JsonRpcProvider()
-    // let signer = new ethers.Wallet(process.env.PRIV_KEY)
-    // signer = signer.connect(provider)
-
-    // get provider and signer
-    const provider = new ethers.providers.Web3Provider(
-      window.ethereum as ExternalProvider
-    );
-    const signer = provider.getSigner();
-    const network = await provider.getNetwork();
-
-    // get address
-    await provider.send("eth_requestAccounts", []);
-    const address = await signer.getAddress();
-
-    // make sure page refreshes when network is changed
-    // https://github.com/MetaMask/metamask-extension/issues/8226
-    window.ethereum.on("chainIdChanged", () => window.location.reload());
-    window.ethereum.on("chainChanged", () => window.location.reload());
-
-    // set states
-    setProvider(provider);
-    setSigner(signer);
-    setNetwork(network);
-    setAddress(address);
+    await onboardInstance.walletSelect();
+    await onboardInstance.walletCheck();
+    setOnboard(onboardInstance);
   };
 
   const connect = async () => {
@@ -75,9 +80,22 @@ function useConnection() {
       const block$ = observable.pipe(debounceTime(1000));
       setBlock$(block$);
     }
-  }, [provider]);
 
-  return { provider, signer, network, address, connect, error, block$ };
+    if (provider && address) {
+      setSigner(provider.getSigner());
+    }
+  }, [provider, address]);
+
+  return {
+    provider,
+    onboard,
+    signer,
+    network,
+    address,
+    connect,
+    error,
+    block$,
+  };
 }
 
 const Connection = createContainer(useConnection);

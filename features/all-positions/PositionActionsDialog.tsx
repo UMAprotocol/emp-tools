@@ -69,7 +69,7 @@ const PositionActionsDialog = (props: DialogProps) => {
   const { empState } = EmpState.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { contract: emp } = EmpContract.useContainer();
-  const { latestPrice, sourceUrl } = PriceFeed.useContainer();
+  const { latestPrice } = PriceFeed.useContainer();
   const {
     symbol: tokenSymbol,
     balance: tokenBalance,
