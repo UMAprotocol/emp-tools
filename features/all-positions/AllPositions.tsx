@@ -1,4 +1,5 @@
-import { Box, Typography } from "@material-ui/core";
+import { Box, Typography, Checkbox } from "@material-ui/core";
+import { useState } from "react";
 import { utils } from "ethers";
 
 import EmpState from "../../containers/EmpState";
@@ -14,6 +15,11 @@ const AllPositions = () => {
   const { priceIdentifier: priceId } = empState;
   const { latestPrice } = PriceFeed.useContainer();
   const { symbol } = Token.useContainer();
+
+  const [showLiquidations, setShowLiquidations] = useState<boolean>(false);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShowLiquidations(e.target.checked);
+  };
 
   if (latestPrice !== null && priceId !== null && symbol !== null) {
     const priceIdUtf8 = utils.parseBytes32String(priceId);
@@ -34,7 +40,13 @@ const AllPositions = () => {
           <AllSponsors />
           <br></br>
           <br></br>
-          <AllLiquidations />
+          <Checkbox
+            checked={showLiquidations}
+            onChange={handleChange}
+            inputProps={{ "aria-label": "primary checkbox" }}
+          />
+          Show Liquidations
+          {showLiquidations && <AllLiquidations />}
         </Box>
       </Box>
     );
