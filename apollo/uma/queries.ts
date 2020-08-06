@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const ACTIVE_POSITIONS = gql`
+export const EMP_DATA = gql`
   query activePositions {
     financialContracts {
       id
@@ -9,6 +9,27 @@ export const ACTIVE_POSITIONS = gql`
         tokensOutstanding
         sponsor {
           id
+        }
+      }
+      liquidations(first: 1000) {
+        sponsor {
+          id
+        }
+        liquidationId
+        liquidator {
+          address
+        }
+        disputer {
+          address
+        }
+        tokensLiquidated
+        lockedCollateral
+        liquidatedCollateral
+        status
+        events {
+          __typename
+          timestamp
+          tx_hash
         }
       }
     }
