@@ -15,7 +15,7 @@ const WEEKS_PER_YEAR = 52;
 const WEEKLY_UMA_REWARDS = 25000;
 
 const FarmingCalculator = () => {
-  const { usdPrice, pool } = Balancer.useContainer();
+  const { usdPrice, pool, userShareFraction } = Balancer.useContainer();
 
   // Yield inputs:
   const [umaPrice, setUmaPrice] = useState<string>("");
@@ -77,6 +77,16 @@ const FarmingCalculator = () => {
   useEffect(() => {
     setDefaultValues();
   }, [usdPrice, pool]);
+
+  // Update pool ownership whenever user changes.
+  useEffect(() => {
+    if (userShareFraction !== null && pool !== null) {
+      const yUSDShare = pool.tokenBalanceEmp * userShareFraction;
+      const USDCShare = pool.tokenBalanceOther * userShareFraction;
+      setyUSDAdded(yUSDShare.toString());
+      setUSDCAdded(USDCShare.toString());
+    }
+  }, [userShareFraction, pool]);
 
   // Update yield amount whenever inputs change.
   useEffect(() => {
