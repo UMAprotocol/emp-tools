@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { utils, BigNumberish } from "ethers";
+import { utils } from "ethers";
 const { formatUnits: fromWei, parseUnits: toWei } = utils;
-import { useState, MouseEvent, Fragment } from "react";
+import { useState, MouseEvent } from "react";
 
 import {
   Box,
@@ -84,10 +84,7 @@ const PositionActionsDialog = (props: DialogProps) => {
     setMaxAllowance: setMaxCollateralAllowance,
   } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
-
-  const [dialogTabIndex, setDialogTabIndex] = useState<string | null>(
-    "deposit"
-  );
+  const [tabIndex, setTabIndex] = useState<string | null>("deposit");
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [minCollPerToken, setMinCollPerToken] = useState<string>("");
   const [maxCollPerToken, setMaxCollPerToken] = useState<string>("");
@@ -108,7 +105,7 @@ const PositionActionsDialog = (props: DialogProps) => {
     event: MouseEvent<HTMLElement>,
     newAlignment: string | null
   ) => {
-    setDialogTabIndex(newAlignment);
+    setTabIndex(newAlignment);
   };
 
   const prettyBalance = (x: number) => {
@@ -116,16 +113,21 @@ const PositionActionsDialog = (props: DialogProps) => {
     return utils.commify(x_string);
   };
 
-  const prettyAddress = (x: String | null) => {
-    if (!x) return "N/A";
+  const prettyAddress = (x: String) => {
     return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
   };
   if (
     props.selectedSponsor &&
     activeSponsors[props.selectedSponsor] &&
-    latestPrice &&
+    latestPrice !== null &&
     collReq
   ) {
+    const collBalanceNum = collBalance || 0;
+    const tokenBalanceNum = tokenBalance || 0;
+    const finalFeeNum = finalFee || 0;
+    const collateralToDepositNum = Number(collateralToDeposit) || 0;
+    const maxTokensToLiquidateNum = Number(maxTokensToLiquidate) || 0;
+
     const sponsorPosition = activeSponsors[props.selectedSponsor];
 
     const pendingWithdrawTimeRemaining =
@@ -163,24 +165,23 @@ const PositionActionsDialog = (props: DialogProps) => {
       100;
 
     const collBalanceTooLow = () => {
-      if (dialogTabIndex == "deposit") {
-        return (collBalance || 0) < (Number(collateralToDeposit) || 0);
+      if (tabIndex == "deposit") {
+        return collBalanceNum < collateralToDepositNum;
       }
-      if (dialogTabIndex == "liquidate") {
-        return (collBalance || 0) < (finalFee || 0);
+      if (tabIndex == "liquidate") {
+        return collBalanceNum < finalFeeNum;
       }
     };
 
-    const tokenBalanceTooLow =
-      (tokenBalance || 0) < (Number(maxTokensToLiquidate) || 0);
+    const tokenBalanceTooLow = tokenBalanceNum < maxTokensToLiquidateNum;
 
     const needCollateralAllowance = () => {
-      if (dialogTabIndex == "deposit") {
+      if (tabIndex == "deposit") {
         if (collAllowance === null || collateralToDeposit === null) return true;
         if (collAllowance === "Infinity") return false;
         return collAllowance < parseFloat(collateralToDeposit);
       }
-      if (dialogTabIndex == "liquidate") {
+      if (tabIndex == "liquidate") {
         if (collAllowance === null || finalFee == null) return true;
         if (collAllowance === "Infinity") return false;
         return collAllowance < finalFee;
@@ -342,7 +343,7 @@ const PositionActionsDialog = (props: DialogProps) => {
               </Box>
               <Box pt={2} textAlign="center">
                 <ToggleButtonGroup
-                  value={dialogTabIndex}
+                  value={tabIndex}
                   exclusive
                   onChange={setDialogTab}
                 >
@@ -351,7 +352,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                 </ToggleButtonGroup>
               </Box>
               <Box>
-                {dialogTabIndex === "deposit" && (
+                {tabIndex === "deposit" && (
                   <Box pt={2}>
                     <Typography>
                       <strong>
@@ -411,7 +412,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                     </Box>
                   </Box>
                 )}
-                {dialogTabIndex === "liquidate" && (
+                {tabIndex === "liquidate" && (
                   <Box pt={2}>
                     <Typography>
                       <strong>Liquidate this sponsor</strong>
