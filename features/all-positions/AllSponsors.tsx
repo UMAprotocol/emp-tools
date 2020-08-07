@@ -203,32 +203,51 @@ const AllSponsors = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Sponsor</TableCell>
-                <TableCell align="right">
-                  <SortableTableColumnHeader sortField={SORT_FIELD.COLLATERAL}>
-                    Collateral
-                    <br />({collSymbol}){" "}
-                  </SortableTableColumnHeader>
+                <TableCell>
+                  <strong>
+                    Sponsor
+                    <br /> Address
+                  </strong>
                 </TableCell>
                 <TableCell align="right">
-                  <SortableTableColumnHeader sortField={SORT_FIELD.TOKENS}>
-                    Synthetics
-                    <br />({tokenSymbol}){" "}
-                  </SortableTableColumnHeader>
+                  <strong>
+                    <SortableTableColumnHeader
+                      sortField={SORT_FIELD.COLLATERAL}
+                    >
+                      Collateral
+                      <br />({collSymbol}){" "}
+                    </SortableTableColumnHeader>
+                  </strong>
                 </TableCell>
                 <TableCell align="right">
-                  <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
-                    Collateral Ratio{" "}
-                  </SortableTableColumnHeader>
+                  <strong>
+                    <SortableTableColumnHeader sortField={SORT_FIELD.TOKENS}>
+                      Synthetics
+                      <br />({tokenSymbol}){" "}
+                    </SortableTableColumnHeader>
+                  </strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>
+                    <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
+                      Collateral
+                      <br /> Ratio{" "}
+                    </SortableTableColumnHeader>
+                  </strong>
                 </TableCell>
                 <Tooltip
                   title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
                   placement="top"
                 >
                   <TableCell align="right">
-                    <SortableTableColumnHeader sortField={SORT_FIELD.LIQ_PRICE}>
-                      Liquidation Price{" "}
-                    </SortableTableColumnHeader>
+                    <strong>
+                      <SortableTableColumnHeader
+                        sortField={SORT_FIELD.LIQ_PRICE}
+                      >
+                        Liquidation
+                        <br /> Price{" "}
+                      </SortableTableColumnHeader>
+                    </strong>
                   </TableCell>
                 </Tooltip>
                 <TableCell align="right"></TableCell>
