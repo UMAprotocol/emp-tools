@@ -117,7 +117,10 @@ const PositionActionsDialog = (props: DialogProps) => {
     return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
   };
   if (
-    props.selectedSponsor &&
+    props.selectedSponsor  !== null &&
+    activeSponsors[props.selectedSponsor] !== null &&
+    latestPrice !== null &&
+    collReq !== null
     activeSponsors[props.selectedSponsor] &&
     latestPrice !== null &&
     collReq
@@ -145,7 +148,17 @@ const PositionActionsDialog = (props: DialogProps) => {
     const pendingTransferTimeRemaining =
       Number(sponsorPosition.TransferTimestamp) - Number(currentTime);
 
-    const pendingTransferTimeString =
+    const prettyTimeRemaining = (timeRemaining: number) => {
+         return timeRemaining > 0
+              ? Math.max(0, Math.floor(timeRemaining / 3600)) +
+                 ":" +
+                 Math.max(0, Math.floor((timeRemaining % 3600) / 60)) +
+                 ":" +
+                 Math.max(0, (timeRemaining % 3600) % 60)
+              : "None";
+    }
+    const pendingTransferTimeString = prettyTimeRemaining(pendingTransferTimeRemaining)
+    const pendingWithdrawTimeString = prettyTimeRemaining(pendingWithdrawTimeRemaining)
       pendingTransferTimeRemaining && pendingTransferTimeRemaining > 0
         ? Math.max(0, Math.floor(pendingTransferTimeRemaining / 3600)) +
           ":" +
@@ -203,13 +216,13 @@ const PositionActionsDialog = (props: DialogProps) => {
         return null;
       }
       if (needCollateralAllowance() && !needTokenAllowance()) {
-        return `You will need to sign two transactions one to approve collateral ${collSymbol} and a second to preform the liquidation.`;
+        return `You will need to sign two transactions, one to approve collateral ${collSymbol} and a second to perform the liquidation.`;
       }
       if (!needCollateralAllowance() && needTokenAllowance()) {
         return `You will need to sign two transactions one to approve synthetic ${tokenSymbol} and a second to preform the liquidation.`;
       }
       if (needCollateralAllowance() && needTokenAllowance()) {
-        return `You will need to sign three transactions one to approve synthetic ${tokenSymbol}, one to approve collateral ${collSymbol} and a third to preform the liquidation.`;
+        return `You will need to sign three transactions, one to approve synthetic ${tokenSymbol}, one to approve collateral ${collSymbol} and a third to perform the liquidation.`;
       }
     };
 
@@ -433,7 +446,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                     </Typography>
                     <Important>
                       Exercise caution! Incorrectly liquidating a position can
-                      loose you money! See the{" "}
+                      lose you money! See the{" "}
                       <a
                         href="https://docs.umaproject.org/synthetic-tokens/explainer#liquidation-and-dispute"
                         target="_blank"
