@@ -23,6 +23,10 @@ interface SponsorMap {
   [sponsor: string]: SponsorPositionState;
 }
 
+interface LiquidationMap {
+  [sponsorPlusId: string]: SponsorPositionState;
+}
+
 // Interfaces for GraphQl queries.
 interface PositionQuery {
   sponsor: { id: string };
@@ -31,6 +35,7 @@ interface PositionQuery {
 }
 
 interface LiquidationQuery {
+  id: string;
   sponsor: { id: string };
   liquidationId: string;
   liquidator: { address: string };
@@ -106,7 +111,7 @@ const useEmpSponsors = () => {
 
         if (empData) {
           let newPositions: SponsorMap = {};
-          let newLiquidations: SponsorMap = {};
+          let newLiquidations: LiquidationMap = {};
 
           const collReqFromWei = parseFloat(
             fromWei(collateralRequirement, collDecs)
@@ -142,7 +147,6 @@ const useEmpSponsors = () => {
           });
 
           empData.liquidations.forEach((liquidation: LiquidationQuery) => {
-            const sponsor = utils.getAddress(liquidation.sponsor.id);
             const liquidationCreatedEvent = liquidation.events.find(
               (e) => e.__typename === "LiquidationCreatedEvent"
             );
@@ -166,8 +170,8 @@ const useEmpSponsors = () => {
                 liquidation.tokensLiquidated !== "0" &&
                 liquidation.lockedCollateral !== "0"
               ) {
-                newLiquidations[sponsor] = {
-                  sponsor,
+                newLiquidations[liquidation.id] = {
+                  sponsor: utils.getAddress(liquidation.sponsor.id),
                   liquidator: liquidation.liquidator?.address,
                   disputer: liquidation.disputer?.address,
                   liquidationId: liquidation.liquidationId,

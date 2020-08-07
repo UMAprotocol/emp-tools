@@ -12,6 +12,7 @@ export const EMP_DATA = gql`
         }
       }
       liquidations(first: 1000) {
+        id
         sponsor {
           id
         }
