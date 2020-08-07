@@ -12,7 +12,7 @@ import { getLiquidationPrice } from "../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../utils/getOffchainPrice";
 
 import { useQuery } from "@apollo/client";
-import { ACTIVE_POSITIONS } from "../apollo/uma/queries";
+import { EMP_DATA } from "../apollo/uma/queries";
 
 // Interfaces for dApp state storage.
 interface SponsorPositionState {
@@ -35,9 +35,26 @@ interface PositionQuery {
   transferPositionRequestPassTimestamp: string;
 }
 
+interface LiquidationQuery {
+  sponsor: { id: string };
+  liquidationId: string;
+  liquidator: { address: string };
+  disputer: { address: string };
+  tokensLiquidated: string;
+  lockedCollateral: string;
+  liquidatedCollateral: string;
+  status: string;
+  events: {
+    __typename: string;
+    tx_hash: string;
+    timestamp: string;
+  }[];
+}
+
 interface FinancialContractQuery {
   id: string;
   sponsorPositions: PositionQuery;
+  sponsorLiquidations: LiquidationQuery;
 }
 
 const useEmpSponsors = () => {
@@ -52,7 +69,7 @@ const useEmpSponsors = () => {
   // We set the poll interval to a very slow 5 seconds for now since the position states
   // are not expected to change much.
   // Source: https://www.apollographql.com/docs/react/data/queries/#polling
-  const { loading, error, data } = useQuery(ACTIVE_POSITIONS, {
+  const { loading, error, data } = useQuery(EMP_DATA, {
     context: { clientName: "UMA" },
     pollInterval: 5000,
   });
@@ -68,11 +85,13 @@ const useEmpSponsors = () => {
   };
 
   const [activePositions, setActivePositions] = useState<SponsorMap>({});
+  const [liquidations, setLiquidations] = useState<SponsorMap>({});
 
   // get position information about every sponsor that has ever created a position.
   const querySponsors = () => {
     // Start with a fresh table.
     setActivePositions({});
+    setLiquidations({});
 
     if (
       emp !== null &&
@@ -92,6 +111,7 @@ const useEmpSponsors = () => {
 
         if (empData) {
           let newPositions: SponsorMap = {};
+          let newLiquidations: SponsorMap = {};
 
           const collReqFromWei = parseFloat(
             fromWei(collateralRequirement, collDecs)
@@ -119,20 +139,69 @@ const useEmpSponsors = () => {
                 ? "No"
                 : "Yes";
 
-            newPositions[sponsor] = {
-              tokensOutstanding: position.tokensOutstanding,
-              collateral: position.collateral,
-              cRatio: cRatio.toString(),
-              liquidationPrice: liquidationPrice.toString(),
-              pendingWithdraw: pendingWithdraw,
-              pendingTransfer: pendingTransfer,
-              withdrawalTimestamp: position.withdrawalRequestPassTimestamp,
-              transferTimestamp: position.transferPositionRequestPassTimestamp,
-              sponsor,
-            };
+            if (
+              position.tokensOutstanding !== "0" &&
+              position.collateral !== "0"
+            ) {
+              newPositions[sponsor] = {
+                tokensOutstanding: position.tokensOutstanding,
+                collateral: position.collateral,
+                cRatio: cRatio.toString(),
+                liquidationPrice: liquidationPrice.toString(),
+                pendingWithdraw: pendingWithdraw,
+                pendingTransfer: pendingTransfer,
+                withdrawalTimestamp: position.withdrawalRequestPassTimestamp,
+                transferTimestamp:
+                  position.transferPositionRequestPassTimestamp,
+                sponsor,
+              };
+            }
+          });
+
+          empData.liquidations.forEach((liquidation: LiquidationQuery) => {
+            const sponsor = utils.getAddress(liquidation.sponsor.id);
+            const liquidationCreatedEvent = liquidation.events.find(
+              (e) => e.__typename === "LiquidationCreatedEvent"
+            );
+
+            // There should always be a LiquidationCreatedEvent associated with each liquidation object, but if not then
+            // we will just ignore this strange edge case.
+            if (liquidationCreatedEvent) {
+              const liquidatedCR =
+                parseFloat(liquidation.tokensLiquidated) > 0
+                  ? parseFloat(liquidation.liquidatedCollateral) /
+                    parseFloat(liquidation.tokensLiquidated)
+                  : 0;
+              const maxDisputablePrice =
+                parseFloat(liquidation.tokensLiquidated) > 0 &&
+                collReqFromWei > 0
+                  ? parseFloat(liquidation.liquidatedCollateral) /
+                    (parseFloat(liquidation.tokensLiquidated) * collReqFromWei)
+                  : 0;
+
+              if (
+                liquidation.tokensLiquidated !== "0" &&
+                liquidation.lockedCollateral !== "0"
+              ) {
+                newLiquidations[sponsor] = {
+                  sponsor,
+                  liquidator: liquidation.liquidator?.address,
+                  disputer: liquidation.disputer?.address,
+                  liquidationId: liquidation.liquidationId,
+                  liquidatedCR: liquidatedCR.toString(),
+                  maxDisputablePrice: maxDisputablePrice.toString(),
+                  tokensLiquidated: liquidation.tokensLiquidated,
+                  lockedCollateral: liquidation.lockedCollateral,
+                  status: liquidation.status,
+                  liquidationTimestamp: liquidationCreatedEvent.timestamp,
+                  liquidationReceipt: liquidationCreatedEvent.tx_hash,
+                };
+              }
+            }
           });
 
           setActivePositions(newPositions);
+          setLiquidations(newLiquidations);
         }
       }
     }
@@ -143,7 +212,7 @@ const useEmpSponsors = () => {
     querySponsors();
   }, [emp, data, latestPrice]);
 
-  return { activeSponsors: activePositions };
+  return { activeSponsors: activePositions, liquidations: liquidations };
 };
 
 const EmpSponsors = createContainer(useEmpSponsors);

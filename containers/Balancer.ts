@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { TOKENS, POOL } from "../apollo/balancer/queries";
 
+import Connection from "./Connection";
+
 interface PoolState {
   exitsCount: number;
   joinsCount: number;
@@ -20,9 +22,10 @@ interface SharesState {
 }
 
 interface SharesQuery {
-  [address: string]: {
+  userAddress: {
     id: string;
   };
+  balance: string;
 }
 interface PoolTokenQuery {
   address: string;
@@ -30,6 +33,8 @@ interface PoolTokenQuery {
 }
 
 const useBalancer = () => {
+  const { address, block$ } = Connection.useContainer();
+
   // In the future, detect the EMP address dynamically. But, for now we are only going to load data for the yUSD pool.
   // I am hardcoding these for now so that this component can be rendered without the user having to select an EMP.
   const empAddress = "0x81ab848898b5ffd3354dbbefb333d5d183eedcb5";
@@ -61,6 +66,9 @@ const useBalancer = () => {
   const [poolAddress, setPoolAddress] = useState<string | null>(null);
   const [pool, setPool] = useState<PoolState | null>(null);
   const [shares, setShares] = useState<SharesState | null>(null);
+  const [userShareFraction, setUserSharesFraction] = useState<number | null>(
+    null
+  );
 
   const queryTokenData = () => {
     setUsdPrice(null);
@@ -84,6 +92,7 @@ const useBalancer = () => {
   const queryPoolData = () => {
     setPool(null);
     setShares(null);
+    setUserSharesFraction(null);
 
     if (poolError) {
       console.error(`Apollo client failed to fetch graph data:`, poolError);
@@ -94,7 +103,7 @@ const useBalancer = () => {
       const shareHolders: SharesState = {};
       data.shares.forEach((share: SharesQuery) => {
         if (!shareHolders[share.userAddress.id]) {
-          shareHolders[share.userAddress.id] = share.userAddress.id;
+          shareHolders[share.userAddress.id] = share.balance;
         }
       });
       setShares(shareHolders);
@@ -115,6 +124,17 @@ const useBalancer = () => {
         ),
         totalSwapVolume: Number(data.totalSwapVolume),
       });
+
+      if (address !== null && shares !== null) {
+        const user = Object.keys(shareHolders).find(
+          (shareholder: string) => shareholder === address
+        );
+        const userShares = user ? Number(shares[user]) : 0;
+        const totalShares = Number(data.totalShares);
+        if (totalShares > 0) {
+          setUserSharesFraction(userShares / totalShares);
+        }
+      }
     }
   };
 
@@ -122,13 +142,25 @@ const useBalancer = () => {
   useEffect(() => {
     queryTokenData();
     queryPoolData();
-  }, [tokenPriceData, tokenPriceLoading, poolData, poolLoading]);
+  }, [tokenPriceData, tokenPriceLoading, poolData, poolLoading, address]);
+
+  // get info on each new block
+  useEffect(() => {
+    if (block$) {
+      const sub = block$.subscribe(() => {
+        queryPoolData();
+        queryTokenData();
+      });
+      return () => sub.unsubscribe();
+    }
+  }, [block$, address]);
 
   return {
     pool,
     poolAddress,
     usdPrice,
     shares,
+    userShareFraction,
   };
 };
 
