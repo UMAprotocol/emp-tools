@@ -19,6 +19,7 @@ import EmpSponsors from "../../containers/EmpSponsors";
 import Etherscan from "../../containers/Etherscan";
 
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
+import LiquidationActionDialog from "./LiquidationActionDialog";
 
 interface SortableTableHeaderProps {
   children: React.ReactNode;
@@ -45,6 +46,27 @@ const PageButtons = styled.div`
   justify-content: center;
   margin-top: 2em;
   margin-bottom: 2em;
+`;
+
+const MoreInfo = styled.a`
+  height: 23px;
+  width: 23px;
+  background-color: #303030;
+  border-radius: 50%;
+  display: inline-block;
+  text-align: center;
+  &:hover {
+    background-color: white;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+`;
+
+const StyledTableRow = styled(TableRow)`
+  &:hover {
+    transition: 0.1s;
+    background-color: #636363;
+  }
 `;
 
 type FadedDiv = {
@@ -95,6 +117,10 @@ const AllLiquidations = () => {
     SORT_FIELD.TOKENS_LIQUIDATED
   );
 
+  // Extra info dialog
+  const [isDialogShowing, setIsDialogShowing] = useState<boolean>(false);
+  const [selectedSponsor, setSelectedSponsor] = useState<string | null>(null);
+
   // Set max page depending on # of liqs
   useEffect(() => {
     setMaxPage(1);
@@ -130,7 +156,17 @@ const AllLiquidations = () => {
     };
 
     const prettyAddress = (x: string) => {
-      return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
+      return x.substr(0, 5) + "..." + x.substr(x.length - 5, x.length);
+    };
+
+    const toggleDialog = () => {
+      setIsDialogShowing(!isDialogShowing);
+    };
+
+    const handleOpenActionsDialog = (address: string) => {
+      console.log("opening for", address);
+      setSelectedSponsor(address);
+      setIsDialogShowing(true);
     };
 
     const invertDisputablePrice = isPricefeedInvertedFromTokenSymbol(
@@ -211,113 +247,144 @@ const AllLiquidations = () => {
     };
 
     return (
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Sponsor</TableCell>
-              <TableCell align="right">
-                <SortableTableColumnHeader
-                  sortField={SORT_FIELD.LOCKED_COLLATERAL}
-                >
-                  Locked Collateral
-                  <br />({collSymbol}){" "}
-                </SortableTableColumnHeader>
-              </TableCell>
-              <TableCell align="right">
-                <SortableTableColumnHeader
-                  sortField={SORT_FIELD.TOKENS_LIQUIDATED}
-                >
-                  Synthetics
-                  <br />({tokenSymbol}){" "}
-                </SortableTableColumnHeader>
-              </TableCell>
-              <Tooltip
-                title={`If the index price at the liquidation timestamp was ${
-                  invertDisputablePrice ? `above` : `below`
-                } this, then the liquidation would be disputable`}
-                placement="top"
-              >
-                <TableCell align="right">
-                  <SortableTableColumnHeader
-                    sortField={SORT_FIELD.MAX_DISPUTABLE_PRICE}
-                  >
-                    {invertDisputablePrice ? `Min` : `Max`} Disputable Price{" "}
-                  </SortableTableColumnHeader>
+      <div>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <strong>
+                    Sponsor
+                    <br />
+                    Address
+                  </strong>
                 </TableCell>
-              </Tooltip>
-              <TableCell align="right">
-                <SortableTableColumnHeader
-                  sortField={SORT_FIELD.LIQUIDATION_TIMESTAMP}
-                >
-                  Liquidation Timestamp{" "}
-                </SortableTableColumnHeader>
-              </TableCell>
-              <TableCell align="right">Liquidation Receipt </TableCell>
-              <TableCell align="right">Status </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {reformattedLiquidationData.map((sponsor: string) => {
-              const liquidation = liquidations[sponsor];
-              return (
-                <TableRow key={sponsor}>
-                  <TableCell component="th" scope="row">
-                    <a href={getEtherscanUrl(sponsor)} target="_blank">
-                      {prettyAddress(sponsor)}
-                    </a>
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(Number(liquidation.lockedCollateral))}
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(Number(liquidation.tokensLiquidated))}
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(
-                      getDisputablePrice(liquidation.maxDisputablePrice)
-                    )}
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyDate(Number(liquidation.liquidationTimestamp))}
-                  </TableCell>
-                  <TableCell align="right">
-                    <a
-                      href={getEtherscanUrl(liquidation.liquidationReceipt)}
-                      target="_blank"
+                <TableCell align="right">
+                  <strong>
+                    <SortableTableColumnHeader
+                      sortField={SORT_FIELD.LIQUIDATION_TIMESTAMP}
                     >
-                      {prettyAddress(liquidation.liquidationReceipt)}
-                    </a>
-                  </TableCell>
+                      Liquidation Timestamp{" "}
+                    </SortableTableColumnHeader>
+                  </strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>
+                    Liquidation
+                    <br />
+                    Status{" "}
+                  </strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>
+                    <SortableTableColumnHeader
+                      sortField={SORT_FIELD.LOCKED_COLLATERAL}
+                    >
+                      Locked
+                      <br /> Collateral
+                      <br />({collSymbol}){" "}
+                    </SortableTableColumnHeader>
+                  </strong>
+                </TableCell>
+                <TableCell align="right" style={{ width: "100%" }}>
+                  <strong>
+                    <SortableTableColumnHeader
+                      sortField={SORT_FIELD.TOKENS_LIQUIDATED}
+                    >
+                      Liquidated <br />
+                      Synthetics
+                      <br />({tokenSymbol}){" "}
+                    </SortableTableColumnHeader>
+                  </strong>
+                </TableCell>
+                <Tooltip
+                  title={`If the index price at the liquidation timestamp was ${
+                    invertDisputablePrice ? `above` : `below`
+                  } this, then the liquidation would be disputable.`}
+                  placement="top"
+                >
                   <TableCell align="right">
-                    {translateLiquidationStatus(
-                      Number(liquidation.liquidationTimestamp),
-                      liquidation.status
-                    )}
+                    <strong>
+                      <SortableTableColumnHeader
+                        sortField={SORT_FIELD.MAX_DISPUTABLE_PRICE}
+                      >
+                        {invertDisputablePrice ? `Minimum` : `Maximum`}{" "}
+                        Disputable Price{" "}
+                      </SortableTableColumnHeader>
+                    </strong>
                   </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-        <PageButtons>
-          <div
-            onClick={() => {
-              setPage(page === 1 ? page : page - 1);
-            }}
-          >
-            <Arrow faded={page === 1 ? true : false}>←</Arrow>
-          </div>
-          {"Page " + page + " of " + maxPage}
-          <div
-            onClick={() => {
-              setPage(page === maxPage ? page : page + 1);
-            }}
-          >
-            <Arrow faded={page === maxPage ? true : false}>→</Arrow>
-          </div>
-        </PageButtons>
-      </TableContainer>
+                </Tooltip>
+
+                <TableCell align="right"></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {reformattedLiquidationData.map((sponsor: string) => {
+                const liquidation = liquidations[sponsor];
+                return (
+                  <StyledTableRow key={sponsor}>
+                    <TableCell component="th" scope="row">
+                      <a href={getEtherscanUrl(sponsor)} target="_blank">
+                        {prettyAddress(sponsor)}
+                      </a>
+                    </TableCell>
+                    <TableCell align="left">
+                      {prettyDate(Number(liquidation.liquidationTimestamp))}
+                    </TableCell>
+                    <TableCell align="right">
+                      {translateLiquidationStatus(
+                        Number(liquidation.liquidationTimestamp),
+                        liquidation.status
+                      )}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(Number(liquidation.lockedCollateral))}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(Number(liquidation.tokensLiquidated))}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(
+                        getDisputablePrice(liquidation.maxDisputablePrice)
+                      )}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <MoreInfo
+                        onClick={() => handleOpenActionsDialog(sponsor)}
+                      >
+                        ⋮
+                      </MoreInfo>
+                    </TableCell>
+                  </StyledTableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+          <PageButtons>
+            <div
+              onClick={() => {
+                setPage(page === 1 ? page : page - 1);
+              }}
+            >
+              <Arrow faded={page === 1 ? true : false}>←</Arrow>
+            </div>
+            {"Page " + page + " of " + maxPage}
+            <div
+              onClick={() => {
+                setPage(page === maxPage ? page : page + 1);
+              }}
+            >
+              <Arrow faded={page === maxPage ? true : false}>→</Arrow>
+            </div>
+          </PageButtons>
+        </TableContainer>
+        <LiquidationActionDialog
+          handleClose={toggleDialog}
+          isDialogShowing={isDialogShowing}
+          selectedSponsor={selectedSponsor}
+        />
+      </div>
     );
   } else {
     return <></>;
