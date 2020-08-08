@@ -173,7 +173,8 @@ const useEmpSponsors = () => {
                 // The UMA subgraph uniquely identifies each liquidation with an "id" that concatenates
                 // the liquidated sponsor's address with the liquidation ID, for example:
                 // "0x1e17a75616cd74f5846b1b71622aa8e10ea26cc0-0"
-                newLiquidations[liquidation.id] = {
+                const sponsorAddressPlusId = liquidation.id;
+                newLiquidations[sponsorAddressPlusId] = {
                   sponsor: utils.getAddress(liquidation.sponsor.id),
                   liquidator: liquidation.liquidator?.address,
                   disputer: liquidation.disputer?.address,
