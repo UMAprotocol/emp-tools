@@ -181,7 +181,7 @@ const Deposit = () => {
         <Box py={4}>
           <Typography>{`Resulting CR: ${pricedResultantCR}`}</Typography>
           <Typography>
-            {`Resulting liquidation price: ${resultantLiquidationPrice} (${priceIdentifierUtf8}`}
+            {`Resulting liquidation price: ${resultantLiquidationPrice} (${priceIdentifierUtf8})`}
           </Typography>
         </Box>
 
