@@ -66,6 +66,11 @@ interface DialogProps {
 
 const PositionActionsDialog = (props: DialogProps) => {
   const { empState } = EmpState.useContainer();
+  const {
+    priceIdentifier: priceId,
+    collateralRequirement: collReq,
+    currentTime,
+  } = empState;
   const { dvmState } = DvmState.useContainer();
   const { finalFee } = dvmState;
   const { getEtherscanUrl } = Etherscan.useContainer();
@@ -84,7 +89,7 @@ const PositionActionsDialog = (props: DialogProps) => {
     setMaxAllowance: setMaxCollateralAllowance,
   } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
-  const [tabIndex, setTabIndex] = useState<string | null>("deposit");
+  const [tabIndex, setTabIndex] = useState<string>("deposit");
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
   const [minCollPerToken, setMinCollPerToken] = useState<string>("");
   const [maxCollPerToken, setMaxCollPerToken] = useState<string>("");
@@ -95,15 +100,9 @@ const PositionActionsDialog = (props: DialogProps) => {
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const {
-    priceIdentifier: priceId,
-    collateralRequirement: collReq,
-    currentTime,
-  } = empState;
-
   const setDialogTab = (
     event: MouseEvent<HTMLElement>,
-    newAlignment: string | null
+    newAlignment: string
   ) => {
     setTabIndex(newAlignment);
   };
@@ -117,13 +116,20 @@ const PositionActionsDialog = (props: DialogProps) => {
     return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
   };
   if (
-    props.selectedSponsor  !== null &&
+    activeSponsors !== null &&
+    props.selectedSponsor !== null &&
     activeSponsors[props.selectedSponsor] !== null &&
     latestPrice !== null &&
-    collReq !== null
-    activeSponsors[props.selectedSponsor] &&
-    latestPrice !== null &&
-    collReq
+    collReq !== null &&
+    emp !== null &&
+    currentTime !== null &&
+    finalFee !== null &&
+    tokenSymbol !== null &&
+    tokenBalance !== null &&
+    tokenAllowance !== null &&
+    collSymbol !== null &&
+    collBalance !== null &&
+    collAllowance !== null
   ) {
     const collBalanceNum = collBalance || 0;
     const tokenBalanceNum = tokenBalance || 0;
@@ -136,46 +142,40 @@ const PositionActionsDialog = (props: DialogProps) => {
     const pendingWithdrawTimeRemaining =
       Number(sponsorPosition.withdrawalTimestamp) - Number(currentTime);
 
-    const pendingWithdrawTimeString =
-      pendingWithdrawTimeRemaining && pendingWithdrawTimeRemaining > 0
-        ? Math.max(0, Math.floor(pendingWithdrawTimeRemaining / 3600)) +
-          ":" +
-          Math.max(0, Math.floor((pendingWithdrawTimeRemaining % 3600) / 60)) +
-          ":" +
-          Math.max(0, (pendingWithdrawTimeRemaining % 3600) % 60)
-        : "None";
-
     const pendingTransferTimeRemaining =
       Number(sponsorPosition.TransferTimestamp) - Number(currentTime);
 
     const prettyTimeRemaining = (timeRemaining: number) => {
-         return timeRemaining > 0
-              ? Math.max(0, Math.floor(timeRemaining / 3600)) +
-                 ":" +
-                 Math.max(0, Math.floor((timeRemaining % 3600) / 60)) +
-                 ":" +
-                 Math.max(0, (timeRemaining % 3600) % 60)
-              : "None";
-    }
-    const pendingTransferTimeString = prettyTimeRemaining(pendingTransferTimeRemaining)
-    const pendingWithdrawTimeString = prettyTimeRemaining(pendingWithdrawTimeRemaining)
-      pendingTransferTimeRemaining && pendingTransferTimeRemaining > 0
-        ? Math.max(0, Math.floor(pendingTransferTimeRemaining / 3600)) +
-          ":" +
-          Math.max(0, Math.floor((pendingTransferTimeRemaining % 3600) / 60)) +
-          ":" +
-          Math.max(0, (pendingTransferTimeRemaining % 3600) % 60)
+      return timeRemaining > 0
+        ? Math.max(0, Math.floor(timeRemaining / 3600)) +
+            ":" +
+            Math.max(0, Math.floor((timeRemaining % 3600) / 60)) +
+            ":" +
+            Math.max(0, (timeRemaining % 3600) % 60)
         : "None";
+    };
+    const pendingTransferTimeString = prettyTimeRemaining(
+      pendingTransferTimeRemaining
+    );
+    const pendingWithdrawTimeString = prettyTimeRemaining(
+      pendingWithdrawTimeRemaining
+    );
 
     const underCollateralizedPrice =
-      Number(sponsorPosition.collateral) /
-      (Number(sponsorPosition.tokensOutstanding) *
-        parseFloat(fromWei(collReq)));
+      Number(sponsorPosition.collateral) === 0 ||
+      Number(sponsorPosition.tokensOutstanding) === 0 ||
+      Number(collReq) === 0
+        ? 0
+        : Number(sponsorPosition.collateral) /
+          (Number(sponsorPosition.tokensOutstanding) *
+            parseFloat(fromWei(collReq)));
 
     const underCollateralizedPercent =
-      ((Number(latestPrice) - Number(underCollateralizedPrice)) /
-        Number(latestPrice)) *
-      100;
+      Number(latestPrice) === 0
+        ? 0
+        : ((Number(latestPrice) - Number(underCollateralizedPrice)) /
+            Number(latestPrice)) *
+          100;
 
     const collBalanceTooLow = () => {
       if (tabIndex == "deposit") {
@@ -216,18 +216,18 @@ const PositionActionsDialog = (props: DialogProps) => {
         return null;
       }
       if (needCollateralAllowance() && !needTokenAllowance()) {
-        return `You will need to sign two transactions, one to approve collateral ${collSymbol} and a second to perform the liquidation.`;
+        return `You will need to sign two transactions, one to approve collateral ${collSymbol} and a second to preform the liquidation.`;
       }
       if (!needCollateralAllowance() && needTokenAllowance()) {
         return `You will need to sign two transactions one to approve synthetic ${tokenSymbol} and a second to preform the liquidation.`;
       }
       if (needCollateralAllowance() && needTokenAllowance()) {
-        return `You will need to sign three transactions, one to approve synthetic ${tokenSymbol}, one to approve collateral ${collSymbol} and a third to perform the liquidation.`;
+        return `You will need to sign three transactions, one to approve synthetic ${tokenSymbol}, one to approve collateral ${collSymbol} and a third to preform the liquidation.`;
       }
     };
 
     const executeDeposit = async () => {
-      if (collateralToDeposit && !collBalanceTooLow() && emp) {
+      if (!collBalanceTooLow()) {
         setHash(null);
         setSuccess(null);
         setError(null);
@@ -252,15 +252,7 @@ const PositionActionsDialog = (props: DialogProps) => {
     };
 
     const executeLiquidation = async () => {
-      if (
-        minCollPerToken &&
-        maxCollPerToken &&
-        maxTokensToLiquidate &&
-        deadline &&
-        !collBalanceTooLow() &&
-        !tokenBalanceTooLow &&
-        emp
-      ) {
+      if (!collBalanceTooLow() && !tokenBalanceTooLow) {
         setHash(null);
         setSuccess(null);
         setError(null);
@@ -302,11 +294,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                 <Status>
                   <Label>Sponsor: </Label>
                   <a
-                    href={
-                      props.selectedSponsor
-                        ? getEtherscanUrl(props.selectedSponsor)
-                        : "N/A"
-                    }
+                    href={getEtherscanUrl(props.selectedSponsor)}
                     target="_blank"
                   >
                     {prettyAddress(props.selectedSponsor)}
@@ -329,10 +317,19 @@ const PositionActionsDialog = (props: DialogProps) => {
                   {sponsorPosition.pendingWithdraw}
                 </Status>
                 {sponsorPosition.pendingWithdraw !== "No" && (
-                  <Status>
-                    <Label>Withdraw liveness time remaining: </Label>
-                    {pendingWithdrawTimeString}
-                  </Status>
+                  <div>
+                    <Status>
+                      <Label>Withdraw liveness time remaining: </Label>
+                      {pendingWithdrawTimeString}
+                    </Status>
+                    <Status>
+                      <Label>Withdraw request amount: </Label>
+                      {prettyBalance(
+                        Number(sponsorPosition.withdrawalRequestAmount)
+                      )}{" "}
+                      {collSymbol}
+                    </Status>
+                  </div>
                 )}
                 <Status>
                   <Label>Pending Transfer: </Label>
@@ -383,7 +380,6 @@ const PositionActionsDialog = (props: DialogProps) => {
                             type="number"
                             inputProps={{ min: "0" }}
                             label={`Collateral (${collSymbol})`}
-                            placeholder="1234"
                             error={collBalanceTooLow()}
                             helperText={
                               collBalanceTooLow()
@@ -464,7 +460,6 @@ const PositionActionsDialog = (props: DialogProps) => {
                             type="number"
                             inputProps={{ min: "0" }}
                             label={`Min collateral/token`}
-                            placeholder="1234"
                             value={minCollPerToken}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>
@@ -477,7 +472,6 @@ const PositionActionsDialog = (props: DialogProps) => {
                             type="number"
                             inputProps={{ min: "0" }}
                             label={`Max collateral/token`}
-                            placeholder="1234"
                             value={maxCollPerToken}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>
@@ -490,7 +484,6 @@ const PositionActionsDialog = (props: DialogProps) => {
                             type="number"
                             inputProps={{ min: "0" }}
                             label={`Max tokens to liquidate`}
-                            placeholder="1234"
                             error={tokenBalanceTooLow}
                             helperText={
                               tokenBalanceTooLow
@@ -525,22 +518,21 @@ const PositionActionsDialog = (props: DialogProps) => {
                     </Box>
 
                     <Box textAlign="center" pt={2} pb={2}>
-                      {minCollPerToken &&
-                      maxCollPerToken &&
-                      maxTokensToLiquidate &&
-                      deadline &&
-                      !collBalanceTooLow() &&
-                      !tokenBalanceTooLow ? (
-                        <Button
-                          fullWidth
-                          variant="contained"
-                          onClick={executeLiquidation}
-                        >{`Submit liquidation`}</Button>
-                      ) : (
-                        <Button fullWidth variant="contained" disabled>
-                          Submit liquidation
-                        </Button>
-                      )}
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={executeLiquidation}
+                        disabled={
+                          !(
+                            minCollPerToken &&
+                            maxCollPerToken &&
+                            maxTokensToLiquidate &&
+                            deadline &&
+                            !collBalanceTooLow() &&
+                            !tokenBalanceTooLow
+                          )
+                        }
+                      >{`Submit liquidation`}</Button>
                     </Box>
                     {liquidationNeedAllowanceText() && (
                       <Typography>

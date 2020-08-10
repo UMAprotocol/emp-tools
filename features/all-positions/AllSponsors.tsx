@@ -146,10 +146,6 @@ const AllSponsors = () => {
       return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
     };
 
-    const toggleDialog = () => {
-      setIsDialogShowing(!isDialogShowing);
-    };
-
     const handleOpenActionsDialog = (address: string) => {
       setSelectedSponsor(address);
       setIsDialogShowing(true);
@@ -307,7 +303,7 @@ const AllSponsors = () => {
         </TableContainer>
         <PositionActionsDialog
           isDialogShowing={isDialogShowing}
-          handleClose={toggleDialog}
+          handleClose={() => setIsDialogShowing(!isDialogShowing)}
           selectedSponsor={selectedSponsor}
         />
       </div>

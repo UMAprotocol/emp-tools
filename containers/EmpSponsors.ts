@@ -28,8 +28,6 @@ interface PositionQuery {
   sponsor: { id: string };
   tokensOutstanding: string;
   collateral: string;
-  pendingWithdraw: string;
-  pendingTransfer: string;
   withdrawalRequestPassTimestamp: string;
   withdrawalRequestAmount: string;
   transferPositionRequestPassTimestamp: string;
@@ -150,6 +148,7 @@ const useEmpSponsors = () => {
                 liquidationPrice: liquidationPrice.toString(),
                 pendingWithdraw: pendingWithdraw,
                 pendingTransfer: pendingTransfer,
+                withdrawalRequestAmount: position.withdrawalRequestAmount,
                 withdrawalTimestamp: position.withdrawalRequestPassTimestamp,
                 transferTimestamp:
                   position.transferPositionRequestPassTimestamp,
