@@ -29,6 +29,8 @@ import Collateral from "../../containers/Collateral";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
+import { DOCS_MAP } from "../../utils/getDocLinks";
+
 const Label = styled.span`
   color: #999999;
 `;
@@ -440,7 +442,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                       Exercise caution! Incorrectly liquidating a position can
                       lose you money! See the{" "}
                       <a
-                        href="https://docs.umaproject.org/synthetic-tokens/explainer#liquidation-and-dispute"
+                        href={DOCS_MAP.FINAL_FEE}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
