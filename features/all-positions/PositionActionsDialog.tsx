@@ -72,6 +72,7 @@ const PositionActionsDialog = (props: DialogProps) => {
     priceIdentifier: priceId,
     collateralRequirement: collReq,
     currentTime,
+    isExpired,
   } = empState;
   const { dvmState } = DvmState.useContainer();
   const { finalFee } = dvmState;
@@ -120,6 +121,7 @@ const PositionActionsDialog = (props: DialogProps) => {
   if (
     activeSponsors !== null &&
     props.selectedSponsor !== null &&
+    activeSponsors[props.selectedSponsor] &&
     activeSponsors[props.selectedSponsor] !== null &&
     latestPrice !== null &&
     collReq !== null &&
@@ -289,8 +291,8 @@ const PositionActionsDialog = (props: DialogProps) => {
         <PositionDialog>
           <Container>
             <Box>
-              <Box>
-                <h1>Additional Position Actions</h1>
+              <Box pb={2}>
+                <h1>Position Info & Actions</h1>
                 <Status>
                   <Label>Sponsor: </Label>
                   <a
@@ -349,198 +351,213 @@ const PositionActionsDialog = (props: DialogProps) => {
                   <Label>Liquidation price: </Label>
                   {Number(sponsorPosition.liquidationPrice).toFixed(4)}
                 </Status>
-                <hr />
               </Box>
-              <Box pt={2} textAlign="center">
-                <ToggleButtonGroup
-                  value={tabIndex}
-                  exclusive
-                  onChange={setDialogTab}
-                >
-                  <ToggleButton value="deposit">deposit</ToggleButton>
-                  <ToggleButton value="liquidate">liquidate</ToggleButton>
-                </ToggleButtonGroup>
-              </Box>
-              <Box>
-                {tabIndex === "deposit" && (
-                  <Box pt={2}>
-                    <Typography>
-                      <strong>
-                        Deposit collateral into this sponsor's position
-                      </strong>
-                      <br></br>
-                      You can add additional collateral to this position, even
-                      if it's not yours.
-                    </Typography>
-                    <Box pt={2}>
-                      <Grid container spacing={4}>
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            type="number"
-                            inputProps={{ min: "0" }}
-                            label={`Collateral (${collSymbol})`}
-                            error={collBalanceTooLow()}
-                            helperText={
-                              collBalanceTooLow()
-                                ? `${collSymbol} balance too low`
-                                : null
-                            }
-                            value={collateralToDeposit}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => setCollateralToDeposit(e.target.value)}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Box py={2}>
-                            {collateralToDeposit &&
-                            collateralToDeposit != "0" &&
-                            !collBalanceTooLow() ? (
-                              <Button
-                                fullWidth
-                                variant="contained"
-                                onClick={executeDeposit}
-                              >{`Deposit ${collateralToDeposit} ${collSymbol} into the position`}</Button>
-                            ) : (
-                              <Button fullWidth variant="contained" disabled>
-                                Deposit
-                              </Button>
-                            )}
-                          </Box>
-                        </Grid>
-                      </Grid>
-                      {needCollateralAllowance() && (
-                        <Typography>
-                          <br></br>
-                          <strong>Note:</strong> You will need to sign two
-                          transactions one to approve {collSymbol} and a second
-                          to preform the deposit.
-                        </Typography>
-                      )}
-                    </Box>
+              {!isExpired && (
+                <Box>
+                  <hr />
+                  <Box pt={2} textAlign="center">
+                    <ToggleButtonGroup
+                      value={tabIndex}
+                      exclusive
+                      onChange={setDialogTab}
+                    >
+                      <ToggleButton value="deposit">deposit</ToggleButton>
+                      <ToggleButton value="liquidate">liquidate</ToggleButton>
+                    </ToggleButtonGroup>
                   </Box>
-                )}
-                {tabIndex === "liquidate" && (
-                  <Box pt={2}>
-                    <Typography>
-                      <strong>Liquidate this sponsor</strong>
-                      <br></br>For the position to be under collateralized{" "}
-                      {utils.parseBytes32String(priceId)} would need to{" "}
-                      {underCollateralizedPrice > latestPrice
-                        ? "increase"
-                        : "decrease"}{" "}
-                      by {Math.abs(underCollateralizedPercent).toFixed(4)}% from{" "}
-                      {latestPrice.toFixed(4)} to{" "}
-                      {underCollateralizedPrice.toFixed(4)}. You can still
-                      liquidate this position if you have a different opinion on
-                      the {utils.parseBytes32String(priceId)} price.
-                      <br></br>
-                      <br></br>
-                    </Typography>
-                    <Important>
-                      Exercise caution! Incorrectly liquidating a position can
-                      lose you money! See the{" "}
-                      <a
-                        href={DOCS_MAP.FINAL_FEE}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        UMA docs
-                      </a>
-                      .
-                    </Important>
-                    <Box pt={2} pb={2}>
-                      <Grid container spacing={4}>
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            type="number"
-                            inputProps={{ min: "0" }}
-                            label={`Min collateral/token`}
-                            value={minCollPerToken}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => setMinCollPerToken(e.target.value)}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            type="number"
-                            inputProps={{ min: "0" }}
-                            label={`Max collateral/token`}
-                            value={maxCollPerToken}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => setMaxCollPerToken(e.target.value)}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            type="number"
-                            inputProps={{ min: "0" }}
-                            label={`Max tokens to liquidate`}
-                            error={tokenBalanceTooLow}
-                            helperText={
-                              tokenBalanceTooLow
-                                ? `${tokenSymbol} balance too low`
-                                : null
-                            }
-                            value={maxTokensToLiquidate}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => setMaxTokensToLiquidate(e.target.value)}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <FormControl fullWidth>
-                            <InputLabel>Deadline</InputLabel>
-                            <Select
-                              value={deadline}
-                              onChange={(
-                                e: React.ChangeEvent<{ value: unknown }>
-                              ) => setDeadline(e.target.value as string)}
-                            >
-                              <MenuItem value={60}>1 minute</MenuItem>
-                              <MenuItem value={5 * 60}>5 minutes</MenuItem>
-                              <MenuItem value={30 * 60}>30 minutes</MenuItem>
-                              <MenuItem value={60 * 60}>1 hour</MenuItem>
-                              <MenuItem value={5 * 60 * 60}>5 hours</MenuItem>
-                              <MenuItem value={1911772800}>Forever</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                      </Grid>
-                    </Box>
+                  <Box>
+                    {tabIndex === "deposit" && (
+                      <Box pt={2}>
+                        <Typography>
+                          <strong>
+                            Deposit collateral into this sponsor's position
+                          </strong>
+                          <br></br>
+                          You can add additional collateral to this position,
+                          even if it's not yours.
+                        </Typography>
+                        <Box pt={2}>
+                          <Grid container spacing={4}>
+                            <Grid item xs={6}>
+                              <TextField
+                                fullWidth
+                                type="number"
+                                inputProps={{ min: "0" }}
+                                label={`Collateral (${collSymbol})`}
+                                error={collBalanceTooLow()}
+                                helperText={
+                                  collBalanceTooLow()
+                                    ? `${collSymbol} balance too low`
+                                    : null
+                                }
+                                value={collateralToDeposit}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>
+                                ) => setCollateralToDeposit(e.target.value)}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Box py={2}>
+                                {collateralToDeposit &&
+                                collateralToDeposit != "0" &&
+                                !collBalanceTooLow() ? (
+                                  <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={executeDeposit}
+                                  >{`Deposit ${collateralToDeposit} ${collSymbol} into the position`}</Button>
+                                ) : (
+                                  <Button
+                                    fullWidth
+                                    variant="contained"
+                                    disabled
+                                  >
+                                    Deposit
+                                  </Button>
+                                )}
+                              </Box>
+                            </Grid>
+                          </Grid>
+                          {needCollateralAllowance() && (
+                            <Typography>
+                              <br></br>
+                              <strong>Note:</strong> You will need to sign two
+                              transactions one to approve {collSymbol} and a
+                              second to preform the deposit.
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+                    )}
+                    {tabIndex === "liquidate" && (
+                      <Box pt={2}>
+                        <Typography>
+                          <strong>Liquidate this sponsor</strong>
+                          <br></br>For the position to be under collateralized{" "}
+                          {utils.parseBytes32String(priceId)} would need to{" "}
+                          {underCollateralizedPrice > latestPrice
+                            ? "increase"
+                            : "decrease"}{" "}
+                          by {Math.abs(underCollateralizedPercent).toFixed(4)}%
+                          from {latestPrice.toFixed(4)} to{" "}
+                          {underCollateralizedPrice.toFixed(4)}. You can still
+                          liquidate this position if you have a different
+                          opinion on the {utils.parseBytes32String(priceId)}{" "}
+                          price.
+                          <br></br>
+                          <br></br>
+                        </Typography>
+                        <Important>
+                          Exercise caution! Incorrectly liquidating a position
+                          can lose you money! See the{" "}
+                          <a
+                            href={DOCS_MAP.FINAL_FEE}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            UMA docs
+                          </a>
+                          .
+                        </Important>
+                        <Box pt={2} pb={2}>
+                          <Grid container spacing={4}>
+                            <Grid item xs={6}>
+                              <TextField
+                                fullWidth
+                                type="number"
+                                inputProps={{ min: "0" }}
+                                label={`Min collateral/token`}
+                                value={minCollPerToken}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>
+                                ) => setMinCollPerToken(e.target.value)}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <TextField
+                                fullWidth
+                                type="number"
+                                inputProps={{ min: "0" }}
+                                label={`Max collateral/token`}
+                                value={maxCollPerToken}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>
+                                ) => setMaxCollPerToken(e.target.value)}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <TextField
+                                fullWidth
+                                type="number"
+                                inputProps={{ min: "0" }}
+                                label={`Max tokens to liquidate`}
+                                error={tokenBalanceTooLow}
+                                helperText={
+                                  tokenBalanceTooLow
+                                    ? `${tokenSymbol} balance too low`
+                                    : null
+                                }
+                                value={maxTokensToLiquidate}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>
+                                ) => setMaxTokensToLiquidate(e.target.value)}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <FormControl fullWidth>
+                                <InputLabel>Deadline</InputLabel>
+                                <Select
+                                  value={deadline}
+                                  onChange={(
+                                    e: React.ChangeEvent<{ value: unknown }>
+                                  ) => setDeadline(e.target.value as string)}
+                                >
+                                  <MenuItem value={60}>1 minute</MenuItem>
+                                  <MenuItem value={5 * 60}>5 minutes</MenuItem>
+                                  <MenuItem value={30 * 60}>
+                                    30 minutes
+                                  </MenuItem>
+                                  <MenuItem value={60 * 60}>1 hour</MenuItem>
+                                  <MenuItem value={5 * 60 * 60}>
+                                    5 hours
+                                  </MenuItem>
+                                  <MenuItem value={1911772800}>
+                                    Forever
+                                  </MenuItem>
+                                </Select>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+                        </Box>
 
-                    <Box textAlign="center" pt={2} pb={2}>
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        onClick={executeLiquidation}
-                        disabled={
-                          !(
-                            minCollPerToken &&
-                            maxCollPerToken &&
-                            maxTokensToLiquidate &&
-                            deadline &&
-                            !collBalanceTooLow() &&
-                            !tokenBalanceTooLow
-                          )
-                        }
-                      >{`Submit liquidation`}</Button>
-                    </Box>
-                    {liquidationNeedAllowanceText() !== "" && (
-                      <Typography>
-                        <strong>Note: </strong>
-                        {liquidationNeedAllowanceText()}
-                      </Typography>
+                        <Box textAlign="center" pt={2} pb={2}>
+                          <Button
+                            fullWidth
+                            variant="contained"
+                            onClick={executeLiquidation}
+                            disabled={
+                              !(
+                                minCollPerToken &&
+                                maxCollPerToken &&
+                                maxTokensToLiquidate &&
+                                deadline &&
+                                !collBalanceTooLow() &&
+                                !tokenBalanceTooLow
+                              )
+                            }
+                          >{`Submit liquidation`}</Button>
+                        </Box>
+                        {liquidationNeedAllowanceText() !== "" && (
+                          <Typography>
+                            <strong>Note: </strong>
+                            {liquidationNeedAllowanceText()}
+                          </Typography>
+                        )}
+                      </Box>
                     )}
                   </Box>
-                )}
-              </Box>
+                </Box>
+              )}
             </Box>
             {hash && (
               <Box py={2}>
