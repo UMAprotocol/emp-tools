@@ -159,12 +159,7 @@ const AllLiquidations = () => {
       return x.substr(0, 5) + "..." + x.substr(x.length - 5, x.length);
     };
 
-    const toggleDialog = () => {
-      setIsDialogShowing(!isDialogShowing);
-    };
-
     const handleOpenActionsDialog = (address: string) => {
-      console.log("opening for", address);
       setSelectedSponsor(address);
       setIsDialogShowing(true);
     };
@@ -380,7 +375,7 @@ const AllLiquidations = () => {
           </PageButtons>
         </TableContainer>
         <LiquidationActionDialog
-          handleClose={toggleDialog}
+          handleClose={() => setIsDialogShowing(!isDialogShowing)}
           isDialogShowing={isDialogShowing}
           selectedSponsor={selectedSponsor}
         />
