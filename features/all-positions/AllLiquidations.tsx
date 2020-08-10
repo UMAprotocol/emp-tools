@@ -172,19 +172,19 @@ const AllLiquidations = () => {
     // then sorts the positions according to selected sort column,
     // and finally slices the array based on pagination selection.
     const reformattedLiquidationData = Object.keys(liquidations)
-      .filter((sponsorAddressPlusId: string) => {
+      .filter((sponsorPlusId: string) => {
         return (
-          liquidations[sponsorAddressPlusId]?.maxDisputablePrice &&
-          liquidations[sponsorAddressPlusId]?.tokensLiquidated &&
-          liquidations[sponsorAddressPlusId]?.lockedCollateral &&
-          liquidations[sponsorAddressPlusId]?.liquidationTimestamp
+          liquidations[sponsorPlusId]?.maxDisputablePrice &&
+          liquidations[sponsorPlusId]?.tokensLiquidated &&
+          liquidations[sponsorPlusId]?.lockedCollateral &&
+          liquidations[sponsorPlusId]?.liquidationTimestamp
         );
       })
-      .sort((sponsorAddressPlusIdA: string, sponsorAddressPlusIdB: string) => {
+      .sort((sponsorPlusIdA: string, sponsorPlusIdB: string) => {
         const fieldValueA =
-          liquidations[sponsorAddressPlusIdA][FIELD_TO_VALUE[sortedColumn]];
+          liquidations[sponsorPlusIdA][FIELD_TO_VALUE[sortedColumn]];
         const fieldValueB =
-          liquidations[sponsorAddressPlusIdB][FIELD_TO_VALUE[sortedColumn]];
+          liquidations[sponsorPlusIdB][FIELD_TO_VALUE[sortedColumn]];
         return Number(fieldValueA) > Number(fieldValueB)
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1;
