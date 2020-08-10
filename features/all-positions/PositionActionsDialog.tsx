@@ -129,7 +129,8 @@ const PositionActionsDialog = (props: DialogProps) => {
     tokenAllowance !== null &&
     collSymbol !== null &&
     collBalance !== null &&
-    collAllowance !== null
+    collAllowance !== null &&
+    priceId !== null
   ) {
     const collBalanceNum = collBalance || 0;
     const tokenBalanceNum = tokenBalance || 0;
@@ -190,21 +191,18 @@ const PositionActionsDialog = (props: DialogProps) => {
 
     const needCollateralAllowance = () => {
       if (tabIndex == "deposit") {
-        if (collAllowance === null || collateralToDeposit === null) return true;
         if (collAllowance === "Infinity") return false;
-        return collAllowance < parseFloat(collateralToDeposit);
+        return collAllowance < collateralToDepositNum;
       }
       if (tabIndex == "liquidate") {
-        if (collAllowance === null || finalFee == null) return true;
         if (collAllowance === "Infinity") return false;
-        return collAllowance < finalFee;
+        return collAllowance < finalFeeNum;
       }
       return true;
     };
     const needTokenAllowance = () => {
-      if (tokenAllowance === null || maxTokensToLiquidate === null) return true;
       if (tokenAllowance === "Infinity") return false;
-      return tokenAllowance < parseFloat(maxTokensToLiquidate);
+      return tokenAllowance < maxTokensToLiquidateNum;
     };
 
     // Liquidation requires both collateral and synthetic to be approved. This
@@ -213,7 +211,7 @@ const PositionActionsDialog = (props: DialogProps) => {
     // component simple.
     const liquidationNeedAllowanceText = () => {
       if (!needCollateralAllowance() && !needTokenAllowance()) {
-        return null;
+        return "";
       }
       if (needCollateralAllowance() && !needTokenAllowance()) {
         return `You will need to sign two transactions, one to approve collateral ${collSymbol} and a second to preform the liquidation.`;
@@ -425,18 +423,16 @@ const PositionActionsDialog = (props: DialogProps) => {
                   <Box pt={2}>
                     <Typography>
                       <strong>Liquidate this sponsor</strong>
-                      <br></br>For the position to be under collateralize{" "}
-                      {priceId ? utils.parseBytes32String(priceId) : "N/A"}{" "}
-                      would need to{" "}
+                      <br></br>For the position to be under collateralized{" "}
+                      {utils.parseBytes32String(priceId)} would need to{" "}
                       {underCollateralizedPrice > latestPrice
                         ? "increase"
                         : "decrease"}{" "}
-                      by {Math.abs(underCollateralizedPercent | 0)}% from{" "}
-                      {latestPrice?.toFixed(4)} to{" "}
-                      {underCollateralizedPrice?.toFixed(4)}. You can still
+                      by {Math.abs(underCollateralizedPercent).toFixed(4)}% from{" "}
+                      {latestPrice.toFixed(4)} to{" "}
+                      {underCollateralizedPrice.toFixed(4)}. You can still
                       liquidate this position if you have a different opinion on
-                      the {priceId ? utils.parseBytes32String(priceId) : "N/A"}{" "}
-                      price.
+                      the {utils.parseBytes32String(priceId)} price.
                       <br></br>
                       <br></br>
                     </Typography>
@@ -534,7 +530,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                         }
                       >{`Submit liquidation`}</Button>
                     </Box>
-                    {liquidationNeedAllowanceText() && (
+                    {liquidationNeedAllowanceText() !== "" && (
                       <Typography>
                         <strong>Note: </strong>
                         {liquidationNeedAllowanceText()}
