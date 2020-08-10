@@ -174,6 +174,7 @@ const AllLiquidations = () => {
     const reformattedLiquidationData = Object.keys(liquidations)
       .filter((sponsorAddressPlusId: string) => {
         return (
+          liquidations[sponsorAddressPlusId]?.maxDisputablePrice &&
           liquidations[sponsorAddressPlusId]?.tokensLiquidated &&
           liquidations[sponsorAddressPlusId]?.lockedCollateral &&
           liquidations[sponsorAddressPlusId]?.liquidationTimestamp
