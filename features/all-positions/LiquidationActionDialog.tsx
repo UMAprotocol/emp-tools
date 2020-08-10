@@ -96,11 +96,22 @@ const LiquidationActionDialog = (props: DialogProps) => {
   };
 
   if (
+    emp &&
+    liquidations &&
     props.selectedSponsor &&
     liquidations[props.selectedSponsor] &&
     liquidationLiveness &&
     priceId &&
-    disputeBondPct
+    disputeBondPct &&
+    collAllowance &&
+    collBalance &&
+    collSymbol &&
+    disputeBondPct &&
+    liquidationLiveness &&
+    withdrawalLiveness &&
+    currentTime &&
+    tokenSymbol &&
+    finalFee
   ) {
     const liquidatedPosition = liquidations[props.selectedSponsor];
     const invertDisputablePrice = isPricefeedInvertedFromTokenSymbol(
@@ -112,7 +123,6 @@ const LiquidationActionDialog = (props: DialogProps) => {
     const disputeBondNum = Number(fromWei(disputeBondPct)) || 0;
 
     const needCollateralAllowance = () => {
-      if (collAllowance === null || finalFee == null) return true;
       if (collAllowance === "Infinity") return false;
       return collAllowance < finalFee;
     };
@@ -196,7 +206,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
     };
 
     const executeDispute = async () => {
-      if (emp && !collBalanceTooLow) {
+      if (!collBalanceTooLow) {
         setHash(null);
         setSuccess(null);
         setError(null);
@@ -359,8 +369,9 @@ const LiquidationActionDialog = (props: DialogProps) => {
                   ).status !== "Liquidation Pending" && (
                     <span>
                       <Typography>
-                        This liquidation can not be disputed as it is no longer
-                        in the pending state.
+                        This liquidation can't be disputed as it is no longer in
+                        the pending state as it has passed the liquidation
+                        liveness period.
                       </Typography>
                       <Box textAlign="center" pt={3} pb={2}>
                         <Button fullWidth variant="contained" disabled>
@@ -406,17 +417,12 @@ const LiquidationActionDialog = (props: DialogProps) => {
                         .
                       </Important>
                       <Box textAlign="center" pt={3} pb={2}>
-                        {!collBalanceTooLow ? (
-                          <Button
-                            fullWidth
-                            variant="contained"
-                            onClick={executeDispute}
-                          >{`Dispute Liquidation`}</Button>
-                        ) : (
-                          <Button fullWidth variant="contained" disabled>
-                            Dispute Liquidation
-                          </Button>
-                        )}
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          onClick={executeDispute}
+                          disabled={collBalanceTooLow}
+                        >{`Dispute Liquidation`}</Button>
                       </Box>
                       {needCollateralAllowance() && !collBalanceTooLow && (
                         <Typography>
