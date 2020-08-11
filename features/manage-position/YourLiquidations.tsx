@@ -55,8 +55,9 @@ const YourLiquidations = () => {
     const liquidationPretty: any[] = [];
     liquidations.map((liq: LiquidationState) => {
       let maxDisputablePrice =
-        liq.tokensOutstanding > 0 && collReqFromWei > 0
-          ? liq.liquidatedCollateral / (liq.tokensOutstanding * collReqFromWei)
+        Number(liq.tokensOutstanding) > 0 && collReqFromWei > 0
+          ? Number(liq.liquidatedCollateral) /
+            (Number(liq.tokensOutstanding) * collReqFromWei)
           : 0;
       if (invertedDisputablePrice) {
         maxDisputablePrice = 1 / maxDisputablePrice;
