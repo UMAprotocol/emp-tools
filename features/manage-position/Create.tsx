@@ -53,8 +53,8 @@ const Create = () => {
   const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { gcr } = Totals.useContainer();
   const {
-    collateral: posCollateral,
-    tokens: posTokens,
+    collateral: posCollateralString,
+    tokens: posTokensString,
     pendingWithdraw,
   } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
@@ -79,8 +79,8 @@ const Create = () => {
     balance !== null &&
     collAllowance !== null &&
     emp !== null &&
-    posTokens !== null &&
-    posCollateral !== null &&
+    posTokensString !== null &&
+    posCollateralString !== null &&
     minSponsorTokens !== null &&
     tokenDec !== null &&
     latestPrice !== null &&
@@ -99,6 +99,8 @@ const Create = () => {
     const hasPendingWithdraw = pendingWithdraw === "Yes";
     const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
+    const posTokens = Number(posTokensString);
+    const posCollateral = Number(posCollateralString);
 
     // CR of new tokens to create. This must be > GCR according to https://github.com/UMAprotocol/protocol/blob/837869b97edef108fdf68038f54f540ca95cfb44/core/contracts/financial-templates/expiring-multiparty/PricelessPositionManager.sol#L409
     const transactionCR =

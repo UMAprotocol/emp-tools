@@ -53,9 +53,9 @@ const Deposit = () => {
   const { symbol: tokenSymbol } = Token.useContainer();
   const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const {
-    tokens: posTokens,
-    collateral: posColl,
-    withdrawAmt,
+    tokens: posTokensString,
+    collateral: posCollString,
+    withdrawAmt: withdrawAmtString,
     withdrawPassTime,
     pendingWithdraw,
   } = Position.useContainer();
@@ -74,24 +74,27 @@ const Deposit = () => {
     emp !== null &&
     collDec !== null &&
     collReq !== null &&
-    posColl !== null &&
-    posTokens !== null &&
+    posCollString !== null &&
+    posTokensString !== null &&
     gcr !== null &&
     withdrawPassTime !== null &&
     withdrawalLiveness !== null &&
-    withdrawAmt !== null &&
+    withdrawAmtString !== null &&
     pendingWithdraw !== null &&
     currentTime !== null &&
     latestPrice !== null &&
     priceIdentifier !== null &&
     collSymbol !== null &&
     tokenSymbol !== null &&
-    posColl !== 0 // If position has no collateral, then don't render withdraw component.
+    posCollString !== "0" // If position has no collateral, then don't render withdraw component.
   ) {
     const collateralToWithdraw = Number(collateral) || 0;
     const collReqFromWei = parseFloat(fromWei(collReq, collDec));
     const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
+    const posTokens = Number(posTokensString);
+    const posColl = Number(posCollString);
+    const withdrawAmt = Number(withdrawAmtString);
 
     // CR data:
     const resultantCollateral = posColl - collateralToWithdraw;

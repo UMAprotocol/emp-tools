@@ -37,10 +37,10 @@ const Link = styled.a`
 const YourPosition = () => {
   const { gcr } = Totals.useContainer();
   const {
-    tokens,
-    collateral,
+    tokens: tokenString,
+    collateral: collString,
     cRatio,
-    withdrawAmt,
+    withdrawAmt: withdrawAmtString,
     pendingWithdraw,
     pendingTransfer,
   } = Position.useContainer();
@@ -52,8 +52,8 @@ const YourPosition = () => {
   const defaultMissingDataDisplay = "N/A";
 
   if (
-    tokens !== null &&
-    collateral !== null &&
+    tokenString !== null &&
+    collString !== null &&
     cRatio !== null &&
     gcr !== null &&
     collSymbol !== null &&
@@ -62,7 +62,7 @@ const YourPosition = () => {
     latestPrice !== null &&
     collReq !== null &&
     priceIdentifier !== null &&
-    withdrawAmt !== null &&
+    withdrawAmtString !== null &&
     pendingWithdraw !== null &&
     pendingTransfer !== null
   ) {
@@ -70,6 +70,9 @@ const YourPosition = () => {
       latestPrice !== 0 ? (cRatio / latestPrice).toFixed(4) : "0";
     const pricedGCR = latestPrice !== 0 ? (gcr / latestPrice).toFixed(4) : "0";
     const collReqFromWei = parseFloat(fromWei(collReq, collDec));
+    const tokens = Number(tokenString);
+    const collateral = Number(collString);
+    const withdrawAmt = Number(withdrawAmtString);
     const liquidationPrice = getLiquidationPrice(
       collateral,
       tokens,

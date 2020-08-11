@@ -37,8 +37,8 @@ const Deposit = () => {
     setMaxAllowance,
   } = Collateral.useContainer();
   const {
-    tokens: posTokens,
-    collateral: posColl,
+    tokens: posTokensString,
+    collateral: posCollString,
     pendingWithdraw,
   } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
@@ -51,8 +51,8 @@ const Deposit = () => {
   const [error, setError] = useState<Error | null>(null);
 
   if (
-    posColl !== null &&
-    posTokens !== null &&
+    posCollString !== null &&
+    posTokensString !== null &&
     pendingWithdraw !== null &&
     collAllowance !== null &&
     collBalance !== null &&
@@ -63,12 +63,14 @@ const Deposit = () => {
     priceIdentifier !== null &&
     tokenSymbol !== null &&
     collSymbol !== null &&
-    posColl !== 0 // If position has no collateral, then don't render deposit component.
+    posCollString !== "0" // If position has no collateral, then don't render deposit component.
   ) {
     const collateralToDeposit = Number(collateral) || 0;
     const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const hasPendingWithdraw = pendingWithdraw === "Yes";
     const collReqFromWei = parseFloat(fromWei(collReq, collDec));
+    const posTokens = Number(posTokensString);
+    const posColl = Number(posCollString);
     const resultantCollateral = posColl + collateralToDeposit;
     const resultantCR = posTokens > 0 ? resultantCollateral / posTokens : 0;
     const pricedResultantCR =
