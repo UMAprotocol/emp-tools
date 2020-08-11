@@ -137,9 +137,6 @@ const PositionActionsDialog = (props: DialogProps) => {
     collAllowance !== null &&
     priceId !== null
   ) {
-    const collBalanceNum = collBalance || 0;
-    const tokenBalanceNum = tokenBalance || 0;
-    const finalFeeNum = finalFee || 0;
     const collateralToDepositNum = Number(collateralToDeposit) || 0;
     const maxTokensToLiquidateNum = Number(maxTokensToLiquidate) || 0;
 
@@ -185,14 +182,14 @@ const PositionActionsDialog = (props: DialogProps) => {
 
     const collBalanceTooLow = () => {
       if (tabIndex == "deposit") {
-        return collBalanceNum < collateralToDepositNum;
+        return collBalance < collateralToDepositNum;
       }
       if (tabIndex == "liquidate") {
-        return collBalanceNum < finalFeeNum;
+        return collBalance < finalFee;
       }
     };
 
-    const tokenBalanceTooLow = tokenBalanceNum < maxTokensToLiquidateNum;
+    const tokenBalanceTooLow = tokenBalance < maxTokensToLiquidateNum;
 
     const needCollateralAllowance = () => {
       if (tabIndex == "deposit") {
@@ -201,7 +198,7 @@ const PositionActionsDialog = (props: DialogProps) => {
       }
       if (tabIndex == "liquidate") {
         if (collAllowance === "Infinity") return false;
-        return collAllowance < finalFeeNum;
+        return collAllowance < finalFee;
       }
       return true;
     };
