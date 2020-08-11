@@ -123,6 +123,7 @@ const PositionActionsDialog = (props: DialogProps) => {
     props.selectedSponsor !== null &&
     activeSponsors[props.selectedSponsor] &&
     activeSponsors[props.selectedSponsor] !== null &&
+    isExpired !== null &&
     latestPrice !== null &&
     collReq !== null &&
     emp !== null &&
