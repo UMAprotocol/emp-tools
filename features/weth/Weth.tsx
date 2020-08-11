@@ -136,7 +136,7 @@ const Weth = () => {
         setSuccess(null);
         setError(null);
         try {
-          const amountWei = toWei(wethAmountToUnwrap.toString());
+          const amountWei = toWei(wethAmount);
           let tx = await weth.withdraw(amountWei);
           setHash(tx.hash as string);
           await tx.wait();
