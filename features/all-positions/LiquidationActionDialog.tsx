@@ -84,6 +84,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
     liquidationLiveness,
     withdrawalLiveness,
     currentTime,
+    isExpired,
   } = empState;
 
   const prettyBalance = (x: number) => {
@@ -96,31 +97,30 @@ const LiquidationActionDialog = (props: DialogProps) => {
   };
 
   if (
-    emp &&
-    liquidations &&
-    props.selectedSponsor &&
+    emp !== null &&
+    liquidations !== null &&
+    props.selectedSponsor !== null &&
     liquidations[props.selectedSponsor] &&
-    liquidationLiveness &&
-    priceId &&
-    disputeBondPct &&
-    collAllowance &&
-    collBalance &&
-    collSymbol &&
-    disputeBondPct &&
-    liquidationLiveness &&
-    withdrawalLiveness &&
-    currentTime &&
-    tokenSymbol &&
-    finalFee
+    liquidations[props.selectedSponsor] !== null &&
+    priceId !== null &&
+    disputeBondPct !== null &&
+    collAllowance !== null &&
+    collBalance !== null &&
+    collSymbol !== null &&
+    liquidationLiveness !== null &&
+    withdrawalLiveness !== null &&
+    currentTime !== null &&
+    tokenSymbol !== null &&
+    finalFee !== null
   ) {
     const liquidatedPosition = liquidations[props.selectedSponsor];
     const invertDisputablePrice = isPricefeedInvertedFromTokenSymbol(
       tokenSymbol
     );
     const priceIdUtf8 = utils.parseBytes32String(priceId);
-    const collBalanceNum = collBalance || 0;
-    const finalFeeNum = finalFee || 0;
-    const disputeBondNum = Number(fromWei(disputeBondPct)) || 0;
+    const collBalanceNum = collBalance;
+    const finalFeeNum = finalFee;
+    const disputeBondNum = Number(fromWei(disputeBondPct));
 
     const needCollateralAllowance = () => {
       if (collAllowance === "Infinity") return false;
@@ -180,13 +180,13 @@ const LiquidationActionDialog = (props: DialogProps) => {
         return {
           status: "Dispute Succeeded",
           description:
-            "The liquidation was disputed and the DVM deemed the liquidation invalid (valid dispute).",
+            "The liquidation was disputed and the DVM resolved price made the liquidation invalid(valid dispute).",
         };
       } else if (liquidationStatus === "DisputeFailed") {
         return {
           status: "Dispute Failed",
           description:
-            "The liquidation was disputed and the DVM deemed the liquidation valid (invalid dispute).",
+            "The liquidation was disputed and the DVM resolved price made the liquidation valid (invalid dispute).",
         };
       } else {
         return { status: "Unknown", description: "" };
@@ -262,7 +262,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                 <Status>
                   <Label>Liquidation Timestamp (UTC): </Label>
                   <Tooltip
-                    title={`Liquidation unixTimestamp: ${liquidatedPosition.liquidationTimestamp}`}
+                    title={`Liquidation occurred at unix timestamp: ${liquidatedPosition.liquidationTimestamp}`}
                     placement="top"
                   >
                     <span>
@@ -277,7 +277,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                     <Label>Liquidation liveness remaining: </Label>
                     <Tooltip
                       title={
-                        "Time remaining for the liquidation to be disputed. After this time no disputes will be accepted."
+                        "Time remaining for the liquidation to be disputed. After this time no dispute requests can be made."
                       }
                       placement="top"
                     >
@@ -303,7 +303,6 @@ const LiquidationActionDialog = (props: DialogProps) => {
                     {prettyAddress(liquidatedPosition.liquidator)}
                   </a>
                 </Status>
-
                 <Status>
                   <Label>Disputer: </Label>
                   {liquidatedPosition.disputer && (
@@ -357,91 +356,94 @@ const LiquidationActionDialog = (props: DialogProps) => {
                     getDisputablePrice(liquidatedPosition.maxDisputablePrice)
                   )}
                 </Status>
-                <hr />
-                <Box pt={2}>
-                  <Typography>
-                    <strong>Dispute this liquidation</strong>
-                    <br></br>
-                  </Typography>
-                  {translateLiquidationStatus(
-                    Number(liquidatedPosition.liquidationTimestamp),
-                    liquidatedPosition.status
-                  ).status !== "Liquidation Pending" && (
-                    <span>
-                      <Typography>
-                        This liquidation can't be disputed as it is no longer in
-                        the pending state as it has passed the liquidation
-                        liveness period.
-                      </Typography>
-                      <Box textAlign="center" pt={3} pb={2}>
-                        <Button fullWidth variant="contained" disabled>
-                          Dispute Liquidation
-                        </Button>
-                      </Box>
-                    </span>
-                  )}
-                  {translateLiquidationStatus(
-                    Number(liquidatedPosition.liquidationTimestamp),
-                    liquidatedPosition.status
-                  ).status === "Liquidation Pending" && (
-                    <span>
-                      <Typography>
-                        This liquidation is currently in it's liveness period
-                        and can be disputed if you think it was invalid. In
-                        order for this liquidation to be invalid, the identifier{" "}
-                        {priceIdUtf8} would need to be greater than{" "}
-                        {prettyBalance(
-                          Number(liquidatedPosition.maxDisputablePrice)
-                        )}{" "}
-                        at the time of liquidation.
-                        <br></br>
-                        <br></br>
-                        To dispute this liquidation you will need to post a
-                        dispute bond of {disputeBondNum * 100}% of the
-                        collateral liquidated, equalling{" "}
-                        {prettyBalance(requiredDisputeBond)} {collSymbol}.
-                        Additionally, you will need to pay the final fee of{" "}
-                        {finalFee} {collSymbol}.<br></br>
-                        <br></br>
-                      </Typography>
-                      <Important>
-                        Exercise caution! An incorrect dispute will loose you
-                        the dispute bond AND final fee! See the{" "}
-                        <a
-                          href={DOCS_MAP.FINAL_FEE}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          UMA docs
-                        </a>
-                        .
-                      </Important>
-                      <Box textAlign="center" pt={3} pb={2}>
-                        <Button
-                          fullWidth
-                          variant="contained"
-                          onClick={executeDispute}
-                          disabled={collBalanceTooLow}
-                        >{`Dispute Liquidation`}</Button>
-                      </Box>
-                      {needCollateralAllowance() && !collBalanceTooLow && (
+                {!isExpired && (
+                  <Box pt={2}>
+                    <hr />
+                    <Typography>
+                      <strong>Dispute this liquidation</strong>
+                      <br></br>
+                    </Typography>
+                    {translateLiquidationStatus(
+                      Number(liquidatedPosition.liquidationTimestamp),
+                      liquidatedPosition.status
+                    ).status !== "Liquidation Pending" && (
+                      <span>
                         <Typography>
-                          Note you will need to sign two transactions one to
-                          approve {collSymbol} to pay the DVM final fee and post
-                          the dispute bond and a second to preform the dispute.
+                          This liquidation can't be disputed because the
+                          liveness period to file a dispute has passed.
                         </Typography>
-                      )}
-                      {collBalanceTooLow && (
+                        <Box textAlign="center" pt={3} pb={2}>
+                          <Button fullWidth variant="contained" disabled>
+                            Dispute Liquidation
+                          </Button>
+                        </Box>
+                      </span>
+                    )}
+                    {translateLiquidationStatus(
+                      Number(liquidatedPosition.liquidationTimestamp),
+                      liquidatedPosition.status
+                    ).status === "Liquidation Pending" && (
+                      <span>
                         <Typography>
-                          Your wallet does not have enough collateral to pay the
-                          dispute bond and DVM final fee! You need, at minimum,{" "}
-                          {prettyBalance(collRequired)} {collSymbol} to preform
-                          this dispute.
+                          This liquidation is currently in it's liveness period
+                          and can be disputed if you think it was invalid. In
+                          order for this liquidation to be invalid, the
+                          identifier {priceIdUtf8} would need to be{" "}
+                          {invertDisputablePrice ? "less" : "greater"} than{" "}
+                          {prettyBalance(
+                            Number(liquidatedPosition.maxDisputablePrice)
+                          )}{" "}
+                          at the time of liquidation.
+                          <br></br>
+                          <br></br>
+                          To dispute this liquidation you will need to post a
+                          dispute bond of {disputeBondNum * 100}% of the
+                          collateral liquidated, equalling{" "}
+                          {prettyBalance(requiredDisputeBond)} {collSymbol}.
+                          Additionally, you will need to pay the final fee of{" "}
+                          {finalFee} {collSymbol}.<br></br>
+                          <br></br>
                         </Typography>
-                      )}
-                    </span>
-                  )}
-                </Box>
+                        <Important>
+                          Exercise caution! An incorrect dispute will lose you
+                          the dispute bond AND final fee! See the{" "}
+                          <a
+                            href={DOCS_MAP.FINAL_FEE}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            UMA docs
+                          </a>
+                          .
+                        </Important>
+                        <Box textAlign="center" pt={3} pb={2}>
+                          <Button
+                            fullWidth
+                            variant="contained"
+                            onClick={executeDispute}
+                            disabled={collBalanceTooLow}
+                          >{`Dispute Liquidation`}</Button>
+                        </Box>
+                        {needCollateralAllowance() && !collBalanceTooLow && (
+                          <Typography>
+                            Note you will need to sign two transactions one to
+                            approve {collSymbol} to pay the DVM final fee and
+                            post the dispute bond and a second to perform the
+                            dispute.
+                          </Typography>
+                        )}
+                        {collBalanceTooLow && (
+                          <Typography>
+                            Your wallet does not have enough collateral to pay
+                            the dispute bond and DVM final fee! You need, at
+                            minimum, {prettyBalance(collRequired)} {collSymbol}{" "}
+                            to perform this dispute.
+                          </Typography>
+                        )}
+                      </span>
+                    )}
+                  </Box>
+                )}
               </Box>
             </Box>
             {hash && (
