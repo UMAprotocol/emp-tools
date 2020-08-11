@@ -102,6 +102,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
     props.selectedSponsor !== null &&
     liquidations[props.selectedSponsor] &&
     liquidations[props.selectedSponsor] !== null &&
+    isExpired !== null &&
     priceId !== null &&
     disputeBondPct !== null &&
     collAllowance !== null &&
