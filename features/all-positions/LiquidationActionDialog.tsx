@@ -55,7 +55,7 @@ const Link = styled.a`
 interface DialogProps {
   handleClose(): any;
   isDialogShowing: boolean;
-  liquidationId: string | null;
+  sponsorPlusId: string | null;
 }
 
 const LiquidationActionDialog = (props: DialogProps) => {
@@ -99,9 +99,9 @@ const LiquidationActionDialog = (props: DialogProps) => {
   if (
     emp !== null &&
     liquidations !== null &&
-    props.liquidationId !== null &&
-    liquidations[props.liquidationId] &&
-    liquidations[props.liquidationId] !== null &&
+    props.sponsorPlusId !== null &&
+    liquidations[props.sponsorPlusId] &&
+    liquidations[props.sponsorPlusId] !== null &&
     isExpired !== null &&
     priceId !== null &&
     disputeBondPct !== null &&
@@ -114,7 +114,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
     tokenSymbol !== null &&
     finalFee !== null
   ) {
-    const liquidatedPosition = liquidations[props.liquidationId];
+    const liquidatedPosition = liquidations[props.sponsorPlusId];
     const invertDisputablePrice = isPricefeedInvertedFromTokenSymbol(
       tokenSymbol
     );
@@ -212,7 +212,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
         try {
           if (needCollateralAllowance()) await setMaxCollateralAllowance();
           const tx = await emp.dispute(
-            liquidatedPosition.liquidationId,
+            liquidatedPosition.sponsorPlusId,
             liquidatedPosition.sponsor
           );
           setHash(tx.hash as string);
@@ -328,7 +328,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                 </Status>
                 <Status>
                   <Label>Liquidation ID: </Label>
-                  {liquidatedPosition.liquidationId}
+                  {liquidatedPosition.sponsorPlusId}
                 </Status>
                 <Status>
                   <Label>Tokens liquidated: </Label>

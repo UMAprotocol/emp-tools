@@ -119,7 +119,7 @@ const AllLiquidations = () => {
 
   // Extra info dialog
   const [isDialogShowing, setIsDialogShowing] = useState<boolean>(false);
-  const [liquidationId, setLiquidationId] = useState<string | null>(null);
+  const [sponsorPlusId, setSponsorPlusId] = useState<string | null>(null);
 
   // Set max page depending on # of liqs
   useEffect(() => {
@@ -160,7 +160,7 @@ const AllLiquidations = () => {
     };
 
     const handleOpenActionsDialog = (id: string) => {
-      setLiquidationId(id);
+      setSponsorPlusId(id);
       setIsDialogShowing(true);
     };
 
@@ -378,7 +378,7 @@ const AllLiquidations = () => {
         <LiquidationActionDialog
           handleClose={() => setIsDialogShowing(!isDialogShowing)}
           isDialogShowing={isDialogShowing}
-          liquidationId={liquidationId}
+          sponsorPlusId={sponsorPlusId}
         />
       </div>
     );
