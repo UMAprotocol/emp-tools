@@ -172,19 +172,19 @@ const AllLiquidations = () => {
     // then sorts the positions according to selected sort column,
     // and finally slices the array based on pagination selection.
     const reformattedLiquidationData = Object.keys(liquidations)
-      .filter((sponsor: string) => {
+      .filter((sponsorPlusId: string) => {
         return (
-          liquidations[sponsor]?.maxDisputablePrice &&
-          liquidations[sponsor]?.tokensLiquidated &&
-          liquidations[sponsor]?.lockedCollateral &&
-          liquidations[sponsor]?.liquidationTimestamp
+          liquidations[sponsorPlusId]?.maxDisputablePrice &&
+          liquidations[sponsorPlusId]?.tokensLiquidated &&
+          liquidations[sponsorPlusId]?.lockedCollateral &&
+          liquidations[sponsorPlusId]?.liquidationTimestamp
         );
       })
-      .sort((sponsorA: string, sponsorB: string) => {
+      .sort((sponsorPlusIdA: string, sponsorPlusIdB: string) => {
         const fieldValueA =
-          liquidations[sponsorA][FIELD_TO_VALUE[sortedColumn]];
+          liquidations[sponsorPlusIdA][FIELD_TO_VALUE[sortedColumn]];
         const fieldValueB =
-          liquidations[sponsorB][FIELD_TO_VALUE[sortedColumn]];
+          liquidations[sponsorPlusIdB][FIELD_TO_VALUE[sortedColumn]];
         return Number(fieldValueA) > Number(fieldValueB)
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1;
@@ -258,13 +258,16 @@ const AllLiquidations = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {reformattedLiquidationData.map((sponsor: string) => {
-              const liquidation = liquidations[sponsor];
+            {reformattedLiquidationData.map((id: string) => {
+              const liquidation = liquidations[id];
               return (
-                <TableRow key={sponsor}>
+                <TableRow key={id}>
                   <TableCell component="th" scope="row">
-                    <a href={getEtherscanUrl(sponsor)} target="_blank">
-                      {prettyAddress(sponsor)}
+                    <a
+                      href={getEtherscanUrl(liquidation.sponsor)}
+                      target="_blank"
+                    >
+                      {prettyAddress(liquidation.sponsor)}
                     </a>
                   </TableCell>
                   <TableCell align="right">
