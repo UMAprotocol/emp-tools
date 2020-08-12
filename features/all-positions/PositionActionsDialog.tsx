@@ -137,14 +137,13 @@ const PositionActionsDialog = (props: DialogProps) => {
     collAllowance !== null &&
     priceId !== null
   ) {
+    const sponsorPosition = activeSponsors[props.selectedSponsor];
+
     const collateralToDepositNum = Number(collateralToDeposit) || 0;
     const maxTokensToLiquidateNum = Number(maxTokensToLiquidate) || 0;
 
-    const sponsorPosition = activeSponsors[props.selectedSponsor];
-
     const pendingWithdrawTimeRemaining =
       Number(sponsorPosition.withdrawalTimestamp) - Number(currentTime);
-
     const pendingTransferTimeRemaining =
       Number(sponsorPosition.TransferTimestamp) - Number(currentTime);
 

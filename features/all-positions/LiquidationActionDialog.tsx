@@ -119,9 +119,6 @@ const LiquidationActionDialog = (props: DialogProps) => {
       tokenSymbol
     );
     const priceIdUtf8 = utils.parseBytes32String(priceId);
-    const collBalanceNum = collBalance;
-    const finalFeeNum = finalFee;
-    const disputeBondNum = Number(fromWei(disputeBondPct));
 
     const needCollateralAllowance = () => {
       if (collAllowance === "Infinity") return false;
@@ -131,8 +128,8 @@ const LiquidationActionDialog = (props: DialogProps) => {
     const requiredDisputeBond =
       Number(fromWei(disputeBondPct)) *
       Number(liquidatedPosition.lockedCollateral);
-    const collRequired = finalFeeNum + requiredDisputeBond;
-    const collBalanceTooLow = collBalanceNum < collRequired;
+    const collRequired = finalFee + requiredDisputeBond;
+    const collBalanceTooLow = collBalance < collRequired;
 
     const liquidationTimeRemaining =
       Number(liquidatedPosition.liquidationTimestamp) +
@@ -287,6 +284,17 @@ const LiquidationActionDialog = (props: DialogProps) => {
                   </Status>
                 )}
                 <Status>
+                  <Label>Liquidation Transaction: </Label>
+                  <a
+                    href={getEtherscanUrl(
+                      liquidatedPosition.liquidationReceipt
+                    )}
+                    target="_blank"
+                  >
+                    {prettyAddress(liquidatedPosition.liquidationReceipt)}
+                  </a>
+                </Status>
+                <Status>
                   <Label>Sponsor: </Label>
                   <a
                     href={getEtherscanUrl(liquidatedPosition.sponsor)}
@@ -317,17 +325,6 @@ const LiquidationActionDialog = (props: DialogProps) => {
                   {!liquidatedPosition.disputer && (
                     <span>None(undisputed)</span>
                   )}
-                </Status>
-                <Status>
-                  <Label>Liquidation Transaction: </Label>
-                  <a
-                    href={getEtherscanUrl(
-                      liquidatedPosition.liquidationReceipt
-                    )}
-                    target="_blank"
-                  >
-                    {prettyAddress(liquidatedPosition.liquidationReceipt)}
-                  </a>
                 </Status>
                 <Status>
                   <Label>Liquidation ID: </Label>
@@ -398,7 +395,8 @@ const LiquidationActionDialog = (props: DialogProps) => {
                           <br></br>
                           <br></br>
                           To dispute this liquidation you will need to post a
-                          dispute bond of {disputeBondNum * 100}% of the
+                          dispute bond of{" "}
+                          {Number(fromWei(disputeBondPct)) * 100}% of the
                           collateral liquidated, equalling{" "}
                           {prettyBalance(requiredDisputeBond)} {collSymbol}.
                           Additionally, you will need to pay the final fee of{" "}
