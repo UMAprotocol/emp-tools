@@ -55,7 +55,7 @@ const Link = styled.a`
 interface DialogProps {
   handleClose(): any;
   isDialogShowing: boolean;
-  selectedSponsor: string | null;
+  liquidationId: string | null;
 }
 
 const LiquidationActionDialog = (props: DialogProps) => {
@@ -99,9 +99,9 @@ const LiquidationActionDialog = (props: DialogProps) => {
   if (
     emp !== null &&
     liquidations !== null &&
-    props.selectedSponsor !== null &&
-    liquidations[props.selectedSponsor] &&
-    liquidations[props.selectedSponsor] !== null &&
+    props.liquidationId !== null &&
+    liquidations[props.liquidationId] &&
+    liquidations[props.liquidationId] !== null &&
     isExpired !== null &&
     priceId !== null &&
     disputeBondPct !== null &&
@@ -114,7 +114,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
     tokenSymbol !== null &&
     finalFee !== null
   ) {
-    const liquidatedPosition = liquidations[props.selectedSponsor];
+    const liquidatedPosition = liquidations[props.liquidationId];
     const invertDisputablePrice = isPricefeedInvertedFromTokenSymbol(
       tokenSymbol
     );
