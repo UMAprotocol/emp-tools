@@ -28,6 +28,9 @@ interface PositionQuery {
   sponsor: { id: string };
   tokensOutstanding: string;
   collateral: string;
+  withdrawalRequestPassTimestamp: string;
+  withdrawalRequestAmount: string;
+  transferPositionRequestPassTimestamp: string;
 }
 
 interface LiquidationQuery {
@@ -126,6 +129,13 @@ const useEmpSponsors = () => {
               collReqFromWei,
               isPricefeedInvertedFromTokenSymbol(tokenSymbol)
             );
+            const pendingWithdraw =
+              position.withdrawalRequestPassTimestamp === "0" ? "No" : "Yes";
+
+            const pendingTransfer =
+              position.transferPositionRequestPassTimestamp === "0"
+                ? "No"
+                : "Yes";
 
             if (
               position.tokensOutstanding !== "0" &&
@@ -136,6 +146,12 @@ const useEmpSponsors = () => {
                 collateral: position.collateral,
                 cRatio: cRatio.toString(),
                 liquidationPrice: liquidationPrice.toString(),
+                pendingWithdraw: pendingWithdraw,
+                pendingTransfer: pendingTransfer,
+                withdrawalRequestAmount: position.withdrawalRequestAmount,
+                withdrawalTimestamp: position.withdrawalRequestPassTimestamp,
+                transferTimestamp:
+                  position.transferPositionRequestPassTimestamp,
                 sponsor,
               };
             }
