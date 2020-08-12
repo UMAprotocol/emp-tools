@@ -7,6 +7,9 @@ export const EMP_DATA = gql`
       positions(first: 1000, where: { collateral_gt: 0 }) {
         collateral
         tokensOutstanding
+        withdrawalRequestPassTimestamp
+        withdrawalRequestAmount
+        transferPositionRequestPassTimestamp
         sponsor {
           id
         }

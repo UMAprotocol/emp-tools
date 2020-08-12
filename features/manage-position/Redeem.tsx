@@ -27,11 +27,7 @@ const MaxLink = styled.div`
   text-decoration-line: underline;
 `;
 
-const {
-  formatUnits: fromWei,
-  parseBytes32String: hexToUtf8,
-  parseUnits: toWei,
-} = utils;
+const { formatUnits: fromWei, parseUnits: toWei } = utils;
 
 const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
@@ -39,8 +35,8 @@ const Redeem = () => {
   const { minSponsorTokens } = empState;
   const { symbol: collSymbol } = Collateral.useContainer();
   const {
-    tokens: posTokens,
-    collateral: posColl,
+    tokens: posTokensString,
+    collateral: posCollString,
     pendingWithdraw,
   } = Position.useContainer();
   const {
@@ -58,8 +54,8 @@ const Redeem = () => {
   const [error, setError] = useState<Error | null>(null);
 
   if (
-    posTokens !== null &&
-    posColl !== null &&
+    posTokensString !== null &&
+    posCollString !== null &&
     minSponsorTokens !== null &&
     tokenBalance !== null &&
     tokenDec !== null &&
@@ -67,9 +63,11 @@ const Redeem = () => {
     tokenAllowance !== null &&
     emp !== null &&
     pendingWithdraw !== null &&
-    posColl !== 0 // If position has no collateral, then don't render redeem component.
+    posCollString !== "0" // If position has no collateral, then don't render redeem component.
   ) {
     const hasPendingWithdraw = pendingWithdraw === "Yes";
+    const posTokens = Number(posTokensString);
+    const posColl = Number(posCollString);
     const tokensToRedeem =
       (Number(tokens) || 0) > posTokens ? posTokens : Number(tokens) || 0;
     const minSponsorTokensFromWei = parseFloat(
@@ -105,7 +103,7 @@ const Redeem = () => {
         setSuccess(null);
         setError(null);
         try {
-          const tokensToRedeemWei = toWei(tokensToRedeem.toString());
+          const tokensToRedeemWei = toWei(tokens);
           const tx = await emp.redeem([tokensToRedeemWei]);
           setHash(tx.hash as string);
           await tx.wait();
@@ -120,7 +118,11 @@ const Redeem = () => {
     };
 
     const setTokensToRedeemToMax = () => {
-      setTokens(tokenBalance.toString());
+      if (tokenBalance > posTokens) {
+        setTokens(posTokensString);
+      } else {
+        setTokens(tokenBalance.toString());
+      }
     };
 
     if (hasPendingWithdraw) {

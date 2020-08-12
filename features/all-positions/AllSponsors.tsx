@@ -18,6 +18,8 @@ import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import Etherscan from "../../containers/Etherscan";
 
+import PositionActionsDialog from "./PositionActionsDialog";
+
 interface SortableTableHeaderProps {
   children: React.ReactNode;
   sortField: number;
@@ -38,6 +40,27 @@ const PageButtons = styled.div`
   justify-content: center;
   margin-top: 2em;
   margin-bottom: 2em;
+`;
+
+const MoreInfo = styled.a`
+  height: 23px;
+  width: 23px;
+  background-color: #303030;
+  border-radius: 50%;
+  display: inline-block;
+  text-align: center;
+  &:hover {
+    background-color: white;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+`;
+
+const StyledTableRow = styled(TableRow)`
+  &:hover {
+    transition: 0.1s;
+    background-color: #636363;
+  }
 `;
 
 type FadedDiv = {
@@ -86,6 +109,10 @@ const AllSponsors = () => {
   const [sortDirection, setSortDirection] = useState<boolean>(true);
   const [sortedColumn, setSortedColumn] = useState<number>(SORT_FIELD.TOKENS);
 
+  // Extra info dialog
+  const [isDialogShowing, setIsDialogShowing] = useState<boolean>(false);
+  const [selectedSponsor, setSelectedSponsor] = useState<string | null>(null);
+
   // Set max page depending on # of sponsors
   useEffect(() => {
     setMaxPage(1);
@@ -117,6 +144,11 @@ const AllSponsors = () => {
 
     const prettyAddress = (x: string) => {
       return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
+    };
+
+    const handleOpenActionsDialog = (address: string) => {
+      setSelectedSponsor(address);
+      setIsDialogShowing(true);
     };
 
     // First filters out sponsor data missing field values,
@@ -162,85 +194,119 @@ const AllSponsors = () => {
     };
 
     return (
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Sponsor</TableCell>
-              <TableCell align="right">
-                <SortableTableColumnHeader sortField={SORT_FIELD.COLLATERAL}>
-                  Collateral
-                  <br />({collSymbol}){" "}
-                </SortableTableColumnHeader>
-              </TableCell>
-              <TableCell align="right">
-                <SortableTableColumnHeader sortField={SORT_FIELD.TOKENS}>
-                  Synthetics
-                  <br />({tokenSymbol}){" "}
-                </SortableTableColumnHeader>
-              </TableCell>
-              <TableCell align="right">
-                <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
-                  Collateral Ratio{" "}
-                </SortableTableColumnHeader>
-              </TableCell>
-              <Tooltip
-                title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
-                placement="top"
-              >
-                <TableCell align="right">
-                  <SortableTableColumnHeader sortField={SORT_FIELD.LIQ_PRICE}>
-                    Liquidation Price{" "}
-                  </SortableTableColumnHeader>
+      <div>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <strong>
+                    Sponsor
+                    <br /> Address
+                  </strong>
                 </TableCell>
-              </Tooltip>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {reformattedSponsorData.map((sponsor: string) => {
-              const activeSponsor = activeSponsors[sponsor];
-              return (
-                <TableRow key={sponsor}>
-                  <TableCell component="th" scope="row">
-                    <a href={getEtherscanUrl(sponsor)} target="_blank">
-                      {prettyAddress(sponsor)}
-                    </a>
-                  </TableCell>
+                <TableCell align="right">
+                  <strong>
+                    <SortableTableColumnHeader
+                      sortField={SORT_FIELD.COLLATERAL}
+                    >
+                      Collateral
+                      <br />({collSymbol}){" "}
+                    </SortableTableColumnHeader>
+                  </strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>
+                    <SortableTableColumnHeader sortField={SORT_FIELD.TOKENS}>
+                      Synthetics
+                      <br />({tokenSymbol}){" "}
+                    </SortableTableColumnHeader>
+                  </strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>
+                    <SortableTableColumnHeader sortField={SORT_FIELD.CRATIO}>
+                      Collateral
+                      <br /> Ratio{" "}
+                    </SortableTableColumnHeader>
+                  </strong>
+                </TableCell>
+                <Tooltip
+                  title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
+                  placement="top"
+                >
                   <TableCell align="right">
-                    {prettyBalance(Number(activeSponsor.collateral))}
+                    <strong>
+                      <SortableTableColumnHeader
+                        sortField={SORT_FIELD.LIQ_PRICE}
+                      >
+                        Liquidation
+                        <br /> Price{" "}
+                      </SortableTableColumnHeader>
+                    </strong>
                   </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(Number(activeSponsor.tokensOutstanding))}
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(Number(activeSponsor.cRatio))}
-                  </TableCell>
-                  <TableCell align="right">
-                    {prettyBalance(Number(activeSponsor.liquidationPrice))}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-        <PageButtons>
-          <div
-            onClick={() => {
-              setPage(page === 1 ? page : page - 1);
-            }}
-          >
-            <Arrow faded={page === 1 ? true : false}>←</Arrow>
-          </div>
-          {"Page " + page + " of " + maxPage}
-          <div
-            onClick={() => {
-              setPage(page === maxPage ? page : page + 1);
-            }}
-          >
-            <Arrow faded={page === maxPage ? true : false}>→</Arrow>
-          </div>
-        </PageButtons>
-      </TableContainer>
+                </Tooltip>
+                <TableCell align="right"></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {reformattedSponsorData.map((sponsor: string) => {
+                const activeSponsor = activeSponsors[sponsor];
+                return (
+                  <StyledTableRow key={sponsor}>
+                    <TableCell component="th" scope="row">
+                      <a href={getEtherscanUrl(sponsor)} target="_blank">
+                        {prettyAddress(sponsor)}
+                      </a>
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(Number(activeSponsor.collateral))}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(Number(activeSponsor.tokensOutstanding))}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(Number(activeSponsor.cRatio))}
+                    </TableCell>
+                    <TableCell align="right">
+                      {prettyBalance(Number(activeSponsor.liquidationPrice))}
+                    </TableCell>
+                    <TableCell align="right">
+                      <MoreInfo
+                        onClick={() => handleOpenActionsDialog(sponsor)}
+                      >
+                        ⋮
+                      </MoreInfo>
+                    </TableCell>
+                  </StyledTableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+          <PageButtons>
+            <div
+              onClick={() => {
+                setPage(page === 1 ? page : page - 1);
+              }}
+            >
+              <Arrow faded={page === 1 ? true : false}>←</Arrow>
+            </div>
+            {"Page " + page + " of " + maxPage}
+            <div
+              onClick={() => {
+                setPage(page === maxPage ? page : page + 1);
+              }}
+            >
+              <Arrow faded={page === maxPage ? true : false}>→</Arrow>
+            </div>
+          </PageButtons>
+        </TableContainer>
+        <PositionActionsDialog
+          isDialogShowing={isDialogShowing}
+          handleClose={() => setIsDialogShowing(!isDialogShowing)}
+          selectedSponsor={selectedSponsor}
+        />
+      </div>
     );
   } else {
     return <></>;

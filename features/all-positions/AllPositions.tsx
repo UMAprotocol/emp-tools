@@ -33,7 +33,7 @@ const AllPositions = () => {
       <Box>
         <Box>
           <Typography>
-            {`Estimated price of ${prettyLatestPrice} for ${priceIdUtf8}`}
+            {`Estimated price of ${prettyLatestPrice} for ${priceIdUtf8}.`}
           </Typography>
         </Box>
         <Box pt={4}>

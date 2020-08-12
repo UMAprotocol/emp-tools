@@ -9,16 +9,16 @@ import Collateral from "./Collateral";
 import Token from "./Token";
 
 const fromWei = ethers.utils.formatUnits;
-const weiToNum = (x: BigNumberish, u = 18) => parseFloat(fromWei(x, u));
+const weiToNum = (x: BigNumberish, u = 18) => fromWei(x, u);
 
 export interface LiquidationState {
   liquidator: string;
-  liquidatedCollateral: number;
-  lockedCollateral: number;
+  liquidatedCollateral: string;
+  lockedCollateral: string;
   liquidationTime: number;
   liquidationTimeRemaining: number;
   liquidationId: number;
-  tokensOutstanding: number;
+  tokensOutstanding: string;
   state: number;
 }
 
@@ -30,10 +30,10 @@ function usePosition() {
   const { empState } = EmpState.useContainer();
   const { liquidationLiveness } = empState;
 
-  const [collateral, setCollateral] = useState<number | null>(null);
-  const [tokens, setTokens] = useState<number | null>(null);
+  const [collateral, setCollateral] = useState<string | null>(null);
+  const [tokens, setTokens] = useState<string | null>(null);
   const [cRatio, setCRatio] = useState<number | null>(null);
-  const [withdrawAmt, setWithdrawAmt] = useState<number | null>(null);
+  const [withdrawAmt, setWithdrawAmt] = useState<string | null>(null);
   const [withdrawPassTime, setWithdrawPassTime] = useState<number | null>(null);
   const [pendingWithdraw, setPendingWithdraw] = useState<string | null>(null);
   const [pendingTransfer, setPendingTransfer] = useState<string | null>(null);
@@ -65,15 +65,15 @@ function usePosition() {
         position.withdrawalRequestPassTimestamp;
       const xferTime: BigNumber = position.transferPositionRequestPassTimestamp;
 
-      const collateral: number = weiToNum(collRaw, collDec);
-      const tokens: number = weiToNum(tokensOutstanding, tokenDec);
+      const collateral: string = weiToNum(collRaw, collDec);
+      const tokens: string = weiToNum(tokensOutstanding, tokenDec);
       const cRatio =
         collateral !== null && tokens !== null
-          ? tokens > 0
-            ? collateral / tokens
+          ? Number(tokens) > 0
+            ? Number(collateral) / Number(tokens)
             : 0
           : null;
-      const withdrawAmt: number = weiToNum(withdrawReqAmt, collDec);
+      const withdrawAmt: string = weiToNum(withdrawReqAmt, collDec);
       const withdrawPassTime: number = withdrawReqPassTime.toNumber();
       const pendingWithdraw: string =
         withdrawReqPassTime.toString() !== "0" ? "Yes" : "No";

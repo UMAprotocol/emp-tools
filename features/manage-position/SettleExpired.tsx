@@ -41,7 +41,10 @@ const SettleExpired = () => {
     isExpired,
   } = empState;
   const { symbol: collSymbol } = Collateral.useContainer();
-  const { tokens: posTokens, collateral: posColl } = Position.useContainer();
+  const {
+    tokens: posTokensString,
+    collateral: posCollString,
+  } = Position.useContainer();
   const {
     symbol: tokenSymbol,
     allowance: tokenAllowance,
@@ -58,8 +61,8 @@ const SettleExpired = () => {
   const [error, setError] = useState<Error | null>(null);
 
   if (
-    posTokens !== null &&
-    posColl !== null &&
+    posTokensString !== null &&
+    posCollString !== null &&
     tokenBalance !== null &&
     tokenDec !== null &&
     tokenSymbol !== null &&
@@ -76,7 +79,8 @@ const SettleExpired = () => {
     const expiryDate = new Date(
       Number(expirationTimestamp) * 1000
     ).toLocaleString("en-GB", { timeZone: "UTC" });
-
+    const posTokens = Number(posTokensString);
+    const posColl = Number(posCollString);
     const needsToRequestSettlementPrice = contractState === CONTRACT_STATE.OPEN;
 
     // Error conditions for calling settle expired:
