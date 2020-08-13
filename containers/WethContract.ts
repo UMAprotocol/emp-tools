@@ -6,7 +6,13 @@ import { weth } from "@studydefi/money-legos/erc20";
 import Connection from "./Connection";
 
 function useContract() {
-  const { signer, address, block$, provider } = Connection.useContainer();
+  const {
+    signer,
+    address,
+    block$,
+    provider,
+    network,
+  } = Connection.useContainer();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [ethBalance, setEthBalance] = useState<BigNumberish | null>(null);
   const [wethBalance, setWethBalance] = useState<BigNumberish | null>(null);
@@ -41,11 +47,17 @@ function useContract() {
   }, [block$, contract, address, provider]);
 
   useEffect(() => {
-    if (signer) {
-      const instance = new ethers.Contract(weth.address, weth.abi, signer);
+    if (signer && network) {
+      const instance = new ethers.Contract(
+        network.chainId === 42
+          ? "0xd0a1e359811322d97991e03f863a0c30c2cf029c"
+          : weth.address, // Uses Kovan WETH contract if on Kovan, otherwise Mainnet WETH contract
+        weth.abi,
+        signer
+      );
       setContract(instance);
     }
-  }, [signer]);
+  }, [signer, network]);
 
   return { contract, ethBalance, wethBalance };
 }

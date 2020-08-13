@@ -13,15 +13,15 @@ export interface Emp {
 }
 
 const useEmpList = () => {
-  const { signer, provider } = Connection.useContainer();
+  const { signer, network } = Connection.useContainer();
   const [emps, setEmps] = useState<Emp[]>([]);
   const [loading, setLoading] = useState(false);
 
   const getEmps = async () => {
-    if (signer && provider) {
+    if (signer && network) {
       setLoading(true);
       // For each EMP address, find its token name and address
-      const promises = EMPs.map(async (empAddress: string) => {
+      const promises = EMPs[network.chainId].map(async (empAddress: string) => {
         const emp = new ethers.Contract(
           empAddress,
           uma.expiringMultiParty.abi,
@@ -47,7 +47,7 @@ const useEmpList = () => {
 
   useEffect(() => {
     getEmps();
-  }, [signer]);
+  }, [signer, network]);
 
   return {
     emps,

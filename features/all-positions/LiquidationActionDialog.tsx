@@ -212,7 +212,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
         try {
           if (needCollateralAllowance()) await setMaxCollateralAllowance();
           const tx = await emp.dispute(
-            liquidatedPosition.sponsorPlusId,
+            liquidatedPosition.liquidationId,
             liquidatedPosition.sponsor
           );
           setHash(tx.hash as string);
