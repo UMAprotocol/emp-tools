@@ -75,9 +75,9 @@ const useEmpSponsors = () => {
   // We set the poll interval to a very slow 5 seconds for now since the position states
   // are not expected to change much.
   // Source: https://www.apollographql.com/docs/react/data/queries/#polling
-  const clientName = `UMA${network?.chainId.toString()}`;
+  const subgraphToQuery = `UMA${network?.chainId.toString()}`;
   const { loading, error, data } = useQuery(EMP_DATA, {
-    context: { clientName: clientName },
+    context: { clientName: subgraphToQuery },
     pollInterval: 5000,
   });
 
