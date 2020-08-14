@@ -13,6 +13,8 @@ type Block = ethers.providers.Block;
 type Network = ethers.providers.Network;
 type Signer = ethers.Signer;
 
+const SUPPORTED_NETWORK_IDS: number[] = [1, 42];
+
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
   const [onboard, setOnboard] = useState<OnboardApi | null>(null);
@@ -32,6 +34,9 @@ function useConnection() {
           setAddress(address);
         },
         network: async (networkId: any) => {
+          if (!SUPPORTED_NETWORK_IDS.includes(networkId)) {
+            alert("This dApp will work only with the Mainnet or Kovan network");
+          }
           onboard?.config({ networkId: networkId });
         },
         wallet: async (wallet: Wallet) => {
