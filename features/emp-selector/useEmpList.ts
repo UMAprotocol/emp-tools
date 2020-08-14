@@ -13,22 +13,33 @@ export interface Emp {
 }
 
 const useEmpList = () => {
-  const { signer, network } = Connection.useContainer();
+  const { signer, network, provider } = Connection.useContainer();
   const [emps, setEmps] = useState<Emp[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // For each EMP address, find its token name and address
   const getEmps = async () => {
-    if (signer && network) {
+    if (provider !== null) {
       setLoading(true);
-      // For each EMP address, find its token name and address
-      const promises = EMPs[network.chainId].map(async (empAddress: string) => {
+
+      // If user is not signed in, then default to mainnet
+      let networkIdToUse = 1;
+
+      // If user is signed in, then select EMP's for chosen network
+      if (signer && network) networkIdToUse = network.chainId;
+
+      const promises = EMPs[networkIdToUse].map(async (empAddress: string) => {
         const emp = new ethers.Contract(
           empAddress,
           uma.expiringMultiParty.abi,
-          signer
+          signer !== null ? signer : provider
         );
         const tokenAddr = await emp.tokenCurrency();
-        const token = new ethers.Contract(tokenAddr, erc20.abi, signer);
+        const token = new ethers.Contract(
+          tokenAddr,
+          erc20.abi,
+          signer !== null ? signer : provider
+        );
         const tokenName = await token.name();
         const tokenSymbol = await token.symbol();
         return {
@@ -47,7 +58,7 @@ const useEmpList = () => {
 
   useEffect(() => {
     getEmps();
-  }, [signer, network]);
+  }, [signer, network, provider]);
 
   return {
     emps,

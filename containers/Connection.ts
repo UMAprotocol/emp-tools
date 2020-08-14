@@ -14,6 +14,9 @@ type Network = ethers.providers.Network;
 type Signer = ethers.Signer;
 
 const SUPPORTED_NETWORK_IDS: number[] = [1, 42];
+const isNetworkIdSupported = (netId: number) => {
+  return SUPPORTED_NETWORK_IDS.includes(netId);
+};
 
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
@@ -34,7 +37,7 @@ function useConnection() {
           setAddress(address);
         },
         network: async (networkId: any) => {
-          if (!SUPPORTED_NETWORK_IDS.includes(networkId)) {
+          if (!isNetworkIdSupported(networkId)) {
             alert("This dApp will work only with the Mainnet or Kovan network");
           }
           onboard?.config({ networkId: networkId });
@@ -84,6 +87,12 @@ function useConnection() {
       // debounce to prevent subscribers making unnecessary calls
       const block$ = observable.pipe(debounceTime(1000));
       setBlock$(block$);
+    } else {
+      // If no provider, then default to a Ethers default provider (combination of Infura and Etherscan).
+      const defaultProvider = ethers.getDefaultProvider(
+        "homestead"
+      ) as Provider;
+      setProvider(defaultProvider);
     }
 
     if (provider && address) {
@@ -100,6 +109,7 @@ function useConnection() {
     connect,
     error,
     block$,
+    isNetworkIdSupported,
   };
 }
 

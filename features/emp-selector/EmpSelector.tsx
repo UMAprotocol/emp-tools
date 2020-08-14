@@ -39,7 +39,7 @@ const EmpSelector = () => {
   const theme = useTheme();
   const largeScreen = useMediaQuery(theme.breakpoints.up("sm"));
 
-  const { signer } = Connection.useContainer();
+  const { provider } = Connection.useContainer();
   const { empAddress, setEmpAddress } = EmpAddress.useContainer();
   const { emps, loading } = useEmpList();
 
@@ -62,11 +62,11 @@ const EmpSelector = () => {
           input={<BootstrapInput />}
           disabled={noEmpsOrLoading}
         >
-          {!signer ? (
+          {!provider ? (
             <MenuItem value={0}>
               <ListItemText
                 primary="Not connected"
-                secondary="You must connect your wallet first"
+                secondary="Failed to connect to network"
               />
             </MenuItem>
           ) : (
