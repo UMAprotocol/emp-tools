@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { utils } from "ethers";
 const fromWei = utils.formatUnits;
 
+import Connection from "./Connection";
 import EmpContract from "./EmpContract";
 import EmpState from "./EmpState";
 import Collateral from "./Collateral";
@@ -13,6 +14,7 @@ import { isPricefeedInvertedFromTokenSymbol } from "../utils/getOffchainPrice";
 
 import { useQuery } from "@apollo/client";
 import { EMP_DATA } from "../apollo/uma/queries";
+import { client } from "../apollo/client";
 
 // Interfaces for dApp state storage.
 interface SponsorPositionState {
@@ -61,6 +63,7 @@ interface FinancialContractQuery {
 }
 
 const useEmpSponsors = () => {
+  const { network } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const { collateralRequirement } = empState;
@@ -72,8 +75,9 @@ const useEmpSponsors = () => {
   // We set the poll interval to a very slow 5 seconds for now since the position states
   // are not expected to change much.
   // Source: https://www.apollographql.com/docs/react/data/queries/#polling
+  const subgraphToQuery = `UMA${network?.chainId.toString()}`;
   const { loading, error, data } = useQuery(EMP_DATA, {
-    context: { clientName: "UMA" },
+    context: { clientName: subgraphToQuery },
     pollInterval: 5000,
   });
 
