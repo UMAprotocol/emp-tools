@@ -8,7 +8,7 @@ import { debounceTime } from "rxjs/operators";
 
 import { config } from "./Config";
 
-type Provider = ethers.providers.Web3Provider;
+type Provider = ethers.providers.JsonRpcProvider;
 type Block = ethers.providers.Block;
 type Network = ethers.providers.Network;
 type Signer = ethers.Signer;
@@ -88,11 +88,12 @@ function useConnection() {
       const block$ = observable.pipe(debounceTime(1000));
       setBlock$(block$);
     } else {
-      // If no provider, then default to a Ethers default provider (combination of Infura and Etherscan).
-      const defaultProvider = ethers.getDefaultProvider(
-        "homestead"
-      ) as Provider;
-      setProvider(defaultProvider);
+      // // If no provider, then default to a Ethers default provider (combination of Infura and Etherscan).
+      // const defaultProvider = new ethers.providers.InfuraProvider(
+      //   "homestead",
+      //   "6e3a4d8e056b4b6180101ceaa3c8c61f"
+      // );
+      // setProvider(defaultProvider);
     }
 
     if (provider && address) {

@@ -19,7 +19,7 @@ const useEmpList = () => {
 
   // For each EMP address, find its token name and address
   const getEmps = async () => {
-    if (provider !== null) {
+    if (provider !== null && signer !== null) {
       setLoading(true);
 
       // If user is not signed in, then default to mainnet
@@ -29,17 +29,14 @@ const useEmpList = () => {
       if (signer && network) networkIdToUse = network.chainId;
 
       const promises = EMPs[networkIdToUse].map(async (empAddress: string) => {
+        console.log(provider, empAddress, signer);
         const emp = new ethers.Contract(
           empAddress,
           uma.expiringMultiParty.abi,
-          signer !== null ? signer : provider
+          signer
         );
         const tokenAddr = await emp.tokenCurrency();
-        const token = new ethers.Contract(
-          tokenAddr,
-          erc20.abi,
-          signer !== null ? signer : provider
-        );
+        const token = new ethers.Contract(tokenAddr, erc20.abi, signer);
         const tokenName = await token.name();
         const tokenSymbol = await token.symbol();
         return {
