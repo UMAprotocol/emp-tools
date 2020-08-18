@@ -77,7 +77,7 @@ const YourPosition = () => {
     const backingCollateral = Number(backingCollString);
     const withdrawAmt = Number(withdrawAmtString);
     const liquidationPrice = getLiquidationPrice(
-      collateral - withdrawAmt,
+      backingCollateral,
       tokens,
       collReqFromWei,
       isPricefeedInvertedFromTokenSymbol(tokenSymbol)
