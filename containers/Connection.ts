@@ -76,6 +76,16 @@ function useConnection() {
 
   // create observable to stream new blocks
   useEffect(() => {
+    // If user does not connect their provider, then default to ethers.js default provider (combination of Infura and Etherscan).
+    if (!provider) {
+      const defaultProvider = ethers.getDefaultProvider() as Provider;
+      setProvider(defaultProvider);
+      defaultProvider.getNetwork().then((net) => {
+        setNetwork(net);
+      });
+    }
+
+    // Once a provider has been set up, set up a block # observable
     if (provider) {
       const observable = new Observable<Block>((subscriber) => {
         provider.on("block", (blockNumber: number) => {
@@ -87,17 +97,10 @@ function useConnection() {
       // debounce to prevent subscribers making unnecessary calls
       const block$ = observable.pipe(debounceTime(1000));
       setBlock$(block$);
-    } else {
-      // If user does not connect their provider, then default to ethers.js default provider (combination of Infura and Etherscan).
-      const defaultProvider = ethers.getDefaultProvider() as Provider;
-      setProvider(defaultProvider);
-      defaultProvider.getNetwork().then((net) => {
-        setNetwork(net);
-      });
-    }
 
-    if (provider && address) {
-      setSigner(provider.getSigner());
+      if (address) {
+        setSigner(provider.getSigner());
+      }
     }
   }, [provider, address]);
 

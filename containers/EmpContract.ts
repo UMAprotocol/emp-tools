@@ -7,7 +7,7 @@ import EmpAddress from "./EmpAddress";
 import Connection from "./Connection";
 
 function useContract() {
-  const { signer } = Connection.useContainer();
+  const { signer, provider } = Connection.useContainer();
   const { empAddress, isValid } = EmpAddress.useContainer();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
 
@@ -15,11 +15,11 @@ function useContract() {
     if (empAddress === null) {
       setContract(null);
     }
-    if (empAddress && isValid && signer) {
+    if (empAddress && isValid && provider) {
       const instance = new ethers.Contract(
         empAddress,
         uma.expiringMultiParty.abi,
-        signer
+        signer ? signer : provider
       );
       setContract(instance);
     }
