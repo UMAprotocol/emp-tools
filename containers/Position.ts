@@ -31,6 +31,9 @@ function usePosition() {
   const { liquidationLiveness } = empState;
 
   const [collateral, setCollateral] = useState<string | null>(null);
+  const [backingCollateral, setBackingCollateral] = useState<string | null>(
+    null
+  );
   const [tokens, setTokens] = useState<string | null>(null);
   const [cRatio, setCRatio] = useState<number | null>(null);
   const [withdrawAmt, setWithdrawAmt] = useState<string | null>(null);
@@ -66,11 +69,15 @@ function usePosition() {
       const xferTime: BigNumber = position.transferPositionRequestPassTimestamp;
 
       const collateral: string = weiToNum(collRaw, collDec);
+      const backingCollateral: string = weiToNum(
+        collRaw.sub(withdrawReqAmt),
+        collDec
+      );
       const tokens: string = weiToNum(tokensOutstanding, tokenDec);
       const cRatio =
-        collateral !== null && tokens !== null
+        backingCollateral !== null && tokens !== null
           ? Number(tokens) > 0
-            ? Number(collateral) / Number(tokens)
+            ? Number(backingCollateral) / Number(tokens)
             : 0
           : null;
       const withdrawAmt: string = weiToNum(withdrawReqAmt, collDec);
@@ -106,6 +113,7 @@ function usePosition() {
 
       // set states
       setCollateral(collateral);
+      setBackingCollateral(backingCollateral);
       setTokens(tokens);
       setCRatio(cRatio);
       setWithdrawAmt(withdrawAmt);
@@ -128,6 +136,7 @@ function usePosition() {
   useEffect(() => {
     if (contract === null) {
       setCollateral(null);
+      setBackingCollateral(null);
       setTokens(null);
       setCRatio(null);
       setWithdrawAmt(null);
@@ -141,6 +150,7 @@ function usePosition() {
 
   return {
     collateral,
+    backingCollateral,
     tokens,
     cRatio,
     withdrawAmt,

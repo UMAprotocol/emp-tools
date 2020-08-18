@@ -39,6 +39,7 @@ const YourPosition = () => {
   const {
     tokens: tokenString,
     collateral: collString,
+    backingCollateral: backingCollString,
     cRatio,
     withdrawAmt: withdrawAmtString,
     pendingWithdraw,
@@ -54,6 +55,7 @@ const YourPosition = () => {
   if (
     tokenString !== null &&
     collString !== null &&
+    backingCollString !== null &&
     cRatio !== null &&
     gcr !== null &&
     collSymbol !== null &&
@@ -72,9 +74,10 @@ const YourPosition = () => {
     const collReqFromWei = parseFloat(fromWei(collReq, collDec));
     const tokens = Number(tokenString);
     const collateral = Number(collString);
+    const backingCollateral = Number(backingCollString);
     const withdrawAmt = Number(withdrawAmtString);
     const liquidationPrice = getLiquidationPrice(
-      collateral,
+      collateral - withdrawAmt,
       tokens,
       collReqFromWei,
       isPricefeedInvertedFromTokenSymbol(tokenSymbol)
@@ -88,6 +91,7 @@ const YourPosition = () => {
       collReqFromWei.toFixed(4),
       liquidationPrice,
       collateral.toFixed(4),
+      backingCollateral.toFixed(4),
       collSymbol,
       tokens.toFixed(4),
       tokenSymbol,
@@ -107,6 +111,7 @@ const YourPosition = () => {
     collReqFromWei: string = defaultMissingDataDisplay,
     liquidationPrice: string = defaultMissingDataDisplay,
     _collateral: string = "0",
+    _backingCollateral: string = "0",
     _collSymbol: string = "",
     _tokens: string = "0",
     _tokenSymbol: string = "",
@@ -126,7 +131,11 @@ const YourPosition = () => {
               {`${_collateral} ${_collSymbol}`}
             </Status>
             <Status>
-              <Label>Tokens outstanding: </Label>
+              <Label>Collateral backing debt: </Label>
+              {`${_backingCollateral} ${_collSymbol}`}
+            </Status>
+            <Status>
+              <Label>Token debt: </Label>
               {`${_tokens} ${_tokenSymbol}`}
             </Status>
             <Status>
@@ -137,17 +146,14 @@ const YourPosition = () => {
               <Label>Liquidation price: </Label>
               {`${liquidationPrice} (${priceIdUtf8})`}
             </Status>
-
             <Status>
               <Label>Pending withdrawal request: </Label>
               {`${_pendingWithdraw}`}
             </Status>
-            {_pendingWithdraw == "available" && (
-              <Status>
-                <Label>Collateral available to withdraw: </Label>
-                {`${_withdrawAmt}`}
-              </Status>
-            )}
+            <Status>
+              <Label>Requested withdrawal amount: </Label>
+              {`${_withdrawAmt}`}
+            </Status>
           </Grid>
           <Grid item md={6} xs={12}>
             <Typography variant="h5">Contract Info</Typography>
