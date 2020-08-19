@@ -15,6 +15,7 @@ import {
   InputLabel,
   FormControl,
   MenuItem,
+  Tooltip,
 } from "@material-ui/core";
 
 import ToggleButton from "@material-ui/lab/ToggleButton";
@@ -304,6 +305,17 @@ const PositionActionsDialog = (props: DialogProps) => {
                   {prettyBalance(Number(sponsorPosition.collateral))}
                 </Status>
                 <Status>
+                  <Tooltip
+                    title={
+                      "Equal to the position collateral minus any requested withdrawal amount"
+                    }
+                    placement="top"
+                  >
+                    <Label>Backing Collateral({collSymbol}): </Label>
+                  </Tooltip>
+                  {prettyBalance(Number(sponsorPosition.backingCollateral))}
+                </Status>
+                <Status>
                   <Label>Minted Synthetics({tokenSymbol}): </Label>
                   {prettyBalance(Number(sponsorPosition.tokensOutstanding))}
                 </Status>
@@ -312,7 +324,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                   {prettyBalance(Number(sponsorPosition.cRatio))}
                 </Status>
                 <Status>
-                  <Label>Pending withdrawal: </Label>
+                  <Label>Pending Withdrawal: </Label>
                   {sponsorPosition.pendingWithdraw}
                 </Status>
                 {sponsorPosition.pendingWithdraw !== "No" && (
@@ -341,11 +353,11 @@ const PositionActionsDialog = (props: DialogProps) => {
                   </Status>
                 )}
                 <Status>
-                  <Label>Collateral ratio: </Label>
+                  <Label>Collateral Ratio: </Label>
                   {Number(sponsorPosition.cRatio).toFixed(4)}
                 </Status>
                 <Status>
-                  <Label>Liquidation price: </Label>
+                  <Label>Liquidation Price: </Label>
                   {Number(sponsorPosition.liquidationPrice).toFixed(4)}
                 </Status>
               </Box>
