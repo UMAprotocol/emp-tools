@@ -90,7 +90,7 @@ const Create = () => {
     collSymbol !== null &&
     priceIdentifier !== null
   ) {
-    const collReqFromWei = parseFloat(fromWei(collReq, collDec));
+    const collReqFromWei = parseFloat(fromWei(collReq, tokenDec));
     const collateralToDeposit = Number(collateral) || 0;
     const tokensToCreate = Number(tokens) || 0;
     const minSponsorTokensFromWei = parseFloat(
@@ -144,7 +144,7 @@ const Create = () => {
         setSuccess(null);
         setError(null);
         try {
-          const collateralWei = toWei(collateral);
+          const collateralWei = toWei(collateral, collDec);
           const tokensWei = toWei(tokens);
           const tx = await emp.create([collateralWei], [tokensWei]);
           setHash(tx.hash as string);

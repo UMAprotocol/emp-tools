@@ -50,7 +50,7 @@ const Deposit = () => {
   } = empState;
 
   const { contract: emp } = EmpContract.useContainer();
-  const { symbol: tokenSymbol } = Token.useContainer();
+  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const {
     tokens: posTokensString,
@@ -73,6 +73,7 @@ const Deposit = () => {
     collateral !== null &&
     emp !== null &&
     collDec !== null &&
+    tokenDec !== null &&
     collReq !== null &&
     posCollString !== null &&
     posTokensString !== null &&
@@ -89,7 +90,7 @@ const Deposit = () => {
     posCollString !== "0" // If position has no collateral, then don't render withdraw component.
   ) {
     const collateralToWithdraw = Number(collateral) || 0;
-    const collReqFromWei = parseFloat(fromWei(collReq, collDec));
+    const collReqFromWei = parseFloat(fromWei(collReq, tokenDec));
     const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const posTokens = Number(posTokensString);
@@ -146,7 +147,7 @@ const Deposit = () => {
         setSuccess(null);
         setError(null);
         try {
-          const collateralToWithdrawWei = toWei(collateral);
+          const collateralToWithdrawWei = toWei(collateral, collDec);
           if (resultantCRBelowGCR) {
             const tx = await emp.requestWithdrawal([collateralToWithdrawWei]);
             setHash(tx.hash as string);
