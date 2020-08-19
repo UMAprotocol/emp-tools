@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { utils } from "ethers";
 const { formatUnits: fromWei, parseUnits: toWei } = utils;
-import { useState, MouseEvent } from "react";
+import { useState, MouseEvent, useEffect } from "react";
 
 import {
   Box,
@@ -283,6 +283,19 @@ const PositionActionsDialog = (props: DialogProps) => {
         setError(new Error("Please check that you are connected."));
       }
     };
+
+    useEffect(() => {
+      // Set min and max collPerToken params for the Liquidation dialog to
+      // approximately the current CRatio, +/- some error threshold.
+      const collPerToken =
+        Number(sponsorPosition.backingCollateral) /
+        Number(sponsorPosition.tokensOutstanding);
+      setMinCollPerToken((collPerToken * 0.95).toFixed(10));
+      setMaxCollPerToken((collPerToken * 1.05).toFixed(10));
+
+      // Set liquidation transaction deadline to a reasonable 30 mins to wait for it to be mined.
+      setDeadline((30 * 60).toString());
+    }, [sponsorPosition]);
 
     return (
       <Dialog open={props.isDialogShowing} onClose={props.handleClose}>
