@@ -133,7 +133,8 @@ const useEmpSponsors = () => {
               latestPrice
             );
             const liquidationPrice = getLiquidationPrice(
-              Number(position.collateral),
+              Number(position.collateral) -
+                Number(position.withdrawalRequestAmount),
               Number(position.tokensOutstanding),
               collReqFromWei,
               isPricefeedInvertedFromTokenSymbol(tokenSymbol)
