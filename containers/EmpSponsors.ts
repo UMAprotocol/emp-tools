@@ -203,6 +203,7 @@ const useEmpSponsors = () => {
                   maxDisputablePrice: maxDisputablePrice.toString(),
                   tokensLiquidated: liquidation.tokensLiquidated,
                   lockedCollateral: liquidation.lockedCollateral,
+                  liquidatedCollateral: liquidation.liquidatedCollateral,
                   status: liquidation.status,
                   liquidationTimestamp: liquidationCreatedEvent.timestamp,
                   liquidationReceipt: liquidationCreatedEvent.tx_hash,
