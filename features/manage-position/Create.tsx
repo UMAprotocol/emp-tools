@@ -1,4 +1,4 @@
-import { ethers, utils } from "ethers";
+import { utils } from "ethers";
 import styled from "styled-components";
 import {
   Box,
@@ -7,10 +7,11 @@ import {
   Typography,
   Grid,
   Tooltip,
+  InputAdornment,
 } from "@material-ui/core";
 
 import EmpContract from "../../containers/EmpContract";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpState from "../../containers/EmpState";
@@ -32,6 +33,10 @@ const Important = styled(Typography)`
 const Link = styled.a`
   color: white;
   font-size: 14px;
+`;
+
+const MinLink = styled.div`
+  text-decoration-line: underline;
 `;
 
 const {
@@ -159,6 +164,17 @@ const Create = () => {
       }
     };
 
+    const setBackingCollateralToMin = () => {
+      // By default set amount of collateral to the minimum required by the GCR constraint. This
+      // default is intended to encourage users to maximize their capital efficiency.
+      const minBackingCollateral = gcr * Number(tokens);
+      setCollateral(minBackingCollateral.toString());
+    };
+
+    useEffect(() => {
+      setBackingCollateralToMin();
+    }, [gcr, tokens, minSponsorTokensFromWei]);
+
     if (hasPendingWithdraw) {
       return (
         <Box py={2}>
@@ -216,24 +232,6 @@ const Create = () => {
                 fullWidth
                 type="number"
                 variant="outlined"
-                label={`Collateral (${collSymbol})`}
-                inputProps={{ min: "0", max: balance }}
-                value={collateral}
-                error={balanceBelowCollateralToDeposit}
-                helperText={
-                  balanceBelowCollateralToDeposit &&
-                  `${collSymbol} balance is too low`
-                }
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setCollateral(e.target.value)
-                }
-              />
-            </Grid>
-            <Grid item md={4} sm={6} xs={12}>
-              <TextField
-                fullWidth
-                type="number"
-                variant="outlined"
                 label={`Tokens (${tokenSymbol})`}
                 inputProps={{ min: "0" }}
                 value={tokens}
@@ -245,6 +243,36 @@ const Create = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setTokens(e.target.value)
                 }
+              />
+            </Grid>
+            <Grid item md={4} sm={6} xs={12}>
+              <TextField
+                fullWidth
+                type="number"
+                variant="outlined"
+                label={`Collateral (${collSymbol})`}
+                inputProps={{ min: "0", max: balance }}
+                value={collateral}
+                error={balanceBelowCollateralToDeposit}
+                helperText={
+                  balanceBelowCollateralToDeposit &&
+                  `${collSymbol} balance is too low`
+                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setCollateral(e.target.value)
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        fullWidth
+                        onClick={() => setBackingCollateralToMin()}
+                      >
+                        <MinLink>Min</MinLink>
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
             <Grid item md={4} sm={6} xs={12}>
