@@ -168,7 +168,7 @@ const Create = () => {
       // By default set amount of collateral to the minimum required by the GCR constraint. This
       // default is intended to encourage users to maximize their capital efficiency.
       const minBackingCollateral = gcr * Number(tokens);
-      setCollateral(minBackingCollateral.toString());
+      setCollateral(minBackingCollateral.toFixed(4));
     };
 
     useEffect(() => {
