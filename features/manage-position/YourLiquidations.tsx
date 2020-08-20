@@ -28,8 +28,7 @@ const Container = styled.div`
 const YourLiquidations = () => {
   const { liquidations } = Position.useContainer();
   const { empState } = EmpState.useContainer();
-  const { decimals: collDec } = Collateral.useContainer();
-  const { symbol: tokenSymbol } = Token.useContainer();
+  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
   const {
     collateralRequirement: collReq,
@@ -40,13 +39,13 @@ const YourLiquidations = () => {
 
   if (
     tokenSymbol !== null &&
-    collDec !== null &&
+    tokenDec !== null &&
     collReq !== null &&
     priceIdentifier !== null &&
     liquidationLiveness !== null &&
     liquidations !== null
   ) {
-    const collReqFromWei = parseFloat(fromWei(collReq, collDec));
+    const collReqFromWei = parseFloat(fromWei(collReq, tokenDec));
     const priceIdUtf8 = hexToUtf8(priceIdentifier);
     const invertedDisputablePrice = isPricefeedInvertedFromTokenSymbol(
       tokenSymbol

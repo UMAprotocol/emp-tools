@@ -6,6 +6,6 @@ export const EMPs: { [networkId: number]: string[] } = {
   ],
   42: [
     "0x834adA34847ff7b9442cF269E0DE3091DC7BB895", // yUSD Kovan Sep20
-    "0x8e6f002607227a4b3f2cceaee0f16fba81b7d85c", // yUSD-BTC Kovan Sep20
+    "0x8E6F002607227a4b3F2CCeaeE0f16FBA81B7d85C", // yUSD-BTC Kovan Sep20
   ],
 };
