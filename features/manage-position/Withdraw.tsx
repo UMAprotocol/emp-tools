@@ -89,7 +89,7 @@ const Withdraw = () => {
     posCollString !== "0" // If position has no collateral, then don't render withdraw component.
   ) {
     const collateralToWithdraw = Number(collateral) || 0;
-    const collReqFromWei = parseFloat(fromWei(collReq, 18));
+    const collReqFromWei = parseFloat(fromWei(collReq));
     const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const posTokens = Number(posTokensString);

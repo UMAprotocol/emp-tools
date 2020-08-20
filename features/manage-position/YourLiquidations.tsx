@@ -44,7 +44,7 @@ const YourLiquidations = () => {
     liquidationLiveness !== null &&
     liquidations !== null
   ) {
-    const collReqFromWei = parseFloat(fromWei(collReq, 18));
+    const collReqFromWei = parseFloat(fromWei(collReq));
     const priceIdUtf8 = hexToUtf8(priceIdentifier);
     const invertedDisputablePrice = isPricefeedInvertedFromTokenSymbol(
       tokenSymbol

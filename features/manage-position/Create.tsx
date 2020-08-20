@@ -90,7 +90,7 @@ const Create = () => {
     collSymbol !== null &&
     priceIdentifier !== null
   ) {
-    const collReqFromWei = parseFloat(fromWei(collReq, 18));
+    const collReqFromWei = parseFloat(fromWei(collReq));
     const collateralToDeposit = Number(collateral) || 0;
     const tokensToCreate = Number(tokens) || 0;
     const minSponsorTokensFromWei = parseFloat(

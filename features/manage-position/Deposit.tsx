@@ -68,7 +68,7 @@ const Deposit = () => {
     const collateralToDeposit = Number(collateral) || 0;
     const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const hasPendingWithdraw = pendingWithdraw === "Yes";
-    const collReqFromWei = parseFloat(fromWei(collReq, 18));
+    const collReqFromWei = parseFloat(fromWei(collReq));
     const posTokens = Number(posTokensString);
     const posColl = Number(posCollString);
     const resultantCollateral = posColl + collateralToDeposit;

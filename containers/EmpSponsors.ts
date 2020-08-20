@@ -120,7 +120,7 @@ const useEmpSponsors = () => {
           let newPositions: SponsorMap = {};
           let newLiquidations: LiquidationMap = {};
 
-          const collReqFromWei = parseFloat(fromWei(collateralRequirement, 18));
+          const collReqFromWei = parseFloat(fromWei(collateralRequirement));
 
           empData.positions.forEach((position: PositionQuery) => {
             const sponsor = utils.getAddress(position.sponsor.id);
