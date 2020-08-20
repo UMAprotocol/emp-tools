@@ -104,6 +104,35 @@ const PositionActionsDialog = (props: DialogProps) => {
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
+  useEffect(() => {
+    if (
+      props.selectedSponsor !== null &&
+      latestPrice !== null &&
+      collReq !== null
+    ) {
+      const sponsorPosition = activeSponsors[props.selectedSponsor];
+
+      // Set smart min and max collPerToken params for the Liquidation.
+      // - min collPerToken should be the point at which you'll lose money on the liquidation (i.e. when locked collateral in the position is = 100% of the token debt)
+      //   Since the liquidator must "burn" tokens to liquidate and withdraw collateral, the amount of backing collateral in the position must be >= 100% of the token debt. Therefore, the
+      //   minimum `collPerToken` is simply the current price of 1 unit token debt, which is the `latestPrice`.
+      // - max collPerToken should be point at which the liquidation is invalid (i.e. equal to the coll requirement).
+      //   The maximum amount of backing collateral in the position for it to be liquidatable is 1.25 x the current price of the token debt,
+      //   which simplifies to 1.25 `latestPrice`.
+      // - (TODO) If the current ratio of backing collateral to token debt is < `minCollPerToken` or > `maxCollPerToken`, then the user shouldn't be liquidating the position.
+      //   Perhaps we should block this functionality in this situation.
+      const _minCollPerTokenToBeProfitable = latestPrice;
+      const _maxCollPerTokenToBeValid =
+        latestPrice * parseFloat(fromWei(collReq));
+
+      setMinCollPerToken(_minCollPerTokenToBeProfitable.toFixed(10));
+      setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(10));
+    }
+
+    // Set liquidation transaction deadline to a reasonable 30 mins to wait for it to be mined.
+    setDeadline((30 * 60).toString());
+  }, [props.selectedSponsor, latestPrice, collReq]);
+
   const setDialogTab = (
     event: MouseEvent<HTMLElement>,
     newAlignment: string
@@ -283,19 +312,6 @@ const PositionActionsDialog = (props: DialogProps) => {
         setError(new Error("Please check that you are connected."));
       }
     };
-
-    useEffect(() => {
-      // Set min and max collPerToken params for the Liquidation dialog to
-      // approximately the current CRatio, +/- some error threshold.
-      const collPerToken =
-        Number(sponsorPosition.backingCollateral) /
-        Number(sponsorPosition.tokensOutstanding);
-      setMinCollPerToken((collPerToken * 0.95).toFixed(10));
-      setMaxCollPerToken((collPerToken * 1.05).toFixed(10));
-
-      // Set liquidation transaction deadline to a reasonable 30 mins to wait for it to be mined.
-      setDeadline((30 * 60).toString());
-    }, [sponsorPosition]);
 
     return (
       <Dialog open={props.isDialogShowing} onClose={props.handleClose}>
