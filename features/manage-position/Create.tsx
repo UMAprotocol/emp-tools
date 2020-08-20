@@ -88,7 +88,10 @@ const Create = () => {
     // By default set amount of collateral to the minimum required by the GCR constraint. This
     // default is intended to encourage users to maximize their capital efficiency.
     const minBackingCollateral = _gcr * _tokens;
-    setCollateral(minBackingCollateral.toFixed(4));
+    // We want to round down the number for better UI display, but we don't actually want the collateral
+    // amount to round down since we want the minimum amount of collateral to pass the GCR constraint. So,
+    // we'll add a tiny amount of collateral to avoid accidentally rounding too low.
+    setCollateral((minBackingCollateral + 0.00005).toFixed(4));
   };
 
   if (
