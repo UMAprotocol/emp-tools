@@ -69,7 +69,7 @@ const useEmpSponsors = () => {
   const { collateralRequirement } = empState;
   const { latestPrice } = PriceFeed.useContainer();
   const { decimals: collDecs } = Collateral.useContainer();
-  const { symbol: tokenSymbol, decimals: tokenDecs } = Token.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   // Because apollo caches results of queries, we will poll/refresh this query periodically.
   // We set the poll interval to a very slow 5 seconds for now since the position states
@@ -105,7 +105,6 @@ const useEmpSponsors = () => {
       latestPrice !== null &&
       collateralRequirement !== null &&
       collDecs !== null &&
-      tokenDecs !== null &&
       tokenSymbol !== null
     ) {
       if (error) {
@@ -121,9 +120,7 @@ const useEmpSponsors = () => {
           let newPositions: SponsorMap = {};
           let newLiquidations: LiquidationMap = {};
 
-          const collReqFromWei = parseFloat(
-            fromWei(collateralRequirement, tokenDecs)
-          );
+          const collReqFromWei = parseFloat(fromWei(collateralRequirement, 18));
 
           empData.positions.forEach((position: PositionQuery) => {
             const sponsor = utils.getAddress(position.sponsor.id);

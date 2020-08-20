@@ -47,7 +47,7 @@ const YourPosition = () => {
   } = Position.useContainer();
   const { empState } = EmpState.useContainer();
   const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
-  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
   const { collateralRequirement: collReq, priceIdentifier } = empState;
   const defaultMissingDataDisplay = "N/A";
@@ -61,7 +61,6 @@ const YourPosition = () => {
     collSymbol !== null &&
     collDec !== null &&
     tokenSymbol !== null &&
-    tokenDec !== null &&
     latestPrice !== null &&
     collReq !== null &&
     priceIdentifier !== null &&
@@ -72,7 +71,7 @@ const YourPosition = () => {
     const pricedCR =
       latestPrice !== 0 ? (cRatio / latestPrice).toFixed(4) : "0";
     const pricedGCR = latestPrice !== 0 ? (gcr / latestPrice).toFixed(4) : "0";
-    const collReqFromWei = parseFloat(fromWei(collReq, tokenDec));
+    const collReqFromWei = parseFloat(fromWei(collReq, 18));
     const tokens = Number(tokenString);
     const collateral = Number(collString);
     const backingCollateral = Number(backingCollString);
