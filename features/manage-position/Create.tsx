@@ -78,6 +78,19 @@ const Create = () => {
   } = empState;
   const liquidationPriceWarningThreshold = 0.1;
 
+  useEffect(() => {
+    if (gcr !== null) {
+      setBackingCollateralToMin(gcr, Number(tokens));
+    }
+  }, [gcr, tokens]);
+
+  const setBackingCollateralToMin = (_gcr: number, _tokens: number) => {
+    // By default set amount of collateral to the minimum required by the GCR constraint. This
+    // default is intended to encourage users to maximize their capital efficiency.
+    const minBackingCollateral = _gcr * _tokens;
+    setCollateral(minBackingCollateral.toFixed(4));
+  };
+
   if (
     collReq !== null &&
     collDec !== null &&
@@ -163,17 +176,6 @@ const Create = () => {
         setError(new Error("Collateral and Token amounts must be positive"));
       }
     };
-
-    const setBackingCollateralToMin = () => {
-      // By default set amount of collateral to the minimum required by the GCR constraint. This
-      // default is intended to encourage users to maximize their capital efficiency.
-      const minBackingCollateral = gcr * Number(tokens);
-      setCollateral(minBackingCollateral.toFixed(4));
-    };
-
-    useEffect(() => {
-      setBackingCollateralToMin();
-    }, [gcr, tokens, minSponsorTokensFromWei]);
 
     if (hasPendingWithdraw) {
       return (
@@ -266,7 +268,9 @@ const Create = () => {
                     <InputAdornment position="end">
                       <Button
                         fullWidth
-                        onClick={() => setBackingCollateralToMin()}
+                        onClick={() =>
+                          setBackingCollateralToMin(gcr, Number(tokens))
+                        }
                       >
                         <MinLink>Min</MinLink>
                       </Button>
