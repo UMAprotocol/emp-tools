@@ -71,7 +71,7 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.compusd;
     case symbol?.includes("ETHBTC"):
       return PRICEFEED_PARAMS.ethbtc;
-    case symbol?.includes("renBTC"):
+    case symbol?.includes("yUSD-BTC"):
       return PRICEFEED_PARAMS.usdbtc;
     case symbol?.includes("yUSD"):
       return PRICEFEED_PARAMS.usdeth;
