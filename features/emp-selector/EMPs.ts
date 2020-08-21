@@ -2,7 +2,8 @@ export const EMPs: { [networkId: number]: string[] } = {
   1: [
     "0x3f2D9eDd9702909Cf1F8C4237B7c4c5931F9C944", // ETHBTC
     "0x67DD35EaD67FcD184C8Ff6D0251DF4241F309ce1", // yCOMP
-    "0xb56C5f1fB93b1Fbd7c473926c87B6B9c4d0e21d5", // yUSD
+    "0xb56C5f1fB93b1Fbd7c473926c87B6B9c4d0e21d5", // yUSD-SEP20
+    "0x4E3168Ea1082f3dda1694646B5EACdeb572009F1", // yUSD-OCT20
   ],
   42: [
     "0x8f8e5d891BaCe2cf987A8E009C26e9fbF92caf20", // yUSD Kovan Sep20
