@@ -1,4 +1,4 @@
-import { ethers, utils } from "ethers";
+import { utils } from "ethers";
 import styled from "styled-components";
 import {
   Box,
@@ -7,10 +7,11 @@ import {
   Typography,
   Grid,
   Tooltip,
+  InputAdornment,
 } from "@material-ui/core";
 
 import EmpContract from "../../containers/EmpContract";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Collateral from "../../containers/Collateral";
 import Token from "../../containers/Token";
 import EmpState from "../../containers/EmpState";
@@ -32,6 +33,10 @@ const Important = styled(Typography)`
 const Link = styled.a`
   color: white;
   font-size: 14px;
+`;
+
+const MinLink = styled.div`
+  text-decoration-line: underline;
 `;
 
 const {
@@ -72,6 +77,22 @@ const Create = () => {
     priceIdentifier,
   } = empState;
   const liquidationPriceWarningThreshold = 0.1;
+
+  useEffect(() => {
+    if (gcr !== null) {
+      setBackingCollateralToMin(gcr, Number(tokens));
+    }
+  }, [gcr, tokens]);
+
+  const setBackingCollateralToMin = (_gcr: number, _tokens: number) => {
+    // By default set amount of collateral to the minimum required by the GCR constraint. This
+    // default is intended to encourage users to maximize their capital efficiency.
+    const minBackingCollateral = _gcr * _tokens;
+    // We want to round down the number for better UI display, but we don't actually want the collateral
+    // amount to round down since we want the minimum amount of collateral to pass the GCR constraint. So,
+    // we'll add a tiny amount of collateral to avoid accidentally rounding too low.
+    setCollateral((minBackingCollateral + 0.00005).toFixed(4));
+  };
 
   if (
     collReq !== null &&
@@ -216,24 +237,6 @@ const Create = () => {
                 fullWidth
                 type="number"
                 variant="outlined"
-                label={`Collateral (${collSymbol})`}
-                inputProps={{ min: "0", max: balance }}
-                value={collateral}
-                error={balanceBelowCollateralToDeposit}
-                helperText={
-                  balanceBelowCollateralToDeposit &&
-                  `${collSymbol} balance is too low`
-                }
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setCollateral(e.target.value)
-                }
-              />
-            </Grid>
-            <Grid item md={4} sm={6} xs={12}>
-              <TextField
-                fullWidth
-                type="number"
-                variant="outlined"
                 label={`Tokens (${tokenSymbol})`}
                 inputProps={{ min: "0" }}
                 value={tokens}
@@ -245,6 +248,38 @@ const Create = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setTokens(e.target.value)
                 }
+              />
+            </Grid>
+            <Grid item md={4} sm={6} xs={12}>
+              <TextField
+                fullWidth
+                type="number"
+                variant="outlined"
+                label={`Collateral (${collSymbol})`}
+                inputProps={{ min: "0", max: balance }}
+                value={collateral}
+                error={balanceBelowCollateralToDeposit}
+                helperText={
+                  balanceBelowCollateralToDeposit &&
+                  `${collSymbol} balance is too low`
+                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setCollateral(e.target.value)
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        fullWidth
+                        onClick={() =>
+                          setBackingCollateralToMin(gcr, Number(tokens))
+                        }
+                      >
+                        <MinLink>Min</MinLink>
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
             <Grid item md={4} sm={6} xs={12}>

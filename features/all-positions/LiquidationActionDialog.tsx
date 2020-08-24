@@ -328,7 +328,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                 </Status>
                 <Status>
                   <Label>Liquidation ID: </Label>
-                  {liquidatedPosition.sponsorPlusId}
+                  {liquidatedPosition.liquidationId}
                 </Status>
                 <Status>
                   <Label>Tokens liquidated: </Label>
@@ -341,6 +341,20 @@ const LiquidationActionDialog = (props: DialogProps) => {
                   <Label>Locked Collateral: </Label>
                   {prettyBalance(
                     Number(liquidatedPosition.lockedCollateral)
+                  )}{" "}
+                  {collSymbol}
+                </Status>
+                <Status>
+                  <Tooltip
+                    title={
+                      "Equal to the locked collateral minus any requested withdrawal amount"
+                    }
+                    placement="top"
+                  >
+                    <Label>Backing Collateral: </Label>
+                  </Tooltip>
+                  {prettyBalance(
+                    Number(liquidatedPosition.liquidatedCollateral)
                   )}{" "}
                   {collSymbol}
                 </Status>

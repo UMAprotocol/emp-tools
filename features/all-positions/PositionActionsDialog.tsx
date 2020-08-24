@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { utils } from "ethers";
 const { formatUnits: fromWei, parseUnits: toWei } = utils;
-import { useState, MouseEvent } from "react";
+import { useState, MouseEvent, useEffect } from "react";
 
 import {
   Box,
@@ -15,6 +15,7 @@ import {
   InputLabel,
   FormControl,
   MenuItem,
+  Tooltip,
 } from "@material-ui/core";
 
 import ToggleButton from "@material-ui/lab/ToggleButton";
@@ -104,6 +105,40 @@ const PositionActionsDialog = (props: DialogProps) => {
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (
+      props.selectedSponsor !== null &&
+      latestPrice !== null &&
+      collReq !== null
+    ) {
+      const sponsorPosition = activeSponsors[props.selectedSponsor];
+
+      // Set smart min and max collPerToken params for the Liquidation.
+      // - min collPerToken should be the point at which you'll lose money on the liquidation
+      //   (i.e. when locked collateral in the position is = 100% of the token debt).
+      //   Since the liquidator must "burn" tokens to liquidate and withdraw collateral,
+      //   the amount of backing collateral in the position must be >= 100% of the token debt.
+      //   Therefore, the minimum `collPerToken` is simply the current price of 1 unit token debt,
+      //   which is the `latestPrice`.
+      // - max collPerToken should be point at which the liquidation is invalid
+      //   (i.e. equal to the coll requirement).
+      //   The maximum amount of backing collateral in the position for it to be liquidatable
+      //   is 1.25 x the current price of the token debt, which simplifies to 1.25 `latestPrice`.
+      // - (TODO) If the current ratio of backing collateral to token debt is < `minCollPerToken`
+      //   or > `maxCollPerToken`, then the user shouldn't be liquidating the position.
+      //   Perhaps we should block this functionality in this situation.
+      const _minCollPerTokenToBeProfitable = latestPrice;
+      const _maxCollPerTokenToBeValid =
+        latestPrice * parseFloat(fromWei(collReq));
+
+      setMinCollPerToken(_minCollPerTokenToBeProfitable.toFixed(10));
+      setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(10));
+    }
+
+    // Set liquidation transaction deadline to a reasonable 30 mins to wait for it to be mined.
+    setDeadline((30 * 60).toString());
+  }, [props.selectedSponsor, latestPrice, collReq]);
 
   const setDialogTab = (
     event: MouseEvent<HTMLElement>,
@@ -308,6 +343,17 @@ const PositionActionsDialog = (props: DialogProps) => {
                   {prettyBalance(Number(sponsorPosition.collateral))}
                 </Status>
                 <Status>
+                  <Tooltip
+                    title={
+                      "Equal to the position collateral minus any requested withdrawal amount"
+                    }
+                    placement="top"
+                  >
+                    <Label>Backing Collateral({collSymbol}): </Label>
+                  </Tooltip>
+                  {prettyBalance(Number(sponsorPosition.backingCollateral))}
+                </Status>
+                <Status>
                   <Label>Minted Synthetics({tokenSymbol}): </Label>
                   {prettyBalance(Number(sponsorPosition.tokensOutstanding))}
                 </Status>
@@ -316,7 +362,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                   {prettyBalance(Number(sponsorPosition.cRatio))}
                 </Status>
                 <Status>
-                  <Label>Pending withdrawal: </Label>
+                  <Label>Pending Withdrawal: </Label>
                   {sponsorPosition.pendingWithdraw}
                 </Status>
                 {sponsorPosition.pendingWithdraw !== "No" && (
@@ -345,11 +391,11 @@ const PositionActionsDialog = (props: DialogProps) => {
                   </Status>
                 )}
                 <Status>
-                  <Label>Collateral ratio: </Label>
+                  <Label>Collateral Ratio: </Label>
                   {Number(sponsorPosition.cRatio).toFixed(4)}
                 </Status>
                 <Status>
-                  <Label>Liquidation price: </Label>
+                  <Label>Liquidation Price: </Label>
                   {Number(sponsorPosition.liquidationPrice).toFixed(4)}
                 </Status>
               </Box>

@@ -63,7 +63,9 @@ const DisputeParams = () => {
       <Status>
         <Label>Dispute bond: </Label>
         {disputeBondPct
-          ? `${parseFloat(fromWei(disputeBondPct)) * 100}%`
+          ? `${parseFloat(fromWei(disputeBondPct)) * 100}% + ${
+              finalFee !== null ? finalFee : "N/A"
+            } ${collSymbol !== null ? collSymbol : ""}`
           : "N/A"}
       </Status>
       <Status>

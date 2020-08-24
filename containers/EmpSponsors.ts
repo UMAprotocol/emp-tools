@@ -124,14 +124,17 @@ const useEmpSponsors = () => {
 
           empData.positions.forEach((position: PositionQuery) => {
             const sponsor = utils.getAddress(position.sponsor.id);
+            const backingCollateral =
+              Number(position.collateral) -
+              Number(position.withdrawalRequestAmount);
 
             const cRatio = getCollateralRatio(
-              Number(position.collateral),
+              backingCollateral,
               Number(position.tokensOutstanding),
               latestPrice
             );
             const liquidationPrice = getLiquidationPrice(
-              Number(position.collateral),
+              backingCollateral,
               Number(position.tokensOutstanding),
               collReqFromWei,
               isPricefeedInvertedFromTokenSymbol(tokenSymbol)
@@ -151,6 +154,7 @@ const useEmpSponsors = () => {
               newPositions[sponsor] = {
                 tokensOutstanding: position.tokensOutstanding,
                 collateral: position.collateral,
+                backingCollateral: backingCollateral.toString(),
                 cRatio: cRatio.toString(),
                 liquidationPrice: liquidationPrice.toString(),
                 pendingWithdraw: pendingWithdraw,
@@ -201,6 +205,7 @@ const useEmpSponsors = () => {
                   maxDisputablePrice: maxDisputablePrice.toString(),
                   tokensLiquidated: liquidation.tokensLiquidated,
                   lockedCollateral: liquidation.lockedCollateral,
+                  liquidatedCollateral: liquidation.liquidatedCollateral,
                   status: liquidation.status,
                   liquidationTimestamp: liquidationCreatedEvent.timestamp,
                   liquidationReceipt: liquidationCreatedEvent.tx_hash,
