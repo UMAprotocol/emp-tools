@@ -132,8 +132,10 @@ const PositionActionsDialog = (props: DialogProps) => {
       const _maxCollPerTokenToBeValid =
         latestPrice * parseFloat(fromWei(collReq));
 
-      setMinCollPerToken(_minCollPerTokenToBeProfitable.toFixed(10));
-      setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(10));
+      // The number of decimals to display in `toFixed()` must be <= the precision of the token
+      // in wei, otherwise you'll experience errors converting the string into toWei(val, precision)
+      setMinCollPerToken(_minCollPerTokenToBeProfitable.toFixed(8));
+      setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(8));
     }
 
     // Set liquidation transaction deadline to a reasonable 30 mins to wait for it to be mined.

@@ -88,7 +88,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
   } = empState;
 
   const prettyBalance = (x: number) => {
-    const x_string = x.toFixed(4);
+    const x_string = x.toFixed(8);
     return utils.commify(x_string);
   };
 
