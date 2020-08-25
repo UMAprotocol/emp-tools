@@ -48,16 +48,17 @@ const useBalancer = () => {
   const usdcAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
   const defaultSwapTokenAddress = usdcAddress;
 
-  const [selectedTokenAddress, setSelectedTokenAddress] = useState<
-    string | null
-  >(defaultTokenAddress);
+  const [selectedTokenAddress, setSelectedTokenAddress] = useState<string>(
+    defaultTokenAddress
+  );
   const [selectedSwapTokenAddress, setSelectedSwapTokenAddress] = useState<
-    string | null
+    string
   >(defaultSwapTokenAddress);
-  const [poolTokenList, setPoolTokenList] = useState<string[] | null>([
+  const [poolTokenList, setPoolTokenList] = useState<string[]>([
     defaultTokenAddress,
     defaultSwapTokenAddress,
   ]);
+  const [isYieldToken, setIsYieldToken] = useState<boolean | null>(false);
 
   const [usdPrice, setUsdPrice] = useState<number | null>(null);
   const [poolAddress, setPoolAddress] = useState<string | null>(null);
@@ -95,6 +96,7 @@ const useBalancer = () => {
       setSelectedSwapTokenAddress(defaultSwapTokenAddress);
 
       const IS_YIELD_TOKEN = YIELD_TOKENS.includes(tokenAddress);
+      setIsYieldToken(IS_YIELD_TOKEN);
       if (IS_YIELD_TOKEN) {
         setSelectedTokenAddress(tokenAddress.toLowerCase());
         setPoolTokenList([tokenAddress.toLowerCase(), defaultSwapTokenAddress]);
@@ -198,6 +200,7 @@ const useBalancer = () => {
     usdPrice,
     shares,
     userShareFraction,
+    isYieldToken,
   };
 };
 
