@@ -48,17 +48,14 @@ const useBalancer = () => {
   const usdcAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
   const defaultSwapTokenAddress = usdcAddress;
 
-  const [selectedTokenAddress, setSelectedTokenAddress] = useState<string>(
-    defaultTokenAddress
-  );
+  const [selectedTokenAddress, setSelectedTokenAddress] = useState<
+    string | null
+  >(null);
   const [selectedSwapTokenAddress, setSelectedSwapTokenAddress] = useState<
-    string
-  >(defaultSwapTokenAddress);
-  const [poolTokenList, setPoolTokenList] = useState<string[]>([
-    defaultTokenAddress,
-    defaultSwapTokenAddress,
-  ]);
-  const [isYieldToken, setIsYieldToken] = useState<boolean | null>(false);
+    string | null
+  >(null);
+  const [poolTokenList, setPoolTokenList] = useState<string[] | null>(null);
+  const [isYieldToken, setIsYieldToken] = useState<boolean>(false);
 
   const [usdPrice, setUsdPrice] = useState<number | null>(null);
   const [poolAddress, setPoolAddress] = useState<string | null>(null);
@@ -178,8 +175,13 @@ const useBalancer = () => {
   // Change state when emp changes or when the graphQL data changes due to polling.
   useEffect(() => {
     initializeTokenAddress();
-    queryTokenData();
-    queryPoolData();
+
+    if (selectedTokenAddress) {
+      queryTokenData();
+    }
+    if (poolTokenList) {
+      queryPoolData();
+    }
   }, [address, selectedTokenAddress, tokenAddress]);
 
   // get info on each new block
@@ -187,8 +189,12 @@ const useBalancer = () => {
     if (block$) {
       const sub = block$.subscribe(() => {
         initializeTokenAddress();
-        queryPoolData();
-        queryTokenData();
+        if (selectedTokenAddress) {
+          queryTokenData();
+        }
+        if (poolTokenList) {
+          queryPoolData();
+        }
       });
       return () => sub.unsubscribe();
     }
