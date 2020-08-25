@@ -44,7 +44,7 @@ const useBalancer = () => {
 
   // Detect if selected token is a yield token, otherwise default to a yield token. This component
   // does not make sense for a non yield token.
-  const defaultTokenAddress = "0x81ab848898b5ffd3354dbbefb333d5d183eedcb5";
+  const defaultTokenAddress = YIELD_TOKENS[0].toLowerCase();
   const usdcAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
   const defaultSwapTokenAddress = usdcAddress;
 
@@ -91,10 +91,6 @@ const useBalancer = () => {
   );
 
   const initializeTokenAddress = () => {
-    setSelectedTokenAddress(null);
-    setSelectedSwapTokenAddress(null);
-    setPoolTokenList(null);
-
     if (tokenAddress !== null) {
       setSelectedSwapTokenAddress(defaultSwapTokenAddress);
 
@@ -103,19 +99,13 @@ const useBalancer = () => {
         setSelectedTokenAddress(tokenAddress.toLowerCase());
         setPoolTokenList([tokenAddress.toLowerCase(), defaultSwapTokenAddress]);
       } else {
-        setSelectedTokenAddress(YIELD_TOKENS[0].toLowerCase());
-        setPoolTokenList([
-          YIELD_TOKENS[0].toLowerCase(),
-          defaultSwapTokenAddress,
-        ]);
+        setSelectedTokenAddress(defaultTokenAddress);
+        setPoolTokenList([defaultTokenAddress, defaultSwapTokenAddress]);
       }
     }
   };
 
   const queryTokenData = () => {
-    setUsdPrice(null);
-    setPoolAddress(null);
-
     if (tokenPriceError) {
       console.error(
         `Apollo client failed to fetch graph data:`,
@@ -132,10 +122,6 @@ const useBalancer = () => {
   };
 
   const queryPoolData = () => {
-    setPool(null);
-    setShares(null);
-    setUserSharesFraction(null);
-
     if (poolError) {
       console.error(`Apollo client failed to fetch graph data:`, poolError);
     }
