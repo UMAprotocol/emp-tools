@@ -37,6 +37,7 @@ interface PositionQuery {
   withdrawalRequestPassTimestamp: string;
   withdrawalRequestAmount: string;
   transferPositionRequestPassTimestamp: string;
+  isEnded: boolean;
 }
 
 interface LiquidationQuery {
@@ -125,6 +126,8 @@ const useEmpSponsors = () => {
           );
 
           empData.positions.forEach((position: PositionQuery) => {
+            if (position.isEnded) return;
+
             const sponsor = utils.getAddress(position.sponsor.id);
             const backingCollateral =
               Number(position.collateral) -
