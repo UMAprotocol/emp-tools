@@ -172,6 +172,91 @@ const useBalancer = () => {
     }
   };
 
+  // Use this function to get the token price for a specified yield token.
+  const getTokenPrice = (_tokenAddress: string) => {
+    const { loading, error, data } = useQuery(TOKENS, {
+      skip: !_tokenAddress,
+      context: { clientName: "BALANCER" },
+      variables: { tokenId: _tokenAddress },
+      pollInterval: 5000,
+    });
+
+    if (error) {
+      console.error(`Apollo client failed to fetch graph data:`, error);
+    }
+    if (!loading && data) {
+      const tokenData = data.tokenPrices[0];
+      const usdPrice = Number(tokenData.price);
+      return usdPrice;
+    }
+  };
+
+  // Use this function get pool data for a specified yield token.
+  const getPoolDataForToken = (_tokenAddress: string) => {
+    const _swapTokenAddress = defaultSwapTokenAddress;
+    const poolTokens = [_tokenAddress, _swapTokenAddress];
+
+    const { loading, error, data } = useQuery(
+      POOL(JSON.stringify(poolTokens)),
+      {
+        skip: !poolTokens,
+        context: { clientName: "BALANCER" },
+        pollInterval: 5000,
+      }
+    );
+
+    if (error) {
+      console.error(`Apollo client failed to fetch graph data:`, error);
+    }
+    if (!loading && data && _tokenAddress && _swapTokenAddress) {
+      const poolData = data.pools[0];
+
+      const shareHolders: SharesState = {};
+      poolData.shares.forEach((share: SharesQuery) => {
+        if (!shareHolders[share.userAddress.id]) {
+          shareHolders[share.userAddress.id] = share.balance;
+        }
+      });
+
+      const pool = {
+        exitsCount: Number(poolData.exitsCount),
+        joinsCount: Number(poolData.joinsCount),
+        swapsCount: Number(poolData.swapsCount),
+        liquidity: Number(poolData.liquidity),
+        swapFeePct: Number(poolData.swapFee) * 100,
+        tokenBalanceEmp: Number(
+          poolData.tokens.find(
+            (t: PoolTokenQuery) => t.address === _tokenAddress
+          ).balance
+        ),
+        tokenBalanceOther: Number(
+          poolData.tokens.find(
+            (t: PoolTokenQuery) => t.address === _swapTokenAddress
+          ).balance
+        ),
+        totalSwapVolume: Number(poolData.totalSwapVolume),
+      };
+
+      let userSharesFraction = 0;
+      if (address !== null && shareHolders !== null) {
+        const user = Object.keys(shareHolders).find(
+          (shareholder: string) => shareholder === address
+        );
+        const userShares = user ? Number(shareHolders[user]) : 0;
+        const totalShares = Number(poolData.totalShares);
+        if (totalShares > 0) {
+          userSharesFraction = userShares / totalShares;
+        }
+      }
+
+      return {
+        shareHolders,
+        pool,
+        userSharesFraction,
+      };
+    }
+  };
+
   // Change state when emp changes or when the graphQL data changes due to polling.
   useEffect(() => {
     initializeTokenAddress();
@@ -207,6 +292,9 @@ const useBalancer = () => {
     shares,
     userShareFraction,
     isYieldToken,
+    YIELD_TOKENS,
+    getPoolDataForToken,
+    getTokenPrice,
   };
 };
 

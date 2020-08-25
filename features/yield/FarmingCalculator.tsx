@@ -15,7 +15,33 @@ const WEEKS_PER_YEAR = 52;
 const WEEKLY_UMA_REWARDS = 25000;
 
 const FarmingCalculator = () => {
-  const { usdPrice, pool, userShareFraction } = Balancer.useContainer();
+  const {
+    usdPrice,
+    getTokenPrice,
+    getPoolDataForToken,
+    YIELD_TOKENS,
+  } = Balancer.useContainer();
+
+  // Farming calculations for rolling between yUSD pools
+  const octPrice = getTokenPrice(YIELD_TOKENS[1].toLowerCase());
+  const sept20PoolData = getPoolDataForToken(YIELD_TOKENS[0].toLowerCase());
+  const oct20PoolData = getPoolDataForToken(YIELD_TOKENS[1].toLowerCase());
+  const cutOffDateForRoll = Date.UTC(2020, 7, 28, 23, 0, 0, 0);
+  const currentDate = new Date();
+  const currentDateUTC = Date.UTC(
+    currentDate.getUTCFullYear(),
+    currentDate.getUTCMonth(),
+    currentDate.getUTCDate(),
+    currentDate.getUTCHours(),
+    currentDate.getUTCMinutes(),
+    currentDate.getUTCSeconds(),
+    currentDate.getUTCMilliseconds()
+  );
+  const timeRemainingToFarmingRoll =
+    cutOffDateForRoll.valueOf() - currentDateUTC.valueOf();
+  const isRolled = timeRemainingToFarmingRoll <= 0;
+  const hoursRemainingToFarmingRoll =
+    timeRemainingToFarmingRoll / 1000 / 60 / 60;
 
   // Yield inputs:
   const [umaPrice, setUmaPrice] = useState<string>("");
@@ -31,10 +57,20 @@ const FarmingCalculator = () => {
   const [apr, setApr] = useState<string>("");
 
   async function setDefaultValues() {
-    if (usdPrice !== null && pool !== null) {
-      setyUSDPrice(usdPrice.toString());
-      setPoolLiquidity(pool.liquidity.toString());
+    if (octPrice && oct20PoolData && sept20PoolData) {
+      // Note: usdPrice should be a combination of the two pools prior to Aug 28 but the error is small
+      // so we will hardcode this to the Oct price.
+      setyUSDPrice(octPrice.toString());
       setUmaPrice(await getUmaPrice());
+      if (!isRolled) {
+        setPoolLiquidity(
+          (
+            oct20PoolData.pool.liquidity + sept20PoolData.pool.liquidity
+          ).toString()
+        );
+      } else {
+        setPoolLiquidity(oct20PoolData.pool.liquidity.toString());
+      }
     }
   }
 
@@ -76,17 +112,32 @@ const FarmingCalculator = () => {
   // Update state whenever container data changes.
   useEffect(() => {
     setDefaultValues();
-  }, [usdPrice, pool]);
+  }, [octPrice, sept20PoolData, oct20PoolData]);
 
   // Update pool ownership whenever user changes.
   useEffect(() => {
-    if (userShareFraction !== null && pool !== null) {
-      const yUSDShare = pool.tokenBalanceEmp * userShareFraction;
-      const USDCShare = pool.tokenBalanceOther * userShareFraction;
-      setyUSDAdded(yUSDShare.toString());
-      setUSDCAdded(USDCShare.toString());
+    if (
+      sept20PoolData &&
+      oct20PoolData &&
+      yUSDAdded === "" &&
+      USDCAdded === ""
+    ) {
+      const userShareFractionSept = sept20PoolData.userSharesFraction;
+      const yUSDShareSept =
+        sept20PoolData.pool.tokenBalanceEmp * userShareFractionSept;
+      const USDCShareSept =
+        sept20PoolData.pool.tokenBalanceOther * userShareFractionSept;
+
+      const userShareFractionOct = oct20PoolData.userSharesFraction;
+      const yUSDShareOct =
+        oct20PoolData.pool.tokenBalanceEmp * userShareFractionOct;
+      const USDCShareOct =
+        oct20PoolData.pool.tokenBalanceOther * userShareFractionOct;
+
+      setyUSDAdded((yUSDShareSept + yUSDShareOct).toString());
+      setUSDCAdded((USDCShareSept + USDCShareOct).toString());
     }
-  }, [userShareFraction, pool]);
+  }, [sept20PoolData, oct20PoolData]);
 
   // Update yield amount whenever inputs change.
   useEffect(() => {
@@ -109,9 +160,11 @@ const FarmingCalculator = () => {
   return (
     <span>
       <Typography variant="h5">UMA Liquidity Mining</Typography>
+
+      <br></br>
       <Typography>
         During the liquidity mining program 25k UMA rewards will be paid out to
-        LP providers in the yUSD balancer pool. Rewards are calculated as a
+        LP providers in certain yUSD balancer pools. Rewards are calculated as a
         pro-rata contribution to the liquidity pool. To learn more about the
         liquidity mining program see UMA Medium post{" "}
         <a
@@ -122,6 +175,33 @@ const FarmingCalculator = () => {
           here
         </a>
         .
+      </Typography>
+
+      <br></br>
+      <br></br>
+      <Typography>
+        <strong>Update (08/24 @ 23:00 UTC):</strong> Before August 28th, 23:00
+        UTC, LP contributions to either the yUSD-SEP20 or the yUSD-OCT20 are
+        considered equally. What this means is that UMA rewards are granted
+        pro-rata as: (your USD contribution) / (total SEP20 liquidity + total
+        OCT20 liquidity). After August 28, 23:00 UTC, only LP contributions in
+        the OCT20 pool will count towards liquidity mining rewards.
+      </Typography>
+
+      <br></br>
+      <br></br>
+      <Typography>
+        <strong>Pools eligible for liquidity mining:</strong>{" "}
+        {isRolled ? "OCT" : "SEPT + OCT"}
+        <br></br>
+        <strong>
+          Hours remaining until liquidity mining rolls to OCT:
+        </strong>{" "}
+        {Math.max(hoursRemainingToFarmingRoll, 0).toFixed(2)}
+        <br></br>
+        <strong>Total liquidity eligible for mining rewards:</strong> $
+        {Number(poolLiquidity).toLocaleString()}
+        <br></br>
       </Typography>
 
       <Box pt={2}>
