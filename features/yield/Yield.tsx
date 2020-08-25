@@ -57,6 +57,14 @@ const Yield = () => {
             >
               here
             </a>
+            , and to learn about rolling between expiries see the article{" "}
+            <a
+              href="https://medium.com/uma-project/umas-liquidity-mining-pilot-retro-and-rollover-e1ba8614339"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              here
+            </a>
             .
           </Typography>
         </Box>

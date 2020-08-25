@@ -5,6 +5,7 @@ import { useQuery } from "@apollo/client";
 import { TOKENS, POOL } from "../apollo/balancer/queries";
 
 import Connection from "./Connection";
+import Token from "./Token";
 
 interface PoolState {
   exitsCount: number;
@@ -32,14 +33,39 @@ interface PoolTokenQuery {
   balance: string;
 }
 
+const YIELD_TOKENS = [
+  "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5", // Sep20
+  "0xB2FdD60AD80ca7bA89B9BAb3b5336c2601C020b4", // Oct20
+];
+
 const useBalancer = () => {
   const { address, block$ } = Connection.useContainer();
+  const { address: tokenAddress } = Token.useContainer();
 
-  // In the future, detect the EMP address dynamically. But, for now we are only going to load data for the yUSD pool.
-  // I am hardcoding these for now so that this component can be rendered without the user having to select an EMP.
-  const empAddress = "0x81ab848898b5ffd3354dbbefb333d5d183eedcb5";
+  // Detect if selected token is a yield token, otherwise default to a yield token. This component
+  // does not make sense for a non yield token.
+  const defaultTokenAddress = "0x81ab848898b5ffd3354dbbefb333d5d183eedcb5";
   const usdcAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
-  const poolTokensList = [empAddress, usdcAddress];
+  const defaultSwapTokenAddress = usdcAddress;
+
+  const [selectedTokenAddress, setSelectedTokenAddress] = useState<
+    string | null
+  >(defaultTokenAddress);
+  const [selectedSwapTokenAddress, setSelectedSwapTokenAddress] = useState<
+    string | null
+  >(defaultSwapTokenAddress);
+  const [poolTokenList, setPoolTokenList] = useState<string[] | null>([
+    defaultTokenAddress,
+    defaultSwapTokenAddress,
+  ]);
+
+  const [usdPrice, setUsdPrice] = useState<number | null>(null);
+  const [poolAddress, setPoolAddress] = useState<string | null>(null);
+  const [pool, setPool] = useState<PoolState | null>(null);
+  const [shares, setShares] = useState<SharesState | null>(null);
+  const [userShareFraction, setUserSharesFraction] = useState<number | null>(
+    null
+  );
 
   // Because apollo caches results of queries, we will poll/refresh this query periodically.
   // We set the poll interval to a very slow 5 seconds for now since the position states
@@ -50,25 +76,41 @@ const useBalancer = () => {
     error: tokenPriceError,
     data: tokenPriceData,
   } = useQuery(TOKENS, {
+    skip: !selectedTokenAddress,
     context: { clientName: "BALANCER" },
-    variables: { tokenId: empAddress.toLowerCase() },
+    variables: { tokenId: selectedTokenAddress },
     pollInterval: 5000,
   });
   const { loading: poolLoading, error: poolError, data: poolData } = useQuery(
-    POOL(JSON.stringify(poolTokensList.map((token) => token.toLowerCase()))),
+    POOL(JSON.stringify(poolTokenList)),
     {
+      skip: !poolTokenList,
       context: { clientName: "BALANCER" },
       pollInterval: 5000,
     }
   );
 
-  const [usdPrice, setUsdPrice] = useState<number | null>(null);
-  const [poolAddress, setPoolAddress] = useState<string | null>(null);
-  const [pool, setPool] = useState<PoolState | null>(null);
-  const [shares, setShares] = useState<SharesState | null>(null);
-  const [userShareFraction, setUserSharesFraction] = useState<number | null>(
-    null
-  );
+  const initializeTokenAddress = () => {
+    setSelectedTokenAddress(null);
+    setSelectedSwapTokenAddress(null);
+    setPoolTokenList(null);
+
+    if (tokenAddress !== null) {
+      setSelectedSwapTokenAddress(defaultSwapTokenAddress);
+
+      const IS_YIELD_TOKEN = YIELD_TOKENS.includes(tokenAddress);
+      if (IS_YIELD_TOKEN) {
+        setSelectedTokenAddress(tokenAddress.toLowerCase());
+        setPoolTokenList([tokenAddress.toLowerCase(), defaultSwapTokenAddress]);
+      } else {
+        setSelectedTokenAddress(YIELD_TOKENS[0].toLowerCase());
+        setPoolTokenList([
+          YIELD_TOKENS[0].toLowerCase(),
+          defaultSwapTokenAddress,
+        ]);
+      }
+    }
+  };
 
   const queryTokenData = () => {
     setUsdPrice(null);
@@ -97,7 +139,12 @@ const useBalancer = () => {
     if (poolError) {
       console.error(`Apollo client failed to fetch graph data:`, poolError);
     }
-    if (!poolLoading && poolData) {
+    if (
+      !poolLoading &&
+      poolData &&
+      selectedTokenAddress &&
+      selectedSwapTokenAddress
+    ) {
       const data = poolData.pools[0];
 
       const shareHolders: SharesState = {};
@@ -115,12 +162,14 @@ const useBalancer = () => {
         liquidity: Number(data.liquidity),
         swapFeePct: Number(data.swapFee) * 100,
         tokenBalanceEmp: Number(
-          data.tokens.find((t: PoolTokenQuery) => t.address === empAddress)
-            .balance
+          data.tokens.find(
+            (t: PoolTokenQuery) => t.address === selectedTokenAddress
+          ).balance
         ),
         tokenBalanceOther: Number(
-          data.tokens.find((t: PoolTokenQuery) => t.address === usdcAddress)
-            .balance
+          data.tokens.find(
+            (t: PoolTokenQuery) => t.address === selectedSwapTokenAddress
+          ).balance
         ),
         totalSwapVolume: Number(data.totalSwapVolume),
       });
@@ -140,20 +189,22 @@ const useBalancer = () => {
 
   // Change state when emp changes or when the graphQL data changes due to polling.
   useEffect(() => {
+    initializeTokenAddress();
     queryTokenData();
     queryPoolData();
-  }, [tokenPriceData, tokenPriceLoading, poolData, poolLoading, address]);
+  }, [address, selectedTokenAddress, tokenAddress]);
 
   // get info on each new block
   useEffect(() => {
     if (block$) {
       const sub = block$.subscribe(() => {
+        initializeTokenAddress();
         queryPoolData();
         queryTokenData();
       });
       return () => sub.unsubscribe();
     }
-  }, [block$, address]);
+  }, [block$, address, selectedTokenAddress, tokenAddress]);
 
   return {
     pool,

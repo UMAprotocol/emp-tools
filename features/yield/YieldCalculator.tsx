@@ -72,7 +72,7 @@ const YieldCalculator = () => {
   // Update state whenever EMP selection changes.
   useEffect(() => {
     setDefaultValues();
-  }, [empState]);
+  }, [empState, usdPrice]);
 
   // Update yield amount whenever inputs change.
   useEffect(() => {
