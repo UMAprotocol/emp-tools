@@ -44,7 +44,6 @@ const useBalancer = () => {
 
   // Detect if selected token is a yield token, otherwise default to a yield token. This component
   // does not make sense for a non yield token.
-  const defaultTokenAddress = YIELD_TOKENS[0].toLowerCase();
   const usdcAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
   const defaultSwapTokenAddress = usdcAddress;
 
@@ -98,6 +97,7 @@ const useBalancer = () => {
         setSelectedTokenAddress(tokenAddress.toLowerCase());
         setPoolTokenList([tokenAddress.toLowerCase(), defaultSwapTokenAddress]);
       } else {
+        const defaultTokenAddress = YIELD_TOKENS[0].toLowerCase();
         setSelectedTokenAddress(defaultTokenAddress);
         setPoolTokenList([defaultTokenAddress, defaultSwapTokenAddress]);
       }
