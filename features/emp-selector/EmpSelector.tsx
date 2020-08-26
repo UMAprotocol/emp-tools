@@ -9,6 +9,7 @@ import {
   Select,
 } from "@material-ui/core";
 import { withStyles, useTheme } from "@material-ui/core/styles";
+
 import useEmpList from "./useEmpList";
 import EmpAddress from "../../containers/EmpAddress";
 import Connection from "../../containers/Connection";
@@ -37,6 +38,7 @@ const FormWrapper = styled(FormControl)`
 const EmpSelector = () => {
   const theme = useTheme();
   const largeScreen = useMediaQuery(theme.breakpoints.up("sm"));
+
   const { signer } = Connection.useContainer();
   const { empAddress, setEmpAddress } = EmpAddress.useContainer();
   const { emps, loading } = useEmpList();
@@ -55,7 +57,6 @@ const EmpSelector = () => {
     <Box py={2}>
       <FormWrapper>
         <Select
-          style={{ marginTop: "8px" }}
           value={noEmpsOrLoading || empAddress === null ? 0 : empAddress}
           onChange={handleChange}
           input={<BootstrapInput />}
