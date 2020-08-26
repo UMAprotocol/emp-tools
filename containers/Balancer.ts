@@ -124,12 +124,7 @@ const useBalancer = () => {
     if (poolError) {
       console.error(`Apollo client failed to fetch graph data:`, poolError);
     }
-    if (
-      !poolLoading &&
-      poolData &&
-      selectedTokenAddress &&
-      selectedSwapTokenAddress
-    ) {
+    if (!poolLoading && poolData) {
       const data = poolData.pools[0];
 
       const shareHolders: SharesState = {};
@@ -260,30 +255,36 @@ const useBalancer = () => {
   // Change state when emp changes or when the graphQL data changes due to polling.
   useEffect(() => {
     initializeTokenAddress();
-
-    if (selectedTokenAddress) {
-      queryTokenData();
-    }
-    if (poolTokenList) {
-      queryPoolData();
-    }
-  }, [address, selectedTokenAddress, tokenAddress]);
+    queryTokenData();
+    queryPoolData();
+  }, [
+    address,
+    tokenAddress,
+    tokenPriceLoading,
+    tokenPriceData,
+    poolData,
+    poolLoading,
+  ]);
 
   // get info on each new block
   useEffect(() => {
     if (block$) {
       const sub = block$.subscribe(() => {
         initializeTokenAddress();
-        if (selectedTokenAddress) {
-          queryTokenData();
-        }
-        if (poolTokenList) {
-          queryPoolData();
-        }
+        queryTokenData();
+        queryPoolData();
       });
       return () => sub.unsubscribe();
     }
-  }, [block$, address, selectedTokenAddress, tokenAddress]);
+  }, [
+    block$,
+    tokenAddress,
+    address,
+    tokenPriceLoading,
+    tokenPriceData,
+    poolData,
+    poolLoading,
+  ]);
 
   return {
     pool,

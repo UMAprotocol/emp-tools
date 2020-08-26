@@ -16,7 +16,6 @@ const WEEKLY_UMA_REWARDS = 25000;
 
 const FarmingCalculator = () => {
   const {
-    usdPrice,
     getTokenPrice,
     getPoolDataForToken,
     YIELD_TOKENS,
