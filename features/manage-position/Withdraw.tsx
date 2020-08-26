@@ -86,7 +86,7 @@ const Deposit = () => {
     priceIdentifier !== null &&
     collSymbol !== null &&
     tokenSymbol !== null &&
-    posCollString !== "0" // If position has no collateral, then don't render withdraw component.
+    Number(posCollString) > 0 // If position has no collateral, then don't render withdraw component.
   ) {
     const collateralToWithdraw = Number(collateral) || 0;
     const collReqFromWei = parseFloat(fromWei(collReq, collDec));

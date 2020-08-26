@@ -63,7 +63,7 @@ const Deposit = () => {
     priceIdentifier !== null &&
     tokenSymbol !== null &&
     collSymbol !== null &&
-    posCollString !== "0" // If position has no collateral, then don't render deposit component.
+    Number(posCollString) > 0 // If position has no collateral, then don't render deposit component.
   ) {
     const collateralToDeposit = Number(collateral) || 0;
     const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
