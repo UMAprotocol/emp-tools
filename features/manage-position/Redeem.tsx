@@ -63,7 +63,7 @@ const Redeem = () => {
     tokenAllowance !== null &&
     emp !== null &&
     pendingWithdraw !== null &&
-    posCollString !== "0" // If position has no collateral, then don't render redeem component.
+    Number(posCollString) > 0 // If position has no collateral, then don't render redeem component.
   ) {
     const hasPendingWithdraw = pendingWithdraw === "Yes";
     const posTokens = Number(posTokensString);
