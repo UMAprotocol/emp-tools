@@ -8,6 +8,7 @@ import {
   Tabs,
   Hidden,
   Button,
+  IconButton,
   Menu,
   MenuItem,
   Grid,
@@ -21,6 +22,8 @@ import EmpSelector from "../features/emp-selector/EmpSelector";
 import AllPositions from "../features/all-positions/AllPositions";
 import Weth from "../features/weth/Weth";
 import Yield from "../features/yield/Yield";
+
+import GitHubIcon from "@material-ui/icons/GitHub";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -160,6 +163,13 @@ export default function Index() {
         {tabIndex === 4 && <Yield />}
       </Box>
       <Box py={4} textAlign="center">
+        <IconButton
+          style={{ marginRight: `8px` }}
+          target="_blank"
+          href="https://github.com/UMAprotocol/emp-tools"
+        >
+          <GitHubIcon />
+        </IconButton>
         <a
           href="https://vercel.com/?utm_source=uma%2Femp-tools"
           target="_blank"
