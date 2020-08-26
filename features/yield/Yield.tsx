@@ -8,6 +8,7 @@ import BalancerData from "./BalancerData";
 import FarmingCalculator from "./FarmingCalculator";
 
 import Connection from "../../containers/Connection";
+import Balancer from "../../containers/Balancer";
 
 const OutlinedContainer = styled.div`
   padding: 1rem;
@@ -16,6 +17,7 @@ const OutlinedContainer = styled.div`
 
 const Yield = () => {
   const { network } = Connection.useContainer();
+  const { isYieldToken } = Balancer.useContainer();
 
   const [dialogTabIndex, setDialogTabIndex] = useState<string>(
     "farming-calculator"
@@ -27,11 +29,14 @@ const Yield = () => {
     setDialogTabIndex(newAlignment);
   };
 
-  if (network === null || network.chainId !== 1) {
+  if (network === null || network.chainId !== 1 || !isYieldToken) {
     return (
       <Box py={2}>
         <Typography>
-          <i>Please first connect and set your network to Mainnet.</i>
+          <i>
+            Please first connect and set your network to Mainnet, and then
+            select a yield token (i.e. yUSD).
+          </i>
         </Typography>
       </Box>
     );
@@ -52,6 +57,14 @@ const Yield = () => {
             more about yUSD see the UMA Medium post{" "}
             <a
               href="https://medium.com/uma-project/the-yield-dollar-on-uma-3a492e79069f"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              here
+            </a>
+            , and to learn about rolling between expiries see the article{" "}
+            <a
+              href="https://medium.com/uma-project/umas-liquidity-mining-pilot-retro-and-rollover-e1ba8614339"
               target="_blank"
               rel="noopener noreferrer"
             >
