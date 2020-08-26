@@ -95,6 +95,14 @@ const PositionActionsDialog = (props: DialogProps) => {
   const { activeSponsors } = EmpSponsors.useContainer();
   const [tabIndex, setTabIndex] = useState<string>("deposit");
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
+
+  const [
+    minCollPerTokenToBeProfitable,
+    setMinCollPerTokenToBeProfitable,
+  ] = useState<string>("");
+  const [maxCollPerTokenToBeValid, setMaxCollPerTokenToBeValid] = useState<
+    string
+  >("");
   const [minCollPerToken, setMinCollPerToken] = useState<string>("");
   const [maxCollPerToken, setMaxCollPerToken] = useState<string>("");
   const [maxTokensToLiquidate, setMaxTokensToLiquidate] = useState<string>("");
@@ -130,6 +138,10 @@ const PositionActionsDialog = (props: DialogProps) => {
       const _maxCollPerTokenToBeValid =
         latestPrice * parseFloat(fromWei(collReq));
 
+      setMinCollPerTokenToBeProfitable(
+        _minCollPerTokenToBeProfitable.toFixed(10)
+      );
+      setMaxCollPerTokenToBeValid(_maxCollPerTokenToBeValid.toFixed(10));
       setMinCollPerToken(_minCollPerTokenToBeProfitable.toFixed(10));
       setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(10));
     }
@@ -198,14 +210,16 @@ const PositionActionsDialog = (props: DialogProps) => {
       pendingWithdrawTimeRemaining
     );
 
-    const underCollateralizedPrice =
+    const collRatio =
       Number(sponsorPosition.collateral) === 0 ||
-      Number(sponsorPosition.tokensOutstanding) === 0 ||
-      Number(collReq) === 0
+      Number(sponsorPosition.tokensOutstanding) === 0
         ? 0
         : Number(sponsorPosition.collateral) /
-          (Number(sponsorPosition.tokensOutstanding) *
-            parseFloat(fromWei(collReq)));
+          Number(sponsorPosition.tokensOutstanding);
+    const underCollateralizedPrice =
+      collRatio === 0 || Number(collReq) === 0
+        ? 0
+        : collRatio / parseFloat(fromWei(collReq));
 
     const underCollateralizedPercent =
       Number(latestPrice) === 0
@@ -318,6 +332,7 @@ const PositionActionsDialog = (props: DialogProps) => {
       }
     };
 
+    console.log(Number(minCollPerToken), minCollPerTokenToBeProfitable);
     return (
       <Dialog open={props.isDialogShowing} onClose={props.handleClose}>
         <PositionDialog>
@@ -466,7 +481,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                               <br></br>
                               <strong>Note:</strong> You will need to sign two
                               transactions one to approve {collSymbol} and a
-                              second to preform the deposit.
+                              second to perform the deposit.
                             </Typography>
                           )}
                         </Box>
@@ -489,19 +504,69 @@ const PositionActionsDialog = (props: DialogProps) => {
                           price.
                           <br></br>
                           <br></br>
+                          <Status>
+                            <Label>Current collateral/token ratio: </Label>
+                            {collRatio.toFixed(4)}
+                          </Status>
+                          <Status>
+                            <Label>Minimum profitable ratio: </Label>
+                            {minCollPerTokenToBeProfitable}
+                          </Status>
+                          <Status>
+                            <Label>Maximum liquidatable ratio: </Label>
+                            {maxCollPerTokenToBeValid}
+                          </Status>
                         </Typography>
-                        <Important>
-                          Exercise caution! Incorrectly liquidating a position
-                          can lose you money! See the{" "}
-                          <a
-                            href={DOCS_MAP.FINAL_FEE}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            UMA docs
-                          </a>
-                          .
-                        </Important>
+                        {Number(minCollPerToken) <
+                          Number(minCollPerTokenToBeProfitable) && (
+                          <>
+                            <br></br>
+                            <br></br>
+                            <Important>
+                              Liquidating a position whose collateral ratio is
+                              below {minCollPerTokenToBeProfitable} would not be
+                              profitable using the estimated{" "}
+                              {utils.parseBytes32String(priceId)} price. This is
+                              because you must burn synthetic tokens in order to
+                              liquidate underlying collateral, and we estimate
+                              that each {tokenSymbol} is worth{" "}
+                              {latestPrice.toFixed(4)} of the collateral{" "}
+                              {collSymbol}. See the{" "}
+                              <a
+                                href={DOCS_MAP.FINAL_FEE}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                UMA docs
+                              </a>
+                              .
+                            </Important>
+                          </>
+                        )}
+                        {Number(maxCollPerToken) >
+                          Number(maxCollPerTokenToBeValid) && (
+                          <>
+                            <br></br>
+                            <br></br>
+                            <Important>
+                              Liquidating a position whose collateral ratio is
+                              greater than {maxCollPerTokenToBeValid} would get
+                              disputed using the estimated{" "}
+                              {utils.parseBytes32String(priceId)} price of{" "}
+                              {latestPrice.toFixed(4)} and the collateral
+                              requirement of {parseFloat(fromWei(collReq))}. See
+                              the{" "}
+                              <a
+                                href={DOCS_MAP.FINAL_FEE}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                UMA docs
+                              </a>
+                              .
+                            </Important>
+                          </>
+                        )}
                         <Box pt={2} pb={2}>
                           <Grid container spacing={4}>
                             <Grid item xs={6}>
@@ -511,6 +576,13 @@ const PositionActionsDialog = (props: DialogProps) => {
                                 inputProps={{ min: "0" }}
                                 label={`Min collateral/token`}
                                 value={minCollPerToken}
+                                error={collRatio < Number(minCollPerToken)}
+                                helperText={
+                                  collRatio < Number(minCollPerToken) &&
+                                  `Current collateral ratio of ${collRatio.toFixed(
+                                    4
+                                  )} is below the specified minimum ratio, transaction will revert.`
+                                }
                                 onChange={(
                                   e: React.ChangeEvent<HTMLInputElement>
                                 ) => setMinCollPerToken(e.target.value)}
@@ -523,6 +595,13 @@ const PositionActionsDialog = (props: DialogProps) => {
                                 inputProps={{ min: "0" }}
                                 label={`Max collateral/token`}
                                 value={maxCollPerToken}
+                                error={collRatio > Number(maxCollPerToken)}
+                                helperText={
+                                  collRatio > Number(maxCollPerToken) &&
+                                  `Current collateral ratio of ${collRatio.toFixed(
+                                    4
+                                  )} is above the specified maximum ratio, transaction will revert.`
+                                }
                                 onChange={(
                                   e: React.ChangeEvent<HTMLInputElement>
                                 ) => setMaxCollPerToken(e.target.value)}
@@ -585,7 +664,9 @@ const PositionActionsDialog = (props: DialogProps) => {
                                 maxTokensToLiquidate &&
                                 deadline &&
                                 !collBalanceTooLow() &&
-                                !tokenBalanceTooLow
+                                !tokenBalanceTooLow &&
+                                collRatio >= Number(minCollPerToken) &&
+                                collRatio <= Number(maxCollPerToken)
                               )
                             }
                           >{`Submit liquidation`}</Button>
