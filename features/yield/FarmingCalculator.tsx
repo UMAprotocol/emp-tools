@@ -15,7 +15,12 @@ const WEEKS_PER_YEAR = 52;
 const WEEKLY_UMA_REWARDS = 25000;
 
 const FarmingCalculator = () => {
-  const { usdPrice, pool, userShareFraction } = Balancer.useContainer();
+  const {
+    usdPrice,
+    pool,
+    userShareFraction,
+    poolAddress,
+  } = Balancer.useContainer();
 
   // Yield inputs:
   const [umaPrice, setUmaPrice] = useState<string>("");
@@ -190,7 +195,9 @@ const FarmingCalculator = () => {
             <i>also</i> yield BAL rewards over and above UMA. To calculate your
             BAL rewards use{" "}
             <a
-              href="https://www.predictions.exchange/balancer/None"
+              href={`https://pools.vision/pool/${
+                poolAddress ? poolAddress : ""
+              }`}
               target="_blank"
               rel="noopener noreferrer"
             >
