@@ -19,6 +19,7 @@ const FarmingCalculator = () => {
     getTokenPrice,
     getPoolDataForToken,
     YIELD_TOKENS,
+    poolAddress,
   } = Balancer.useContainer();
 
   // Farming calculations for rolling between yUSD pools
@@ -269,7 +270,9 @@ const FarmingCalculator = () => {
             <i>also</i> yield BAL rewards over and above UMA. To calculate your
             BAL rewards use{" "}
             <a
-              href="https://www.predictions.exchange/balancer/None"
+              href={`https://pools.vision/pool/${
+                poolAddress ? poolAddress : ""
+              }`}
               target="_blank"
               rel="noopener noreferrer"
             >
