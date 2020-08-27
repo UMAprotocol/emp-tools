@@ -588,7 +588,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                               <TextField
                                 fullWidth
                                 type="number"
-                                inputProps={{ min: "0" }}
+                                inputProps={{ min: "0", step: collRatio / 100 }}
                                 label={`Min collateral/token`}
                                 value={minCollPerToken}
                                 error={collRatio < minCollPerTokenNum}
@@ -607,7 +607,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                               <TextField
                                 fullWidth
                                 type="number"
-                                inputProps={{ min: "0" }}
+                                inputProps={{ min: "0", step: collRatio / 100 }}
                                 label={`Max collateral/token`}
                                 value={maxCollPerToken}
                                 error={collRatio > maxCollPerTokenNum}
