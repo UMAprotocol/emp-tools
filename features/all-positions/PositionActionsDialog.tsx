@@ -116,7 +116,8 @@ const PositionActionsDialog = (props: DialogProps) => {
     if (
       props.selectedSponsor !== null &&
       latestPrice !== null &&
-      collReq !== null
+      collReq !== null &&
+      tokenBalance !== null
     ) {
       const sponsorPosition = activeSponsors[props.selectedSponsor];
 
@@ -146,12 +147,17 @@ const PositionActionsDialog = (props: DialogProps) => {
       setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(10));
 
       // Set max tokens to liquidate as full position size.
-      setMaxTokensToLiquidate(sponsorPosition.tokensOutstanding);
+      setMaxTokensToLiquidate(
+        Math.min(
+          Number(sponsorPosition.tokensOutstanding),
+          tokenBalance
+        ).toString()
+      );
     }
 
     // Set liquidation transaction deadline to a reasonable 30 mins to wait for it to be mined.
     setDeadline((30 * 60).toString());
-  }, [props.selectedSponsor, latestPrice, collReq]);
+  }, [props.selectedSponsor, latestPrice, collReq, tokenBalance]);
 
   const setDialogTab = (
     event: MouseEvent<HTMLElement>,
