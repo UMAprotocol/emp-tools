@@ -27,7 +27,6 @@ import Yield from "../features/yield/Yield";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import DiscordIcon from "../public/discord.svg";
 import TwitterIcon from "../public/twitter.svg";
-import VercelIcon from "../public/vercel.svg";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
