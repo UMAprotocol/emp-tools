@@ -144,6 +144,9 @@ const PositionActionsDialog = (props: DialogProps) => {
       setMaxCollPerTokenToBeValid(_maxCollPerTokenToBeValid.toFixed(10));
       setMinCollPerToken(_minCollPerTokenToBeProfitable.toFixed(10));
       setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(10));
+
+      // Set max tokens to liquidate as full position size.
+      setMaxTokensToLiquidate(sponsorPosition.tokensOutstanding);
     }
 
     // Set liquidation transaction deadline to a reasonable 30 mins to wait for it to be mined.
@@ -244,6 +247,10 @@ const PositionActionsDialog = (props: DialogProps) => {
     };
 
     const tokenBalanceTooLow = tokenBalance < maxTokensToLiquidateNum;
+    const positionTokensOutstanding =
+      Number(sponsorPosition.tokensOutstanding) || 0;
+    const tokensToLiquidateInvalid =
+      maxTokensToLiquidateNum > positionTokensOutstanding;
 
     const needCollateralAllowance = () => {
       if (tabIndex == "deposit") {
@@ -306,7 +313,11 @@ const PositionActionsDialog = (props: DialogProps) => {
     };
 
     const executeLiquidation = async () => {
-      if (!collBalanceTooLow() && !tokenBalanceTooLow) {
+      if (
+        !collBalanceTooLow() &&
+        !tokenBalanceTooLow &&
+        !tokensToLiquidateInvalid
+      ) {
         setHash(null);
         setSuccess(null);
         setError(null);
@@ -494,7 +505,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                     )}
                     {tabIndex === "liquidate" && (
                       <Box pt={2}>
-                        <Typography>
+                        <Typography component={"span"}>
                           <strong>Liquidate this sponsor</strong>
                           <br></br>For the position to be under collateralized{" "}
                           {utils.parseBytes32String(priceId)} would need to{" "}
@@ -615,12 +626,19 @@ const PositionActionsDialog = (props: DialogProps) => {
                               <TextField
                                 fullWidth
                                 type="number"
-                                inputProps={{ min: "0" }}
+                                inputProps={{
+                                  min: "0",
+                                  max: positionTokensOutstanding.toString(),
+                                }}
                                 label={`Max tokens to liquidate`}
-                                error={tokenBalanceTooLow}
+                                error={
+                                  tokenBalanceTooLow || tokensToLiquidateInvalid
+                                }
                                 helperText={
                                   tokenBalanceTooLow
                                     ? `${tokenSymbol} balance too low`
+                                    : tokensToLiquidateInvalid
+                                    ? `Invalid liquidation amount`
                                     : null
                                 }
                                 value={maxTokensToLiquidate}
