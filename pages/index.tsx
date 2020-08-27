@@ -12,7 +12,6 @@ import {
   Menu,
   MenuItem,
   Grid,
-  SvgIcon,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 
@@ -25,8 +24,7 @@ import Weth from "../features/weth/Weth";
 import Yield from "../features/yield/Yield";
 
 import GitHubIcon from "@material-ui/icons/GitHub";
-import DiscordIcon from "../public/discord.svg";
-import TwitterIcon from "../public/twitter.svg";
+import TwitterIcon from "@material-ui/icons/Twitter";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -177,22 +175,10 @@ export default function Index() {
         <IconButton
           style={{ marginRight: `8px` }}
           target="_blank"
-          href="https://discord.com/invite/jsb9XQJ"
-          size="medium"
-        >
-          <SvgIcon>
-            <DiscordIcon />
-          </SvgIcon>
-        </IconButton>
-        <IconButton
-          style={{ marginRight: `8px` }}
-          target="_blank"
           href="https://twitter.com/umaprotocol"
           size="medium"
         >
-          <SvgIcon>
-            <TwitterIcon />
-          </SvgIcon>
+          <TwitterIcon fontSize="inherit" />
         </IconButton>
         <a
           href="https://vercel.com/?utm_source=uma%2Femp-tools"
