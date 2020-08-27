@@ -520,18 +520,49 @@ const PositionActionsDialog = (props: DialogProps) => {
                           price.
                           <br></br>
                           <br></br>
-                          <Status>
-                            <Label>Current collateral/token ratio: </Label>
-                            {collRatio.toFixed(4)}
-                          </Status>
-                          <Status>
-                            <Label>Minimum profitable ratio: </Label>
-                            {minCollPerTokenToBeProfitable}
-                          </Status>
-                          <Status>
-                            <Label>Maximum liquidatable ratio: </Label>
-                            {maxCollPerTokenToBeValid}
-                          </Status>
+                          <Tooltip
+                            placement="top"
+                            title={`This can be calculated as (amount of collateral) divided by 
+                              (amount of tokens)`}
+                          >
+                            <Status>
+                              <Label>Current collateral/token ratio: </Label>
+                              {collRatio.toFixed(4)}
+                            </Status>
+                          </Tooltip>
+                          <Tooltip
+                            placement="top"
+                            title={`Liquidating a position whose collateral ratio is
+                              below ${minCollPerTokenToBeProfitable} would not be
+                              profitable using the estimated 
+                              ${utils.parseBytes32String(
+                                priceId
+                              )} price. This is
+                              because you must burn synthetic tokens in order to
+                              liquidate underlying collateral, and we estimate
+                              that each ${tokenSymbol} is worth
+                              ${latestPrice.toFixed(4)} of the collateral
+                              ${collSymbol}.`}
+                          >
+                            <Status>
+                              <Label>Minimum profitable ratio: </Label>
+                              {minCollPerTokenToBeProfitable}
+                            </Status>
+                          </Tooltip>
+                          <Tooltip
+                            placement="top"
+                            title={`Liquidating a position whose collateral ratio is
+                              greater than ${maxCollPerTokenToBeValid} would get
+                              disputed using the estimated
+                              ${utils.parseBytes32String(priceId)} price of 
+                              ${latestPrice.toFixed(4)} and the collateral
+                              requirement of ${parseFloat(fromWei(collReq))}.`}
+                          >
+                            <Status>
+                              <Label>Maximum liquidatable ratio: </Label>
+                              {maxCollPerTokenToBeValid}
+                            </Status>
+                          </Tooltip>
                         </Typography>
                         {minCollPerTokenNum <
                           minCollPerTokeToBeProfitablenNum && (
