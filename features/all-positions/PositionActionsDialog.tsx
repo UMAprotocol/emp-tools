@@ -184,6 +184,12 @@ const PositionActionsDialog = (props: DialogProps) => {
     collAllowance !== null &&
     priceId !== null
   ) {
+    const minCollPerTokenNum = Number(minCollPerToken) || 0;
+    const maxCollPerTokenNum = Number(maxCollPerToken) || 0;
+    const minCollPerTokeToBeProfitablenNum =
+      Number(minCollPerTokenToBeProfitable) || 0;
+    const maxCollPerTokenToBeValidNum = Number(maxCollPerTokenToBeValid) || 0;
+
     const sponsorPosition = activeSponsors[props.selectedSponsor];
 
     const collateralToDepositNum = Number(collateralToDeposit) || 0;
@@ -332,7 +338,6 @@ const PositionActionsDialog = (props: DialogProps) => {
       }
     };
 
-    console.log(Number(minCollPerToken), minCollPerTokenToBeProfitable);
     return (
       <Dialog open={props.isDialogShowing} onClose={props.handleClose}>
         <PositionDialog>
@@ -517,8 +522,8 @@ const PositionActionsDialog = (props: DialogProps) => {
                             {maxCollPerTokenToBeValid}
                           </Status>
                         </Typography>
-                        {Number(minCollPerToken) <
-                          Number(minCollPerTokenToBeProfitable) && (
+                        {minCollPerTokenNum <
+                          minCollPerTokeToBeProfitablenNum && (
                           <>
                             <br></br>
                             <br></br>
@@ -543,8 +548,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                             </Important>
                           </>
                         )}
-                        {Number(maxCollPerToken) >
-                          Number(maxCollPerTokenToBeValid) && (
+                        {maxCollPerTokenNum > maxCollPerTokenToBeValidNum && (
                           <>
                             <br></br>
                             <br></br>
@@ -576,9 +580,9 @@ const PositionActionsDialog = (props: DialogProps) => {
                                 inputProps={{ min: "0" }}
                                 label={`Min collateral/token`}
                                 value={minCollPerToken}
-                                error={collRatio < Number(minCollPerToken)}
+                                error={collRatio < minCollPerTokenNum}
                                 helperText={
-                                  collRatio < Number(minCollPerToken) &&
+                                  collRatio < minCollPerTokenNum &&
                                   `Current collateral ratio of ${collRatio.toFixed(
                                     4
                                   )} is below the specified minimum ratio, transaction will revert.`
@@ -595,9 +599,9 @@ const PositionActionsDialog = (props: DialogProps) => {
                                 inputProps={{ min: "0" }}
                                 label={`Max collateral/token`}
                                 value={maxCollPerToken}
-                                error={collRatio > Number(maxCollPerToken)}
+                                error={collRatio > maxCollPerTokenNum}
                                 helperText={
-                                  collRatio > Number(maxCollPerToken) &&
+                                  collRatio > maxCollPerTokenNum &&
                                   `Current collateral ratio of ${collRatio.toFixed(
                                     4
                                   )} is above the specified maximum ratio, transaction will revert.`
@@ -665,8 +669,8 @@ const PositionActionsDialog = (props: DialogProps) => {
                                 deadline &&
                                 !collBalanceTooLow() &&
                                 !tokenBalanceTooLow &&
-                                collRatio >= Number(minCollPerToken) &&
-                                collRatio <= Number(maxCollPerToken)
+                                collRatio >= minCollPerTokenNum &&
+                                collRatio <= maxCollPerTokenNum
                               )
                             }
                           >{`Submit liquidation`}</Button>
