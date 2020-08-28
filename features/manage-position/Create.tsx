@@ -71,6 +71,9 @@ const Create = () => {
   const [success, setSuccess] = useState<boolean | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
+  const collateralNum = Number(collateral) || 0;
+  const tokensNum = Number(tokens) || 0;
+
   const {
     collateralRequirement: collReq,
     minSponsorTokens,
@@ -78,20 +81,23 @@ const Create = () => {
   } = empState;
   const liquidationPriceWarningThreshold = 0.1;
 
-  useEffect(() => {
-    if (gcr !== null) {
-      setBackingCollateralToMin(gcr, Number(tokens));
-    }
-  }, [gcr, tokens]);
-
   const setBackingCollateralToMin = (_gcr: number, _tokens: number) => {
-    // By default set amount of collateral to the minimum required by the GCR constraint. This
-    // default is intended to encourage users to maximize their capital efficiency.
+    // Set amount of collateral to the minimum required by the GCR constraint. This
+    // is intended to encourage users to maximize their capital efficiency.
     const minBackingCollateral = _gcr * _tokens;
     // We want to round down the number for better UI display, but we don't actually want the collateral
     // amount to round down since we want the minimum amount of collateral to pass the GCR constraint. So,
     // we'll add a tiny amount of collateral to avoid accidentally rounding too low.
     setCollateral((minBackingCollateral + 0.00005).toFixed(4));
+  };
+
+  const setTokensToMax = (_gcr: number, collateral: number) => {
+    // Set amount of tokens to the maximum required by the GCR constraint. This
+    // is intended to encourage users to maximize their capital efficiency.
+    const maxTokensToCreate = _gcr > 0 ? collateral / _gcr : 0;
+    // Unlike the min collateral, we're ok if we round down the tokens slightly as round down
+    // can only increase the position's CR and maintain it above the GCR constraint
+    setTokens(maxTokensToCreate.toFixed(4));
   };
 
   if (
@@ -248,6 +254,23 @@ const Create = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setTokens(e.target.value)
                 }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip
+                        placement="top"
+                        title="Maximum amount of tokens with entered collateral"
+                      >
+                        <Button
+                          fullWidth
+                          onClick={() => setTokensToMax(gcr, collateralNum)}
+                        >
+                          <MinLink>Max</MinLink>
+                        </Button>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
             <Grid item md={4} sm={6} xs={12}>
@@ -269,14 +292,19 @@ const Create = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Button
-                        fullWidth
-                        onClick={() =>
-                          setBackingCollateralToMin(gcr, Number(tokens))
-                        }
+                      <Tooltip
+                        placement="top"
+                        title="Minimum amount of collateral with entered tokens"
                       >
-                        <MinLink>Min</MinLink>
-                      </Button>
+                        <Button
+                          fullWidth
+                          onClick={() =>
+                            setBackingCollateralToMin(gcr, tokensNum)
+                          }
+                        >
+                          <MinLink>Min</MinLink>
+                        </Button>
+                      </Tooltip>
                     </InputAdornment>
                   ),
                 }}
