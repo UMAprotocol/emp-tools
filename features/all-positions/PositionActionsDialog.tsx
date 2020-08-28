@@ -342,7 +342,10 @@ const PositionActionsDialog = (props: DialogProps) => {
           Number(maxCollPerToken).toFixed(6),
           collDecs
         );
-        const maxTokensToLiquidateWei = toWei(maxTokensToLiquidate, tokenDecs);
+        const maxTokensToLiquidateWei = toWei(
+          Number(maxTokensToLiquidate).toFixed(6),
+          tokenDecs
+        );
         const deadlineTimestamp = Math.floor(Date.now() / 1000) + deadline;
         try {
           if (needCollateralAllowance()) await setMaxCollateralAllowance();
