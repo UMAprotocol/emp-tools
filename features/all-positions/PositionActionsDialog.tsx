@@ -529,7 +529,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                           <Tooltip
                             placement="top"
                             title={`This can be calculated as (amount of collateral) divided by 
-                              (amount of tokens)`}
+                              (amount of tokens)`}.
                           >
                             <Status>
                               <Label>Current collateral/token ratio: </Label>
