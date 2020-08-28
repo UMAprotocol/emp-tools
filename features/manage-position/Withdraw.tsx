@@ -146,7 +146,10 @@ const Withdraw = () => {
         setSuccess(null);
         setError(null);
         try {
-          const collateralToWithdrawWei = toWei(collateral, collDec);
+          const collateralToWithdrawWei = toWei(
+            Number(collateral).toFixed(6),
+            collDec
+          );
           if (resultantCRBelowGCR) {
             const tx = await emp.requestWithdrawal([collateralToWithdrawWei]);
             setHash(tx.hash as string);

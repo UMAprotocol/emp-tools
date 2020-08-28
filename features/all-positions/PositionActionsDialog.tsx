@@ -302,7 +302,10 @@ const PositionActionsDialog = (props: DialogProps) => {
         setHash(null);
         setSuccess(null);
         setError(null);
-        const collateralToDepositWei = toWei(collateralToDeposit, collDecs);
+        const collateralToDepositWei = toWei(
+          Number(collateralToDeposit).toFixed(6),
+          collDecs
+        );
 
         try {
           if (needCollateralAllowance()) await setMaxCollateralAllowance();
@@ -331,8 +334,14 @@ const PositionActionsDialog = (props: DialogProps) => {
         setHash(null);
         setSuccess(null);
         setError(null);
-        const minCollPerTokenWei = toWei(minCollPerToken, collDecs);
-        const maxCollPerTokenWei = toWei(maxCollPerToken, collDecs);
+        const minCollPerTokenWei = toWei(
+          Number(minCollPerToken).toFixed(6),
+          collDecs
+        );
+        const maxCollPerTokenWei = toWei(
+          Number(maxCollPerToken).toFixed(6),
+          collDecs
+        );
         const maxTokensToLiquidateWei = toWei(maxTokensToLiquidate, tokenDecs);
         const deadlineTimestamp = Math.floor(Date.now() / 1000) + deadline;
         try {

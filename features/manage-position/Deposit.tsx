@@ -93,7 +93,10 @@ const Deposit = () => {
         setSuccess(null);
         setError(null);
         try {
-          const collateralToDepositWei = toWei(collateral, collDec);
+          const collateralToDepositWei = toWei(
+            Number(collateral).toFixed(6),
+            collDec
+          );
           const tx = await emp.deposit([collateralToDepositWei]);
           setHash(tx.hash as string);
           await tx.wait();
