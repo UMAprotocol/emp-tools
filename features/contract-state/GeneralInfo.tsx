@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { utils } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
+import AddressUtils from "./AddressUtils";
+
 import EmpState from "../../containers/EmpState";
 import Token from "../../containers/Token";
 import EmpContract from "../../containers/EmpContract";
@@ -104,18 +106,9 @@ const GeneralInfo = () => {
   ) {
     return (
       <Box>
-        <Typography variant="h5">
-          {`General Info `}
-          {contract?.address && (
-            <Link
-              href={getEtherscanUrl(contract.address)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </Link>
-          )}
-        </Typography>
+        <Typography variant="h5">{`General Info `}</Typography>
+        <AddressUtils />
+
         <Status>
           <Label>Expiry date: </Label>
           <Tooltip title={`Timestamp: ${expiryTimestamp}`} interactive>
