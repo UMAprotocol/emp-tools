@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { utils } from "ethers";
-const { formatUnits: fromWei, parseUnits: toWei } = utils;
+const { formatUnits: fromWei } = utils;
 import { useState } from "react";
 
 import {

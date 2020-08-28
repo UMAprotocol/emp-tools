@@ -22,6 +22,7 @@ import Etherscan from "../../containers/Etherscan";
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../utils/getDocLinks";
+import { toWeiSafe } from "../../utils/convertToWeiSafely";
 
 const Important = styled(Typography)`
   color: red;
@@ -34,11 +35,7 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
-const {
-  formatUnits: fromWei,
-  parseBytes32String: hexToUtf8,
-  parseUnits: toWei,
-} = utils;
+const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
 const Withdraw = () => {
   const { empState } = EmpState.useContainer();
@@ -146,10 +143,7 @@ const Withdraw = () => {
         setSuccess(null);
         setError(null);
         try {
-          const collateralToWithdrawWei = toWei(
-            Number(collateral).toFixed(6),
-            collDec
-          );
+          const collateralToWithdrawWei = toWeiSafe(collateral, collDec);
           if (resultantCRBelowGCR) {
             const tx = await emp.requestWithdrawal([collateralToWithdrawWei]);
             setHash(tx.hash as string);

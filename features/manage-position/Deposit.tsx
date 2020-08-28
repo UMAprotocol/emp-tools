@@ -13,17 +13,14 @@ import Etherscan from "../../containers/Etherscan";
 
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
+import { toWeiSafe } from "../../utils/convertToWeiSafely";
 
 const Link = styled.a`
   color: white;
   font-size: 14px;
 `;
 
-const {
-  formatUnits: fromWei,
-  parseBytes32String: hexToUtf8,
-  parseUnits: toWei,
-} = utils;
+const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
 const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
@@ -93,10 +90,7 @@ const Deposit = () => {
         setSuccess(null);
         setError(null);
         try {
-          const collateralToDepositWei = toWei(
-            Number(collateral).toFixed(6),
-            collDec
-          );
+          const collateralToDepositWei = toWeiSafe(collateral, collDec);
           const tx = await emp.deposit([collateralToDepositWei]);
           setHash(tx.hash as string);
           await tx.wait();

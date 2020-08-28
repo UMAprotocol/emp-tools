@@ -23,6 +23,7 @@ import Etherscan from "../../containers/Etherscan";
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../utils/getDocLinks";
+import { toWeiSafe } from "../../utils/convertToWeiSafely";
 
 const Important = styled(Typography)`
   color: red;
@@ -39,11 +40,7 @@ const MinLink = styled.div`
   text-decoration-line: underline;
 `;
 
-const {
-  formatUnits: fromWei,
-  parseBytes32String: hexToUtf8,
-  parseUnits: toWei,
-} = utils;
+const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
 const Create = () => {
   const { contract: emp } = EmpContract.useContainer();
@@ -165,8 +162,8 @@ const Create = () => {
         setSuccess(null);
         setError(null);
         try {
-          const collateralWei = toWei(Number(collateral).toFixed(6), collDec);
-          const tokensWei = toWei(Number(tokens).toFixed(6));
+          const collateralWei = toWeiSafe(collateral, collDec);
+          const tokensWei = toWeiSafe(tokens);
           const tx = await emp.create([collateralWei], [tokensWei]);
           setHash(tx.hash as string);
           await tx.wait();

@@ -18,6 +18,8 @@ import Position from "../../containers/Position";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 
+import { toWeiSafe } from "../../utils/convertToWeiSafely";
+
 const Link = styled.a`
   color: white;
   font-size: 14px;
@@ -27,7 +29,7 @@ const MaxLink = styled.div`
   text-decoration-line: underline;
 `;
 
-const { formatUnits: fromWei, parseUnits: toWei } = utils;
+const { formatUnits: fromWei } = utils;
 
 const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
@@ -103,7 +105,7 @@ const Redeem = () => {
         setSuccess(null);
         setError(null);
         try {
-          const tokensToRedeemWei = toWei(Number(tokens).toFixed(6));
+          const tokensToRedeemWei = toWeiSafe(tokens);
           const tx = await emp.redeem([tokensToRedeemWei]);
           setHash(tx.hash as string);
           await tx.wait();

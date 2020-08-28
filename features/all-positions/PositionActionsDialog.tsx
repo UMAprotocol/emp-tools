@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { utils } from "ethers";
-const { formatUnits: fromWei, parseUnits: toWei } = utils;
+const { formatUnits: fromWei } = utils;
 import { useState, MouseEvent, useEffect } from "react";
 
 import {
@@ -31,6 +31,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { DOCS_MAP } from "../../utils/getDocLinks";
+import { toWeiSafe } from "../../utils/convertToWeiSafely";
 
 const Label = styled.span`
   color: #999999;
@@ -302,10 +303,7 @@ const PositionActionsDialog = (props: DialogProps) => {
         setHash(null);
         setSuccess(null);
         setError(null);
-        const collateralToDepositWei = toWei(
-          Number(collateralToDeposit).toFixed(6),
-          collDecs
-        );
+        const collateralToDepositWei = toWeiSafe(collateralToDeposit, collDecs);
 
         try {
           if (needCollateralAllowance()) await setMaxCollateralAllowance();
@@ -334,16 +332,10 @@ const PositionActionsDialog = (props: DialogProps) => {
         setHash(null);
         setSuccess(null);
         setError(null);
-        const minCollPerTokenWei = toWei(
-          Number(minCollPerToken).toFixed(6),
-          collDecs
-        );
-        const maxCollPerTokenWei = toWei(
-          Number(maxCollPerToken).toFixed(6),
-          collDecs
-        );
-        const maxTokensToLiquidateWei = toWei(
-          Number(maxTokensToLiquidate).toFixed(6),
+        const minCollPerTokenWei = toWeiSafe(minCollPerToken, collDecs);
+        const maxCollPerTokenWei = toWeiSafe(maxCollPerToken, collDecs);
+        const maxTokensToLiquidateWei = toWeiSafe(
+          maxTokensToLiquidate,
           tokenDecs
         );
         const deadlineTimestamp = Math.floor(Date.now() / 1000) + deadline;
