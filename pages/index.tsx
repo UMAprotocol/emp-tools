@@ -21,10 +21,12 @@ import EmpSelector from "../features/emp-selector/EmpSelector";
 import AllPositions from "../features/all-positions/AllPositions";
 import Weth from "../features/weth/Weth";
 import Yield from "../features/yield/Yield";
+import Analytics from "../features/analytics/Analytics";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
     border-bottom: 1px solid #999;
+    width: 200%;
   }
   & .Mui-selected {
     font-weight: bold;
@@ -48,6 +50,7 @@ export default function Index() {
     "All Positions",
     "Wrap/Unwrap WETH",
     "yUSD Yield",
+    "Analytics",
   ];
 
   const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
@@ -158,6 +161,8 @@ export default function Index() {
         {tabIndex === 3 && <Weth />}
 
         {tabIndex === 4 && <Yield />}
+
+        {tabIndex === 5 && <Analytics />}
       </Box>
       <Box py={4} textAlign="center">
         <a
