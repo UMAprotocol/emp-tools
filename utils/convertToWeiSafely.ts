@@ -1,20 +1,21 @@
 import { utils } from "ethers";
 const { parseUnits: toWei } = utils;
 
-// Minimum precision for a token or collateral currency that this dApp can support
-const MIN_TOKEN_PRECISION = 6;
+const DEFAULT_PRECISION = 18;
 
-// Invariant: `desiredPrecision >= MIN_TOKEN_PRECISION`.
-// If `desiredPrecision < MIN_TOKEN_PRECISION`, then it is possible that
-// the `toWei()` call will return a number with decimals.
-// Therefore, `toWeiSafe()` should always be used to convert floats into wei values
+// `toWeiSafe()` should always be used to convert floats into wei values
 // before passing the result as a transaction arg, as Solidity cannot deal with non-Integers.
+// If the argument to pass into `toWei()` has too much precision (specifically more than `precisionToUse`),
+// then `toWei()` might return a string number with decimals, which Solidity cannot handle.
 export function toWeiSafe(
   numberToConvertToWei: string,
   desiredPrecision?: number
 ) {
+  const precisionToUse = desiredPrecision
+    ? desiredPrecision
+    : DEFAULT_PRECISION;
   return toWei(
-    Number(numberToConvertToWei).toFixed(MIN_TOKEN_PRECISION),
-    desiredPrecision
+    Number(numberToConvertToWei).toFixed(precisionToUse),
+    precisionToUse
   );
 }
