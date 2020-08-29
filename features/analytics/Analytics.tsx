@@ -15,9 +15,9 @@ const OutlinedContainer = styled.div`
 `;
 
 const Analytics = () => {
-  console.log("INSIDE");
   const { network } = Connection.useContainer();
-  const { shares } = Balancer.useContainer();
+  const { isYieldToken } = Balancer.useContainer();
+  console.log("isYieldToken", isYieldToken);
 
   const [dialogTabIndex, setDialogTabIndex] = useState<string>("emp-analytics");
   const handleAlignment = (
@@ -27,13 +27,13 @@ const Analytics = () => {
     setDialogTabIndex(newAlignment);
   };
 
-  if (network === null || network.chainId !== 1) {
+  if (network === null || network.chainId !== 1 || !isYieldToken) {
     return (
       <Box py={2}>
         <Typography>
           <i>
-            Please first connect and set your network to Mainnet, and then
-            select a yield token (i.e. yUSD).
+            Please first connect to Mainnet, and then select a yield token (i.e.
+            yUSD).
           </i>
         </Typography>
       </Box>

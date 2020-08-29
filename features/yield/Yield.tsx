@@ -34,8 +34,8 @@ const Yield = () => {
       <Box py={2}>
         <Typography>
           <i>
-            Please first connect and set your network to Mainnet, and then
-            select a yield token (i.e. yUSD).
+            Please first connect to Mainnet, and then select a yield token (i.e.
+            yUSD).
           </i>
         </Typography>
       </Box>
