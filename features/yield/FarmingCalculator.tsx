@@ -194,11 +194,15 @@ const FarmingCalculator = () => {
         <strong>Pools eligible for liquidity mining:</strong>{" "}
         {isRolled ? "OCT" : "SEPT + OCT"}
         <br></br>
-        <strong>
-          Hours remaining until liquidity mining rolls to OCT:
-        </strong>{" "}
-        {Math.max(hoursRemainingToFarmingRoll, 0).toFixed(2)}
-        <br></br>
+        {hoursRemainingToFarmingRoll > 0 && (
+          <>
+            <strong>
+              Hours remaining until liquidity mining rolls to OCT:
+            </strong>{" "}
+            {hoursRemainingToFarmingRoll.toFixed(2)}
+            <br></br>
+          </>
+        )}
         <strong>Total liquidity eligible for mining rewards:</strong> $
         {Number(poolLiquidity).toLocaleString()}
         <br></br>
