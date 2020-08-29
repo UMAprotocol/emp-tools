@@ -96,7 +96,7 @@ const Create = () => {
     // is intended to encourage users to maximize their capital efficiency.
     const maxTokensToCreate = _gcr > 0 ? collateral / _gcr : 0;
     // Unlike the min collateral, we're ok if we round down the tokens slightly as round down
-    // can only increase the position's CR and maintain it above the GCR constraint
+    // can only increase the position's CR and maintain it above the GCR constraint.
     setTokens(maxTokensToCreate.toFixed(4));
   };
 
