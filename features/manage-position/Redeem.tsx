@@ -105,7 +105,7 @@ const Redeem = () => {
         setSuccess(null);
         setError(null);
         try {
-          const tokensToRedeemWei = toWeiSafe(tokens);
+          const tokensToRedeemWei = toWeiSafe(tokens, tokenDec);
           const tx = await emp.redeem([tokensToRedeemWei]);
           setHash(tx.hash as string);
           await tx.wait();
