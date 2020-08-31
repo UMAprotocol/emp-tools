@@ -7,6 +7,7 @@ import {
   Typography,
   Grid,
   Tooltip,
+  LinearProgress,
 } from "@material-ui/core";
 import { utils } from "ethers";
 
@@ -123,6 +124,10 @@ const Deposit = () => {
     );
     const hasPendingWithdraw = pendingWithdraw === "Yes";
     const pendingWithdrawTimeRemaining = withdrawPassTime - Number(currentTime);
+    const progressBarPercent =
+      ((Number(withdrawalLiveness) - pendingWithdrawTimeRemaining) /
+        Number(withdrawalLiveness)) *
+      100;
     const canExecutePendingWithdraw =
       hasPendingWithdraw && pendingWithdrawTimeRemaining <= 0;
     const pendingWithdrawTimeString =
@@ -225,16 +230,32 @@ const Deposit = () => {
                 time before you execute it.
               </Typography>
             </Box>
+
             <Box py={2}>
               <Typography>
-                <strong>Time left until withdrawal: </strong>
-                {pendingWithdrawTimeString}
+                <Box display="flex" alignItems="center">
+                  <Box width="100%">
+                    <strong>Time left until withdrawal: </strong>
+                    {pendingWithdrawTimeString}
+                  </Box>
+                  <Box width="100%" mr={1}>
+                    <LinearProgress
+                      variant="determinate"
+                      value={progressBarPercent}
+                    />{" "}
+                  </Box>
+                  <Box>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                    >{`${progressBarPercent.toFixed(4)}%`}</Typography>
+                  </Box>
+                </Box>
                 <br></br>
                 <strong>Requested withdrawal amount: </strong>{" "}
                 {`${withdrawAmt} ${collSymbol}`}
               </Typography>
             </Box>
-
             <Box py={2}>
               <Tooltip
                 placement="bottom"
