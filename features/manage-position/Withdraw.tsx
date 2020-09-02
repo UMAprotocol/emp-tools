@@ -129,7 +129,7 @@ const Deposit = () => {
         ? ((Number(withdrawalLiveness) - pendingWithdrawTimeRemaining) /
             Number(withdrawalLiveness)) *
           100
-        : 0;
+        : 100;
     const canExecutePendingWithdraw =
       hasPendingWithdraw && pendingWithdrawTimeRemaining <= 0;
     const pendingWithdrawTimeString =
