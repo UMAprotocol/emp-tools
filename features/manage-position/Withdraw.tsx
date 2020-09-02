@@ -125,9 +125,11 @@ const Deposit = () => {
     const hasPendingWithdraw = pendingWithdraw === "Yes";
     const pendingWithdrawTimeRemaining = withdrawPassTime - Number(currentTime);
     const progressBarPercent =
-      ((Number(withdrawalLiveness) - pendingWithdrawTimeRemaining) /
-        Number(withdrawalLiveness)) *
-      100;
+      pendingWithdrawTimeRemaining > 0
+        ? ((Number(withdrawalLiveness) - pendingWithdrawTimeRemaining) /
+            Number(withdrawalLiveness)) *
+          100
+        : 0;
     const canExecutePendingWithdraw =
       hasPendingWithdraw && pendingWithdrawTimeRemaining <= 0;
     const pendingWithdrawTimeString =
