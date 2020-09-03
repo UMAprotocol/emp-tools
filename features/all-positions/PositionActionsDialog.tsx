@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { utils } from "ethers";
-const { formatUnits: fromWei, parseUnits: toWei } = utils;
+const { formatUnits: fromWei } = utils;
 import { useState, MouseEvent, useEffect } from "react";
 
 import {
@@ -31,6 +31,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
 import { DOCS_MAP } from "../../utils/getDocLinks";
+import { toWeiSafe } from "../../utils/convertToWeiSafely";
 
 const Label = styled.span`
   color: #999999;
@@ -83,12 +84,14 @@ const PositionActionsDialog = (props: DialogProps) => {
   const {
     symbol: tokenSymbol,
     balance: tokenBalance,
+    decimals: tokenDecs,
     allowance: tokenAllowance,
     setMaxAllowance: setMaxTokenAllowance,
   } = Token.useContainer();
   const {
     symbol: collSymbol,
     balance: collBalance,
+    decimals: collDecs,
     allowance: collAllowance,
     setMaxAllowance: setMaxCollateralAllowance,
   } = Collateral.useContainer();
@@ -186,9 +189,11 @@ const PositionActionsDialog = (props: DialogProps) => {
     currentTime !== null &&
     finalFee !== null &&
     tokenSymbol !== null &&
+    tokenDecs !== null &&
     tokenBalance !== null &&
     tokenAllowance !== null &&
     collSymbol !== null &&
+    collDecs !== null &&
     collBalance !== null &&
     collAllowance !== null &&
     priceId !== null
@@ -298,7 +303,7 @@ const PositionActionsDialog = (props: DialogProps) => {
         setHash(null);
         setSuccess(null);
         setError(null);
-        const collateralToDepositWei = toWei(collateralToDeposit);
+        const collateralToDepositWei = toWeiSafe(collateralToDeposit, collDecs);
 
         try {
           if (needCollateralAllowance()) await setMaxCollateralAllowance();
@@ -327,9 +332,12 @@ const PositionActionsDialog = (props: DialogProps) => {
         setHash(null);
         setSuccess(null);
         setError(null);
-        const minCollPerTokenWei = toWei(minCollPerToken);
-        const maxCollPerTokenWei = toWei(maxCollPerToken);
-        const maxTokensToLiquidateWei = toWei(maxTokensToLiquidate);
+        const minCollPerTokenWei = toWeiSafe(minCollPerToken, collDecs);
+        const maxCollPerTokenWei = toWeiSafe(maxCollPerToken, collDecs);
+        const maxTokensToLiquidateWei = toWeiSafe(
+          maxTokensToLiquidate,
+          tokenDecs
+        );
         const deadlineTimestamp = Math.floor(Date.now() / 1000) + deadline;
         try {
           if (needCollateralAllowance()) await setMaxCollateralAllowance();
@@ -519,8 +527,8 @@ const PositionActionsDialog = (props: DialogProps) => {
                             ? "increase"
                             : "decrease"}{" "}
                           by {Math.abs(underCollateralizedPercent).toFixed(4)}%
-                          from {latestPrice.toFixed(4)} to{" "}
-                          {underCollateralizedPrice.toFixed(4)}. You can still
+                          from {latestPrice.toFixed(8)} to{" "}
+                          {underCollateralizedPrice.toFixed(8)}. You can still
                           liquidate this position if you have a different
                           opinion on the {utils.parseBytes32String(priceId)}{" "}
                           price.

@@ -66,8 +66,8 @@ const GeneralInfo = () => {
     const expiryDate = new Date(
       expiry.toNumber() * 1000
     ).toLocaleString("en-GB", { timeZone: "UTC" });
-    const prettyLatestPrice = Number(latestPrice).toFixed(4);
-    const pricedGcr = (gcr / latestPrice).toFixed(4);
+    const prettyLatestPrice = Number(latestPrice).toFixed(8);
+    const pricedGcr = (gcr / latestPrice).toFixed(8);
 
     const priceIdUtf8 = parseBytes32String(priceId);
     const collReqPct = parseFloat(fromWei(collReq)).toString();

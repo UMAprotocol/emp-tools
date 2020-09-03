@@ -71,7 +71,7 @@ const YourPosition = () => {
     const pricedCR =
       latestPrice !== 0 ? (cRatio / latestPrice).toFixed(4) : "0";
     const pricedGCR = latestPrice !== 0 ? (gcr / latestPrice).toFixed(4) : "0";
-    const collReqFromWei = parseFloat(fromWei(collReq, collDec));
+    const collReqFromWei = parseFloat(fromWei(collReq));
     const tokens = Number(tokenString);
     const collateral = Number(collString);
     const backingCollateral = Number(backingCollString);

@@ -22,6 +22,7 @@ import Etherscan from "../../containers/Etherscan";
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../utils/getDocLinks";
+import { toWeiSafe } from "../../utils/convertToWeiSafely";
 
 const Important = styled(Typography)`
   color: red;
@@ -34,13 +35,9 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
-const {
-  formatUnits: fromWei,
-  parseBytes32String: hexToUtf8,
-  parseUnits: toWei,
-} = utils;
+const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
-const Deposit = () => {
+const Withdraw = () => {
   const { empState } = EmpState.useContainer();
   const {
     collateralRequirement: collReq,
@@ -89,7 +86,7 @@ const Deposit = () => {
     Number(posCollString) > 0 // If position has no collateral, then don't render withdraw component.
   ) {
     const collateralToWithdraw = Number(collateral) || 0;
-    const collReqFromWei = parseFloat(fromWei(collReq, collDec));
+    const collReqFromWei = parseFloat(fromWei(collReq));
     const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const posTokens = Number(posTokensString);
@@ -146,7 +143,7 @@ const Deposit = () => {
         setSuccess(null);
         setError(null);
         try {
-          const collateralToWithdrawWei = toWei(collateral);
+          const collateralToWithdrawWei = toWeiSafe(collateral, collDec);
           if (resultantCRBelowGCR) {
             const tx = await emp.requestWithdrawal([collateralToWithdrawWei]);
             setHash(tx.hash as string);
@@ -442,7 +439,7 @@ const Deposit = () => {
       <Box>
         <Box py={2}>
           <Typography>
-            <i>Create a position before depositing more collateral.</i>
+            <i>Create a position before withdrawing collateral.</i>
           </Typography>
         </Box>
       </Box>
@@ -450,4 +447,4 @@ const Deposit = () => {
   }
 };
 
-export default Deposit;
+export default Withdraw;

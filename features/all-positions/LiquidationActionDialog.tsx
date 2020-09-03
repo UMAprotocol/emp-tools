@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { utils } from "ethers";
-const { formatUnits: fromWei, parseUnits: toWei } = utils;
+const { formatUnits: fromWei } = utils;
 import { useState } from "react";
 
 import {
@@ -88,7 +88,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
   } = empState;
 
   const prettyBalance = (x: number) => {
-    const x_string = x.toFixed(4);
+    const x_string = x.toFixed(8);
     return utils.commify(x_string);
   };
 

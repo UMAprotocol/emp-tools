@@ -52,6 +52,14 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
       "https://api.kraken.com/0/public/Ticker?pair=ETHUSD",
     ],
   },
+  usdbtc: {
+    invertedPrice: true,
+    source: [
+      "https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT",
+      "https://api.pro.coinbase.com/products/BTC-USD/trades?limit=1",
+      "https://api.kraken.com/0/public/Ticker?pair=BTCUSD",
+    ],
+  },
 };
 
 export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
@@ -63,6 +71,8 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.compusd;
     case symbol?.includes("ETHBTC"):
       return PRICEFEED_PARAMS.ethbtc;
+    case symbol?.includes("yUSDBTC"):
+      return PRICEFEED_PARAMS.usdbtc;
     case symbol?.includes("yUSD"):
       return PRICEFEED_PARAMS.usdeth;
     default:
