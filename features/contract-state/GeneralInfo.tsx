@@ -155,6 +155,7 @@ const GeneralInfo = () => {
                   ((url.includes("coinbase") && "Coinbase") ||
                     (url.includes("kraken") && "Kraken") ||
                     (url.includes("binance") && "Binance") ||
+                    (url.includes("bitstamp") && "Bitstamp") ||
                     "") +
                   (index < sourceUrls.length - 1 ? ", " : "]")}
               </Link>
