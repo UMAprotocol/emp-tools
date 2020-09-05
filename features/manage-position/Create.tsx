@@ -97,7 +97,7 @@ const Create = () => {
     const maxTokensToCreate = _gcr > 0 ? collateral / _gcr : 0;
     // Unlike the min collateral, we're ok if we round down the tokens slightly as round down
     // can only increase the position's CR and maintain it above the GCR constraint.
-    setTokens(Math.floor(maxTokensToCreate - 0.00005).toString());
+    setTokens((maxTokensToCreate - 0.0001).toFixed(4));
   };
 
   if (
