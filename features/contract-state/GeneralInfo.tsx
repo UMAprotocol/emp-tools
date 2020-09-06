@@ -66,8 +66,8 @@ const GeneralInfo = () => {
     const expiryDate = new Date(
       expiry.toNumber() * 1000
     ).toLocaleString("en-GB", { timeZone: "UTC" });
-    const prettyLatestPrice = Number(latestPrice).toFixed(4);
-    const pricedGcr = (gcr / latestPrice).toFixed(4);
+    const prettyLatestPrice = Number(latestPrice).toFixed(8);
+    const pricedGcr = (gcr / latestPrice).toFixed(8);
 
     const priceIdUtf8 = parseBytes32String(priceId);
     const collReqPct = parseFloat(fromWei(collReq)).toString();
@@ -155,6 +155,7 @@ const GeneralInfo = () => {
                   ((url.includes("coinbase") && "Coinbase") ||
                     (url.includes("kraken") && "Kraken") ||
                     (url.includes("binance") && "Binance") ||
+                    (url.includes("bitstamp") && "Bitstamp") ||
                     "") +
                   (index < sourceUrls.length - 1 ? ", " : "]")}
               </Link>

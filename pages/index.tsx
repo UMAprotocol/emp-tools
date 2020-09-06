@@ -181,6 +181,14 @@ export default function Index() {
           <TwitterIcon fontSize="inherit" />
         </IconButton>
         <a
+          href="/terms"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ marginRight: `16px` }}
+        >
+          <strong>Terms</strong>
+        </a>
+        <a
           href="https://vercel.com/?utm_source=uma%2Femp-tools"
           target="_blank"
           rel="noopener noreferrer"

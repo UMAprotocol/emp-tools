@@ -45,6 +45,8 @@ const _getExchangeTypeFromTokenSymbol = (symbol: string | null) => {
       return TOKEN_TO_EXCHANGE_MAP.ethbtc;
     case symbol?.includes("yUSD"):
       return TOKEN_TO_EXCHANGE_MAP.yusd;
+    case symbol?.includes("uUSD"):
+      return TOKEN_TO_EXCHANGE_MAP.yusd;
     default:
       return null;
   }

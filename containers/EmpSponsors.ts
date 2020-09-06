@@ -121,9 +121,7 @@ const useEmpSponsors = () => {
           let newPositions: SponsorMap = {};
           let newLiquidations: LiquidationMap = {};
 
-          const collReqFromWei = parseFloat(
-            fromWei(collateralRequirement, collDecs)
-          );
+          const collReqFromWei = parseFloat(fromWei(collateralRequirement));
 
           empData.positions.forEach((position: PositionQuery) => {
             if (position.isEnded) return;

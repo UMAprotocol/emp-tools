@@ -6,7 +6,7 @@ export const EMPs: { [networkId: number]: string[] } = {
     "0xE1Ee8D4C5dBA1c221840c08f6Cf42154435B9D52", // yUSD-OCT20
   ],
   42: [
-    "0x8f8e5d891BaCe2cf987A8E009C26e9fbF92caf20", // yUSD Kovan Sep20
-    "0xbf0e8ee7FD3d1fc42C8e305D4A495D50744Bc081", // yUSD Kovan Oct20
+    "0xFb70A4CBD537B36e647553C279a93E969b041DF0", //"Perpetual", yUSD Kovan Sep30
+    "0xA000Dfe84A1852865d5231e0F6CBF0De08888abE", // uUSDrBTC Kovan Oct20
   ],
 };
