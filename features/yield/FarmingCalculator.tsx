@@ -13,7 +13,16 @@ const FormInput = styled.div`
 `;
 
 const WEEKS_PER_YEAR = 52;
-const WEEKLY_UMA_REWARDS = 25000;
+// const WEEKLY_UMA_REWARDS = 25000;
+const WEEKLY_UMA_REWARDS: { [key: string]: any } = {
+  "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": {
+    UMA: 25000,
+  }, // yUSDETH-Oct20
+  "0x208d174775dc39fe18b1b374972f77ddec6c0f73": {
+    UMA: 10000,
+    REN: 25000,
+  }, // uUSDrBTC-OCT
+};
 
 const FarmingCalculator = () => {
   const {
@@ -22,16 +31,17 @@ const FarmingCalculator = () => {
     YIELD_TOKENS,
     poolAddress,
   } = Balancer.useContainer();
-  const { symbol: tokenSymbol } = Token.useContainer();
+  const { symbol: tokenSymbol, address } = Token.useContainer();
 
   // Farming calculations for rolling between yUSD pools
-  const octPrice = getTokenPrice(Object.keys(YIELD_TOKENS)[1].toLowerCase());
+  const tokenAddress =
+    address !== null ? address : Object.keys(YIELD_TOKENS)[1];
+  const octPrice = getTokenPrice(tokenAddress.toLowerCase());
   const sept20PoolData = getPoolDataForToken(
     Object.keys(YIELD_TOKENS)[0].toLowerCase()
   );
-  const oct20PoolData = getPoolDataForToken(
-    Object.keys(YIELD_TOKENS)[1].toLowerCase()
-  );
+  const oct20PoolData = getPoolDataForToken(tokenAddress.toLowerCase());
+
   const cutOffDateForRoll = Date.UTC(2020, 7, 28, 23, 0, 0, 0);
   const currentDate = new Date();
   const currentDateUTC = Date.UTC(
@@ -55,6 +65,7 @@ const FarmingCalculator = () => {
   const [yUSDAdded, setyUSDAdded] = useState<string>("");
   const [USDCAdded, setUSDCAdded] = useState<string>("");
   const [poolLiquidity, setPoolLiquidity] = useState<string>("");
+  const [weeklyPoolRewards, setWeeklyPoolRewards] = useState<number>(0);
 
   // Yield outputs:
   const [fracLiquidity, setFracLiquidity] = useState<string>("");
@@ -85,21 +96,23 @@ const FarmingCalculator = () => {
     _USDCAdded: number,
     _yUSDPrice: number,
     _poolLiquidity: number,
-    _umaPrice: number
+    _umaPrice: number,
+    _weeklyPoolRewards: number
   ) => {
     if (
       _yUSDAdded < 0 ||
       _USDCAdded < 0 ||
       _yUSDPrice < 0 ||
       _poolLiquidity <= 0 ||
-      _umaPrice < 0
+      _umaPrice < 0 ||
+      _weeklyPoolRewards < 0
     ) {
       return null;
     }
 
     const totalValueAddedToPool = _USDCAdded + _yUSDPrice * _yUSDAdded;
     const fracLiquidityProvided = totalValueAddedToPool / _poolLiquidity;
-    const umaPaidPerWeek = fracLiquidityProvided * WEEKLY_UMA_REWARDS;
+    const umaPaidPerWeek = fracLiquidityProvided * _weeklyPoolRewards;
     const usdYieldPerWeek = umaPaidPerWeek * _umaPrice;
 
     let apr = 0;
@@ -118,7 +131,14 @@ const FarmingCalculator = () => {
   // Update state whenever container data changes.
   useEffect(() => {
     setDefaultValues();
-  }, [octPrice, sept20PoolData, oct20PoolData]);
+
+    if (WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()]) {
+      // TODO: Display REN rewards as well
+      const _weeklyPoolRewards =
+        WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()].UMA;
+      setWeeklyPoolRewards(_weeklyPoolRewards.toString());
+    }
+  }, [octPrice, sept20PoolData, oct20PoolData, tokenAddress]);
 
   // Update pool ownership whenever user changes.
   useEffect(() => {
@@ -152,7 +172,8 @@ const FarmingCalculator = () => {
       Number(USDCAdded) || 0,
       Number(yUSDPrice) || 0,
       Number(poolLiquidity) || 0,
-      Number(umaPrice) || 0
+      Number(umaPrice) || 0,
+      weeklyPoolRewards
     );
 
     if (updatedYield !== null) {
@@ -169,10 +190,10 @@ const FarmingCalculator = () => {
 
       <br></br>
       <Typography>
-        During the liquidity mining program 25k UMA rewards will be paid out to
-        LP providers in certain yield token balancer pools. Rewards are
-        calculated as a pro-rata contribution to the liquidity pool. To learn
-        more about the liquidity mining program see UMA Medium post{" "}
+        During the liquidity mining program UMA rewards will be paid out to LP
+        providers in certain yield token balancer pools. Rewards are calculated
+        as a pro-rata contribution to the liquidity pool. To learn more about
+        the liquidity mining program see UMA Medium post{" "}
         <a
           href="https://medium.com/uma-project/liquidity-mining-on-uma-is-now-live-5f6cb0bd53ee"
           target="_blank"
@@ -198,7 +219,7 @@ const FarmingCalculator = () => {
       <br></br>
       <Typography>
         <strong>Pools eligible for liquidity mining:</strong>{" "}
-        {isRolled ? "OCT" : "SEPT + OCT"}
+        {isRolled ? "yUSD-OCT, uUSDrBTC-OCT" : "SEPT + OCT"}
         <br></br>
         {hoursRemainingToFarmingRoll > 0 && (
           <>
@@ -211,6 +232,9 @@ const FarmingCalculator = () => {
         )}
         <strong>Total liquidity eligible for mining rewards:</strong> $
         {Number(poolLiquidity).toLocaleString()}
+        <br></br>
+        <strong>Weekly UMA rewards for selected pool:</strong>{" "}
+        {weeklyPoolRewards.toLocaleString()}
         <br></br>
       </Typography>
 
