@@ -33,10 +33,30 @@ interface PoolTokenQuery {
   balance: string;
 }
 
-const YIELD_TOKENS = [
-  "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5", // Sep20
-  "0xB2FdD60AD80ca7bA89B9BAb3b5336c2601C020b4", // Oct20
-];
+interface yieldPair {
+  [key: string]: string;
+}
+
+interface yieldToken {
+  [key: string]: yieldPair;
+}
+
+// The keys in this object are the synthetic token. the `token0` and `token1` are
+// the balancer pool key value pairs for the first and second token in the pool.
+const YIELD_TOKENS: yieldToken = {
+  "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5": {
+    token0: "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // yUSDETH-SEP20
+  "0xB2FdD60AD80ca7bA89B9BAb3b5336c2601C020b4": {
+    token0: "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // yUSDETH-Oct20
+  "0x208D174775dc39fe18B1b374972F77ddEc6c0F73": {
+    token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    token1: "0x208d174775dc39fe18b1b374972f77ddec6c0f73",
+  }, // uUSDrBTC-OCT
+};
 
 const useBalancer = () => {
   const { address, block$ } = Connection.useContainer();
@@ -90,16 +110,21 @@ const useBalancer = () => {
   const initializeTokenAddress = () => {
     if (tokenAddress !== null) {
       setSelectedSwapTokenAddress(defaultSwapTokenAddress);
-
-      const IS_YIELD_TOKEN = YIELD_TOKENS.includes(tokenAddress);
+      const IS_YIELD_TOKEN = Object.keys(YIELD_TOKENS).includes(tokenAddress);
       setIsYieldToken(IS_YIELD_TOKEN);
       if (IS_YIELD_TOKEN) {
         setSelectedTokenAddress(tokenAddress.toLowerCase());
-        setPoolTokenList([tokenAddress.toLowerCase(), defaultSwapTokenAddress]);
+        setPoolTokenList([
+          YIELD_TOKENS[tokenAddress].token0.toLowerCase(),
+          YIELD_TOKENS[tokenAddress].token1.toLowerCase(),
+        ]);
       } else {
-        const defaultTokenAddress = YIELD_TOKENS[0].toLowerCase();
+        const defaultTokenAddress = Object.keys(YIELD_TOKENS)[0].toLowerCase();
         setSelectedTokenAddress(defaultTokenAddress);
-        setPoolTokenList([defaultTokenAddress, defaultSwapTokenAddress]);
+        setPoolTokenList([
+          YIELD_TOKENS[defaultTokenAddress].token0.toLowerCase(),
+          YIELD_TOKENS[defaultTokenAddress].token1.toLowerCase(),
+        ]);
       }
     }
   };
@@ -126,6 +151,7 @@ const useBalancer = () => {
     }
     if (!poolLoading && poolData) {
       const data = poolData.pools[0];
+      if (!data) return null;
 
       const shareHolders: SharesState = {};
       data.shares.forEach((share: SharesQuery) => {

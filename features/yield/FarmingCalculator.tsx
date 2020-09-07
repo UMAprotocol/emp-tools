@@ -3,6 +3,7 @@ import { Box, TextField, Typography, Grid } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Balancer from "../../containers/Balancer";
+import Token from "../../containers/Token";
 
 import { getUmaPrice } from "../../utils/getUmaTokenPrice";
 
@@ -21,11 +22,16 @@ const FarmingCalculator = () => {
     YIELD_TOKENS,
     poolAddress,
   } = Balancer.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   // Farming calculations for rolling between yUSD pools
-  const octPrice = getTokenPrice(YIELD_TOKENS[1].toLowerCase());
-  const sept20PoolData = getPoolDataForToken(YIELD_TOKENS[0].toLowerCase());
-  const oct20PoolData = getPoolDataForToken(YIELD_TOKENS[1].toLowerCase());
+  const octPrice = getTokenPrice(Object.keys(YIELD_TOKENS)[1].toLowerCase());
+  const sept20PoolData = getPoolDataForToken(
+    Object.keys(YIELD_TOKENS)[0].toLowerCase()
+  );
+  const oct20PoolData = getPoolDataForToken(
+    Object.keys(YIELD_TOKENS)[1].toLowerCase()
+  );
   const cutOffDateForRoll = Date.UTC(2020, 7, 28, 23, 0, 0, 0);
   const currentDate = new Date();
   const currentDateUTC = Date.UTC(
@@ -164,9 +170,9 @@ const FarmingCalculator = () => {
       <br></br>
       <Typography>
         During the liquidity mining program 25k UMA rewards will be paid out to
-        LP providers in certain yUSD balancer pools. Rewards are calculated as a
-        pro-rata contribution to the liquidity pool. To learn more about the
-        liquidity mining program see UMA Medium post{" "}
+        LP providers in certain yield token balancer pools. Rewards are
+        calculated as a pro-rata contribution to the liquidity pool. To learn
+        more about the liquidity mining program see UMA Medium post{" "}
         <a
           href="https://medium.com/uma-project/liquidity-mining-on-uma-is-now-live-5f6cb0bd53ee"
           target="_blank"
@@ -216,7 +222,7 @@ const FarmingCalculator = () => {
                 <TextField
                   fullWidth
                   type="number"
-                  label="yUSD added to pool"
+                  label={`${tokenSymbol} added to pool`}
                   value={yUSDAdded}
                   onChange={(e) => setyUSDAdded(e.target.value)}
                   variant="outlined"
