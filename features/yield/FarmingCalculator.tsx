@@ -23,9 +23,13 @@ const FarmingCalculator = () => {
   } = Balancer.useContainer();
 
   // Farming calculations for rolling between yUSD pools
-  const octPrice = getTokenPrice(YIELD_TOKENS[1].toLowerCase());
-  const sept20PoolData = getPoolDataForToken(YIELD_TOKENS[0].toLowerCase());
-  const oct20PoolData = getPoolDataForToken(YIELD_TOKENS[1].toLowerCase());
+  const octPrice = getTokenPrice(Object.keys(YIELD_TOKENS)[1].toLowerCase());
+  const sept20PoolData = getPoolDataForToken(
+    Object.keys(YIELD_TOKENS)[0].toLowerCase()
+  );
+  const oct20PoolData = getPoolDataForToken(
+    Object.keys(YIELD_TOKENS)[1].toLowerCase()
+  );
   const cutOffDateForRoll = Date.UTC(2020, 7, 28, 23, 0, 0, 0);
   const currentDate = new Date();
   const currentDateUTC = Date.UTC(
