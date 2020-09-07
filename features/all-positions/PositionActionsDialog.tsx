@@ -166,7 +166,9 @@ const PositionActionsDialog = (props: DialogProps) => {
     event: MouseEvent<HTMLElement>,
     newAlignment: string
   ) => {
-    setTabIndex(newAlignment);
+    if (newAlignment) {
+      setTabIndex(newAlignment);
+    }
   };
 
   const prettyBalance = (x: number) => {
