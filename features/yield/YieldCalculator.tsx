@@ -92,9 +92,9 @@ const YieldCalculator = () => {
 
   return (
     <span>
-      <Typography variant="h5">yUSD Yield Calculator</Typography>
+      <Typography variant="h5">{tokenSymbol} Yield Calculator</Typography>
       <Typography>
-        The yield for yUSD changes if you plan on <i>buying</i> it as a
+        The yield for {tokenSymbol} changes if you plan on <i>buying</i> it as a
         borrower, looking for a stable yield or <i>selling</i> it as a lender,
         looking to gain levered exposure on your ETH.
       </Typography>
@@ -127,7 +127,7 @@ const YieldCalculator = () => {
                 onChange={(e) => setTokenPrice(e.target.value)}
                 variant="outlined"
                 inputProps={{ min: "0", max: "10", step: "0.01" }}
-                helperText={`Enter the price of yUSD in $`}
+                helperText={`${tokenSymbol} price in USD`}
                 InputLabelProps={{
                   shrink: true,
                 }}
