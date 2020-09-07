@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import EmpState from "../../containers/EmpState";
 import Balancer from "../../containers/Balancer";
+import Token from "../../containers/Token";
 
 const FormInput = styled.div`
   margin-top: 20px;
@@ -22,6 +23,7 @@ const YieldCalculator = () => {
   const { empState } = EmpState.useContainer();
   const { expirationTimestamp } = empState;
   const { usdPrice } = Balancer.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   const [tokenPrice, setTokenPrice] = useState<string>("");
   const [daysToExpiry, setDaysToExpiry] = useState<string>("");
@@ -120,7 +122,7 @@ const YieldCalculator = () => {
               <TextField
                 fullWidth
                 type="number"
-                label="Current yUSD Price (USD)"
+                label={`Current ${tokenSymbol} Price (USD)`}
                 value={tokenPrice}
                 onChange={(e) => setTokenPrice(e.target.value)}
                 variant="outlined"
@@ -141,7 +143,7 @@ const YieldCalculator = () => {
                 value={daysToExpiry}
                 onChange={(e) => setDaysToExpiry(e.target.value)}
                 inputProps={{ min: "0", step: "1" }}
-                helperText={`Days to expiry for chosen EMP: ${daysToExpiry}`}
+                helperText={`Days to expiry for EMP: ${daysToExpiry}`}
                 variant="outlined"
                 InputLabelProps={{
                   shrink: true,
