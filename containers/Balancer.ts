@@ -73,7 +73,7 @@ const useBalancer = () => {
   const [selectedSwapTokenAddress, setSelectedSwapTokenAddress] = useState<
     string | null
   >(null);
-  const [poolTokenList, setPoolTokenList] = useState<string[] | null>();
+  const [poolTokenList, setPoolTokenList] = useState<string[] | null>(null);
   const [isYieldToken, setIsYieldToken] = useState<boolean>(false);
 
   const [usdPrice, setUsdPrice] = useState<number | null>(null);
