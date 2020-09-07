@@ -9,6 +9,7 @@ import FarmingCalculator from "./FarmingCalculator";
 
 import Connection from "../../containers/Connection";
 import Balancer from "../../containers/Balancer";
+import Token from "../../containers/Token";
 
 const OutlinedContainer = styled.div`
   padding: 1rem;
@@ -18,6 +19,7 @@ const OutlinedContainer = styled.div`
 const Yield = () => {
   const { network } = Connection.useContainer();
   const { isYieldToken } = Balancer.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   const [dialogTabIndex, setDialogTabIndex] = useState<string>(
     "farming-calculator"
@@ -35,7 +37,7 @@ const Yield = () => {
         <Typography>
           <i>
             Please first connect and set your network to Mainnet, and then
-            select a yield token (i.e. yUSD).
+            select a yield token (i.e. yUSD-OCT20).
           </i>
         </Typography>
       </Box>
@@ -52,9 +54,9 @@ const Yield = () => {
             >
               yTokens
             </a>
-            , like yUSD, are expiring tokens with a fixed-rate return and are
-            redeemable for exactly 1 USD worth of collateral at expiry. To learn
-            more about yUSD see the UMA Medium post{" "}
+            , like {tokenSymbol}, are expiring tokens with a fixed-rate return
+            and are redeemable for exactly 1 USD worth of collateral at expiry.
+            To learn more about {tokenSymbol} see the UMA Medium post{" "}
             <a
               href="https://medium.com/uma-project/the-yield-dollar-on-uma-3a492e79069f"
               target="_blank"
@@ -87,7 +89,7 @@ const Yield = () => {
             <ToggleButton value="farming-calculator">
               Liquidity Mining
             </ToggleButton>
-            <ToggleButton value="yusd-calculator">yusd Yield</ToggleButton>
+            <ToggleButton value="yusd-calculator">yield dollar</ToggleButton>
           </ToggleButtonGroup>
         </Box>
         {dialogTabIndex === "farming-calculator" && (
