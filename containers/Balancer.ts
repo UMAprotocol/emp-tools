@@ -91,7 +91,6 @@ const useBalancer = () => {
     variables: { tokenId: selectedTokenAddress },
     pollInterval: 5000,
   });
-  console.log("poolTokenList", poolTokenList);
   const { loading: poolLoading, error: poolError, data: poolData } = useQuery(
     POOL(JSON.stringify(poolTokenList)),
     {
@@ -108,12 +107,6 @@ const useBalancer = () => {
       setIsYieldToken(IS_YIELD_TOKEN);
       if (IS_YIELD_TOKEN) {
         setSelectedTokenAddress(tokenAddress.toLowerCase());
-        console.log("tokenAddress.toLowerCase()", tokenAddress.toLowerCase());
-        console.log("YIELD_TOKENS", YIELD_TOKENS);
-        console.log(
-          "YIELD_TOKENS[tokenAddress.toLowerCase()]",
-          YIELD_TOKENS[tokenAddress]
-        );
         setPoolTokenList(YIELD_TOKENS[tokenAddress]);
       } else {
         const defaultTokenAddress = Object.keys(YIELD_TOKENS)[0].toLowerCase();
@@ -145,7 +138,6 @@ const useBalancer = () => {
     }
     if (!poolLoading && poolData) {
       const data = poolData.pools[0];
-      console.log("data", data);
       if (!data) return null;
 
       const shareHolders: SharesState = {};
