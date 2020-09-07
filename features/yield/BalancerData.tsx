@@ -1,5 +1,6 @@
 import { Typography, Grid } from "@material-ui/core";
 import styled from "styled-components";
+import Token from "../../containers/Token";
 
 import Balancer from "../../containers/Balancer";
 
@@ -19,6 +20,7 @@ const Link = styled.a`
 
 const BalancerData = () => {
   const { poolAddress, usdPrice, pool, shares } = Balancer.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   if (
     poolAddress !== null &&
@@ -60,7 +62,7 @@ const BalancerData = () => {
     return (
       <span>
         <Typography variant="h5" style={{ marginBottom: "10px" }}>
-          yUSD Pool Metrics{" "}
+          {tokenSymbol} Pool Metrics{" "}
           <Link
             href={balancerPoolUrl}
             target="_blank"
@@ -77,7 +79,7 @@ const BalancerData = () => {
             </Status>
             <Status>
               <Label>
-                - <i>yUSD</i>:{" "}
+                - <i>{tokenSymbol}</i>:{" "}
               </Label>
               {poolBalanceToken}
             </Status>
