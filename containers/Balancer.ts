@@ -33,22 +33,29 @@ interface PoolTokenQuery {
   balance: string;
 }
 
-interface YIELD_TOKEN {
-  [key: string]: string[];
+interface yieldPair {
+  [key: string]: string;
 }
-const YIELD_TOKENS: YIELD_TOKEN = {
-  "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5": [
-    "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5".toLowerCase(),
-    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48".toLowerCase(),
-  ], // yUSDETH-SEP20
-  "0xB2FdD60AD80ca7bA89B9BAb3b5336c2601C020b4": [
-    "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4".toLowerCase(),
-    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48".toLowerCase(),
-  ], // yUSDETH-Oct20
-  "0x208D174775dc39fe18B1b374972F77ddEc6c0F73": [
-    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48".toLowerCase(),
-    "0x208d174775dc39fe18b1b374972f77ddec6c0f73".toLowerCase(),
-  ], // uUSDrBTC-OCT
+
+interface yieldToken {
+  [key: string]: yieldPair;
+}
+
+// The keys in this object are the synthetic token. the `token0` and `token1` are
+// the balancer pool key value pairs for the first and second token in the pool.
+const YIELD_TOKENS: yieldToken = {
+  "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5": {
+    token0: "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // yUSDETH-SEP20
+  "0xB2FdD60AD80ca7bA89B9BAb3b5336c2601C020b4": {
+    token0: "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // yUSDETH-Oct20
+  "0x208D174775dc39fe18B1b374972F77ddEc6c0F73": {
+    token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    token1: "0x208d174775dc39fe18b1b374972f77ddec6c0f73",
+  }, // uUSDrBTC-OCT
 };
 
 const useBalancer = () => {
@@ -107,11 +114,17 @@ const useBalancer = () => {
       setIsYieldToken(IS_YIELD_TOKEN);
       if (IS_YIELD_TOKEN) {
         setSelectedTokenAddress(tokenAddress.toLowerCase());
-        setPoolTokenList(YIELD_TOKENS[tokenAddress]);
+        setPoolTokenList([
+          YIELD_TOKENS[tokenAddress].token0.toLowerCase(),
+          YIELD_TOKENS[tokenAddress].token1.toLowerCase(),
+        ]);
       } else {
         const defaultTokenAddress = Object.keys(YIELD_TOKENS)[0].toLowerCase();
         setSelectedTokenAddress(defaultTokenAddress);
-        setPoolTokenList(YIELD_TOKENS[defaultTokenAddress]);
+        setPoolTokenList([
+          YIELD_TOKENS[defaultTokenAddress].token0.toLowerCase(),
+          YIELD_TOKENS[defaultTokenAddress].token1.toLowerCase(),
+        ]);
       }
     }
   };
