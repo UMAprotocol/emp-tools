@@ -58,8 +58,7 @@ const YieldCalculator = () => {
 
     // `yieldPerUnit` = (FACE/yUSD_PX)^(1/(365/DAYS_TO_EXP)) - 1,
     // where FACE = $1. More details: https://www.bankrate.com/glossary/a/apy-annual-percentage-yield/
-    const yieldPerUnit =
-      Math.pow(1 / _tokenPrice, 1 / (_daysToExpiry / DAYS_PER_YEAR)) - 1;
+    const yieldPerUnit = (1 - _tokenPrice) * (DAYS_PER_YEAR / _daysToExpiry);
     const flipSign = _selectedUserMode === USER_MODE.BUY ? 1 : -1;
     return yieldPerUnit * flipSign;
   };
