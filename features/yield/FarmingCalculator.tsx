@@ -34,6 +34,12 @@ const FarmingCalculator = () => {
   const { symbol: tokenSymbol, address } = Token.useContainer();
 
   // Farming calculations for rolling between yUSD pools
+  if (
+    !Object.keys(WEEKLY_UMA_REWARDS).includes(
+      (address && address.toLowerCase()) || ""
+    )
+  )
+    return null;
   const tokenAddress =
     address !== null ? address : Object.keys(YIELD_TOKENS)[1];
   const octPrice = getTokenPrice(tokenAddress.toLowerCase());

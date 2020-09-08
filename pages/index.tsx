@@ -52,6 +52,7 @@ export default function Index() {
   const { address: collAddress } = Collateral.useContainer();
   const { contract: weth } = WethContract.useContainer();
   const { isYieldToken } = Balancer.useContainer();
+  // setTabIndex(0);
 
   const options = ["General Info", "Manage Position", "All Positions"];
 
@@ -65,11 +66,12 @@ export default function Index() {
 
   // Update selected page if the user toggles between EMPs while selected on
   // invalid pages (i.e on Wrap/Unwrap then moves to uUSDrBTC)
-  useEffect(() => {
-    if (tabIndex > options.length - 1) {
-      setTabIndex(0);
-    }
-  }, [collAddress, tabIndex]);
+  if (tabIndex > options.length - 1) {
+    setTabIndex(0);
+  }
+  // useEffect(() => {
+  //   console.log(tabIndex, options.length - 1);
+  // }, [collAddress, tabIndex]);
 
   const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
