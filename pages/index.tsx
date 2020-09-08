@@ -52,7 +52,6 @@ export default function Index() {
   const { address: collAddress } = Collateral.useContainer();
   const { contract: weth } = WethContract.useContainer();
   const { isYieldToken } = Balancer.useContainer();
-  // setTabIndex(0);
 
   const options = ["General Info", "Manage Position", "All Positions"];
 
