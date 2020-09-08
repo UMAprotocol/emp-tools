@@ -146,16 +146,24 @@ const PositionActionsDialog = (props: DialogProps) => {
         _minCollPerTokenToBeProfitable.toFixed(10)
       );
       setMaxCollPerTokenToBeValid(_maxCollPerTokenToBeValid.toFixed(10));
-      setMinCollPerToken(_minCollPerTokenToBeProfitable.toFixed(10));
-      setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(10));
+
+      // Only autofill these if they are empty
+      if (minCollPerToken === "") {
+        setMinCollPerToken(_minCollPerTokenToBeProfitable.toFixed(10));
+      }
+      if (maxCollPerToken === "") {
+        setMaxCollPerToken(_maxCollPerTokenToBeValid.toFixed(10));
+      }
 
       // Set max tokens to liquidate as full position size.
-      setMaxTokensToLiquidate(
-        Math.min(
-          Number(sponsorPosition.tokensOutstanding),
-          tokenBalance
-        ).toString()
-      );
+      if (maxTokensToLiquidate === "") {
+        setMaxTokensToLiquidate(
+          Math.min(
+            Number(sponsorPosition.tokensOutstanding),
+            tokenBalance
+          ).toString()
+        );
+      }
     }
 
     // Set liquidation transaction deadline to a reasonable 30 mins to wait for it to be mined.
@@ -166,7 +174,9 @@ const PositionActionsDialog = (props: DialogProps) => {
     event: MouseEvent<HTMLElement>,
     newAlignment: string
   ) => {
-    setTabIndex(newAlignment);
+    if (newAlignment) {
+      setTabIndex(newAlignment);
+    }
   };
 
   const prettyBalance = (x: number) => {
