@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { utils } from "ethers";
 const { formatUnits: fromWei } = utils;
 import { useState, MouseEvent, useEffect } from "react";
+import Alert from "@material-ui/lab/Alert";
 
 import {
   Box,
@@ -29,6 +30,7 @@ import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
+import Connection from "../../containers/Connection";
 
 import { DOCS_MAP } from "../../utils/getDocLinks";
 import { toWeiSafe } from "../../utils/convertToWeiSafely";
@@ -96,6 +98,8 @@ const PositionActionsDialog = (props: DialogProps) => {
     setMaxAllowance: setMaxCollateralAllowance,
   } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
+  const { address: connectedWalletAddress } = Connection.useContainer();
+
   const [tabIndex, setTabIndex] = useState<string>("deposit");
   const [collateralToDeposit, setCollateralToDeposit] = useState<string>("");
 
@@ -463,9 +467,25 @@ const PositionActionsDialog = (props: DialogProps) => {
                       <ToggleButton value="liquidate">liquidate</ToggleButton>
                     </ToggleButtonGroup>
                   </Box>
-                  <Box>
+                  <Box pt={2}>
                     {tabIndex === "deposit" && (
-                      <Box pt={2}>
+                      <Box>
+                        {connectedWalletAddress?.toLowerCase() !==
+                          props.selectedSponsor?.toLowerCase() && (
+                          <Box pt={2} pb={3}>
+                            <Alert severity="warning">
+                              Make sure you control the sponsor address{" "}
+                              <a
+                                href={getEtherscanUrl(props.selectedSponsor)}
+                                target="_blank"
+                              >
+                                {prettyAddress(props.selectedSponsor)}
+                              </a>{" "}
+                              before depositing. Otherwise, you will lose your
+                              deposit.
+                            </Alert>
+                          </Box>
+                        )}
                         <Typography>
                           <strong>
                             Deposit collateral into this sponsor's position
