@@ -28,7 +28,9 @@ const Yield = () => {
     event: MouseEvent<HTMLElement>,
     newAlignment: string
   ) => {
-    setDialogTabIndex(newAlignment);
+    if (newAlignment) {
+      setDialogTabIndex(newAlignment);
+    }
   };
 
   if (network === null || network.chainId !== 1 || !isYieldToken) {

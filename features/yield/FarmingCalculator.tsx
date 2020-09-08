@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
 
-import { getUmaPrice } from "../../utils/getUmaTokenPrice";
+import { getUmaPrice, getRenPrice } from "../../utils/getCoinGeckoTokenPrice";
 
 const FormInput = styled.div`
   margin-top: 20px;
@@ -61,14 +61,17 @@ const FarmingCalculator = () => {
 
   // Yield inputs:
   const [umaPrice, setUmaPrice] = useState<string>("");
+  const [renPrice, setRenPrice] = useState<string>("");
   const [yUSDPrice, setyUSDPrice] = useState<string>("");
   const [yUSDAdded, setyUSDAdded] = useState<string>("");
   const [USDCAdded, setUSDCAdded] = useState<string>("");
   const [poolLiquidity, setPoolLiquidity] = useState<string>("");
-  const [weeklyPoolRewards, setWeeklyPoolRewards] = useState<number>(0);
+  const [weeklyUmaRewards, setWeeklyUmaRewards] = useState<number>(0);
+  const [weeklyRenRewards, setWeeklyRenRewards] = useState<number>(0);
 
   // Yield outputs:
   const [fracLiquidity, setFracLiquidity] = useState<string>("");
+  const [renYieldAmount, setRenYieldAmount] = useState<string>("");
   const [umaYieldAmount, setUmaYieldAmount] = useState<string>("");
   const [usdYieldAmount, setUsdYieldAmount] = useState<string>("");
   const [apr, setApr] = useState<string>("");
@@ -79,6 +82,7 @@ const FarmingCalculator = () => {
       // so we will hardcode this to the Oct price.
       setyUSDPrice(octPrice.toString());
       setUmaPrice(await getUmaPrice());
+      setRenPrice(await getRenPrice());
       if (!isRolled) {
         setPoolLiquidity(
           (
@@ -96,7 +100,7 @@ const FarmingCalculator = () => {
     _USDCAdded: number,
     _yUSDPrice: number,
     _poolLiquidity: number,
-    _umaPrice: number,
+    _tokenPrice: number,
     _weeklyPoolRewards: number
   ) => {
     if (
@@ -104,7 +108,7 @@ const FarmingCalculator = () => {
       _USDCAdded < 0 ||
       _yUSDPrice < 0 ||
       _poolLiquidity <= 0 ||
-      _umaPrice < 0 ||
+      _tokenPrice < 0 ||
       _weeklyPoolRewards < 0
     ) {
       return null;
@@ -112,8 +116,8 @@ const FarmingCalculator = () => {
 
     const totalValueAddedToPool = _USDCAdded + _yUSDPrice * _yUSDAdded;
     const fracLiquidityProvided = totalValueAddedToPool / _poolLiquidity;
-    const umaPaidPerWeek = fracLiquidityProvided * _weeklyPoolRewards;
-    const usdYieldPerWeek = umaPaidPerWeek * _umaPrice;
+    const tokensPaidPerWeek = fracLiquidityProvided * _weeklyPoolRewards;
+    const usdYieldPerWeek = tokensPaidPerWeek * _tokenPrice;
 
     let apr = 0;
     if (totalValueAddedToPool > 0) {
@@ -122,7 +126,7 @@ const FarmingCalculator = () => {
 
     return {
       fracLiquidityProvided,
-      umaPaidPerWeek,
+      tokensPaidPerWeek,
       usdYieldPerWeek,
       apr,
     };
@@ -133,10 +137,14 @@ const FarmingCalculator = () => {
     setDefaultValues();
 
     if (WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()]) {
-      // TODO: Display REN rewards as well
-      const _weeklyPoolRewards =
-        WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()].UMA;
-      setWeeklyPoolRewards(_weeklyPoolRewards.toString());
+      const selectedTokenRewards =
+        WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()];
+      setWeeklyUmaRewards(selectedTokenRewards.UMA.toString());
+      if (Object.keys(selectedTokenRewards).includes("REN")) {
+        setWeeklyRenRewards(selectedTokenRewards.REN.toString());
+      } else {
+        setWeeklyRenRewards(0);
+      }
     }
   }, [octPrice, sept20PoolData, oct20PoolData, tokenAddress]);
 
@@ -167,33 +175,58 @@ const FarmingCalculator = () => {
 
   // Update yield amount whenever inputs change.
   useEffect(() => {
-    const updatedYield = calculateYield(
+    const updatedUmaYield = calculateYield(
       Number(yUSDAdded) || 0,
       Number(USDCAdded) || 0,
       Number(yUSDPrice) || 0,
       Number(poolLiquidity) || 0,
       Number(umaPrice) || 0,
-      weeklyPoolRewards
+      weeklyUmaRewards
+    );
+    const updatedRenYield = calculateYield(
+      Number(yUSDAdded) || 0,
+      Number(USDCAdded) || 0,
+      Number(yUSDPrice) || 0,
+      Number(poolLiquidity) || 0,
+      Number(renPrice) || 0,
+      weeklyRenRewards
     );
 
-    if (updatedYield !== null) {
-      setFracLiquidity((updatedYield.fracLiquidityProvided * 100).toFixed(4));
-      setUmaYieldAmount(updatedYield.umaPaidPerWeek.toFixed(4));
-      setUsdYieldAmount(updatedYield.usdYieldPerWeek.toFixed(4));
-      setApr((updatedYield.apr * 100).toFixed(4));
+    if (updatedUmaYield !== null) {
+      setFracLiquidity(
+        (updatedUmaYield.fracLiquidityProvided * 100).toFixed(4)
+      );
+      setUmaYieldAmount(updatedUmaYield.tokensPaidPerWeek.toFixed(4));
+      setUsdYieldAmount(updatedUmaYield.usdYieldPerWeek.toFixed(4));
+      setApr((updatedUmaYield.apr * 100).toFixed(4));
     }
-  }, [yUSDAdded, USDCAdded, yUSDPrice, poolLiquidity, umaPrice]);
+    if (updatedRenYield !== null) {
+      setRenYieldAmount(updatedRenYield.tokensPaidPerWeek.toFixed(4));
+      setUsdYieldAmount(updatedRenYield.usdYieldPerWeek.toFixed(4));
+    }
+    if (updatedRenYield !== null && updatedUmaYield !== null) {
+      setUsdYieldAmount(
+        (
+          updatedUmaYield.usdYieldPerWeek + updatedRenYield.usdYieldPerWeek
+        ).toFixed(4)
+      );
+      setApr(((updatedUmaYield.apr + updatedRenYield.apr) * 100).toFixed(4));
+    }
+  }, [yUSDAdded, USDCAdded, yUSDPrice, poolLiquidity, umaPrice, renPrice]);
 
   return (
     <span>
-      <Typography variant="h5">UMA Liquidity Mining</Typography>
+      <Typography variant="h5">
+        UMA {weeklyRenRewards !== 0 && <span>& REN</span>} Liquidity Mining
+      </Typography>
 
       <br></br>
       <Typography>
-        During the liquidity mining program UMA rewards will be paid out to LP
-        providers in certain yield token balancer pools. Rewards are calculated
-        as a pro-rata contribution to the liquidity pool. To learn more about
-        the liquidity mining program see UMA Medium post{" "}
+        During the liquidity mining program UMA{" "}
+        {weeklyRenRewards !== 0 && <span>& REN</span>} rewards will be paid out
+        to LP providers in certain yield token balancer pools. Rewards are
+        calculated as a pro-rata contribution to the liquidity pool. To learn
+        more about the liquidity mining program see UMA Medium post{" "}
         <a
           href="https://medium.com/uma-project/liquidity-mining-on-uma-is-now-live-5f6cb0bd53ee"
           target="_blank"
@@ -237,7 +270,14 @@ const FarmingCalculator = () => {
         {Number(poolLiquidity).toLocaleString()}
         <br></br>
         <strong>Weekly UMA rewards for selected pool:</strong>{" "}
-        {weeklyPoolRewards.toLocaleString()}
+        {weeklyUmaRewards.toLocaleString()}
+        {weeklyRenRewards !== 0 && (
+          <span>
+            <br></br>
+            <strong>Weekly REN rewards for selected pool:</strong>{" "}
+            {weeklyRenRewards.toLocaleString()}
+          </span>
+        )}
         <br></br>
       </Typography>
 
@@ -286,7 +326,13 @@ const FarmingCalculator = () => {
             <Grid item md={6} sm={6} xs={12}>
               <Box textAlign="center">
                 <Typography variant="h6">
-                  Weekly rewards: <strong>{umaYieldAmount} UMA</strong>
+                  Weekly rewards: <strong>{umaYieldAmount} UMA</strong>{" "}
+                  {weeklyRenRewards !== 0 && (
+                    <span>
+                      <br></br>
+                      <strong>+ {renYieldAmount} REN</strong>
+                    </span>
+                  )}
                 </Typography>
                 <Typography>~{usdYieldAmount} USD per week</Typography>
               </Box>
@@ -296,15 +342,23 @@ const FarmingCalculator = () => {
                 <Typography variant="h6">
                   Yearly APR in USD <strong>{apr}%</strong>
                 </Typography>
-                <Typography>At current UMA price of {umaPrice}</Typography>
+                <Typography>
+                  At current UMA price of {umaPrice}
+                  {weeklyRenRewards !== 0 && (
+                    <span>
+                      <br></br> & REN price of {renPrice}
+                    </span>
+                  )}
+                </Typography>
               </Box>
             </Grid>
           </Grid>
         </form>
         <Box pt={4}>
           <Typography>
-            <strong>Note: </strong>Providing liquidity on Balancer will{" "}
-            <i>also</i> yield BAL rewards over and above UMA. To calculate your
+            <strong>Note: </strong>Providing liquidity on Balancer will also
+            yield BAL rewards over and above UMA{" "}
+            {weeklyRenRewards !== 0 && <span>& REN</span>}. To calculate your
             BAL rewards use{" "}
             <a
               href={`https://pools.vision/pool/${
