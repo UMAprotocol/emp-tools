@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   Container,
@@ -23,6 +23,10 @@ import AllPositions from "../features/all-positions/AllPositions";
 import Weth from "../features/weth/Weth";
 import Yield from "../features/yield/Yield";
 
+import Collateral from "../containers/Collateral";
+import WethContract from "../containers/WethContract";
+import Balancer from "../containers/Balancer";
+
 import GitHubIcon from "@material-ui/icons/GitHub";
 import TwitterIcon from "@material-ui/icons/Twitter";
 
@@ -45,14 +49,27 @@ export default function Index() {
   const [tabIndex, setTabIndex] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const { address: collAddress } = Collateral.useContainer();
+  const { contract: weth } = WethContract.useContainer();
+  const { isYieldToken } = Balancer.useContainer();
 
-  const options = [
-    "General Info",
-    "Manage Position",
-    "All Positions",
-    "Wrap/Unwrap WETH",
-    "yUSD Yield",
-  ];
+  const options = ["General Info", "Manage Position", "All Positions"];
+
+  if (isYieldToken) {
+    options.push("yUSD Yield");
+  }
+
+  if (weth && collAddress == weth.address) {
+    options.push("Wrap/Unwrap WETH");
+  }
+
+  // Update selected page if the user toggles between EMPs while selected on
+  // invalid pages (i.e on Wrap/Unwrap then moves to uUSDrBTC)
+  useEffect(() => {
+    if (tabIndex > options.length - 1) {
+      setTabIndex(0);
+    }
+  }, [collAddress, tabIndex]);
 
   const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -159,9 +176,9 @@ export default function Index() {
 
         {tabIndex === 2 && <AllPositions />}
 
-        {tabIndex === 3 && <Weth />}
+        {tabIndex === 3 && <Yield />}
 
-        {tabIndex === 4 && <Yield />}
+        {tabIndex === 4 && <Weth />}
       </Box>
       <Box py={4} textAlign="center">
         <IconButton

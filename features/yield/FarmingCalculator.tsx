@@ -60,8 +60,8 @@ const FarmingCalculator = () => {
     timeRemainingToFarmingRoll / 1000 / 60 / 60;
 
   // Yield inputs:
-  const [umaPrice, setUmaPrice] = useState<string>("");
-  const [renPrice, setRenPrice] = useState<string>("");
+  const [umaPrice, setUmaPrice] = useState<number>(0);
+  const [renPrice, setRenPrice] = useState<number>(0);
   const [yUSDPrice, setyUSDPrice] = useState<string>("");
   const [yUSDAdded, setyUSDAdded] = useState<string>("");
   const [USDCAdded, setUSDCAdded] = useState<string>("");
