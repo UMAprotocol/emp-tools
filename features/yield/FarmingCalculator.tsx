@@ -203,18 +203,21 @@ const FarmingCalculator = () => {
         </a>
         .
       </Typography>
-
-      <br></br>
-      <br></br>
-      <Typography>
-        <strong>Update (08/24 @ 23:00 UTC):</strong> Before August 28th, 23:00
-        UTC, LP contributions to either the yUSD-SEP20 or the yUSD-OCT20 are
-        considered equally. What this means is that UMA rewards are granted
-        pro-rata as: (your USD contribution) / (total SEP20 liquidity + total
-        OCT20 liquidity). After August 28, 23:00 UTC, only LP contributions in
-        the OCT20 pool will count towards liquidity mining rewards.
-      </Typography>
-
+      {hoursRemainingToFarmingRoll > 0 && (
+        <>
+          <br></br>
+          <br></br>
+          <Typography>
+            <strong>Update (08/24 @ 23:00 UTC):</strong> Before August 28th,
+            23:00 UTC, LP contributions to either the yUSD-SEP20 or the
+            yUSD-OCT20 are considered equally. What this means is that UMA
+            rewards are granted pro-rata as: (your USD contribution) / (total
+            SEP20 liquidity + total OCT20 liquidity). After August 28, 23:00
+            UTC, only LP contributions in the OCT20 pool will count towards
+            liquidity mining rewards.
+          </Typography>
+        </>
+      )}
       <br></br>
       <br></br>
       <Typography>
