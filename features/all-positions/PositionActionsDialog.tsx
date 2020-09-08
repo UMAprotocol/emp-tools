@@ -474,7 +474,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                           props.selectedSponsor?.toLowerCase() && (
                           <Box pt={2} pb={3}>
                             <Alert severity="warning">
-                              The owner of this position (
+                              The sponsor of this position (
                               <a
                                 href={getEtherscanUrl(props.selectedSponsor)}
                                 target="_blank"
