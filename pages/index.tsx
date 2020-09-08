@@ -69,9 +69,6 @@ export default function Index() {
   if (tabIndex > options.length - 1) {
     setTabIndex(0);
   }
-  // useEffect(() => {
-  //   console.log(tabIndex, options.length - 1);
-  // }, [collAddress, tabIndex]);
 
   const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
