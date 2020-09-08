@@ -93,6 +93,7 @@ const YieldCalculator = () => {
   return (
     <span>
       <Typography variant="h5">{tokenSymbol} Yield Calculator</Typography>
+      <br></br>
       <Typography>
         The yield for {tokenSymbol} changes if you plan on <i>buying</i> it as a
         borrower, looking for a stable yield or <i>selling</i> it as a lender,

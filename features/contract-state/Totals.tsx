@@ -64,8 +64,19 @@ const Totals = () => {
     tokenAddress !== null &&
     provider !== null
   ) {
-    const prettyTotalCollateral = Number(totalCollateral).toLocaleString();
-    const prettyTotalTokens = Number(totalTokens).toLocaleString();
+    const prettyTotalCollateral = Number(totalCollateral).toLocaleString(
+      undefined,
+      {
+        style: "decimal",
+        maximumFractionDigits: 4,
+        minimumFractionDigits: 4,
+      }
+    );
+    const prettyTotalTokens = Number(totalTokens).toLocaleString(undefined, {
+      style: "decimal",
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    });
     const prettyCollSymbol = collSymbol;
     const prettyTokenSymbol = tokenSymbol;
     const getExchangeLinkCollateral = exchangeInfo.getExchangeUrl(collAddress);
