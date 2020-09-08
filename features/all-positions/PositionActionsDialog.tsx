@@ -474,14 +474,15 @@ const PositionActionsDialog = (props: DialogProps) => {
                           props.selectedSponsor?.toLowerCase() && (
                           <Box pt={2} pb={3}>
                             <Alert severity="warning">
-                              The sponsor of this position (
+                              Make sure you control the sponsor address{" "}
                               <a
                                 href={getEtherscanUrl(props.selectedSponsor)}
                                 target="_blank"
                               >
                                 {prettyAddress(props.selectedSponsor)}
-                              </a>
-                              ) does not match the connected wallet address.
+                              </a>{" "}
+                              before depositing. Otherwise, you will lose your
+                              deposit.
                             </Alert>
                           </Box>
                         )}
