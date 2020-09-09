@@ -43,6 +43,12 @@ const FarmingCalculator = () => {
   const [rewardYieldAmounts, setRewardYieldAmounts] = useState<{
     [key: string]: string;
   }>({});
+  const [rewardTokenPrices, setRewardTokenPrices] = useState<{
+    [key: string]: string;
+  }>({});
+  const [userRewardAmounts, setUserRewardAmounts] = useState<{
+    [key: string]: string;
+  }>({});
   const [apr, setApr] = useState<string>("");
 
   // Render page once all data is loaded
@@ -116,9 +122,14 @@ const FarmingCalculator = () => {
         let usdPaidPerWeek = 0;
 
         // Sum USD rewards for each reward token
-        const usdRewards: { [key: string]: string } = {};
+        interface rewardTokenMap {
+          [key: string]: string;
+        }
+        const usdRewards: rewardTokenMap = {};
+        const tokenPrices: rewardTokenMap = {};
         for (let rewardObj of WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()]) {
           const _tokenPrice = await rewardObj.getPrice();
+          tokenPrices[rewardObj.token] = _tokenPrice.toLocaleString();
           const _rewards = rewardObj.count;
           const _usdYield = _tokenPrice * _rewards;
           usdPaidPerWeek += _usdYield;
@@ -126,6 +137,7 @@ const FarmingCalculator = () => {
         }
 
         setRewardYieldAmounts(usdRewards);
+        setRewardTokenPrices(tokenPrices);
         let _apr = usdPaidPerWeek * fracUnitLiquidityProvided * WEEKS_PER_YEAR;
         setApr((_apr * 100).toFixed(4));
       }
@@ -258,6 +270,29 @@ const FarmingCalculator = () => {
           <strong>Total liquidity eligible for mining rewards:</strong> $
           {Number(poolLiquidity).toLocaleString()}
           <br></br>
+          {WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()] &&
+            WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()].map((rewardObj) => {
+              if (
+                rewardYieldAmounts[rewardObj.token] &&
+                rewardTokenPrices[rewardObj.token]
+              ) {
+                return (
+                  <>
+                    <br></br>
+                    <strong>
+                      Weekly {rewardObj.token} distributed to pool:
+                    </strong>
+                    {" " + rewardObj.count.toLocaleString()} ($
+                    {rewardYieldAmounts[rewardObj.token]})<br></br>
+                    {`- 1 ${rewardObj.token} = $${
+                      rewardTokenPrices[rewardObj.token]
+                    }`}
+                  </>
+                );
+              } else {
+                return <></>;
+              }
+            })}
         </Typography>
 
         <Box pt={2}>
