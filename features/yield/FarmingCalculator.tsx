@@ -30,193 +30,196 @@ const FarmingCalculator = () => {
     YIELD_TOKENS,
     poolAddress,
   } = Balancer.useContainer();
-  const { symbol: tokenSymbol, address: tokenAddress } = Token.useContainer();
+  const { symbol: tokenSymbol, address } = Token.useContainer();
+
+  // Set a default token address
+  const [tokenAddress, setTokenAddress] = useState<string>(
+    Object.keys(YIELD_TOKENS)[0].toLowerCase()
+  );
 
   // Yield inputs:
   const [yUSDPrice, setyUSDPrice] = useState<string>("");
   const [yUSDAdded, setyUSDAdded] = useState<string>("");
   const [USDCAdded, setUSDCAdded] = useState<string>("");
   const [poolLiquidity, setPoolLiquidity] = useState<string>("");
+  const [rewardToken, setRewardToken] = useState<any[] | null>(null);
+  const [rewardTokenPrice, setRewardTokenPrice] = useState<number | null>(null);
+
+  // Set reward token data
+  const _rewardTokenPrice = getTokenPrice(tokenAddress);
+  useEffect(() => {
+    if (address) {
+      setTokenAddress(address.toLowerCase());
+    }
+    if (Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress)) {
+      setRewardToken(WEEKLY_UMA_REWARDS[tokenAddress]);
+    }
+    if (tokenAddress && _rewardTokenPrice) {
+      setRewardTokenPrice(_rewardTokenPrice);
+    }
+  }, [address, _rewardTokenPrice, tokenAddress]);
+
+  // Roll inputs:
+  const sept20PoolData = getPoolDataForToken(
+    Object.keys(YIELD_TOKENS)[0].toLowerCase()
+  );
+  const rewardTokenPoolData = getPoolDataForToken(tokenAddress);
+  const cutOffDateForRoll = Date.UTC(2020, 7, 28, 23, 0, 0, 0);
+  const currentDate = new Date();
+  const currentDateUTC = Date.UTC(
+    currentDate.getUTCFullYear(),
+    currentDate.getUTCMonth(),
+    currentDate.getUTCDate(),
+    currentDate.getUTCHours(),
+    currentDate.getUTCMinutes(),
+    currentDate.getUTCSeconds(),
+    currentDate.getUTCMilliseconds()
+  );
+  const timeRemainingToFarmingRoll =
+    cutOffDateForRoll.valueOf() - currentDateUTC.valueOf();
+  const isRolled = timeRemainingToFarmingRoll <= 0;
+  const hoursRemainingToFarmingRoll =
+    timeRemainingToFarmingRoll / 1000 / 60 / 60;
 
   // Yield outputs:
   const [fracLiquidity, setFracLiquidity] = useState<string>("");
   const [rewardYieldAmounts, setRewardYieldAmounts] = useState<{
-    [key: string]: string;
+    [key: string]: number;
   }>({});
   const [rewardTokenPrices, setRewardTokenPrices] = useState<{
-    [key: string]: string;
-  }>({});
-  const [userRewardAmounts, setUserRewardAmounts] = useState<{
-    [key: string]: string;
+    [key: string]: number;
   }>({});
   const [apr, setApr] = useState<string>("");
 
+  const setDefaultValues = async () => {
+    if (rewardTokenPrice && rewardTokenPoolData && sept20PoolData) {
+      // Note: usdPrice should be a combination of the two pools prior to Aug 28 but the error is small
+      // so we will hardcode this to the Oct price.
+      setyUSDPrice(rewardTokenPrice.toString());
+      if (!isRolled) {
+        setPoolLiquidity(
+          (
+            rewardTokenPoolData.pool.liquidity + sept20PoolData.pool.liquidity
+          ).toString()
+        );
+      } else {
+        setPoolLiquidity(rewardTokenPoolData.pool.liquidity.toString());
+      }
+    }
+  };
+
+  const calculateApr = async () => {
+    if (Number(poolLiquidity) > 0 && rewardToken) {
+      const fracUnitLiquidityProvided = 1 / Number(poolLiquidity);
+      let usdPaidPerWeek = 0;
+
+      // Sum USD rewards for each reward token
+      interface rewardTokenMap {
+        [key: string]: number;
+      }
+      const usdRewards: rewardTokenMap = {};
+      const tokenPrices: rewardTokenMap = {};
+      for (let rewardObj of rewardToken) {
+        const _tokenPrice = await rewardObj.getPrice();
+        tokenPrices[rewardObj.token] = _tokenPrice;
+        const _rewards = rewardObj.count;
+        const _usdYield = _tokenPrice * _rewards;
+        usdPaidPerWeek += _usdYield;
+        usdRewards[rewardObj.token] = _usdYield;
+      }
+
+      setRewardYieldAmounts(usdRewards);
+      setRewardTokenPrices(tokenPrices);
+      let _apr = usdPaidPerWeek * fracUnitLiquidityProvided * WEEKS_PER_YEAR;
+      setApr((_apr * 100).toFixed(4));
+    }
+  };
+
+  const calculatePoolShare = (
+    _yUSDAdded: number,
+    _USDCAdded: number,
+    _yUSDPrice: number,
+    _poolLiquidity: number
+  ) => {
+    if (
+      _yUSDAdded < 0 ||
+      _USDCAdded < 0 ||
+      _yUSDPrice < 0 ||
+      _poolLiquidity <= 0
+    ) {
+      return null;
+    }
+
+    const totalValueAddedToPool = _USDCAdded + _yUSDPrice * _yUSDAdded;
+    const fracLiquidityProvided = totalValueAddedToPool / _poolLiquidity;
+
+    return {
+      fracLiquidityProvided,
+    };
+  };
+
+  // Update default pool information
+  useEffect(() => {
+    setDefaultValues();
+  }, [rewardTokenPrice, sept20PoolData, rewardTokenPoolData, tokenAddress]);
+
+  // Update APR
+  useEffect(() => {
+    calculateApr();
+  }, [tokenAddress, poolLiquidity]);
+
+  // Update pool ownership
+  useEffect(() => {
+    if (
+      sept20PoolData &&
+      rewardTokenPoolData &&
+      yUSDAdded === "" &&
+      USDCAdded === ""
+    ) {
+      const userShareFractionSept = sept20PoolData.userSharesFraction;
+      const yUSDShareSept =
+        sept20PoolData.pool.tokenBalanceEmp * userShareFractionSept;
+      const USDCShareSept =
+        sept20PoolData.pool.tokenBalanceOther * userShareFractionSept;
+
+      const userShareFractionOct = rewardTokenPoolData.userSharesFraction;
+      const yUSDShareOct =
+        rewardTokenPoolData.pool.tokenBalanceEmp * userShareFractionOct;
+      const USDCShareOct =
+        rewardTokenPoolData.pool.tokenBalanceOther * userShareFractionOct;
+
+      setyUSDAdded((yUSDShareSept + yUSDShareOct).toString());
+      setUSDCAdded((USDCShareSept + USDCShareOct).toString());
+    }
+  }, [sept20PoolData, rewardTokenPoolData]);
+
+  // Update pool share
+  useEffect(() => {
+    const updatedPoolShare = calculatePoolShare(
+      Number(yUSDAdded) || 0,
+      Number(USDCAdded) || 0,
+      Number(yUSDPrice) || 0,
+      Number(poolLiquidity) || 0
+    );
+
+    if (updatedPoolShare !== null) {
+      setFracLiquidity(
+        (updatedPoolShare.fracLiquidityProvided * 100).toFixed(4)
+      );
+    }
+  }, [yUSDAdded, USDCAdded, yUSDPrice, poolLiquidity]);
+
   // Render page once all data is loaded
-  if (tokenAddress === null) {
+  // Only display farming calculator for tokens eligible for LM rewards
+  if (!rewardToken) {
     return (
       <Box>
         <Typography>
-          <i>Loading data...</i>
+          <i>Selected token is ineligible for liquidity mining rewards</i>
         </Typography>
       </Box>
     );
   } else {
-    // Only display farming calculator for tokens eligible for LM rewards
-    if (!Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress.toLowerCase())) {
-      return (
-        <Box>
-          <Typography>
-            <i>Selected token is ineligible for liquidity mining rewards</i>
-          </Typography>
-        </Box>
-      );
-    }
-
-    const octPrice = getTokenPrice(tokenAddress.toLowerCase());
-    const sept20PoolData = getPoolDataForToken(
-      Object.keys(YIELD_TOKENS)[0].toLowerCase()
-    );
-    const oct20PoolData = getPoolDataForToken(tokenAddress.toLowerCase());
-
-    // Calculate roll timing information
-    const cutOffDateForRoll = Date.UTC(2020, 7, 28, 23, 0, 0, 0);
-    const currentDate = new Date();
-    const currentDateUTC = Date.UTC(
-      currentDate.getUTCFullYear(),
-      currentDate.getUTCMonth(),
-      currentDate.getUTCDate(),
-      currentDate.getUTCHours(),
-      currentDate.getUTCMinutes(),
-      currentDate.getUTCSeconds(),
-      currentDate.getUTCMilliseconds()
-    );
-    const timeRemainingToFarmingRoll =
-      cutOffDateForRoll.valueOf() - currentDateUTC.valueOf();
-    const isRolled = timeRemainingToFarmingRoll <= 0;
-    const hoursRemainingToFarmingRoll =
-      timeRemainingToFarmingRoll / 1000 / 60 / 60;
-
-    const setDefaultValues = async () => {
-      if (octPrice && oct20PoolData && sept20PoolData) {
-        // Note: usdPrice should be a combination of the two pools prior to Aug 28 but the error is small
-        // so we will hardcode this to the Oct price.
-        setyUSDPrice(octPrice.toString());
-        if (!isRolled) {
-          setPoolLiquidity(
-            (
-              oct20PoolData.pool.liquidity + sept20PoolData.pool.liquidity
-            ).toString()
-          );
-        } else {
-          setPoolLiquidity(oct20PoolData.pool.liquidity.toString());
-        }
-      }
-    };
-
-    const calculateApr = async () => {
-      if (
-        Number(poolLiquidity) > 0 &&
-        WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()]
-      ) {
-        const fracUnitLiquidityProvided = 1 / Number(poolLiquidity);
-        let usdPaidPerWeek = 0;
-
-        // Sum USD rewards for each reward token
-        interface rewardTokenMap {
-          [key: string]: string;
-        }
-        const usdRewards: rewardTokenMap = {};
-        const tokenPrices: rewardTokenMap = {};
-        for (let rewardObj of WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()]) {
-          const _tokenPrice = await rewardObj.getPrice();
-          tokenPrices[rewardObj.token] = _tokenPrice.toLocaleString();
-          const _rewards = rewardObj.count;
-          const _usdYield = _tokenPrice * _rewards;
-          usdPaidPerWeek += _usdYield;
-          usdRewards[rewardObj.token] = _usdYield.toLocaleString();
-        }
-
-        setRewardYieldAmounts(usdRewards);
-        setRewardTokenPrices(tokenPrices);
-        let _apr = usdPaidPerWeek * fracUnitLiquidityProvided * WEEKS_PER_YEAR;
-        setApr((_apr * 100).toFixed(4));
-      }
-    };
-
-    const calculatePoolShare = (
-      _yUSDAdded: number,
-      _USDCAdded: number,
-      _yUSDPrice: number,
-      _poolLiquidity: number
-    ) => {
-      if (
-        _yUSDAdded < 0 ||
-        _USDCAdded < 0 ||
-        _yUSDPrice < 0 ||
-        _poolLiquidity <= 0
-      ) {
-        return null;
-      }
-
-      const totalValueAddedToPool = _USDCAdded + _yUSDPrice * _yUSDAdded;
-      const fracLiquidityProvided = totalValueAddedToPool / _poolLiquidity;
-
-      return {
-        fracLiquidityProvided,
-      };
-    };
-
-    // Update default pool information
-    useEffect(() => {
-      setDefaultValues();
-    }, [octPrice, sept20PoolData, oct20PoolData, tokenAddress]);
-
-    // Update APR
-    useEffect(() => {
-      calculateApr();
-    }, [tokenAddress, poolLiquidity]);
-
-    // Update pool ownership
-    useEffect(() => {
-      if (
-        sept20PoolData &&
-        oct20PoolData &&
-        yUSDAdded === "" &&
-        USDCAdded === ""
-      ) {
-        const userShareFractionSept = sept20PoolData.userSharesFraction;
-        const yUSDShareSept =
-          sept20PoolData.pool.tokenBalanceEmp * userShareFractionSept;
-        const USDCShareSept =
-          sept20PoolData.pool.tokenBalanceOther * userShareFractionSept;
-
-        const userShareFractionOct = oct20PoolData.userSharesFraction;
-        const yUSDShareOct =
-          oct20PoolData.pool.tokenBalanceEmp * userShareFractionOct;
-        const USDCShareOct =
-          oct20PoolData.pool.tokenBalanceOther * userShareFractionOct;
-
-        setyUSDAdded((yUSDShareSept + yUSDShareOct).toString());
-        setUSDCAdded((USDCShareSept + USDCShareOct).toString());
-      }
-    }, [sept20PoolData, oct20PoolData]);
-
-    // Update pool share
-    useEffect(() => {
-      const updatedPoolShare = calculatePoolShare(
-        Number(yUSDAdded) || 0,
-        Number(USDCAdded) || 0,
-        Number(yUSDPrice) || 0,
-        Number(poolLiquidity) || 0
-      );
-
-      if (updatedPoolShare !== null) {
-        setFracLiquidity(
-          (updatedPoolShare.fracLiquidityProvided * 100).toFixed(4)
-        );
-      }
-    }, [yUSDAdded, USDCAdded, yUSDPrice, poolLiquidity]);
-
     return (
       <span>
         <Typography variant="h5">UMA Liquidity Mining</Typography>
@@ -270,28 +273,25 @@ const FarmingCalculator = () => {
           <strong>Total liquidity eligible for mining rewards:</strong> $
           {Number(poolLiquidity).toLocaleString()}
           <br></br>
-          {WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()] &&
-            WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()].map((rewardObj) => {
-              if (
+          {rewardToken &&
+            rewardToken.map((rewardObj) => {
+              return (
                 rewardYieldAmounts[rewardObj.token] &&
-                rewardTokenPrices[rewardObj.token]
-              ) {
-                return (
-                  <>
+                rewardTokenPrices[rewardObj.token] && (
+                  <span key={rewardObj.token}>
                     <br></br>
                     <strong>
                       Weekly {rewardObj.token} distributed to pool:
                     </strong>
                     {" " + rewardObj.count.toLocaleString()} ($
-                    {rewardYieldAmounts[rewardObj.token]})<br></br>
-                    {`- 1 ${rewardObj.token} = $${
-                      rewardTokenPrices[rewardObj.token]
-                    }`}
-                  </>
-                );
-              } else {
-                return <></>;
-              }
+                    {rewardYieldAmounts[rewardObj.token].toLocaleString()})
+                    <br></br>
+                    {`- 1 ${rewardObj.token} = $${rewardTokenPrices[
+                      rewardObj.token
+                    ].toLocaleString()}`}
+                  </span>
+                )
+              );
             })}
         </Typography>
 
@@ -339,21 +339,28 @@ const FarmingCalculator = () => {
               </Grid>
               <Grid item md={6} sm={6} xs={12}>
                 <Box textAlign="center">
-                  <Typography variant="h6">Weekly rewards:</Typography>
-                  {WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()] &&
-                    WEEKLY_UMA_REWARDS[tokenAddress.toLowerCase()].map(
-                      (rewardObj) => {
+                  <Typography variant="h6">
+                    Projected weekly rewards:
+                  </Typography>
+                  {fracLiquidity &&
+                    rewardToken &&
+                    rewardToken.map((rewardObj) => {
+                      if (rewardTokenPrices[rewardObj.token]) {
+                        const userReward =
+                          Number(fracLiquidity) * rewardObj.count;
+                        const userRewardUsd =
+                          userReward * rewardTokenPrices[rewardObj.token];
                         return (
                           <Typography key={rewardObj.token}>
-                            -{" "}
-                            <strong>
-                              {rewardObj.count} {rewardObj.token} ($
-                              {rewardYieldAmounts[rewardObj.token]})
-                            </strong>
+                            {"- " +
+                              userReward.toLocaleString() +
+                              ` ${
+                                rewardObj.token
+                              } ($${userRewardUsd.toLocaleString()})`}
                           </Typography>
                         );
                       }
-                    )}
+                    })}
                 </Box>
               </Grid>
               <Grid item md={6} sm={6} xs={12}>
