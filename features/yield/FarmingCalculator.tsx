@@ -347,7 +347,7 @@ const FarmingCalculator = () => {
                     rewardToken.map((rewardObj) => {
                       if (rewardTokenPrices[rewardObj.token]) {
                         const userReward =
-                          Number(fracLiquidity) * rewardObj.count;
+                          (Number(fracLiquidity) * rewardObj.count) / 100;
                         const userRewardUsd =
                           userReward * rewardTokenPrices[rewardObj.token];
                         return (
