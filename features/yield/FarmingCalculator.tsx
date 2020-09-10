@@ -352,11 +352,13 @@ const FarmingCalculator = () => {
                           userReward * rewardTokenPrices[rewardObj.token];
                         return (
                           <Typography key={rewardObj.token}>
-                            {"- " +
-                              userReward.toLocaleString() +
-                              ` ${
-                                rewardObj.token
-                              } ($${userRewardUsd.toLocaleString()})`}
+                            {"- "}
+                            <strong>
+                              {userReward.toLocaleString() +
+                                ` ${
+                                  rewardObj.token
+                                } ($${userRewardUsd.toLocaleString()})`}
+                            </strong>
                           </Typography>
                         );
                       }
