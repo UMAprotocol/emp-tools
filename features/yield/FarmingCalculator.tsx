@@ -166,7 +166,7 @@ const FarmingCalculator = () => {
   // Update APR
   useEffect(() => {
     calculateApr();
-  }, [tokenAddress, poolLiquidity]);
+  }, [tokenAddress, poolLiquidity, rewardToken, rewardTokenPrices]);
 
   // Update pool ownership
   useEffect(() => {
