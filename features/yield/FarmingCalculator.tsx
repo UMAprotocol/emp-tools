@@ -355,10 +355,9 @@ const FarmingCalculator = () => {
                             {"- "}
                             <strong>
                               {userReward.toLocaleString() +
-                                ` ${
-                                  rewardObj.token
-                                } ($${userRewardUsd.toLocaleString()})`}
+                                ` ${rewardObj.token}`}
                             </strong>
+                            {` ($${userRewardUsd.toLocaleString()})`}
                           </Typography>
                         );
                       }
