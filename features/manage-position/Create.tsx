@@ -161,9 +161,10 @@ const Create = () => {
       parseFloat(pricedResultantCR) >= 0 &&
       parseFloat(pricedResultantCR) < collReqFromWei;
     const transactionCRBelowGCR = transactionCR < gcr;
+    const resultantCRBelowGCR = resultantCR < gcr;
 
     const mintTokens = async () => {
-      if (collateralToDeposit > 0 && tokensToCreate > 0) {
+      if (collateralToDeposit >= 0 && tokensToCreate > 0) {
         setHash(null);
         setSuccess(null);
         setError(null);
@@ -324,11 +325,11 @@ const Create = () => {
                     variant="contained"
                     onClick={mintTokens}
                     disabled={
-                      transactionCRBelowGCR ||
+                      (transactionCRBelowGCR && resultantCRBelowGCR) ||
                       balanceBelowCollateralToDeposit ||
                       resultantCRBelowRequirement ||
                       resultantTokensBelowMin ||
-                      collateralToDeposit <= 0 ||
+                      collateralToDeposit < 0 ||
                       tokensToCreate <= 0
                     }
                   >
@@ -345,12 +346,18 @@ const Create = () => {
               <Tooltip
                 placement="right"
                 title={
+                  resultantCRBelowGCR &&
                   transactionCRBelowGCR &&
-                  `This must be above the GCR: ${pricedGCR}`
+                  `Since your resulting position's CR < GCR, then this transaction CR must be above the GCR: ${pricedGCR}`
                 }
               >
                 <span
-                  style={{ color: transactionCRBelowGCR ? "red" : "unset" }}
+                  style={{
+                    color:
+                      resultantCRBelowGCR && transactionCRBelowGCR
+                        ? "red"
+                        : "unset",
+                  }}
                 >
                   {pricedTransactionCR}
                 </span>
