@@ -120,7 +120,9 @@ const Redeem = () => {
     };
 
     const setTokensToRedeemToMax = () => {
-      if (tokenBalance > posTokens) {
+      // `tokenBalance` and `posTokens` might be incorrectly rounded,
+      // so we round them arbitrarily to the same precision to compare.
+      if (tokenBalance.toFixed(4) >= posTokens.toFixed(4)) {
         setTokens(posTokensString);
       } else {
         setTokens(tokenBalance.toString());
