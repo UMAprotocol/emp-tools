@@ -47,6 +47,7 @@ const Redeem = () => {
     decimals: tokenDec,
     setMaxAllowance,
     balance: tokenBalance,
+    balanceBN: tokenBalanceBN,
   } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
@@ -60,6 +61,7 @@ const Redeem = () => {
     posCollString !== null &&
     minSponsorTokens !== null &&
     tokenBalance !== null &&
+    tokenBalanceBN !== null &&
     tokenDec !== null &&
     tokenSymbol !== null &&
     tokenAllowance !== null &&
@@ -121,8 +123,8 @@ const Redeem = () => {
 
     const setTokensToRedeemToMax = () => {
       // `tokenBalance` and `posTokens` might be incorrectly rounded,
-      // so we round them arbitrarily to the same precision to compare.
-      if (tokenBalance.toFixed(4) >= posTokens.toFixed(4)) {
+      // so we compare their raw BN's instead.
+      if (tokenBalanceBN.gte(toWeiSafe(posTokensString, tokenDec))) {
         setTokens(posTokensString);
       } else {
         setTokens(tokenBalance.toString());
