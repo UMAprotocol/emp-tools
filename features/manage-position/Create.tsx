@@ -19,7 +19,9 @@ import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
+import Connection from "../../containers/Connection";
 
+import { legacyEMPs } from "../../utils/legacyEmps";
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../utils/getDocLinks";
@@ -43,6 +45,7 @@ const MinLink = styled.div`
 const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
 const Create = () => {
+  const { network } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const {
@@ -98,6 +101,7 @@ const Create = () => {
   };
 
   if (
+    network !== null &&
     collReq !== null &&
     collDec !== null &&
     balance !== null &&
@@ -162,6 +166,12 @@ const Create = () => {
       parseFloat(pricedResultantCR) < collReqFromWei;
     const transactionCRBelowGCR = transactionCR < gcr;
     const resultantCRBelowGCR = resultantCR < gcr;
+    const cannotMint = legacyEMPs[network.chainId].includes(emp.address)
+      ? transactionCRBelowGCR
+      : transactionCRBelowGCR && resultantCRBelowGCR;
+    console.log(
+      `legacy EMP: ${legacyEMPs[network.chainId].includes(emp.address)}`
+    );
 
     const mintTokens = async () => {
       if (collateralToDeposit >= 0 && tokensToCreate > 0) {
@@ -325,7 +335,7 @@ const Create = () => {
                     variant="contained"
                     onClick={mintTokens}
                     disabled={
-                      (transactionCRBelowGCR && resultantCRBelowGCR) ||
+                      cannotMint ||
                       balanceBelowCollateralToDeposit ||
                       resultantCRBelowRequirement ||
                       resultantTokensBelowMin ||
@@ -346,17 +356,15 @@ const Create = () => {
               <Tooltip
                 placement="right"
                 title={
-                  resultantCRBelowGCR &&
                   transactionCRBelowGCR &&
-                  `Since your resulting position's CR < GCR, then this transaction CR must be above the GCR: ${pricedGCR}`
+                  cannotMint &&
+                  `This transaction CR must be above the GCR: ${pricedGCR}`
                 }
               >
                 <span
                   style={{
                     color:
-                      resultantCRBelowGCR && transactionCRBelowGCR
-                        ? "red"
-                        : "unset",
+                      transactionCRBelowGCR && cannotMint ? "red" : "unset",
                   }}
                 >
                   {pricedTransactionCR}
