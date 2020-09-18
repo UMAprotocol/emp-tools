@@ -14,8 +14,15 @@ export function toWeiSafe(
   const precisionToUse = desiredPrecision
     ? desiredPrecision
     : DEFAULT_PRECISION;
-  return toWei(
-    Number(numberToConvertToWei).toFixed(precisionToUse),
-    precisionToUse
-  );
+
+  // Try converting just the raw string first to avoid unneccessary stripping of precision.
+  try {
+    return toWei(numberToConvertToWei, precisionToUse);
+  } catch (err) {
+    // This shouldn't throw an error, and if it does then its unexpected and we want to know about it.
+    return toWei(
+      Number(numberToConvertToWei).toFixed(precisionToUse),
+      precisionToUse
+    );
+  }
 }

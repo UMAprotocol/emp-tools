@@ -21,6 +21,7 @@ function useToken() {
   const [decimals, setDecimals] = useState<number | null>(null);
   const [allowance, setAllowance] = useState<number | "Infinity" | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
+  const [balanceBN, setBalanceBN] = useState<BigNumber | null>(null);
 
   const getTokenInfo = async () => {
     if (contract) {
@@ -44,6 +45,7 @@ function useToken() {
       setName(name);
       setDecimals(decimals);
       setBalance(balance);
+      setBalanceBN(balanceRaw);
       setAllowance(allowance);
     }
   };
@@ -64,6 +66,7 @@ function useToken() {
     setName(null);
     setDecimals(null);
     setBalance(null);
+    setBalanceBN(null);
     setAllowance(null);
     getTokenInfo();
   }, [contract]);
@@ -91,6 +94,7 @@ function useToken() {
     symbol,
     decimals,
     balance,
+    balanceBN,
     allowance,
     setMaxAllowance,
   };
