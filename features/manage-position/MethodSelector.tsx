@@ -12,6 +12,10 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { Method } from "./ManagePosition";
 
 import EmpState from "../../containers/EmpState";
+import EmpAddress from "../../containers/EmpAddress";
+import Connection from "../../containers/Connection";
+
+import { legacyEMPs } from "../../utils/legacyEmps";
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
@@ -43,6 +47,8 @@ interface IProps {
 
 const MethodSelector = ({ method, handleChange }: IProps) => {
   const { empState } = EmpState.useContainer();
+  const { empAddress } = EmpAddress.useContainer();
+  const { network } = Connection.useContainer();
   const { isExpired } = empState;
   if (isExpired !== null) {
     return renderComponent(isExpired);
@@ -51,6 +57,10 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
   }
 
   function renderComponent(contractHasExpired: boolean = false) {
+    // Older EMP contracts cannot redeem or cancel withdrawal requests post-expiry.
+    const cannotRedeemAndWithdrawPostExpiry =
+      network && empAddress && legacyEMPs[network.chainId].includes(empAddress);
+
     return (
       <Box py={2}>
         <FormWrapper>
@@ -61,7 +71,16 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
             onChange={handleChange}
             input={<BootstrapInput />}
           >
-            {contractHasExpired
+            {contractHasExpired && cannotRedeemAndWithdrawPostExpiry
+              ? [
+                  <MenuItem key={"settle"} value={"settle"}>
+                    <ListItemText
+                      primary="Settle"
+                      secondary="Settle expired tokens at settlement price."
+                    />
+                  </MenuItem>,
+                ]
+              : contractHasExpired
               ? [
                   <MenuItem key={"settle"} value={"settle"}>
                     <ListItemText
