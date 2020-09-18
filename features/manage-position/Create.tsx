@@ -169,9 +169,6 @@ const Create = () => {
     const cannotMint = legacyEMPs[network.chainId].includes(emp.address)
       ? transactionCRBelowGCR
       : transactionCRBelowGCR && resultantCRBelowGCR;
-    console.log(
-      `legacy EMP: ${legacyEMPs[network.chainId].includes(emp.address)}`
-    );
 
     const mintTokens = async () => {
       if (collateralToDeposit >= 0 && tokensToCreate > 0) {
