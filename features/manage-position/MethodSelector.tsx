@@ -66,7 +66,19 @@ const MethodSelector = ({ method, handleChange }: IProps) => {
                   <MenuItem key={"settle"} value={"settle"}>
                     <ListItemText
                       primary="Settle"
-                      secondary="Settle expired tokens."
+                      secondary="Settle expired tokens at settlement price."
+                    />
+                  </MenuItem>,
+                  <MenuItem key={"withdraw"} value={"withdraw"}>
+                    <ListItemText
+                      primary="Withdraw"
+                      secondary="Cancel pending withdrawal requests"
+                    />
+                  </MenuItem>,
+                  <MenuItem key={"redeem"} value={"redeem"}>
+                    <ListItemText
+                      primary="Redeem"
+                      secondary="Redeem synthetic tokens for locked collateral."
                     />
                   </MenuItem>,
                 ]
