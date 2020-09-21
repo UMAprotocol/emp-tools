@@ -135,9 +135,14 @@ const Withdraw = () => {
       pendingWithdrawTimeRemaining > 0
         ? Math.max(0, Math.floor(pendingWithdrawTimeRemaining / 3600)) +
           ":" +
-          Math.max(0, Math.floor((pendingWithdrawTimeRemaining % 3600) / 60)) +
+          (
+            "00" +
+            Math.max(0, Math.floor((pendingWithdrawTimeRemaining % 3600) / 60))
+          ).slice(-2) +
           ":" +
-          Math.max(0, (pendingWithdrawTimeRemaining % 3600) % 60)
+          (
+            "00" + Math.max(0, (pendingWithdrawTimeRemaining % 3600) % 60)
+          ).slice(-2)
         : "None";
 
     // Error conditions for calling withdraw:
