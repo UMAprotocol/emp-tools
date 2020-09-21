@@ -23,16 +23,17 @@ const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
   ], // uUSDrBTC-OCT
 };
 
+// TODO: `rollFromToken` needs to be replaced with NOV20 token addresses
 const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
   "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": {
     label: "October uUSDrETH Roll",
-    rollFromToken: "0x208d174775dc39fe18b1b374972f77ddec6c0f73",
+    rollFromToken: "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4",
     rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
   }, // yUSDETH-Oct20 --> yUSDETH-Nov20
   "0x208d174775dc39fe18b1b374972f77ddec6c0f73": {
     label: "October uUSDrBTC Roll",
-    rollFromToken: "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4",
+    rollFromToken: "0x208d174775dc39fe18b1b374972f77ddec6c0f73",
     rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
   }, // uUSDrBTC-OCT --> uUSDrBTC-Nov20
