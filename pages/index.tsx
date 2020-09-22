@@ -59,7 +59,7 @@ export default function Index() {
     options.push("yUSD Yield");
   }
 
-  if (weth && collAddress == weth.address) {
+  if (weth && collAddress?.toLowerCase() == weth.address.toLowerCase()) {
     options.push("Wrap/Unwrap WETH");
   }
 
