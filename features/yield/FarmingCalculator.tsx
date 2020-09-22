@@ -103,6 +103,10 @@ const FarmingCalculator = () => {
   const hoursRemainingToFarmingRoll =
     timeUntilRoll && timeUntilRoll / 1000 / 60 / 60;
 
+  const getDateReadable = (dateObj: Date | undefined) => {
+    if (!dateObj) return "N/A";
+    return new Date(dateObj).toISOString().replace("T", " ").substr(0, 19);
+  };
   const setDefaultValues = async () => {
     if (currentTokenPrice && rollFromPool) {
       setyUSDPrice(currentTokenPrice.toString());
@@ -280,13 +284,14 @@ const FarmingCalculator = () => {
             <br></br>
             <br></br>
             <Typography>
-              <strong>Update (09/23 @ 23:00 UTC):</strong> Before September
-              23rd, 23:00 UTC, LP contributions to either the OCT20 or the NOV20
-              are considered equally. What this means is that UMA rewards are
-              granted pro-rata as: (your USD contribution) / (total OCT20
-              liquidity + total NOV20 liquidity). After September 27, 23:00 UTC,
-              only LP contributions in the NOV20 pool will count towards
-              liquidity mining rewards.
+              <strong>Liquidity mining rewards during the roll:</strong> Before{" "}
+              {getDateReadable(rollDate)}, LP contributions to either the{" "}
+              {tokenSymbol} or the {rollTokenName} are considered equally. What
+              this means is that rewards are granted pro-rata as: (your USD
+              contribution) / (total {tokenSymbol} liquidity + total{" "}
+              {rollTokenName} liquidity). After {getDateReadable(rollDate)},
+              only LP contributions in the {rollTokenName} pool will count
+              towards liquidity mining rewards.
             </Typography>
           </>
         )}
