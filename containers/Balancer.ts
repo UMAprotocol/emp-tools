@@ -56,13 +56,13 @@ const YIELD_TOKENS: yieldToken = {
     token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     token1: "0x208d174775dc39fe18b1b374972f77ddec6c0f73",
   }, // uUSDrBTC-OCT
-  "0x3605ec11ba7bd208501cbb24cd890bc58d2dba56": {
-    token0: "0x3605ec11ba7bd208501cbb24cd890bc58d2dba56",
+  "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9": {
+    token0: "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9",
     token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   }, // uUSDwETH-DEC
-  "0xabbee9fc7a882499162323eeb7bf6614193312e3": {
+  "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce": {
     token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    token1: "0xabbee9fc7a882499162323eeb7bf6614193312e3",
+    token1: "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce",
   }, // uUSDrBTC-DEC
 };
 
@@ -148,6 +148,8 @@ const useBalancer = () => {
     }
     if (!tokenPriceLoading && tokenPriceData) {
       const data = tokenPriceData.tokenPrices[0];
+      if (!data) return null;
+
       setUsdPrice(Number(data.price));
       const _poolAddress = data.poolTokenId.split("-")[0];
       // const _tokenAddress = data.poolTokenId.split("-")[1];
@@ -217,6 +219,8 @@ const useBalancer = () => {
     }
     if (!loading && data) {
       const tokenData = data.tokenPrices[0];
+      if (!tokenData) return null;
+
       const usdPrice = Number(tokenData.price);
       return usdPrice;
     }

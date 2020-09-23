@@ -27,14 +27,14 @@ const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
 const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
   "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": {
     rollToTokenName: "uUSDwETH-DEC",
-    rollToToken: "0x3605ec11ba7bd208501cbb24cd890bc58d2dba56",
-    rollStartDate: Date.UTC(2020, 8, 23, 0, 0, 0, 0),
+    rollToToken: "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9",
+    rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
   }, // yUSDETH-Oct20 --> uUSDwETH-DEC
   "0x208d174775dc39fe18b1b374972f77ddec6c0f73": {
     rollToTokenName: "uUSDrBTC-DEC",
-    rollToToken: "0xabbee9fc7a882499162323eeb7bf6614193312e3",
-    rollStartDate: Date.UTC(2020, 8, 23, 0, 0, 0, 0),
+    rollToToken: "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce",
+    rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
   }, // uUSDrBTC-OCT --> uUSDrBTC-DEC
 };
