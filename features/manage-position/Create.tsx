@@ -19,7 +19,9 @@ import Totals from "../../containers/Totals";
 import Position from "../../containers/Position";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
+import Connection from "../../containers/Connection";
 
+import { legacyEMPs } from "../../utils/legacyEmps";
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../utils/getDocLinks";
@@ -43,6 +45,7 @@ const MinLink = styled.div`
 const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
 const Create = () => {
+  const { network } = Connection.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const {
@@ -78,26 +81,97 @@ const Create = () => {
   } = empState;
   const liquidationPriceWarningThreshold = 0.1;
 
-  const setBackingCollateralToMin = (_gcr: number, _tokens: number) => {
+  // Sets `collateral` to the min amount of collateral that can be added to `startingCollateral` to keep the CR <= GCR.
+  const _setBackingCollateralToMin = (
+    _gcr: number,
+    _tokens: number,
+    startingCollateral: number
+  ) => {
     // Set amount of collateral to the minimum required by the GCR constraint. This
     // is intended to encourage users to maximize their capital efficiency.
-    const minBackingCollateral = _gcr * _tokens;
-    // We want to round down the number for better UI display, but we don't actually want the collateral
-    // amount to round down since we want the minimum amount of collateral to pass the GCR constraint. So,
-    // we'll add a tiny amount of collateral to avoid accidentally rounding too low.
-    setCollateral((minBackingCollateral + 0.00005).toFixed(4));
+    const minBackingCollateral = _gcr * _tokens - startingCollateral;
+    if (minBackingCollateral < 0) {
+      setCollateral("0");
+    } else {
+      // We want to round down the number for better UI display, but we don't actually want the collateral
+      // amount to round down since we want the minimum amount of collateral to pass the GCR constraint. So,
+      // we'll add a tiny amount of collateral to avoid accidentally rounding too low.
+      setCollateral((minBackingCollateral + 0.00005).toFixed(4));
+    }
   };
 
-  const setTokensToMax = (_gcr: number, collateral: number) => {
+  const setBackingCollateralToMin = (
+    _gcr: number,
+    transactionTokens: number,
+    resultantPositionTokens: number,
+    positionTokens: number,
+    positionCollateral: number,
+    isLegacyEmp: boolean
+  ) => {
+    if (isLegacyEmp) {
+      // In legacy EMP's, transaction CR must be > GCR
+      _setBackingCollateralToMin(_gcr, transactionTokens, 0);
+    } else {
+      // Current EMP's require position CR must be > GCR otherwise transaction CR > GCR, therefore
+      // if the current CR < GCR, then the min amount of collateral to deposit is equal to transaction CR (and resultant
+      // CR will still be < GCR). If the current CR > GCR, then the min amount of collateral to deposit would set the
+      // resultant CR to the GCR
+      const currentCR =
+        positionTokens > 0 ? positionCollateral / positionTokens : 0;
+      if (currentCR < _gcr) {
+        _setBackingCollateralToMin(_gcr, transactionTokens, 0);
+      } else {
+        _setBackingCollateralToMin(
+          _gcr,
+          resultantPositionTokens,
+          positionCollateral
+        );
+      }
+    }
+  };
+
+  // Sets `tokens` to the max amount of tokens that can be added to `startingTokens` to keep the CR <= GCR.
+  const _setTokensToMax = (
+    _gcr: number,
+    collateral: number,
+    startingTokens: number
+  ) => {
     // Set amount of tokens to the maximum required by the GCR constraint. This
     // is intended to encourage users to maximize their capital efficiency.
-    const maxTokensToCreate = _gcr > 0 ? collateral / _gcr : 0;
+    const maxTokensToCreate = _gcr > 0 ? collateral / _gcr - startingTokens : 0;
     // Unlike the min collateral, we're ok if we round down the tokens slightly as round down
     // can only increase the position's CR and maintain it above the GCR constraint.
     setTokens((maxTokensToCreate - 0.0001).toFixed(4));
   };
 
+  const setTokensToMax = (
+    _gcr: number,
+    transactionCollateral: number,
+    resultantPositionCollateral: number,
+    positionTokens: number,
+    positionCollateral: number,
+    isLegacyEmp: boolean
+  ) => {
+    if (isLegacyEmp) {
+      // In legacy EMP's, transaction CR must be > GCR
+      _setTokensToMax(_gcr, transactionCollateral, 0);
+    } else {
+      // Current EMP's require position CR must be > GCR otherwise transaction CR > GCR, therefore
+      // if the current CR < GCR, then the max amount of tokens to mint is equal to transaction CR (and resultant
+      // CR will still be < GCR). If the current CR > GCR, then the max amount of tokens to mint would set the
+      // resultant CR to the GCR
+      const currentCR =
+        positionTokens > 0 ? positionCollateral / positionTokens : 0;
+      if (currentCR < _gcr) {
+        _setTokensToMax(_gcr, transactionCollateral, 0);
+      } else {
+        _setTokensToMax(_gcr, resultantPositionCollateral, positionTokens);
+      }
+    }
+  };
+
   if (
+    network !== null &&
     collReq !== null &&
     collDec !== null &&
     balance !== null &&
@@ -161,9 +235,14 @@ const Create = () => {
       parseFloat(pricedResultantCR) >= 0 &&
       parseFloat(pricedResultantCR) < collReqFromWei;
     const transactionCRBelowGCR = transactionCR < gcr;
+    const resultantCRBelowGCR = resultantCR < gcr;
+    const isLegacyEmp = legacyEMPs[network.chainId].includes(emp.address);
+    const cannotMint = isLegacyEmp
+      ? transactionCRBelowGCR
+      : transactionCRBelowGCR && resultantCRBelowGCR;
 
     const mintTokens = async () => {
-      if (collateralToDeposit > 0 && tokensToCreate > 0) {
+      if (collateralToDeposit >= 0 && tokensToCreate > 0) {
         setHash(null);
         setSuccess(null);
         setError(null);
@@ -260,7 +339,16 @@ const Create = () => {
                       >
                         <Button
                           fullWidth
-                          onClick={() => setTokensToMax(gcr, collateralNum)}
+                          onClick={() =>
+                            setTokensToMax(
+                              gcr,
+                              collateralNum,
+                              resultantCollateral,
+                              posTokens,
+                              posCollateral,
+                              isLegacyEmp
+                            )
+                          }
                         >
                           <MinLink>Max</MinLink>
                         </Button>
@@ -296,7 +384,14 @@ const Create = () => {
                         <Button
                           fullWidth
                           onClick={() =>
-                            setBackingCollateralToMin(gcr, tokensNum)
+                            setBackingCollateralToMin(
+                              gcr,
+                              tokensNum,
+                              resultantTokens,
+                              posTokens,
+                              posCollateral,
+                              isLegacyEmp
+                            )
                           }
                         >
                           <MinLink>Min</MinLink>
@@ -324,11 +419,11 @@ const Create = () => {
                     variant="contained"
                     onClick={mintTokens}
                     disabled={
-                      transactionCRBelowGCR ||
+                      cannotMint ||
                       balanceBelowCollateralToDeposit ||
                       resultantCRBelowRequirement ||
                       resultantTokensBelowMin ||
-                      collateralToDeposit <= 0 ||
+                      collateralToDeposit < 0 ||
                       tokensToCreate <= 0
                     }
                   >
@@ -346,11 +441,15 @@ const Create = () => {
                 placement="right"
                 title={
                   transactionCRBelowGCR &&
-                  `This must be above the GCR: ${pricedGCR}`
+                  cannotMint &&
+                  `This transaction CR must be above the GCR: ${pricedGCR}`
                 }
               >
                 <span
-                  style={{ color: transactionCRBelowGCR ? "red" : "unset" }}
+                  style={{
+                    color:
+                      transactionCRBelowGCR && cannotMint ? "red" : "unset",
+                  }}
                 >
                   {pricedTransactionCR}
                 </span>
