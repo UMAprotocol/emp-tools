@@ -56,6 +56,14 @@ const YIELD_TOKENS: yieldToken = {
     token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     token1: "0x208d174775dc39fe18b1b374972f77ddec6c0f73",
   }, // uUSDrBTC-OCT
+  "0x3605ec11ba7bd208501cbb24cd890bc58d2dba56": {
+    token0: "0x3605ec11ba7bd208501cbb24cd890bc58d2dba56",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // uUSDwETH-DEC
+  "0xabbee9fc7a882499162323eeb7bf6614193312e3": {
+    token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    token1: "0xabbee9fc7a882499162323eeb7bf6614193312e3",
+  }, // uUSDrBTC-DEC
 };
 
 const useBalancer = () => {
@@ -241,6 +249,7 @@ const useBalancer = () => {
     }
     if (!loading && data && _tokenAddress && _swapTokenAddress) {
       const poolData = data.pools[0];
+      if (!poolData) return null;
 
       const shareHolders: SharesState = {};
       poolData.shares.forEach((share: SharesQuery) => {
