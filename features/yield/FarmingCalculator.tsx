@@ -26,17 +26,17 @@ const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
 // TODO: `rollToToken` needs to be replaced with NOV20 token addresses
 const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
   "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": {
-    rollToTokenName: "uUSDrETH-NOV20",
+    rollToTokenName: "uUSDwETH-DEC",
     rollToToken: "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4",
-    rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
+    rollStartDate: Date.UTC(2020, 8, 23, 0, 0, 0, 0),
     rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
   }, // yUSDETH-Oct20 --> yUSDETH-Nov20
   "0x208d174775dc39fe18b1b374972f77ddec6c0f73": {
-    rollToTokenName: "uUSDrBTC-NOV20",
+    rollToTokenName: "uUSDrBTC-DEC",
     rollToToken: "0x208d174775dc39fe18b1b374972f77ddec6c0f73",
     rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
-  }, // uUSDrBTC-OCT --> uUSDrBTC-Nov20
+  }, // uUSDrBTC-OCT --> uUSDrBTC-DEC
 };
 
 const FarmingCalculator = () => {

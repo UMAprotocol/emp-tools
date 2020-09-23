@@ -79,6 +79,8 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.usdbtc;
     case symbol?.includes("uUSDrETH"):
       return PRICEFEED_PARAMS.usdeth;
+    case symbol?.includes("uUSDwETH"):
+      return PRICEFEED_PARAMS.usdeth;
     case symbol?.includes("yUSD"):
       return PRICEFEED_PARAMS.usdeth;
     default:
