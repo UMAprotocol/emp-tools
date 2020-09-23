@@ -23,7 +23,6 @@ const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
   ], // uUSDrBTC-OCT
 };
 
-// TODO: `rollToToken` needs to be replaced with NOV20 token addresses
 const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
   "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": {
     rollToTokenName: "uUSDwETH-DEC",
