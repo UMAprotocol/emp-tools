@@ -61,8 +61,8 @@ const YIELD_TOKENS: yieldToken = {
     token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   }, // uUSDwETH-DEC
   "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce": {
-    token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    token1: "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce",
+    token0: "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   }, // uUSDrBTC-DEC
 };
 
@@ -148,7 +148,6 @@ const useBalancer = () => {
     }
     if (!tokenPriceLoading && tokenPriceData) {
       const data = tokenPriceData.tokenPrices[0];
-      if (!data) return null;
 
       setUsdPrice(Number(data.price));
       const _poolAddress = data.poolTokenId.split("-")[0];
@@ -219,7 +218,6 @@ const useBalancer = () => {
     }
     if (!loading && data) {
       const tokenData = data.tokenPrices[0];
-      if (!tokenData) return null;
 
       const usdPrice = Number(tokenData.price);
       return usdPrice;
@@ -253,7 +251,6 @@ const useBalancer = () => {
     }
     if (!loading && data && _tokenAddress && _swapTokenAddress) {
       const poolData = data.pools[0];
-      if (!poolData) return null;
 
       const shareHolders: SharesState = {};
       poolData.shares.forEach((share: SharesQuery) => {
