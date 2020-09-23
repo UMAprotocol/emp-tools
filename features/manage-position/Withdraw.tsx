@@ -45,6 +45,7 @@ const Withdraw = () => {
     withdrawalLiveness,
     currentTime,
     priceIdentifier,
+    isExpired,
   } = empState;
 
   const { contract: emp } = EmpContract.useContainer();
@@ -68,6 +69,7 @@ const Withdraw = () => {
   const [error, setError] = useState<Error | null>(null);
 
   if (
+    isExpired !== null &&
     collateral !== null &&
     emp !== null &&
     collDec !== null &&
@@ -218,71 +220,122 @@ const Withdraw = () => {
     };
 
     if (hasPendingWithdraw) {
+      // If EMP is expired, user can only cancel pending withdrawal requests.
+      if (isExpired) {
+        return (
+          <Box>
+            <Box pt={4} pb={2}>
+              <Typography>
+                <i>You have a pending withdraw on your position!</i>
+              </Typography>
+            </Box>
+
+            <Box pb={2}>
+              <Box py={2}>
+                <Typography>
+                  You may cancel any pending withdrawal requests that you made
+                  prior to the EMP expiration. Post expiry, the only way to
+                  remove collateral from this contract is to Settle or Redeem
+                  synthetic tokens.
+                </Typography>
+              </Box>
+
+              <Box py={2}>
+                <Typography>
+                  <strong>Requested withdrawal amount: </strong>{" "}
+                  {`${withdrawAmt} ${collSymbol}`}
+                </Typography>
+              </Box>
+              <Box py={2}>
+                <Button variant="contained" onClick={cancelWithdraw}>
+                  {`Cancel withdraw request`}
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        );
+      } else {
+        return (
+          <Box>
+            <Box pt={4} pb={2}>
+              <Typography>
+                <i>You have a pending withdraw on your position!</i>
+              </Typography>
+            </Box>
+
+            <Box pb={2}>
+              <Box py={2}>
+                <Typography>
+                  Once the liveness period has passed you can execute your
+                  withdrawal request. You can cancel the withdraw request at any
+                  time before you execute it.
+                </Typography>
+              </Box>
+
+              <Box py={2}>
+                <Typography>
+                  <Box display="flex" alignItems="center">
+                    <Box width="100%">
+                      <strong>Time left until withdrawal: </strong>
+                      {pendingWithdrawTimeString}
+                    </Box>
+                    <Box width="100%" mr={1}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={progressBarPercent}
+                      />{" "}
+                    </Box>
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                      >{`${progressBarPercent.toFixed(4)}%`}</Typography>
+                    </Box>
+                  </Box>
+                  <br></br>
+                  <strong>Requested withdrawal amount: </strong>{" "}
+                  {`${withdrawAmt} ${collSymbol}`}
+                </Typography>
+              </Box>
+              <Box py={2}>
+                <Tooltip
+                  placement="bottom"
+                  title={
+                    !canExecutePendingWithdraw &&
+                    "Once the withdrawal liveness period passes you will be able to click this button"
+                  }
+                >
+                  <span>
+                    <Button
+                      variant="contained"
+                      onClick={executeWithdraw}
+                      disabled={!canExecutePendingWithdraw}
+                      style={{ marginRight: `12px` }}
+                    >
+                      {`Withdraw ${withdrawAmt} ${collSymbol} from your position`}
+                    </Button>
+                  </span>
+                </Tooltip>
+                <Button variant="contained" onClick={cancelWithdraw}>
+                  {`Cancel withdraw request`}
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        );
+      }
+    }
+
+    if (isExpired) {
       return (
         <Box>
-          <Box pt={4} pb={2}>
+          <Box py={2}>
             <Typography>
-              <i>You have a pending withdraw on your position!</i>
+              <i>
+                You cannot withdraw from an expired EMP. You may remove
+                collateral by settling or redeeming synthetic tokens.
+              </i>
             </Typography>
-          </Box>
-
-          <Box pb={2}>
-            <Box py={2}>
-              <Typography>
-                Once the liveness period has passed you can execute your
-                withdrawal request. You can cancel the withdraw request at any
-                time before you execute it.
-              </Typography>
-            </Box>
-
-            <Box py={2}>
-              <Typography>
-                <Box display="flex" alignItems="center">
-                  <Box width="100%">
-                    <strong>Time left until withdrawal: </strong>
-                    {pendingWithdrawTimeString}
-                  </Box>
-                  <Box width="100%" mr={1}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={progressBarPercent}
-                    />{" "}
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                    >{`${progressBarPercent.toFixed(4)}%`}</Typography>
-                  </Box>
-                </Box>
-                <br></br>
-                <strong>Requested withdrawal amount: </strong>{" "}
-                {`${withdrawAmt} ${collSymbol}`}
-              </Typography>
-            </Box>
-            <Box py={2}>
-              <Tooltip
-                placement="bottom"
-                title={
-                  !canExecutePendingWithdraw &&
-                  "Once the withdrawal liveness period passes you will be able to click this button"
-                }
-              >
-                <span>
-                  <Button
-                    variant="contained"
-                    onClick={executeWithdraw}
-                    disabled={!canExecutePendingWithdraw}
-                    style={{ marginRight: `12px` }}
-                  >
-                    {`Withdraw ${withdrawAmt} ${collSymbol} from your position`}
-                  </Button>
-                </span>
-              </Tooltip>
-              <Button variant="contained" onClick={cancelWithdraw}>
-                {`Cancel withdraw request`}
-              </Button>
-            </Box>
           </Box>
         </Box>
       );
