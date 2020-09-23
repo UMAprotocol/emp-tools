@@ -56,6 +56,14 @@ const YIELD_TOKENS: yieldToken = {
     token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     token1: "0x208d174775dc39fe18b1b374972f77ddec6c0f73",
   }, // uUSDrBTC-OCT
+  "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9": {
+    token0: "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // uUSDwETH-DEC
+  "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce": {
+    token0: "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // uUSDrBTC-DEC
 };
 
 const useBalancer = () => {
@@ -140,6 +148,7 @@ const useBalancer = () => {
     }
     if (!tokenPriceLoading && tokenPriceData) {
       const data = tokenPriceData.tokenPrices[0];
+
       setUsdPrice(Number(data.price));
       const _poolAddress = data.poolTokenId.split("-")[0];
       // const _tokenAddress = data.poolTokenId.split("-")[1];
@@ -209,6 +218,7 @@ const useBalancer = () => {
     }
     if (!loading && data) {
       const tokenData = data.tokenPrices[0];
+
       const usdPrice = Number(tokenData.price);
       return usdPrice;
     }

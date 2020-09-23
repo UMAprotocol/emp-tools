@@ -23,6 +23,21 @@ const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
   ], // uUSDrBTC-OCT
 };
 
+const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
+  "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": {
+    rollToTokenName: "uUSDwETH-DEC",
+    rollToToken: "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9",
+    rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
+    rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+  }, // yUSDETH-Oct20 --> uUSDwETH-DEC
+  "0x208d174775dc39fe18b1b374972f77ddec6c0f73": {
+    rollToTokenName: "uUSDrBTC-DEC",
+    rollToToken: "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce",
+    rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
+    rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+  }, // uUSDrBTC-OCT --> uUSDrBTC-DEC
+};
+
 const FarmingCalculator = () => {
   const {
     getTokenPrice,
@@ -38,48 +53,12 @@ const FarmingCalculator = () => {
   );
 
   // Yield inputs:
+  const currentTokenPrice = getTokenPrice(tokenAddress);
   const [yUSDPrice, setyUSDPrice] = useState<string>("");
   const [yUSDAdded, setyUSDAdded] = useState<string>("");
   const [USDCAdded, setUSDCAdded] = useState<string>("");
   const [poolLiquidity, setPoolLiquidity] = useState<string>("");
   const [rewardToken, setRewardToken] = useState<any[] | null>(null);
-  const [rewardTokenPrice, setRewardTokenPrice] = useState<number | null>(null);
-
-  // Set reward token data
-  const _rewardTokenPrice = getTokenPrice(tokenAddress);
-  useEffect(() => {
-    if (address) {
-      setTokenAddress(address.toLowerCase());
-    }
-    if (Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress)) {
-      setRewardToken(WEEKLY_UMA_REWARDS[tokenAddress]);
-    }
-    if (tokenAddress && _rewardTokenPrice) {
-      setRewardTokenPrice(_rewardTokenPrice);
-    }
-  }, [address, _rewardTokenPrice, tokenAddress]);
-
-  // Roll inputs:
-  const sept20PoolData = getPoolDataForToken(
-    Object.keys(YIELD_TOKENS)[0].toLowerCase()
-  );
-  const rewardTokenPoolData = getPoolDataForToken(tokenAddress);
-  const cutOffDateForRoll = Date.UTC(2020, 7, 28, 23, 0, 0, 0);
-  const currentDate = new Date();
-  const currentDateUTC = Date.UTC(
-    currentDate.getUTCFullYear(),
-    currentDate.getUTCMonth(),
-    currentDate.getUTCDate(),
-    currentDate.getUTCHours(),
-    currentDate.getUTCMinutes(),
-    currentDate.getUTCSeconds(),
-    currentDate.getUTCMilliseconds()
-  );
-  const timeRemainingToFarmingRoll =
-    cutOffDateForRoll.valueOf() - currentDateUTC.valueOf();
-  const isRolled = timeRemainingToFarmingRoll <= 0;
-  const hoursRemainingToFarmingRoll =
-    timeRemainingToFarmingRoll / 1000 / 60 / 60;
 
   // Yield outputs:
   const [fracLiquidity, setFracLiquidity] = useState<string>("");
@@ -91,19 +70,59 @@ const FarmingCalculator = () => {
   }>({});
   const [apr, setApr] = useState<string>("");
 
+  // Roll inputs
+  const [rollToTokenObj, setRollToTokenObj] = useState<any | null>(null);
+  const [rollToTokenAddress, setRollToTokenAddress] = useState<string>(
+    tokenAddress
+  );
+
+  // Roll outputs
+  const rollFromPool = getPoolDataForToken(tokenAddress);
+  const rollToPool = getPoolDataForToken(rollToTokenAddress);
+  const rollStartDate = rollToTokenObj && rollToTokenObj.rollStartDate;
+  const rollTokenName = rollToTokenObj && rollToTokenObj.rollToTokenName;
+  const rollDate = rollToTokenObj && rollToTokenObj.rollDate;
+  const currentDate = new Date();
+  const currentDateUTC = Date.UTC(
+    currentDate.getUTCFullYear(),
+    currentDate.getUTCMonth(),
+    currentDate.getUTCDate(),
+    currentDate.getUTCHours(),
+    currentDate.getUTCMinutes(),
+    currentDate.getUTCSeconds(),
+    currentDate.getUTCMilliseconds()
+  );
+  // `timeUntilRoll` will be > 0 if mid-roll, < 0 if post-roll, or false if roll has not started
+  const timeUntilRoll =
+    rollStartDate &&
+    currentDateUTC.valueOf() - rollStartDate.valueOf() > 0 &&
+    rollDate &&
+    rollDate.valueOf() - currentDateUTC.valueOf();
+  const isRolled = timeUntilRoll ? timeUntilRoll <= 0 : true;
+  const hoursRemainingToFarmingRoll =
+    timeUntilRoll && timeUntilRoll / 1000 / 60 / 60;
+
+  const getDateReadable = (dateObj: Date | undefined) => {
+    if (!dateObj) return "N/A";
+    return new Date(dateObj).toISOString().replace("T", " ").substr(0, 19);
+  };
   const setDefaultValues = async () => {
-    if (rewardTokenPrice && rewardTokenPoolData && sept20PoolData) {
-      // Note: usdPrice should be a combination of the two pools prior to Aug 28 but the error is small
-      // so we will hardcode this to the Oct price.
-      setyUSDPrice(rewardTokenPrice.toString());
-      if (!isRolled) {
+    if (currentTokenPrice && rollFromPool) {
+      setyUSDPrice(currentTokenPrice.toString());
+
+      // Scenario 1: Roll has finished, reward to current pool has ended
+      if (timeUntilRoll && isRolled && rollToPool) {
+        setPoolLiquidity("0");
+      }
+      // Scenario 2: Roll is currently undergoing, contributions to either pool should accrue equally.
+      else if (timeUntilRoll && !isRolled && rollToPool) {
         setPoolLiquidity(
-          (
-            rewardTokenPoolData.pool.liquidity + sept20PoolData.pool.liquidity
-          ).toString()
+          (rollToPool.pool.liquidity + rollFromPool.pool.liquidity).toString()
         );
-      } else {
-        setPoolLiquidity(rewardTokenPoolData.pool.liquidity.toString());
+      }
+      // Scenario 3: Roll has not happened yet or is not applicable, reward to current pool only
+      else {
+        setPoolLiquidity(rollFromPool.pool.liquidity.toString());
       }
     }
   };
@@ -132,6 +151,8 @@ const FarmingCalculator = () => {
       setRewardTokenPrices(tokenPrices);
       let _apr = usdPaidPerWeek * fracUnitLiquidityProvided * WEEKS_PER_YEAR;
       setApr((_apr * 100).toFixed(4));
+    } else {
+      setApr("0");
     }
   };
 
@@ -158,10 +179,32 @@ const FarmingCalculator = () => {
     };
   };
 
+  // Set roll and LM reward token information
+  useEffect(() => {
+    if (address) {
+      setTokenAddress(address.toLowerCase());
+    }
+    if (Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress)) {
+      setRewardToken(WEEKLY_UMA_REWARDS[tokenAddress]);
+    }
+
+    // Check if token should display roll information.
+    if (Object.keys(ROLL_REWARDS_SCHEDULE).includes(tokenAddress)) {
+      setRollToTokenObj(ROLL_REWARDS_SCHEDULE[tokenAddress]);
+    } else {
+      setRollToTokenObj(null);
+    }
+
+    // Update roll rewards information.
+    if (rollToTokenObj) {
+      setRollToTokenAddress(rollToTokenObj.rollToToken.toLowerCase());
+    }
+  }, [address, tokenAddress, rollToTokenObj]);
+
   // Update default pool information
   useEffect(() => {
     setDefaultValues();
-  }, [rewardTokenPrice, sept20PoolData, rewardTokenPoolData, tokenAddress]);
+  }, [currentTokenPrice, rollFromPool, rollToPool, tokenAddress]);
 
   // Update APR
   useEffect(() => {
@@ -170,28 +213,23 @@ const FarmingCalculator = () => {
 
   // Update pool ownership
   useEffect(() => {
-    if (
-      sept20PoolData &&
-      rewardTokenPoolData &&
-      yUSDAdded === "" &&
-      USDCAdded === ""
-    ) {
-      const userShareFractionSept = sept20PoolData.userSharesFraction;
-      const yUSDShareSept =
-        sept20PoolData.pool.tokenBalanceEmp * userShareFractionSept;
-      const USDCShareSept =
-        sept20PoolData.pool.tokenBalanceOther * userShareFractionSept;
+    if (rollFromPool && rollToPool && yUSDAdded === "" && USDCAdded === "") {
+      const userShareFractionRollFrom = rollFromPool.userSharesFraction;
+      const yUSDShareRollFrom =
+        rollFromPool.pool.tokenBalanceEmp * userShareFractionRollFrom;
+      const USDCShareRollFrom =
+        rollFromPool.pool.tokenBalanceOther * userShareFractionRollFrom;
 
-      const userShareFractionOct = rewardTokenPoolData.userSharesFraction;
-      const yUSDShareOct =
-        rewardTokenPoolData.pool.tokenBalanceEmp * userShareFractionOct;
-      const USDCShareOct =
-        rewardTokenPoolData.pool.tokenBalanceOther * userShareFractionOct;
+      const userShareFractionRollTo = rollToPool.userSharesFraction;
+      const yUSDShareRollTo =
+        rollToPool.pool.tokenBalanceEmp * userShareFractionRollTo;
+      const USDCShareRollTo =
+        rollToPool.pool.tokenBalanceOther * userShareFractionRollTo;
 
-      setyUSDAdded((yUSDShareSept + yUSDShareOct).toString());
-      setUSDCAdded((USDCShareSept + USDCShareOct).toString());
+      setyUSDAdded((yUSDShareRollFrom + yUSDShareRollTo).toString());
+      setUSDCAdded((USDCShareRollFrom + USDCShareRollTo).toString());
     }
-  }, [sept20PoolData, rewardTokenPoolData]);
+  }, [rollFromPool, rollToPool]);
 
   // Update pool share
   useEffect(() => {
@@ -240,32 +278,35 @@ const FarmingCalculator = () => {
           </a>
           .
         </Typography>
-        {hoursRemainingToFarmingRoll > 0 && (
+        {timeUntilRoll && timeUntilRoll > 0 && (
           <>
             <br></br>
             <br></br>
             <Typography>
-              <strong>Update (08/24 @ 23:00 UTC):</strong> Before August 28th,
-              23:00 UTC, LP contributions to either the yUSD-SEP20 or the
-              yUSD-OCT20 are considered equally. What this means is that UMA
-              rewards are granted pro-rata as: (your USD contribution) / (total
-              SEP20 liquidity + total OCT20 liquidity). After August 28, 23:00
-              UTC, only LP contributions in the OCT20 pool will count towards
-              liquidity mining rewards.
+              <strong>Liquidity mining rewards during the roll:</strong> Before{" "}
+              {getDateReadable(rollDate)}, LP contributions to either the{" "}
+              {tokenSymbol} or the {rollTokenName} are considered equally. What
+              this means is that rewards are granted pro-rata as: (your USD
+              contribution) / (total {tokenSymbol} liquidity + total{" "}
+              {rollTokenName} liquidity). After {getDateReadable(rollDate)},
+              only LP contributions in the {rollTokenName} pool will count
+              towards liquidity mining rewards.
             </Typography>
           </>
         )}
         <br></br>
         <br></br>
         <Typography>
-          <strong>Pools eligible for liquidity mining:</strong>{" "}
-          {isRolled ? "yUSD-OCT, uUSDrBTC-OCT" : "SEPT + OCT"}
+          <strong>Tokens eligible for liquidity mining:</strong>{" "}
+          {timeUntilRoll
+            ? isRolled
+              ? rollTokenName
+              : `${tokenSymbol} + ${rollTokenName}`
+            : tokenSymbol}
           <br></br>
-          {hoursRemainingToFarmingRoll > 0 && (
+          {hoursRemainingToFarmingRoll && hoursRemainingToFarmingRoll > 0 && (
             <>
-              <strong>
-                Hours remaining until liquidity mining rolls to OCT:
-              </strong>{" "}
+              <strong>Hours remaining until liquidity mining rolls:</strong>{" "}
               {hoursRemainingToFarmingRoll.toFixed(2)}
               <br></br>
             </>
