@@ -52,6 +52,13 @@ const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     },
+    {
+      token: "REN",
+      count: 25000,
+      getPrice: getRenPrice,
+      startDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
+      endDate: Date.UTC(2020, 9, 1, 0, 0, 0),
+    },
   ], // uUSDrBTC-DEC
 };
 
