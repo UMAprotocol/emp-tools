@@ -6,6 +6,7 @@ import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
 
 import { getUmaPrice, getRenPrice } from "../../utils/getCoinGeckoTokenPrice";
+import { YIELD_TOKENS } from "../../utils/yieldTokenList";
 
 const FormInput = styled.div`
   margin-top: 20px;
@@ -42,7 +43,6 @@ const FarmingCalculator = () => {
   const {
     getTokenPrice,
     getPoolDataForToken,
-    YIELD_TOKENS,
     poolAddress,
   } = Balancer.useContainer();
   const { symbol: tokenSymbol, address } = Token.useContainer();
@@ -137,13 +137,21 @@ const FarmingCalculator = () => {
         [key: string]: number;
       }
       const usdRewards: rewardTokenMap = {};
-      const tokenPrices: rewardTokenMap = {};
+
+      // Fetch token prices if not set already.
+      let tokenPrices: rewardTokenMap = rewardTokenPrices;
       for (let rewardObj of rewardToken) {
-        const _tokenPrice = await rewardObj.getPrice();
-        tokenPrices[rewardObj.token] = _tokenPrice;
+        let _tokenPrice;
+        if (!tokenPrices[rewardObj.token]) {
+          _tokenPrice = await rewardObj.getPrice();
+          tokenPrices[rewardObj.token] = _tokenPrice;
+        } else {
+          _tokenPrice = tokenPrices[rewardObj.token];
+        }
         const _rewards = rewardObj.count;
         const _usdYield = _tokenPrice * _rewards;
         usdPaidPerWeek += _usdYield;
+
         usdRewards[rewardObj.token] = _usdYield;
       }
 
@@ -186,6 +194,8 @@ const FarmingCalculator = () => {
     }
     if (Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress)) {
       setRewardToken(WEEKLY_UMA_REWARDS[tokenAddress]);
+    } else {
+      setRewardToken(null);
     }
 
     // Check if token should display roll information.

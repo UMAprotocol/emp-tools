@@ -14,7 +14,6 @@ import { isPricefeedInvertedFromTokenSymbol } from "../utils/getOffchainPrice";
 
 import { useQuery } from "@apollo/client";
 import { EMP_DATA } from "../apollo/uma/queries";
-import { client } from "../apollo/client";
 
 // Interfaces for dApp state storage.
 interface SponsorPositionState {
@@ -72,14 +71,9 @@ const useEmpSponsors = () => {
   const { decimals: collDecs } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
 
-  // Because apollo caches results of queries, we will poll/refresh this query periodically.
-  // We set the poll interval to a very slow 5 seconds for now since the position states
-  // are not expected to change much.
-  // Source: https://www.apollographql.com/docs/react/data/queries/#polling
   const subgraphToQuery = `UMA${network?.chainId.toString()}`;
   const { loading, error, data } = useQuery(EMP_DATA, {
     context: { clientName: subgraphToQuery },
-    pollInterval: 5000,
   });
 
   const getCollateralRatio = (

@@ -24,8 +24,10 @@ import Weth from "../features/weth/Weth";
 import Yield from "../features/yield/Yield";
 
 import Collateral from "../containers/Collateral";
+import Token from "../containers/Token";
 import WethContract from "../containers/WethContract";
-import Balancer from "../containers/Balancer";
+
+import { YIELD_TOKENS } from "../utils/yieldTokenList";
 
 import GitHubIcon from "@material-ui/icons/GitHub";
 import TwitterIcon from "@material-ui/icons/Twitter";
@@ -50,8 +52,12 @@ export default function Index() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { address: collAddress } = Collateral.useContainer();
+  const { address: tokenAddress } = Token.useContainer();
   const { contract: weth } = WethContract.useContainer();
-  const { isYieldToken } = Balancer.useContainer();
+
+  const isYieldToken =
+    tokenAddress &&
+    Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
   const options = ["General Info", "Manage Position", "All Positions"];
 
