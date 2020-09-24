@@ -156,8 +156,12 @@ const FarmingCalculator = () => {
     if (currentTokenPrice && rollFromPool) {
       setyUSDPrice(currentTokenPrice.toString());
 
+      // Scenario 0: Current token is the roll to token and the roll has occurred, reward to current pool only.
+      if (timeUntilRoll && isRolled && isRollToToken && rollToPool) {
+        setPoolLiquidity(rollToPool.pool.liquidity.toString());
+      }
       // Scenario 1: Roll has finished, reward to current pool has ended
-      if (timeUntilRoll && isRolled && rollToPool) {
+      else if (timeUntilRoll && isRolled && rollToPool) {
         setPoolLiquidity("0");
       }
       // Scenario 2: Roll is currently undergoing, contributions to either pool should accrue equally.
@@ -282,6 +286,9 @@ const FarmingCalculator = () => {
         setRollFromTokenObj(ROLL_REWARDS_SCHEDULE[rollFromAddress]);
         setRollFromTokenAddress(rollFromAddress);
         setIsRollToToken(true);
+        break;
+      } else {
+        setIsRollToToken(false);
       }
     }
   }, [address, tokenAddress, rollFromTokenObj, rollFromTokenAddress]);
