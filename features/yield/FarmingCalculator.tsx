@@ -137,13 +137,21 @@ const FarmingCalculator = () => {
         [key: string]: number;
       }
       const usdRewards: rewardTokenMap = {};
-      const tokenPrices: rewardTokenMap = {};
+
+      // Fetch token prices if not set already.
+      let tokenPrices: rewardTokenMap = rewardTokenPrices;
       for (let rewardObj of rewardToken) {
-        const _tokenPrice = await rewardObj.getPrice();
-        tokenPrices[rewardObj.token] = _tokenPrice;
+        let _tokenPrice;
+        if (!tokenPrices[rewardObj.token]) {
+          _tokenPrice = await rewardObj.getPrice();
+          tokenPrices[rewardObj.token] = _tokenPrice;
+        } else {
+          _tokenPrice = tokenPrices[rewardObj.token];
+        }
         const _rewards = rewardObj.count;
         const _usdYield = _tokenPrice * _rewards;
         usdPaidPerWeek += _usdYield;
+
         usdRewards[rewardObj.token] = _usdYield;
       }
 
