@@ -42,7 +42,7 @@ const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
       token: "UMA",
       count: 25000,
       getPrice: getUmaPrice,
-      startDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+      startDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     },
   ], // uUSDwETH-DEC
   "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce": [
@@ -50,19 +50,22 @@ const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
       token: "UMA",
       count: 10000,
       getPrice: getUmaPrice,
-      startDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+      startDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     },
   ], // uUSDrBTC-DEC
 };
 
+// Key is roll from token address.
 const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
   "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": {
+    rollFromTokenName: "yUSD-OCT20",
     rollToTokenName: "uUSDwETH-DEC",
     rollToToken: "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9",
     rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
   }, // yUSDETH-Oct20 --> uUSDwETH-DEC
   "0x208d174775dc39fe18b1b374972f77ddec6c0f73": {
+    rollFromTokenName: "uUSDrBTC-OCT",
     rollToTokenName: "uUSDrBTC-DEC",
     rollToToken: "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce",
     rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
@@ -102,17 +105,29 @@ const FarmingCalculator = () => {
   const [apr, setApr] = useState<string>("");
 
   // Roll inputs
-  const [rollToTokenObj, setRollToTokenObj] = useState<any | null>(null);
   const [rollToTokenAddress, setRollToTokenAddress] = useState<string>(
     tokenAddress
   );
 
+  const [isRollToToken, setIsRollToToken] = useState<Boolean>(false);
+  const [rollFromTokenObj, setRollFromTokenObj] = useState<any | null>(null);
+  const [rollFromTokenAddress, setRollFromTokenAddress] = useState<
+    string | null
+  >(null);
+
   // Roll outputs
-  const rollFromPool = getPoolDataForToken(tokenAddress);
+  const rollFromPool = getPoolDataForToken(
+    rollFromTokenAddress || tokenAddress
+  );
   const rollToPool = getPoolDataForToken(rollToTokenAddress);
-  const rollStartDate = rollToTokenObj && rollToTokenObj.rollStartDate;
-  const rollTokenName = rollToTokenObj && rollToTokenObj.rollToTokenName;
-  const rollDate = rollToTokenObj && rollToTokenObj.rollDate;
+  const rollStartDate = rollFromTokenObj && rollFromTokenObj.rollStartDate;
+  const rollFromTokenName = isRollToToken
+    ? rollFromTokenObj && rollFromTokenObj.rollFromTokenName
+    : rollFromTokenObj && rollFromTokenObj.rollToTokenName;
+  const rollToTokenName = !isRollToToken
+    ? rollFromTokenObj && rollFromTokenObj.rollFromTokenName
+    : rollFromTokenObj && rollFromTokenObj.rollToTokenName;
+  const rollDate = rollFromTokenObj && rollFromTokenObj.rollDate;
   const currentDate = new Date();
   const currentDateUTC = Date.UTC(
     currentDate.getUTCFullYear(),
@@ -253,16 +268,23 @@ const FarmingCalculator = () => {
 
     // Check if token should display roll information.
     if (Object.keys(ROLL_REWARDS_SCHEDULE).includes(tokenAddress)) {
-      setRollToTokenObj(ROLL_REWARDS_SCHEDULE[tokenAddress]);
+      setRollFromTokenObj(ROLL_REWARDS_SCHEDULE[tokenAddress]);
+      setRollToTokenAddress(
+        ROLL_REWARDS_SCHEDULE[tokenAddress].rollToToken.toLowerCase()
+      );
     } else {
-      setRollToTokenObj(null);
+      setRollFromTokenObj(null);
     }
 
-    // Update roll rewards information.
-    if (rollToTokenObj) {
-      setRollToTokenAddress(rollToTokenObj.rollToToken.toLowerCase());
+    for (const rollFromAddress of Object.keys(ROLL_REWARDS_SCHEDULE)) {
+      if (ROLL_REWARDS_SCHEDULE[rollFromAddress].rollToToken == tokenAddress) {
+        setRollToTokenAddress(tokenAddress);
+        setRollFromTokenObj(ROLL_REWARDS_SCHEDULE[rollFromAddress]);
+        setRollFromTokenAddress(rollFromAddress);
+        setIsRollToToken(true);
+      }
     }
-  }, [address, tokenAddress, rollToTokenObj]);
+  }, [address, tokenAddress, rollFromTokenObj, rollFromTokenAddress]);
 
   // Update default pool information
   useEffect(() => {
@@ -316,7 +338,7 @@ const FarmingCalculator = () => {
     return (
       <Box>
         <Typography>
-          <i>Selected token is ineligible for liquidity mining rewards</i>
+          <i>Selected token is ineligible for liquidity mining rewards.</i>
         </Typography>
       </Box>
     );
@@ -348,12 +370,13 @@ const FarmingCalculator = () => {
             <Typography>
               <strong>Liquidity mining rewards during the roll:</strong> Before{" "}
               {getDateReadable(rollDate)}, LP contributions to either the{" "}
-              {tokenSymbol} or the {rollTokenName} are considered equally. What
-              this means is that rewards are granted pro-rata as: (your USD
-              contribution) / (total {tokenSymbol} liquidity + total{" "}
-              {rollTokenName} liquidity). After {getDateReadable(rollDate)},
-              only LP contributions in the {rollTokenName} pool will count
-              towards liquidity mining rewards.
+              {rollFromTokenName} or the {rollToTokenName} are considered
+              equally. What this means is that rewards are granted pro-rata as:
+              (your USD contribution) / (total {rollFromTokenName} liquidity +
+              total {rollToTokenName} liquidity). After{" "}
+              {getDateReadable(rollDate)}, only LP contributions in the{" "}
+              {rollToTokenName} pool will count towards liquidity mining
+              rewards.
             </Typography>
           </>
         )}
@@ -364,9 +387,9 @@ const FarmingCalculator = () => {
             <strong>Tokens eligible for liquidity mining:</strong>{" "}
             {timeUntilRoll
               ? isRolled
-                ? rollTokenName
-                : `${tokenSymbol} + ${rollTokenName}`
-              : tokenSymbol}
+                ? rollToTokenName
+                : `${rollFromTokenName} + ${rollToTokenName}`
+              : rollFromTokenName}
             <br></br>
             {hoursRemainingToFarmingRoll && hoursRemainingToFarmingRoll > 0 && (
               <>
