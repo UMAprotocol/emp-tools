@@ -302,7 +302,6 @@ const useBalancer = () => {
     usdPrice,
     shares,
     userShareFraction,
-    initializeTokenAddress,
     getPoolDataForToken,
     getTokenPrice,
   };
