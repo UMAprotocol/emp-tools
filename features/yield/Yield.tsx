@@ -8,8 +8,9 @@ import BalancerData from "./BalancerData";
 import FarmingCalculator from "./FarmingCalculator";
 
 import Connection from "../../containers/Connection";
-import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
+
+import { YIELD_TOKENS } from "../../utils/yieldTokenList";
 
 const OutlinedContainer = styled.div`
   padding: 1rem;
@@ -18,8 +19,12 @@ const OutlinedContainer = styled.div`
 
 const Yield = () => {
   const { network } = Connection.useContainer();
-  const { isYieldToken } = Balancer.useContainer();
+  const { address: tokenAddress } = Token.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
+
+  const isYieldToken =
+    tokenAddress &&
+    Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
   const [dialogTabIndex, setDialogTabIndex] = useState<string>(
     "farming-calculator"

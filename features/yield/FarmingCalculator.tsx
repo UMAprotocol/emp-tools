@@ -6,6 +6,7 @@ import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
 
 import { getUmaPrice, getRenPrice } from "../../utils/getCoinGeckoTokenPrice";
+import { YIELD_TOKENS } from "../../utils/yieldTokenList";
 
 const FormInput = styled.div`
   margin-top: 20px;
@@ -42,7 +43,6 @@ const FarmingCalculator = () => {
   const {
     getTokenPrice,
     getPoolDataForToken,
-    YIELD_TOKENS,
     poolAddress,
   } = Balancer.useContainer();
   const { symbol: tokenSymbol, address } = Token.useContainer();
@@ -194,6 +194,8 @@ const FarmingCalculator = () => {
     }
     if (Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress)) {
       setRewardToken(WEEKLY_UMA_REWARDS[tokenAddress]);
+    } else {
+      setRewardToken(null);
     }
 
     // Check if token should display roll information.
