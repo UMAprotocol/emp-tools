@@ -16,12 +16,43 @@ const FormInput = styled.div`
 const WEEKS_PER_YEAR = 52;
 const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
   "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": [
-    { token: "UMA", count: 25000, getPrice: getUmaPrice },
+    {
+      token: "UMA",
+      count: 25000,
+      getPrice: getUmaPrice,
+      endDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+    },
   ], // yUSDETH-Oct20
   "0x208d174775dc39fe18b1b374972f77ddec6c0f73": [
-    { token: "UMA", count: 10000, getPrice: getUmaPrice },
-    { token: "REN", count: 25000, getPrice: getRenPrice },
+    {
+      token: "UMA",
+      count: 10000,
+      getPrice: getUmaPrice,
+      endDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+    },
+    {
+      token: "REN",
+      count: 25000,
+      getPrice: getRenPrice,
+      endDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+    },
   ], // uUSDrBTC-OCT
+  "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9": [
+    {
+      token: "UMA",
+      count: 25000,
+      getPrice: getUmaPrice,
+      startDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+    },
+  ], // uUSDwETH-DEC
+  "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce": [
+    {
+      token: "UMA",
+      count: 10000,
+      getPrice: getUmaPrice,
+      startDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
+    },
+  ], // uUSDrBTC-DEC
 };
 
 const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
@@ -187,13 +218,35 @@ const FarmingCalculator = () => {
     };
   };
 
-  // Set roll and LM reward token information
+  // Set roll and LM reward token information from which to calculate APY's.
   useEffect(() => {
     if (address) {
       setTokenAddress(address.toLowerCase());
     }
     if (Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress)) {
-      setRewardToken(WEEKLY_UMA_REWARDS[tokenAddress]);
+      // Strip out rewards that have expired or have not started yet.
+      const allRewards = WEEKLY_UMA_REWARDS[tokenAddress];
+      const filteredRewards = [];
+      for (let i = 0; i < allRewards.length; i++) {
+        const reward = allRewards[i];
+        if (
+          reward.endDate &&
+          reward.endDate.valueOf() - currentDateUTC.valueOf() < 0
+        ) {
+          // Reward has expired.
+          continue;
+        } else if (
+          reward.startDate &&
+          currentDateUTC.valueOf() - reward.startDate.valueOf() < 0
+        ) {
+          // Reward has not started.
+          continue;
+        } else {
+          filteredRewards.push(reward);
+        }
+      }
+
+      setRewardToken(filteredRewards);
     } else {
       setRewardToken(null);
     }
@@ -306,46 +359,51 @@ const FarmingCalculator = () => {
         )}
         <br></br>
         <br></br>
-        <Typography>
-          <strong>Tokens eligible for liquidity mining:</strong>{" "}
-          {timeUntilRoll
-            ? isRolled
-              ? rollTokenName
-              : `${tokenSymbol} + ${rollTokenName}`
-            : tokenSymbol}
-          <br></br>
-          {hoursRemainingToFarmingRoll && hoursRemainingToFarmingRoll > 0 && (
-            <>
-              <strong>Hours remaining until liquidity mining rolls:</strong>{" "}
-              {hoursRemainingToFarmingRoll.toFixed(2)}
-              <br></br>
-            </>
-          )}
-          <strong>Total liquidity eligible for mining rewards:</strong> $
-          {Number(poolLiquidity).toLocaleString()}
-          <br></br>
-          {rewardToken &&
-            rewardToken.map((rewardObj) => {
-              return (
-                rewardYieldAmounts[rewardObj.token] &&
-                rewardTokenPrices[rewardObj.token] && (
-                  <span key={rewardObj.token}>
-                    <br></br>
-                    <strong>
-                      Weekly {rewardObj.token} distributed to pool:
-                    </strong>
-                    {" " + rewardObj.count.toLocaleString()} ($
-                    {rewardYieldAmounts[rewardObj.token].toLocaleString()})
-                    <br></br>
-                    {`- 1 ${rewardObj.token} = $${rewardTokenPrices[
-                      rewardObj.token
-                    ].toLocaleString()}`}
-                  </span>
-                )
-              );
-            })}
-        </Typography>
-
+        {rewardToken.length > 0 ? (
+          <Typography>
+            <strong>Tokens eligible for liquidity mining:</strong>{" "}
+            {timeUntilRoll
+              ? isRolled
+                ? rollTokenName
+                : `${tokenSymbol} + ${rollTokenName}`
+              : tokenSymbol}
+            <br></br>
+            {hoursRemainingToFarmingRoll && hoursRemainingToFarmingRoll > 0 && (
+              <>
+                <strong>Hours remaining until liquidity mining rolls:</strong>{" "}
+                {hoursRemainingToFarmingRoll.toFixed(2)}
+                <br></br>
+              </>
+            )}
+            <strong>Total liquidity eligible for mining rewards:</strong> $
+            {Number(poolLiquidity).toLocaleString()}
+            <br></br>
+            {rewardToken &&
+              rewardToken.map((rewardObj) => {
+                return (
+                  rewardYieldAmounts[rewardObj.token] &&
+                  rewardTokenPrices[rewardObj.token] && (
+                    <span key={rewardObj.token}>
+                      <br></br>
+                      <strong>
+                        Weekly {rewardObj.token} distributed to pool:
+                      </strong>
+                      {" " + rewardObj.count.toLocaleString()} ($
+                      {rewardYieldAmounts[rewardObj.token].toLocaleString()})
+                      <br></br>
+                      {`- 1 ${rewardObj.token} = $${rewardTokenPrices[
+                        rewardObj.token
+                      ].toLocaleString()}`}
+                    </span>
+                  )
+                );
+              })}
+          </Typography>
+        ) : (
+          <Typography>
+            <strong>This token is not currently eligible for rewards</strong>
+          </Typography>
+        )}
         <Box pt={2}>
           <form noValidate autoComplete="off">
             <Grid container spacing={2}>
