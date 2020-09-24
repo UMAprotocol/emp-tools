@@ -63,10 +63,6 @@ const useBalancer = () => {
     null
   );
 
-  // Because apollo caches results of queries, we will poll/refresh this query periodically.
-  // We set the poll interval to a very slow 5 seconds for now since the position states
-  // are not expected to change much.
-  // Source: https://www.apollographql.com/docs/react/data/queries/#polling
   const {
     loading: tokenPriceLoading,
     error: tokenPriceError,
@@ -75,14 +71,12 @@ const useBalancer = () => {
     skip: !selectedTokenAddress,
     context: { clientName: "BALANCER" },
     variables: { tokenId: selectedTokenAddress },
-    pollInterval: 5000,
   });
   const { loading: poolLoading, error: poolError, data: poolData } = useQuery(
     POOL(JSON.stringify(poolTokenList)),
     {
       skip: !poolTokenList,
       context: { clientName: "BALANCER" },
-      pollInterval: 5000,
     }
   );
 
