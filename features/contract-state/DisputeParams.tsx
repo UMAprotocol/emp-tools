@@ -6,7 +6,7 @@ import EmpState from "../../containers/EmpState";
 import DvmState from "../../containers/DvmState";
 import Collateral from "../../containers/Collateral";
 
-import { DOCS_MAP } from "../../utils/getDocLinks";
+import { DOCS_MAP } from "../../constants/docLinks";
 
 const Label = styled.span`
   color: #999999;

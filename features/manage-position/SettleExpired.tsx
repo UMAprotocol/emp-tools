@@ -10,7 +10,7 @@ import Position from "../../containers/Position";
 import DvmState from "../../containers/DvmState";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
-import { DOCS_MAP } from "../../utils/getDocLinks";
+import { DOCS_MAP } from "../../constants/docLinks";
 
 const Link = styled.a`
   color: white;

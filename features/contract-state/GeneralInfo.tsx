@@ -12,7 +12,7 @@ import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
-import { DOCS_MAP } from "../../utils/getDocLinks";
+import { DOCS_MAP } from "../../constants/docLinks";
 
 const Label = styled.span`
   color: #999999;

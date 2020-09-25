@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import {
   Container,
@@ -27,7 +27,7 @@ import Collateral from "../containers/Collateral";
 import Token from "../containers/Token";
 import WethContract from "../containers/WethContract";
 
-import { YIELD_TOKENS } from "../utils/yieldTokenList";
+import { YIELD_TOKENS } from "../constants/yieldTokens";
 
 import GitHubIcon from "@material-ui/icons/GitHub";
 import TwitterIcon from "@material-ui/icons/Twitter";

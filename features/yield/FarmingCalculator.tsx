@@ -6,7 +6,7 @@ import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
 
 import { getUmaPrice, getRenPrice } from "../../utils/getCoinGeckoTokenPrice";
-import { YIELD_TOKENS } from "../../utils/yieldTokenList";
+import { YIELD_TOKENS } from "../../constants/yieldTokens";
 
 const FormInput = styled.div`
   margin-top: 20px;

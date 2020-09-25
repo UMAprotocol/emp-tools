@@ -6,7 +6,7 @@ import { TOKENS, POOL } from "../apollo/balancer/queries";
 
 import Connection from "./Connection";
 import Token from "./Token";
-import { YIELD_TOKENS } from "../utils/yieldTokenList";
+import { YIELD_TOKENS } from "../constants/yieldTokens";
 
 interface PoolState {
   exitsCount: number;
