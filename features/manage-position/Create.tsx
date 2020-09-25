@@ -21,7 +21,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 import Connection from "../../containers/Connection";
 
-import { legacyEMPs } from "../../utils/legacyEmps";
+import { legacyEMPs } from "../../constants/legacyEmps";
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 import { DOCS_MAP } from "../../constants/docLinks";

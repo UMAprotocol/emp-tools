@@ -15,7 +15,7 @@ import EmpState from "../../containers/EmpState";
 import EmpAddress from "../../containers/EmpAddress";
 import Connection from "../../containers/Connection";
 
-import { legacyEMPs } from "../../utils/legacyEmps";
+import { legacyEMPs } from "../../constants/legacyEmps";
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
