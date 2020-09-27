@@ -18,6 +18,8 @@ import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import Etherscan from "../../containers/Etherscan";
 
+import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
+
 import PositionActionsDialog from "./PositionActionsDialog";
 
 interface SortableTableHeaderProps {
@@ -100,6 +102,8 @@ const AllSponsors = () => {
   const { symbol: collSymbol } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
+
+  const invertedPrice = isPricefeedInvertedFromTokenSymbol(tokenSymbol);
 
   // Pagination
   const [page, setPage] = useState<number>(1);
@@ -232,7 +236,9 @@ const AllSponsors = () => {
                   </strong>
                 </TableCell>
                 <Tooltip
-                  title={`This is the price that the identifier (${priceIdUtf8}) must increase to in order for the position be liquidatable`}
+                  title={`This is the price that the identifier (${priceIdUtf8}) must ${
+                    invertedPrice ? "decrease" : "increase"
+                  } to in order for the position be liquidatable`}
                   placement="top"
                 >
                   <TableCell align="right">
