@@ -1,14 +1,15 @@
-import { useState, MouseEvent } from "react";
 import { Box, Typography } from "@material-ui/core";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import styled from "styled-components";
-
-import YieldCalculator from "./YieldCalculator";
-import BalancerData from "./BalancerData";
-import FarmingCalculator from "./FarmingCalculator";
 
 import Connection from "../../containers/Connection";
 import Token from "../../containers/Token";
+import Balancer from "../../containers/Balancer";
+
+const Important = styled(Typography)`
+  color: red;
+  background: black;
+  display: inline-block;
+`;
 
 import { YIELD_TOKENS } from "../../constants/yieldTokens";
 
@@ -17,26 +18,21 @@ const OutlinedContainer = styled.div`
   border: 1px solid #434343;
 `;
 
+const Link = styled.a`
+  font-size: 14px;
+`;
+
 const Yield = () => {
   const { network } = Connection.useContainer();
   const { address: tokenAddress } = Token.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
+  const { poolAddress } = Balancer.useContainer();
 
   const isYieldToken =
     tokenAddress &&
     Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
-  const [dialogTabIndex, setDialogTabIndex] = useState<string>(
-    "farming-calculator"
-  );
-  const handleAlignment = (
-    event: MouseEvent<HTMLElement>,
-    newAlignment: string
-  ) => {
-    if (newAlignment) {
-      setDialogTabIndex(newAlignment);
-    }
-  };
+  const balancerPoolUrl = `https://pools.balancer.exchange/#/pool/${poolAddress}`;
 
   if (network === null || network.chainId !== 1 || !isYieldToken) {
     return (
@@ -84,35 +80,36 @@ const Yield = () => {
         </Box>
         <Box pb={2}>
           <OutlinedContainer>
-            <BalancerData />
+            <Important>Update 09/27/20</Important>
+            <br></br>
+            <br></br>
+            <Typography>
+              We fetch Balancer pool data from the Balancer subgraph API, which
+              is currently returning inaccurate information. Instead of
+              displaying inaccurate data, we redirect you to the Balancer pool
+              interface where you can access accurate on-chain information. This
+              fix has no ETA yet, but we will revert back to the old display as
+              soon as the data is accurate. Apologies for the inconvenience!
+            </Typography>
+            <br></br>
+            <Typography>
+              After 09/27/20 @ 23:00:00 UTC, only the uUSDwBTC and uUSDwETH
+              contracts will be eligible for liquidity mining. 10,000 UMA and
+              25,000 UMA, respectively, are granted pro-rata (based on
+              continuous snapshots) to LP's in the uUSDwBTC-USDC and uUSDwETH
+              Balancer pools.
+            </Typography>
+            <br></br>
+            <br></br>
+            <Link
+              href={balancerPoolUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Balancer Pool Link
+            </Link>
           </OutlinedContainer>
         </Box>
-        <Box py={1} textAlign="center">
-          <ToggleButtonGroup
-            value={dialogTabIndex}
-            exclusive
-            onChange={handleAlignment}
-          >
-            <ToggleButton value="farming-calculator">
-              Liquidity Mining
-            </ToggleButton>
-            <ToggleButton value="yusd-calculator">yield dollar</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-        {dialogTabIndex === "farming-calculator" && (
-          <Box py={2}>
-            <OutlinedContainer>
-              <FarmingCalculator />
-            </OutlinedContainer>
-          </Box>
-        )}
-        {dialogTabIndex === "yusd-calculator" && (
-          <Box py={2}>
-            <OutlinedContainer>
-              <YieldCalculator />
-            </OutlinedContainer>
-          </Box>
-        )}
       </Box>
     );
   }
