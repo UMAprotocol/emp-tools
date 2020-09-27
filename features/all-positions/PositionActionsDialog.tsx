@@ -32,7 +32,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 import Connection from "../../containers/Connection";
 
-import { DOCS_MAP } from "../../utils/getDocLinks";
+import { DOCS_MAP } from "../../constants/docLinks";
 import { toWeiSafe } from "../../utils/convertToWeiSafely";
 
 const Label = styled.span`

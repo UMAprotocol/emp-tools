@@ -20,7 +20,7 @@ import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import Etherscan from "../../containers/Etherscan";
 
-import { DOCS_MAP } from "../../utils/getDocLinks";
+import { DOCS_MAP } from "../../constants/docLinks";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
 const Label = styled.span`

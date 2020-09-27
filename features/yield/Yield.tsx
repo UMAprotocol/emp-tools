@@ -10,7 +10,7 @@ import FarmingCalculator from "./FarmingCalculator";
 import Connection from "../../containers/Connection";
 import Token from "../../containers/Token";
 
-import { YIELD_TOKENS } from "../../utils/yieldTokenList";
+import { YIELD_TOKENS } from "../../constants/yieldTokens";
 
 const OutlinedContainer = styled.div`
   padding: 1rem;
