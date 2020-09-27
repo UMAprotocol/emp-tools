@@ -96,7 +96,7 @@ const Create = () => {
       // We want to round down the number for better UI display, but we don't actually want the collateral
       // amount to round down since we want the minimum amount of collateral to pass the GCR constraint. So,
       // we'll add a tiny amount of collateral to avoid accidentally rounding too low.
-      setCollateral((minBackingCollateral + 0.00005).toFixed(4));
+      setCollateral(Math.ceil(minBackingCollateral).toString());
     }
   };
 
@@ -141,7 +141,7 @@ const Create = () => {
     const maxTokensToCreate = _gcr > 0 ? collateral / _gcr - startingTokens : 0;
     // Unlike the min collateral, we're ok if we round down the tokens slightly as round down
     // can only increase the position's CR and maintain it above the GCR constraint.
-    setTokens((maxTokensToCreate - 0.0001).toFixed(4));
+    setTokens(Math.floor(maxTokensToCreate).toString());
   };
 
   const setTokensToMax = (
