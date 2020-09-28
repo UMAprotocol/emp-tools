@@ -6,6 +6,7 @@ import { TOKENS, POOL } from "../apollo/balancer/queries";
 
 import Connection from "./Connection";
 import Token from "./Token";
+import { YIELD_TOKENS } from "../constants/yieldTokens";
 
 interface PoolState {
   exitsCount: number;
@@ -33,10 +34,9 @@ interface PoolTokenQuery {
   balance: string;
 }
 
-const YIELD_TOKENS = [
-  "0x81ab848898b5ffD3354dbbEfb333D5D183eEDcB5", // Sep20
-  "0xB2FdD60AD80ca7bA89B9BAb3b5336c2601C020b4", // Oct20
-];
+interface yieldPair {
+  [key: string]: string;
+}
 
 const useBalancer = () => {
   const { address, block$ } = Connection.useContainer();
@@ -54,7 +54,6 @@ const useBalancer = () => {
     string | null
   >(null);
   const [poolTokenList, setPoolTokenList] = useState<string[] | null>(null);
-  const [isYieldToken, setIsYieldToken] = useState<boolean>(false);
 
   const [usdPrice, setUsdPrice] = useState<number | null>(null);
   const [poolAddress, setPoolAddress] = useState<string | null>(null);
@@ -64,10 +63,6 @@ const useBalancer = () => {
     null
   );
 
-  // Because apollo caches results of queries, we will poll/refresh this query periodically.
-  // We set the poll interval to a very slow 5 seconds for now since the position states
-  // are not expected to change much.
-  // Source: https://www.apollographql.com/docs/react/data/queries/#polling
   const {
     loading: tokenPriceLoading,
     error: tokenPriceError,
@@ -76,30 +71,34 @@ const useBalancer = () => {
     skip: !selectedTokenAddress,
     context: { clientName: "BALANCER" },
     variables: { tokenId: selectedTokenAddress },
-    pollInterval: 5000,
   });
   const { loading: poolLoading, error: poolError, data: poolData } = useQuery(
     POOL(JSON.stringify(poolTokenList)),
     {
       skip: !poolTokenList,
       context: { clientName: "BALANCER" },
-      pollInterval: 5000,
     }
   );
 
   const initializeTokenAddress = () => {
     if (tokenAddress !== null) {
       setSelectedSwapTokenAddress(defaultSwapTokenAddress);
-
-      const IS_YIELD_TOKEN = YIELD_TOKENS.includes(tokenAddress);
-      setIsYieldToken(IS_YIELD_TOKEN);
+      const IS_YIELD_TOKEN = Object.keys(YIELD_TOKENS).includes(
+        tokenAddress.toLowerCase()
+      );
       if (IS_YIELD_TOKEN) {
         setSelectedTokenAddress(tokenAddress.toLowerCase());
-        setPoolTokenList([tokenAddress.toLowerCase(), defaultSwapTokenAddress]);
+        setPoolTokenList([
+          YIELD_TOKENS[tokenAddress.toLowerCase()].token0.toLowerCase(),
+          YIELD_TOKENS[tokenAddress.toLowerCase()].token1.toLowerCase(),
+        ]);
       } else {
-        const defaultTokenAddress = YIELD_TOKENS[0].toLowerCase();
+        const defaultTokenAddress = Object.keys(YIELD_TOKENS)[0].toLowerCase();
         setSelectedTokenAddress(defaultTokenAddress);
-        setPoolTokenList([defaultTokenAddress, defaultSwapTokenAddress]);
+        setPoolTokenList([
+          YIELD_TOKENS[defaultTokenAddress].token0.toLowerCase(),
+          YIELD_TOKENS[defaultTokenAddress].token1.toLowerCase(),
+        ]);
       }
     }
   };
@@ -113,6 +112,7 @@ const useBalancer = () => {
     }
     if (!tokenPriceLoading && tokenPriceData) {
       const data = tokenPriceData.tokenPrices[0];
+
       setUsdPrice(Number(data.price));
       const _poolAddress = data.poolTokenId.split("-")[0];
       // const _tokenAddress = data.poolTokenId.split("-")[1];
@@ -126,6 +126,7 @@ const useBalancer = () => {
     }
     if (!poolLoading && poolData) {
       const data = poolData.pools[0];
+      if (!data) return null;
 
       const shareHolders: SharesState = {};
       data.shares.forEach((share: SharesQuery) => {
@@ -181,6 +182,7 @@ const useBalancer = () => {
     }
     if (!loading && data) {
       const tokenData = data.tokenPrices[0];
+
       const usdPrice = Number(tokenData.price);
       return usdPrice;
     }
@@ -188,8 +190,16 @@ const useBalancer = () => {
 
   // Use this function get pool data for a specified yield token.
   const getPoolDataForToken = (_tokenAddress: string) => {
+    const IS_YIELD_TOKEN = Object.keys(YIELD_TOKENS).includes(
+      _tokenAddress.toLowerCase()
+    );
+    if (!IS_YIELD_TOKEN) {
+      return;
+    }
+
     const _swapTokenAddress = defaultSwapTokenAddress;
-    const poolTokens = [_tokenAddress, _swapTokenAddress];
+    const _poolTokens = YIELD_TOKENS[_tokenAddress.toLowerCase()];
+    const poolTokens = [_poolTokens.token0, _poolTokens.token1];
 
     const { loading, error, data } = useQuery(
       POOL(JSON.stringify(poolTokens)),
@@ -292,8 +302,6 @@ const useBalancer = () => {
     usdPrice,
     shares,
     userShareFraction,
-    isYieldToken,
-    YIELD_TOKENS,
     getPoolDataForToken,
     getTokenPrice,
   };

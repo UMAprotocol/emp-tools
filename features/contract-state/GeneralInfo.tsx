@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { utils } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
+import AddressUtils from "./AddressUtils";
+
 import EmpState from "../../containers/EmpState";
 import Token from "../../containers/Token";
 import EmpContract from "../../containers/EmpContract";
@@ -10,7 +12,7 @@ import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
 import Etherscan from "../../containers/Etherscan";
 
-import { DOCS_MAP } from "../../utils/getDocLinks";
+import { DOCS_MAP } from "../../constants/docLinks";
 
 const Label = styled.span`
   color: #999999;
@@ -64,8 +66,8 @@ const GeneralInfo = () => {
     const expiryDate = new Date(
       expiry.toNumber() * 1000
     ).toLocaleString("en-GB", { timeZone: "UTC" });
-    const prettyLatestPrice = Number(latestPrice).toFixed(4);
-    const pricedGcr = (gcr / latestPrice).toFixed(4);
+    const prettyLatestPrice = Number(latestPrice).toFixed(8);
+    const pricedGcr = (gcr / latestPrice).toFixed(8);
 
     const priceIdUtf8 = parseBytes32String(priceId);
     const collReqPct = parseFloat(fromWei(collReq)).toString();
@@ -104,18 +106,9 @@ const GeneralInfo = () => {
   ) {
     return (
       <Box>
-        <Typography variant="h5">
-          {`General Info `}
-          {contract?.address && (
-            <Link
-              href={getEtherscanUrl(contract.address)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </Link>
-          )}
-        </Typography>
+        <Typography variant="h5">{`General Info `}</Typography>
+        <AddressUtils />
+
         <Status>
           <Label>Expiry date: </Label>
           <Tooltip title={`Timestamp: ${expiryTimestamp}`} interactive>
@@ -162,6 +155,7 @@ const GeneralInfo = () => {
                   ((url.includes("coinbase") && "Coinbase") ||
                     (url.includes("kraken") && "Kraken") ||
                     (url.includes("binance") && "Binance") ||
+                    (url.includes("bitstamp") && "Bitstamp") ||
                     "") +
                   (index < sourceUrls.length - 1 ? ", " : "]")}
               </Link>

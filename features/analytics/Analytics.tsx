@@ -7,7 +7,9 @@ import CurrentSponsorsCollateralRatio from "./CurrentSponsorsCollateralRatio";
 import CurrentLiquidityProviders from "./CurrentLiquidityProviders";
 
 import Connection from "../../containers/Connection";
-import Balancer from "../../containers/Balancer";
+import Token from "../../containers/Token";
+
+import { YIELD_TOKENS } from "../../constants/yieldTokens";
 
 const OutlinedContainer = styled.div`
   padding: 1rem;
@@ -15,9 +17,13 @@ const OutlinedContainer = styled.div`
 `;
 
 const Analytics = () => {
+  console.log("TOP");
+  const { address: tokenAddress } = Token.useContainer();
   const { network } = Connection.useContainer();
-  const { isYieldToken } = Balancer.useContainer();
-  console.log("isYieldToken", isYieldToken);
+
+  const isYieldToken =
+    tokenAddress &&
+    Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
   const [dialogTabIndex, setDialogTabIndex] = useState<string>("emp-analytics");
   const handleAlignment = (

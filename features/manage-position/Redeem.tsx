@@ -18,6 +18,8 @@ import Position from "../../containers/Position";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 
+import { toWeiSafe } from "../../utils/convertToWeiSafely";
+
 const Link = styled.a`
   color: white;
   font-size: 14px;
@@ -27,7 +29,7 @@ const MaxLink = styled.div`
   text-decoration-line: underline;
 `;
 
-const { formatUnits: fromWei, parseUnits: toWei } = utils;
+const { formatUnits: fromWei } = utils;
 
 const Redeem = () => {
   const { contract: emp } = EmpContract.useContainer();
@@ -45,6 +47,7 @@ const Redeem = () => {
     decimals: tokenDec,
     setMaxAllowance,
     balance: tokenBalance,
+    balanceBN: tokenBalanceBN,
   } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
 
@@ -58,6 +61,7 @@ const Redeem = () => {
     posCollString !== null &&
     minSponsorTokens !== null &&
     tokenBalance !== null &&
+    tokenBalanceBN !== null &&
     tokenDec !== null &&
     tokenSymbol !== null &&
     tokenAllowance !== null &&
@@ -103,7 +107,7 @@ const Redeem = () => {
         setSuccess(null);
         setError(null);
         try {
-          const tokensToRedeemWei = toWei(tokens);
+          const tokensToRedeemWei = toWeiSafe(tokens, tokenDec);
           const tx = await emp.redeem([tokensToRedeemWei]);
           setHash(tx.hash as string);
           await tx.wait();
@@ -118,7 +122,9 @@ const Redeem = () => {
     };
 
     const setTokensToRedeemToMax = () => {
-      if (tokenBalance > posTokens) {
+      // `tokenBalance` and `posTokens` might be incorrectly rounded,
+      // so we compare their raw BN's instead.
+      if (tokenBalanceBN.gte(toWeiSafe(posTokensString, tokenDec))) {
         setTokens(posTokensString);
       } else {
         setTokens(tokenBalance.toString());

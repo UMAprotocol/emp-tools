@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { utils } from "ethers";
-const { formatUnits: fromWei, parseUnits: toWei } = utils;
+const { formatUnits: fromWei } = utils;
 import { useState } from "react";
 
 import {
@@ -20,7 +20,7 @@ import EmpContract from "../../containers/EmpContract";
 import Collateral from "../../containers/Collateral";
 import Etherscan from "../../containers/Etherscan";
 
-import { DOCS_MAP } from "../../utils/getDocLinks";
+import { DOCS_MAP } from "../../constants/docLinks";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
 const Label = styled.span`
@@ -88,7 +88,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
   } = empState;
 
   const prettyBalance = (x: number) => {
-    const x_string = x.toFixed(4);
+    const x_string = x.toFixed(8);
     return utils.commify(x_string);
   };
 

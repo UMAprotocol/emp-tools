@@ -112,7 +112,7 @@ const CurrentSponsorsCollateralRatio = () => {
         },
         plotOptions: {
           bar: {
-            columnWidth: "100%",
+            columnWidth: "300%",
           },
         },
         dataLabels: {

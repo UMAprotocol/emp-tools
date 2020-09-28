@@ -8,7 +8,9 @@ import BalancerData from "./BalancerData";
 import FarmingCalculator from "./FarmingCalculator";
 
 import Connection from "../../containers/Connection";
-import Balancer from "../../containers/Balancer";
+import Token from "../../containers/Token";
+
+import { YIELD_TOKENS } from "../../constants/yieldTokens";
 
 const OutlinedContainer = styled.div`
   padding: 1rem;
@@ -17,7 +19,12 @@ const OutlinedContainer = styled.div`
 
 const Yield = () => {
   const { network } = Connection.useContainer();
-  const { isYieldToken } = Balancer.useContainer();
+  const { address: tokenAddress } = Token.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
+
+  const isYieldToken =
+    tokenAddress &&
+    Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
   const [dialogTabIndex, setDialogTabIndex] = useState<string>(
     "farming-calculator"
@@ -26,7 +33,9 @@ const Yield = () => {
     event: MouseEvent<HTMLElement>,
     newAlignment: string
   ) => {
-    setDialogTabIndex(newAlignment);
+    if (newAlignment) {
+      setDialogTabIndex(newAlignment);
+    }
   };
 
   if (network === null || network.chainId !== 1 || !isYieldToken) {
@@ -52,9 +61,9 @@ const Yield = () => {
             >
               yTokens
             </a>
-            , like yUSD, are expiring tokens with a fixed-rate return and are
-            redeemable for exactly 1 USD worth of collateral at expiry. To learn
-            more about yUSD see the UMA Medium post{" "}
+            , like {tokenSymbol}, are expiring tokens with a fixed-rate return
+            and are redeemable for exactly 1 USD worth of collateral at expiry.
+            To learn more about {tokenSymbol} see the UMA Medium post{" "}
             <a
               href="https://medium.com/uma-project/the-yield-dollar-on-uma-3a492e79069f"
               target="_blank"
@@ -87,7 +96,7 @@ const Yield = () => {
             <ToggleButton value="farming-calculator">
               Liquidity Mining
             </ToggleButton>
-            <ToggleButton value="yusd-calculator">yusd Yield</ToggleButton>
+            <ToggleButton value="yusd-calculator">yield dollar</ToggleButton>
           </ToggleButtonGroup>
         </Box>
         {dialogTabIndex === "farming-calculator" && (

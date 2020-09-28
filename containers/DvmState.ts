@@ -26,7 +26,10 @@ const initState = {
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
   const { votingContract, storeContract } = DvmContracts.useContainer();
-  const { address: collAddress } = Collateral.useContainer();
+  const {
+    address: collAddress,
+    decimals: collDecimals,
+  } = Collateral.useContainer();
   const { empState } = EmpState.useContainer();
   const { priceIdentifier, expirationTimestamp } = empState;
   const { empAddress } = EmpAddress.useContainer();
@@ -39,6 +42,7 @@ const useContractState = () => {
       votingContract !== null &&
       storeContract !== null &&
       collAddress !== null &&
+      collDecimals !== null &&
       priceIdentifier !== null &&
       expirationTimestamp !== null
     ) {
@@ -52,7 +56,9 @@ const useContractState = () => {
       ]);
 
       const hasPrice = hasPriceResult as boolean;
-      const finalFee = parseFloat(fromWei(finalFeeResult[0].toString()));
+      const finalFee = parseFloat(
+        fromWei(finalFeeResult[0].toString(), collDecimals)
+      );
 
       let resolvedPrice = null;
       if (hasPrice) {
@@ -64,7 +70,11 @@ const useContractState = () => {
               { from: empAddress }
             ),
           ]);
-          resolvedPrice = parseFloat(fromWei(postResolutionRes.toString()));
+          // Important assumption we make: the price identifier's resolved price has the same
+          // precision as the collateral currency.
+          resolvedPrice = parseFloat(
+            fromWei(postResolutionRes.toString(), collDecimals)
+          );
         } catch (err) {
           console.error(`getPrice failed:`, err);
         }

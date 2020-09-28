@@ -6,7 +6,15 @@ Live frontend:
 
 - Production: https://tools.umaproject.org/
 
-## Manual testing
+## Install dependencies
+
+`yarn`
+
+## Developing on Public Network
+
+Quick run on a public network (Mainnet and Kovan supported): `yarn dev`
+
+## Developing on Mainnet-fork
 
 First create a `.env` file with the following contents:
 
@@ -17,7 +25,7 @@ PRIV_KEY=0x123456789...
 
 The following instructions will spin up a test chain forked off mainnet and also swap 10 ETH to DAI on Uniswap so that you have a healthy balance of ETH and DAI to test with. You can manually test the dapp with MetaMask in your browser this way.
 
-1. Run `npm run chain`.
+1. Run `yarn chain`.
 2. Copy the private key into MetaMask to access the account and connect to `localhost:8545`. Your balance should be ~990 ETH and a bunch of DAI.
 3. Test.
 

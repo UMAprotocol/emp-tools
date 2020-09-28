@@ -26,6 +26,10 @@ function _getKrakenPriceFromJSON(jsonData: any) {
   return Number(jsonData.result[tickerName].c[0]);
 }
 
+function _getBitstampPriceFromJSON(jsonData: any) {
+  return Number(jsonData.last);
+}
+
 // This function returns a type predicate that we can use to filter prices from a (number | null)[] into a number[],
 // source: https://www.typescriptlang.org/docs/handbook/advanced-types.html#user-defined-type-guards
 function isValidPrice<Price>(value: Price | null): value is Price {
@@ -52,6 +56,14 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
       "https://api.kraken.com/0/public/Ticker?pair=ETHUSD",
     ],
   },
+  usdbtc: {
+    invertedPrice: true,
+    source: [
+      "https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT",
+      "https://api.pro.coinbase.com/products/BTC-USD/trades?limit=1",
+      "https://cors-anywhere.herokuapp.com/https://www.bitstamp.net/api/v2/ticker/btcusd",
+    ],
+  },
 };
 
 export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
@@ -63,6 +75,12 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.compusd;
     case symbol?.includes("ETHBTC"):
       return PRICEFEED_PARAMS.ethbtc;
+    case symbol?.includes("uUSDrBTC"):
+      return PRICEFEED_PARAMS.usdbtc;
+    case symbol?.includes("uUSDrETH"):
+      return PRICEFEED_PARAMS.usdeth;
+    case symbol?.includes("uUSDwETH"):
+      return PRICEFEED_PARAMS.usdeth;
     case symbol?.includes("yUSD"):
       return PRICEFEED_PARAMS.usdeth;
     default:
@@ -101,6 +119,8 @@ export const getOffchainPriceFromTokenSymbol = async (symbol: string) => {
               return _getBinancePriceFromJSON(json);
             case url.includes("kraken"):
               return _getKrakenPriceFromJSON(json);
+            case url.includes("bitstamp"):
+              return _getBitstampPriceFromJSON(json);
             default:
               return null;
           }
