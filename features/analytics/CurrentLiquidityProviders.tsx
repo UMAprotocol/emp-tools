@@ -1,8 +1,8 @@
 import { Typography, Switch } from "@material-ui/core";
-import styled from "styled-components";
 import { useState } from "react";
 
 import Balancer from "../../containers/Balancer";
+import Token from "../../containers/Token";
 
 import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -14,6 +14,7 @@ const prettyAddress = (x: string) => {
 const CurrentLiquidityProviders = () => {
   const { pool, shares } = Balancer.useContainer();
   const [switchState, setSwitchState] = useState<boolean>(false);
+  const { symbol } = Token.useContainer();
 
   const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSwitchState(event.target.checked);
@@ -81,7 +82,7 @@ const CurrentLiquidityProviders = () => {
     return (
       <span>
         <Typography variant="h5" style={{ marginBottom: "10px" }}>
-          Current Balancer Liquidity Providers{" "}
+          Current {symbol} Balancer Liquidity Providers
         </Typography>
         Logarithmic:{" "}
         <Switch checked={switchState} onChange={handleSwitchChange} />

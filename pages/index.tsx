@@ -52,7 +52,9 @@ const Blurb = styled.div`
 export default function Index() {
   const [tabIndex, setTabIndex] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
+  const [selectedMenuItem, setSelectedMenuItem] = useState<string>(
+    "General Info"
+  );
   const { address: collAddress } = Collateral.useContainer();
   const { address: tokenAddress } = Token.useContainer();
   const { contract: weth } = WethContract.useContainer();

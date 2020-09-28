@@ -1,6 +1,4 @@
 import { Typography, Switch } from "@material-ui/core";
-import styled from "styled-components";
-import { useState } from "react";
 import { utils } from "ethers";
 
 import EmpState from "../../containers/EmpState";
@@ -25,13 +23,12 @@ const CurrentSponsorsCollateralRatio = () => {
   const { latestPrice } = PriceFeed.useContainer();
   const { symbol } = Token.useContainer();
 
-  const [switchState, setSwitchState] = useState<boolean>(false);
-
-  const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSwitchState(event.target.checked);
-  };
-
-  if (activeSponsors !== null && latestPrice !== null && priceId !== null) {
+  if (
+    activeSponsors !== null &&
+    latestPrice !== null &&
+    priceId !== null &&
+    symbol !== null
+  ) {
     const priceIdUtf8 = utils.parseBytes32String(priceId);
     const reformattedSponsorKeys = Object.keys(activeSponsors)
       .filter((sponsor: string) => {
@@ -65,6 +62,9 @@ const CurrentSponsorsCollateralRatio = () => {
         ? (1 / latestPrice).toFixed(6)
         : latestPrice.toFixed(6);
 
+    // how much above the current price the x-axis should show until.
+    const maxColumnScalingFactor = 1.05;
+
     const plotConfig = {
       options: {
         annotations: {
@@ -96,15 +96,14 @@ const CurrentSponsorsCollateralRatio = () => {
           type: "numeric",
           categories: sponsorArray.map((tokenSponsor) => tokenSponsor.bucket),
           tickAmount: 20,
-          min: 100,
-          max: Number(prettyLatestPrice) * 1.05,
+          min: 0,
+          max: Number(prettyLatestPrice) * maxColumnScalingFactor,
           title: {
             text: "Liquidation Price",
             offsetY: 15,
           },
         },
         yaxis: {
-          logarithmic: switchState,
           title: {
             text: `Position Collateral (${collSymbol})`,
             offsetY: 15,
@@ -112,7 +111,7 @@ const CurrentSponsorsCollateralRatio = () => {
         },
         plotOptions: {
           bar: {
-            columnWidth: "300%",
+            columnWidth: Number(prettyLatestPrice) / 3, // scale the column width as a function of price.
           },
         },
         dataLabels: {
@@ -132,10 +131,8 @@ const CurrentSponsorsCollateralRatio = () => {
     return (
       <span>
         <Typography variant="h5" style={{ marginBottom: "10px" }}>
-          EMP Token Sponsor Liquidation Prices
+          {symbol} Sponsor Liquidation Prices
         </Typography>
-        Logarithmic:{" "}
-        <Switch checked={switchState} onChange={handleSwitchChange} />
         <Chart
           options={plotConfig.options}
           series={plotConfig.series}

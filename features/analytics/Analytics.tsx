@@ -17,7 +17,6 @@ const OutlinedContainer = styled.div`
 `;
 
 const Analytics = () => {
-  console.log("TOP");
   const { address: tokenAddress } = Token.useContainer();
   const { network } = Connection.useContainer();
 
