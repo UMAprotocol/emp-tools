@@ -5,6 +5,8 @@ import Connection from "../../containers/Connection";
 import Token from "../../containers/Token";
 import Balancer from "../../containers/Balancer";
 
+import { getExchangeInfo } from "../../utils/getExchangeLinks";
+
 const Important = styled(Typography)`
   color: red;
   background: black;
@@ -24,8 +26,7 @@ const Link = styled.a`
 
 const Yield = () => {
   const { network } = Connection.useContainer();
-  const { address: tokenAddress } = Token.useContainer();
-  const { symbol: tokenSymbol } = Token.useContainer();
+  const { address: tokenAddress, symbol: tokenSymbol } = Token.useContainer();
   const { poolAddress } = Balancer.useContainer();
 
   const isYieldToken =
@@ -33,6 +34,9 @@ const Yield = () => {
     Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
   const balancerPoolUrl = `https://pools.balancer.exchange/#/pool/${poolAddress}`;
+  const exchangeInfo = getExchangeInfo(tokenSymbol);
+  const getExchangeLinkToken = exchangeInfo?.getExchangeUrl(tokenAddress);
+  const exchangeName = exchangeInfo?.name;
 
   if (network === null || network.chainId !== 1 || !isYieldToken) {
     return (
@@ -87,9 +91,10 @@ const Yield = () => {
               We fetch Balancer pool data from the Balancer subgraph API, which
               is currently returning inaccurate information. Instead of
               displaying inaccurate data, we redirect you to the Balancer pool
-              interface where you can access accurate on-chain information. This
-              fix has no ETA yet, but we will revert back to the old display as
-              soon as the data is accurate. Apologies for the inconvenience!
+              and exchange interfaces where you can access accurate on-chain
+              information. This fix has no ETA yet, but we will revert back to
+              the old display as soon as the data is accurate. Apologies for the
+              inconvenience!
             </Typography>
             <br></br>
             <Typography>
@@ -107,7 +112,18 @@ const Yield = () => {
               rel="noopener noreferrer"
             >
               Balancer Pool Link
-            </Link>
+            </Link>{" "}
+            ← Go here to add & remove liquidity
+            <br></br>
+            <br></br>
+            <Link
+              href={getExchangeLinkToken}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {exchangeName} Exchange Link
+            </Link>{" "}
+            ← Go here to check the {tokenSymbol} exchange rate
           </OutlinedContainer>
         </Box>
       </Box>
