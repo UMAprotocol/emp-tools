@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   Container,
@@ -24,6 +24,7 @@ import Weth from "../features/weth/Weth";
 import Yield from "../features/yield/Yield";
 import Analytics from "../features/analytics/Analytics";
 
+import EmpAddress from "../containers/EmpAddress";
 import Collateral from "../containers/Collateral";
 import Token from "../containers/Token";
 import WethContract from "../containers/WethContract";
@@ -50,7 +51,6 @@ const Blurb = styled.div`
 `;
 
 export default function Index() {
-  const [tabIndex, setTabIndex] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>(
     "General Info"
@@ -58,34 +58,41 @@ export default function Index() {
   const { address: collAddress } = Collateral.useContainer();
   const { address: tokenAddress } = Token.useContainer();
   const { contract: weth } = WethContract.useContainer();
+  const { empAddress } = EmpAddress.useContainer();
 
   const isYieldToken =
     tokenAddress &&
     Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
   let options = ["General Info", "Manage Position", "All Positions"];
+  const buildOptionsList = () => {
+    // If it is weth collateral contract then add the weth option.
+    if (weth && collAddress?.toLowerCase() == weth.address.toLowerCase()) {
+      options.push("Wrap/Unwrap WETH");
+    }
 
-  if (weth && collAddress?.toLowerCase() == weth.address.toLowerCase()) {
-    options.push("Wrap/Unwrap WETH");
-  }
+    // If it is a yield token then add the yUSD yield and analytics tabs.
+    if (isYieldToken) {
+      options = options.concat(["yUSD Yield", "Analytics"]);
+    }
 
-  if (isYieldToken) {
-    options = options.concat(["yUSD Yield", "Analytics"]);
-  }
+    // Update selected page if the user toggles between EMPs while selected on
+    // invalid pages (i.e on Wrap/Unwrap then moves to uUSDrBTC).
+    if (options.indexOf(selectedMenuItem) == -1) {
+      setSelectedMenuItem("General Info");
+    }
+  };
+  buildOptionsList();
 
-  // Update selected page if the user toggles between EMPs while selected on
-  // invalid pages (i.e on Wrap/Unwrap then moves to uUSDrBTC)
-  if (tabIndex > options.length - 1) {
-    setSelectedMenuItem("General Info");
-    setTabIndex(0);
-  }
+  useEffect(() => {
+    buildOptionsList();
+  }, [empAddress]);
 
   const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleMenuItemClick = (index: number) => {
-    setTabIndex(index);
     setAnchorEl(null);
     setSelectedMenuItem(options[index]);
   };
@@ -101,7 +108,7 @@ export default function Index() {
         <EmpSelector />
         <Hidden only={["sm", "xs"]}>
           <StyledTabs
-            value={tabIndex}
+            value={options.indexOf(selectedMenuItem)}
             onChange={(_, index) => handleMenuItemClick(index)}
           >
             {options.map((option, index) => (
@@ -134,7 +141,7 @@ export default function Index() {
               {options.map((option, index) => (
                 <MenuItem
                   key={index}
-                  selected={index === tabIndex}
+                  selected={index === options.indexOf(selectedMenuItem)}
                   onClick={(_) => handleMenuItemClick(index)}
                 >
                   {option}

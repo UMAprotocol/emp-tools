@@ -25,6 +25,7 @@ const CurrentSponsorsCollateralRatio = () => {
 
   if (
     activeSponsors !== null &&
+    activeSponsors !== {} &&
     latestPrice !== null &&
     priceId !== null &&
     symbol !== null
@@ -67,20 +68,6 @@ const CurrentSponsorsCollateralRatio = () => {
 
     const plotConfig = {
       options: {
-        annotations: {
-          xaxis: [
-            {
-              x: Number(prettyLatestPrice),
-              borderColor: "#fff",
-              label: {
-                style: {
-                  color: "#434343",
-                },
-                text: `Current ${priceIdUtf8} Price`,
-              },
-            },
-          ],
-        },
         theme: {
           palette: "palette7",
           mode: "dark",
@@ -116,6 +103,20 @@ const CurrentSponsorsCollateralRatio = () => {
         },
         dataLabels: {
           enabled: false,
+        },
+        annotations: {
+          xaxis: [
+            {
+              x: Number(prettyLatestPrice),
+              borderColor: "#fff",
+              label: {
+                style: {
+                  color: "#434343",
+                },
+                text: `Current ${priceIdUtf8} Price`,
+              },
+            },
+          ],
         },
       },
       series: [
