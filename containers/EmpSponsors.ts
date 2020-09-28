@@ -77,8 +77,6 @@ const useEmpSponsors = () => {
     pollInterval: 10000,
   });
 
-  console.log(data);
-
   const getCollateralRatio = (
     collateral: number,
     tokens: number,
