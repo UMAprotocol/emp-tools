@@ -65,12 +65,9 @@ const FarmingCalculator = () => {
   );
   const rollToPool = getPoolDataForToken(rollToTokenAddress);
   const rollStartDate = rollFromTokenObj && rollFromTokenObj.rollStartDate;
-  const rollFromTokenName = isRollToToken
-    ? rollFromTokenObj && rollFromTokenObj.rollFromTokenName
-    : rollFromTokenObj && rollFromTokenObj.rollToTokenName;
-  const rollToTokenName = !isRollToToken
-    ? rollFromTokenObj && rollFromTokenObj.rollFromTokenName
-    : rollFromTokenObj && rollFromTokenObj.rollToTokenName;
+  const rollFromTokenName =
+    rollFromTokenObj && rollFromTokenObj.rollFromTokenName;
+  const rollToTokenName = rollFromTokenObj && rollFromTokenObj.rollToTokenName;
   const rollDate = rollFromTokenObj && rollFromTokenObj.rollDate;
   const currentDate = new Date();
   const currentDateUTC = Date.UTC(
@@ -320,12 +317,12 @@ const FarmingCalculator = () => {
             <br></br>
             <Typography>
               <strong>Liquidity mining rewards during the roll:</strong> Before{" "}
-              {getDateReadable(rollDate)}, LP contributions to either the{" "}
+              {getDateReadable(rollDate)} UTC, LP contributions to either the{" "}
               {rollFromTokenName} or the {rollToTokenName} are considered
               equally. What this means is that rewards are granted pro-rata as:
               (your USD contribution) / (total {rollFromTokenName} liquidity +
               total {rollToTokenName} liquidity). After{" "}
-              {getDateReadable(rollDate)}, only LP contributions in the{" "}
+              {getDateReadable(rollDate)} UTC, only LP contributions in the{" "}
               {rollToTokenName} pool will count towards liquidity mining
               rewards.
             </Typography>
