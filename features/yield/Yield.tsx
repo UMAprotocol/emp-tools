@@ -128,12 +128,12 @@ const Yield = () => {
             <br></br>
             <Typography>
               <strong>APY</strong>: To approximate your weekly returns, you can
-              divide the number of UMA rewarded for a pool per week by the $
+              divide the $ amount of UMA rewarded for a pool per week by the $
               amount of pooled liquidity. For example, if the pool size is $10
-              million and the reward is 25,000 UMA/week, then the return for
-              each $1 supplied to the pool is:{" "}
+              million, the UMA-USD price is $10, and the reward is 25,000
+              UMA/week, then the return for each $1 supplied to the pool is:{" "}
               <strong>
-                (25,000 / $10 million) = 0.0025 UMA per week per $1
+                ($10 * 25,000 / $10 million) * 100 = 2.5% weekly return
               </strong>
             </Typography>
           </OutlinedContainer>
