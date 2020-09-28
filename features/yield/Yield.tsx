@@ -98,7 +98,7 @@ const Yield = () => {
             </Typography>
             <br></br>
             <Typography>
-              After 09/27/20 @ 23:00:00 UTC, only the uUSDwBTC and uUSDwETH
+              After 09/27/20 @ 23:00:00 UTC, only the uUSDrenBTC and uUSDwETH
               contracts will be eligible for liquidity mining. 10,000 UMA and
               25,000 UMA, respectively, are granted pro-rata (based on
               continuous snapshots) to LP's in the uUSDwBTC-USDC and uUSDwETH
@@ -124,6 +124,18 @@ const Yield = () => {
               {exchangeName} Exchange Link
             </Link>{" "}
             ← Go here to check the {tokenSymbol} exchange rate
+            <br></br>
+            <br></br>
+            <Typography>
+              <strong>APY</strong>: To approximate your weekly returns, you can
+              divide the $ amount of UMA rewarded for a pool per week by the $
+              amount of pooled liquidity. For example, if the pool size is $10
+              million, the UMA-USD price is $10, and the reward is 25,000
+              UMA/week, then the return for each $1 supplied to the pool is:{" "}
+              <strong>
+                ($10 * 25,000 / $10 million) * 100 = 2.5% weekly return
+              </strong>
+            </Typography>
           </OutlinedContainer>
         </Box>
       </Box>
