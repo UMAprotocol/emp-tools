@@ -90,7 +90,6 @@ const SettleExpired = () => {
     const resolvedPrice = dvmResolvedPrice
       ? dvmResolvedPrice
       : parseFloat(fromWei(expiryPrice.toString(), collDec)); // DVM identifier should have same precision as collateral.
-    // It's possible that the EMP has a price available even if resolvedPrice is 0
     const hasEmpPrice = resolvedPrice !== 0;
 
     // Error conditions for calling settle expired:
