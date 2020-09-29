@@ -71,12 +71,14 @@ const useBalancer = () => {
     skip: !selectedTokenAddress,
     context: { clientName: "BALANCER" },
     variables: { tokenId: selectedTokenAddress },
+    pollInterval: 10000,
   });
   const { loading: poolLoading, error: poolError, data: poolData } = useQuery(
     POOL(JSON.stringify(poolTokenList)),
     {
       skip: !poolTokenList,
       context: { clientName: "BALANCER" },
+      pollInterval: 10000,
     }
   );
 
