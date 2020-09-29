@@ -74,6 +74,7 @@ const useEmpSponsors = () => {
   const subgraphToQuery = `UMA${network?.chainId.toString()}`;
   const { loading, error, data } = useQuery(EMP_DATA, {
     context: { clientName: subgraphToQuery },
+    pollInterval: 10000,
   });
 
   const getCollateralRatio = (
