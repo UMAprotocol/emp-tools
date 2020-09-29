@@ -1,17 +1,14 @@
+import { useState, MouseEvent } from "react";
 import { Box, Typography } from "@material-ui/core";
+import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import styled from "styled-components";
+
+import YieldCalculator from "./YieldCalculator";
+import BalancerData from "./BalancerData";
+import FarmingCalculator from "./FarmingCalculator";
 
 import Connection from "../../containers/Connection";
 import Token from "../../containers/Token";
-import Balancer from "../../containers/Balancer";
-
-import { getExchangeInfo } from "../../utils/getExchangeLinks";
-
-const Important = styled(Typography)`
-  color: red;
-  background: black;
-  display: inline-block;
-`;
 
 import { YIELD_TOKENS } from "../../constants/yieldTokens";
 
@@ -20,23 +17,26 @@ const OutlinedContainer = styled.div`
   border: 1px solid #434343;
 `;
 
-const Link = styled.a`
-  font-size: 14px;
-`;
-
 const Yield = () => {
   const { network } = Connection.useContainer();
-  const { address: tokenAddress, symbol: tokenSymbol } = Token.useContainer();
-  const { poolAddress } = Balancer.useContainer();
+  const { address: tokenAddress } = Token.useContainer();
+  const { symbol: tokenSymbol } = Token.useContainer();
 
   const isYieldToken =
     tokenAddress &&
     Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
-  const balancerPoolUrl = `https://pools.balancer.exchange/#/pool/${poolAddress}`;
-  const exchangeInfo = getExchangeInfo(tokenSymbol);
-  const getExchangeLinkToken = exchangeInfo?.getExchangeUrl(tokenAddress);
-  const exchangeName = exchangeInfo?.name;
+  const [dialogTabIndex, setDialogTabIndex] = useState<string>(
+    "farming-calculator"
+  );
+  const handleAlignment = (
+    event: MouseEvent<HTMLElement>,
+    newAlignment: string
+  ) => {
+    if (newAlignment) {
+      setDialogTabIndex(newAlignment);
+    }
+  };
 
   if (network === null || network.chainId !== 1 || !isYieldToken) {
     return (
@@ -84,60 +84,35 @@ const Yield = () => {
         </Box>
         <Box pb={2}>
           <OutlinedContainer>
-            <Important>Update 09/27/20</Important>
-            <br></br>
-            <br></br>
-            <Typography>
-              We fetch Balancer pool data from the Balancer subgraph API, which
-              is currently returning inaccurate information. Instead of
-              displaying inaccurate data, we redirect you to the Balancer pool
-              and exchange interfaces where you can access accurate on-chain
-              information. This fix has no ETA yet, but we will revert back to
-              the old display as soon as the data is accurate. Apologies for the
-              inconvenience!
-            </Typography>
-            <br></br>
-            <Typography>
-              After 09/27/20 @ 23:00:00 UTC, only the uUSDrenBTC and uUSDwETH
-              contracts will be eligible for liquidity mining. 10,000 UMA and
-              25,000 UMA, respectively, are granted pro-rata (based on
-              continuous snapshots) to LP's in the uUSDwBTC-USDC and uUSDwETH
-              Balancer pools.
-            </Typography>
-            <br></br>
-            <br></br>
-            <Link
-              href={balancerPoolUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Balancer Pool Link
-            </Link>{" "}
-            ← Go here to add & remove liquidity
-            <br></br>
-            <br></br>
-            <Link
-              href={getExchangeLinkToken}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {exchangeName} Exchange Link
-            </Link>{" "}
-            ← Go here to check the {tokenSymbol} exchange rate
-            <br></br>
-            <br></br>
-            <Typography>
-              <strong>APY</strong>: To approximate your weekly returns, you can
-              divide the $ amount of UMA rewarded for a pool per week by the $
-              amount of pooled liquidity. For example, if the pool size is $10
-              million, the UMA-USD price is $10, and the reward is 25,000
-              UMA/week, then the return for each $1 supplied to the pool is:{" "}
-              <strong>
-                ($10 * 25,000 / $10 million) * 100 = 2.5% weekly return
-              </strong>
-            </Typography>
+            <BalancerData />
           </OutlinedContainer>
         </Box>
+        <Box py={1} textAlign="center">
+          <ToggleButtonGroup
+            value={dialogTabIndex}
+            exclusive
+            onChange={handleAlignment}
+          >
+            <ToggleButton value="farming-calculator">
+              Liquidity Mining
+            </ToggleButton>
+            <ToggleButton value="yusd-calculator">yield dollar</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+        {dialogTabIndex === "farming-calculator" && (
+          <Box py={2}>
+            <OutlinedContainer>
+              <FarmingCalculator />
+            </OutlinedContainer>
+          </Box>
+        )}
+        {dialogTabIndex === "yusd-calculator" && (
+          <Box py={2}>
+            <OutlinedContainer>
+              <YieldCalculator />
+            </OutlinedContainer>
+          </Box>
+        )}
       </Box>
     );
   }
