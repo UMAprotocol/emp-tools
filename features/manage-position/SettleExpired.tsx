@@ -29,7 +29,7 @@ enum CONTRACT_STATE {
   PRICE_RECEIVED,
 }
 
-const { parseBytes32String: hexToUtf8 } = utils;
+const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
 
 const SettleExpired = () => {
   const { contract: emp } = EmpContract.useContainer();
@@ -39,8 +39,9 @@ const SettleExpired = () => {
     expirationTimestamp,
     contractState,
     isExpired,
+    expiryPrice,
   } = empState;
-  const { symbol: collSymbol } = Collateral.useContainer();
+  const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const {
     tokens: posTokensString,
     collateral: posCollString,
@@ -54,7 +55,7 @@ const SettleExpired = () => {
   } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { dvmState } = DvmState.useContainer();
-  const { hasEmpPrice, resolvedPrice } = dvmState;
+  const { resolvedPrice: dvmResolvedPrice } = dvmState;
 
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
@@ -71,7 +72,8 @@ const SettleExpired = () => {
     priceIdentifier !== null &&
     expirationTimestamp !== null &&
     contractState !== null &&
-    hasEmpPrice !== null &&
+    collDec !== null &&
+    expiryPrice !== null &&
     isExpired !== null &&
     isExpired // If contract has not expired, then do not render this component
   ) {
@@ -82,6 +84,14 @@ const SettleExpired = () => {
     const posTokens = Number(posTokensString);
     const posColl = Number(posCollString);
     const needsToRequestSettlementPrice = contractState === CONTRACT_STATE.OPEN;
+
+    // Resolved price is either the DVM's resolved price, the EMP's stored price (once a settle() is called),
+    // or 0.
+    const resolvedPrice = dvmResolvedPrice
+      ? dvmResolvedPrice
+      : parseFloat(fromWei(expiryPrice.toString(), collDec)); // DVM identifier should have same precision as collateral.
+    // It's possible that the EMP has a price available even if resolvedPrice is 0
+    const hasEmpPrice = resolvedPrice !== 0;
 
     // Error conditions for calling settle expired:
     const needAllowance =
@@ -234,7 +244,7 @@ const SettleExpired = () => {
           </>
         )}
 
-        {resolvedPrice !== null &&
+        {hasEmpPrice &&
           positionTRV !== null &&
           excessCollateral !== null &&
           balanceTRV !== null &&
