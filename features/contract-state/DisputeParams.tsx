@@ -32,6 +32,7 @@ const DisputeParams = () => {
     disputerDisputeRewardPct,
     sponsorDisputeRewardPct,
     withdrawalLiveness,
+    liquidationLiveness,
   } = empState;
 
   const { dvmState } = DvmState.useContainer();
@@ -41,6 +42,9 @@ const DisputeParams = () => {
   const withdrawalLivenessInMinutes = (Number(withdrawalLiveness) / 60).toFixed(
     2
   );
+  const liquidationLivenessInMinutes = (
+    Number(liquidationLiveness) / 60
+  ).toFixed(2);
 
   return (
     <Box>
@@ -96,6 +100,24 @@ const DisputeParams = () => {
           title={`To withdraw past the global collateralization ratio, you will need to wait a liveness period before completing your withdrawal.`}
         >
           <span>{withdrawalLivenessInMinutes}</span>
+        </Tooltip>
+      </Status>
+      <Status>
+        <Label>
+          Liquidation liveness in mins (
+          <Link
+            href={DOCS_MAP.FINAL_FEE}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Docs
+          </Link>
+          ){`: `}
+        </Label>
+        <Tooltip
+          title={`After a liquidation is submitted the position enters into a liveness period during which the liquidation can be disputed if invalid.`}
+        >
+          <span>{liquidationLivenessInMinutes}</span>
         </Tooltip>
       </Status>
     </Box>

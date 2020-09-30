@@ -133,7 +133,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
 
     const liquidationTimeRemaining =
       Number(liquidatedPosition.liquidationTimestamp) +
-      Number(withdrawalLiveness) -
+      Number(liquidationLiveness) -
       Number(currentTime);
 
     const pendingLiquidationTimeString =
