@@ -4,6 +4,7 @@ import { useState } from "react";
 import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
 
+// Import client side only to disable serverside rendering for the charts.
 import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 

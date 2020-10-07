@@ -55,6 +55,7 @@ export default function Index() {
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>(
     "General Info"
   );
+  const [options, setOptions] = useState<Array<string>>([]);
   const { address: collAddress } = Collateral.useContainer();
   const { address: tokenAddress } = Token.useContainer();
   const { contract: weth } = WethContract.useContainer();
@@ -64,29 +65,30 @@ export default function Index() {
     tokenAddress &&
     Object.keys(YIELD_TOKENS).includes(tokenAddress.toLowerCase());
 
-  let options = ["General Info", "Manage Position", "All Positions"];
   const buildOptionsList = () => {
+    // Default list that all contracts have.
+    let menuOptions = ["General Info", "Manage Position", "All Positions"];
     // If it is weth collateral contract then add the weth option.
     if (weth && collAddress?.toLowerCase() == weth.address.toLowerCase()) {
-      options.push("Wrap/Unwrap WETH");
+      menuOptions.push("Wrap/Unwrap WETH");
     }
 
     // If it is a yield token then add the yUSD yield and analytics tabs.
     if (isYieldToken) {
-      options = options.concat(["yUSD Yield", "Analytics"]);
+      menuOptions = menuOptions.concat(["yUSD Yield", "Analytics"]);
     }
 
     // Update selected page if the user toggles between EMPs while selected on
     // invalid pages (i.e on Wrap/Unwrap then moves to uUSDrBTC).
-    if (options.indexOf(selectedMenuItem) == -1) {
+    if (menuOptions.indexOf(selectedMenuItem) == -1) {
       setSelectedMenuItem("General Info");
     }
+    return menuOptions;
   };
-  buildOptionsList();
 
   useEffect(() => {
-    buildOptionsList();
-  }, [empAddress]);
+    setOptions(buildOptionsList());
+  }, [empAddress, weth, collAddress, isYieldToken, selectedMenuItem]);
 
   const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

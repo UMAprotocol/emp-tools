@@ -8,6 +8,7 @@ import PriceFeed from "../../containers/PriceFeed";
 import Token from "../../containers/Token";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
+// Import client side only to disable serverside rendering for the charts.
 import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -50,6 +51,8 @@ const CurrentSponsorsCollateralRatio = () => {
       return {
         address: prettyAddress(address),
         bucket:
+          // Note the bucket scalling adapts the width of according to the current liquidation price. This works fine
+          //for prices between 100 and 100,000 but might scale badly for very small or very large prices.
           Math.ceil(Number(activeSponsors[address].liquidationPrice) / 5) * 5,
         liquidationPrice: Number(activeSponsors[address].liquidationPrice),
         tokensOutstanding: Number(activeSponsors[address].tokensOutstanding),
