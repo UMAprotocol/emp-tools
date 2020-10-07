@@ -36,7 +36,7 @@ const CurrentLiquidityProviders = () => {
       return a + b.balance;
     }, 0);
 
-    const usdPerBPT = pool.liquidity / totalBPT;
+    const usdPerBPT = totalBPT != 0 ? pool.liquidity / totalBPT : 0;
 
     const plotConfig = {
       options: {
