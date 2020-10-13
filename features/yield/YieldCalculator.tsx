@@ -158,7 +158,7 @@ const YieldCalculator = () => {
           <Grid item md={4} sm={12} xs={12}>
             <Box pt={1} textAlign="center">
               <Typography variant="h6">
-                Yearly APR for {selectedUserMode}: {yieldAmount}%
+                Yearly APY for {selectedUserMode}: {yieldAmount}%
               </Typography>
             </Box>
           </Grid>
