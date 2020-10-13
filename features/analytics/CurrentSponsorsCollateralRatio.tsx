@@ -135,7 +135,7 @@ const CurrentSponsorsCollateralRatio = () => {
     return (
       <span>
         <Typography variant="h5" style={{ marginBottom: "10px" }}>
-          {symbol} Sponsor Liquidation Prices
+          {symbol} Liquidation Prices vs. Collateral
         </Typography>
         <Chart
           options={plotConfig.options}

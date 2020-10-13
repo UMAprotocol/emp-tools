@@ -83,7 +83,7 @@ const CurrentLiquidityProviders = () => {
     return (
       <span>
         <Typography variant="h5" style={{ marginBottom: "10px" }}>
-          Current {symbol} Balancer Liquidity Providers
+          {symbol} Balancer Liquidity Providers
         </Typography>
         Logarithmic:{" "}
         <Switch checked={switchState} onChange={handleSwitchChange} />
