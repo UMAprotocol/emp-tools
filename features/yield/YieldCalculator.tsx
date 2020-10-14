@@ -4,7 +4,7 @@ import styled from "styled-components";
 import EmpState from "../../containers/EmpState";
 import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
-import { calcInterest, calcApy } from "../../utils/calculators";
+import { calcApr } from "../../utils/calculators";
 
 const FormInput = styled.div`
   margin-top: 20px;
@@ -58,15 +58,10 @@ const YieldCalculator = () => {
     if (_tokenPrice <= 0 || _daysToExpiry <= 0) {
       return null;
     }
-    // this is annual compounded interest based on days to expiry
-    let interest;
     if (_selectedUserMode === USER_MODE.BUY) {
-      interest = calcInterest(_tokenPrice, 1, _daysToExpiry);
-    } else {
-      interest = calcInterest(1, _tokenPrice, _daysToExpiry);
+      return calcApr(_tokenPrice, 1, _daysToExpiry);
     }
-    // apy can be calculated directly from this rate
-    return calcApy(interest);
+    return calcApr(1, _tokenPrice, _daysToExpiry);
   };
 
   const prettyPercentage = (x: number | null) => {
@@ -158,7 +153,7 @@ const YieldCalculator = () => {
           <Grid item md={4} sm={12} xs={12}>
             <Box pt={1} textAlign="center">
               <Typography variant="h6">
-                Yearly APY for {selectedUserMode}: {yieldAmount}%
+                Yearly APR for {selectedUserMode}: {yieldAmount}%
               </Typography>
             </Box>
           </Grid>
