@@ -4,6 +4,7 @@ import styled from "styled-components";
 import EmpState from "../../containers/EmpState";
 import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
+import { calcApr } from "../../utils/calculators";
 
 const FormInput = styled.div`
   margin-top: 20px;
@@ -57,13 +58,10 @@ const YieldCalculator = () => {
     if (_tokenPrice <= 0 || _daysToExpiry <= 0) {
       return null;
     }
-
-    // `yieldPerUnit` = (FACE/yUSD_PX)^(1/(365/DAYS_TO_EXP)) - 1,
-    // where FACE = $1. More details: https://www.bankrate.com/glossary/a/apy-annual-percentage-yield/
-    const yieldPerUnit =
-      Math.pow(1 / _tokenPrice, 1 / (_daysToExpiry / DAYS_PER_YEAR)) - 1;
-    const flipSign = _selectedUserMode === USER_MODE.BUY ? 1 : -1;
-    return yieldPerUnit * flipSign;
+    if (_selectedUserMode === USER_MODE.BUY) {
+      return calcApr(_tokenPrice, 1, _daysToExpiry);
+    }
+    return calcApr(1, _tokenPrice, _daysToExpiry);
   };
 
   const prettyPercentage = (x: number | null) => {

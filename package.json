@@ -6,7 +6,9 @@
     "build": "next build",
     "start": "next start",
     "chain": "ts-node -O '{\"module\":\"commonjs\"}' chain.ts",
-    "lint": "prettier './**/*.{ts,tsx,css,html,md}' --write"
+    "lint": "prettier './**/*.{ts,tsx,css,html,md}' --write",
+    "test": "jest -c jest.config.js",
+    "watch-test": "jest -c jest.config.js --watch"
   },
   "dependencies": {
     "@apollo/client": "^3.0.1",
@@ -30,15 +32,21 @@
     "unstated-next": "^1.1.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.0.4",
+    "@testing-library/user-event": "^12.1.7",
     "@types/node": "^14.0.13",
     "@types/react": "^16.9.36",
     "@types/styled-components": "^5.1.0",
+    "babel-jest": "^26.5.2",
     "babel-plugin-styled-components": "^1.11.0-0",
     "dotenv": "^8.2.0",
     "ganache-core": "^2.10.2",
     "husky": "^4.2.3",
     "lint-staged": ">=10",
     "prettier": "^2.0.5",
+    "react-scripts": "^3.4.3",
+    "ts-jest": "^26.4.1",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   },
