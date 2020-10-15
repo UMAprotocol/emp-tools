@@ -11,7 +11,8 @@ import { getExchangeInfo } from "../../utils/getExchangeLinks";
 
 const DataBox = styled(Box)`
   border: 1px solid #434343;
-  padding: 1rem 2rem;
+  padding: 1rem 1rem;
+  margin: 1rem 1rem;
 `;
 
 const Label = styled.div`
@@ -129,7 +130,7 @@ const Totals = () => {
     addTokenToMetamask: any = null
   ) {
     return (
-      <>
+      <Grid container spacing={0}>
         <Grid item md={6} xs={12}>
           <DataBox>
             <Typography variant="h4">
@@ -200,7 +201,7 @@ const Totals = () => {
             </LinksContainer>
           </DataBox>
         </Grid>
-      </>
+      </Grid>
     );
   }
 };
