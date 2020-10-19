@@ -18,7 +18,7 @@
     "@studydefi/money-legos": "^2.3.2",
     "apexcharts": "^3.20.0",
     "bnc-notify": "^1.2.4",
-    "bnc-onboard": "^1.10.3",
+    "bnc-onboard": "^1.14.0",
     "date-fns": "^2.14.0",
     "ethers": "^5.0.1",
     "graphql": "^15.3.0",
