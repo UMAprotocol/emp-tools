@@ -25,8 +25,8 @@ function LiquidityMiningV2() {
 
       <br></br>
       <Typography>
-        UMA liquidity mining program will changing, and a new calculator is in
-        the works. See UMA Medium post for more context about the upcoming
+        UMA liquidity mining program will be changing, and a new calculator is
+        in the works. See UMA Medium post for more context about the upcoming
         changes&nbsp;
         <a
           href="https://medium.com/uma-project/uma-announces-developer-mining-6f6fe15d5604"
