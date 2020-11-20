@@ -1,3 +1,4 @@
+// const { ethers } = require('ethers')
 // https://www.calculatorsoup.com/calculators/financial/compound-interest-calculator.php
 // Calculates a compounding interest, leaving this in as potential useful function
 export const calcInterest = (
@@ -31,3 +32,91 @@ export const calcApr = (
 ) => {
   return ((endPrice - startPrice) / startPrice / periodsRemaining) * periods;
 };
+
+// export async function DevMiningEstimate(){
+// }
+type DevMiningCalculatorParams = {
+  ethers: any;
+  getPrice: any;
+  empAbi: any;
+  erc20Abi: any;
+  provider: any;
+};
+export function DevMiningCalculator({
+  provider,
+  ethers,
+  getPrice,
+  empAbi,
+  erc20Abi,
+}: DevMiningCalculatorParams) {
+  const { utils, BigNumber, FixedNumber } = ethers;
+  const { parseEther } = utils;
+  async function getEmpInfo(address: string, toCurrency = "usd") {
+    const emp = new ethers.Contract(address, empAbi, provider);
+    const collateralAddress = await emp.collateralCurrency();
+    const erc20 = new ethers.Contract(collateralAddress, erc20Abi, provider);
+    const size = (await emp.rawTotalPositionCollateral()).toString();
+    const price = await getPrice(collateralAddress, toCurrency);
+    const decimals = await erc20.decimals();
+
+    return {
+      address,
+      toCurrency,
+      collateralAddress,
+      size,
+      price,
+      decimals,
+    };
+  }
+  // returns a fixed number
+  function calculateEmpValue({
+    price,
+    size,
+    decimals,
+  }: {
+    price: number;
+    size: string;
+    decimals: number;
+  }) {
+    const fixedPrice = FixedNumber.from(price.toString());
+    const fixedSize = FixedNumber.fromValue(size, decimals);
+    return fixedPrice.mulUnsafe(fixedSize);
+  }
+
+  async function estimateDevMiningRewards({
+    totalRewards,
+    empWhitelist,
+  }: {
+    totalRewards: number;
+    empWhitelist: string[];
+  }) {
+    const allInfo = await Promise.all(
+      empWhitelist.map((address) => getEmpInfo(address))
+    );
+
+    const values: any[] = [];
+    const totalValue = allInfo.reduce((totalValue, info) => {
+      const value = calculateEmpValue(info);
+      values.push(value);
+      return totalValue.addUnsafe(value);
+    }, FixedNumber.from("0"));
+
+    return allInfo.map((info, i): [string, string] => {
+      return [
+        info.address,
+        values[i]
+          .mulUnsafe(FixedNumber.from(totalRewards))
+          .divUnsafe(totalValue)
+          .toString(),
+      ];
+    });
+  }
+
+  return {
+    estimateDevMiningRewards,
+    utils: {
+      getEmpInfo,
+      calculateEmpValue,
+    },
+  };
+}

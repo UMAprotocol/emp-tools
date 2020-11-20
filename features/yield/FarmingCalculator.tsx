@@ -1,9 +1,11 @@
-import { Box, TextField, Typography, Grid } from "@material-ui/core";
+import { Box, TextField, Typography, Grid, Tooltip } from "@material-ui/core";
 
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Balancer from "../../containers/Balancer";
 import Token from "../../containers/Token";
+import EmpAddress from "../../containers/EmpAddress";
+import DevMining from "../../containers/DevMining";
 
 import {
   WEEKS_PER_YEAR,
@@ -17,29 +19,6 @@ const FormInput = styled.div`
   margin-bottom: 20px;
 `;
 
-// TODO update with best calculation based on dev mining stats
-function LiquidityMiningV2() {
-  return (
-    <span>
-      <Typography variant="h5">UMA Liquidity Mining</Typography>
-
-      <br></br>
-      <Typography>
-        UMA liquidity mining program will be changing, and a new calculator is
-        in the works. See UMA Medium post for more context about the upcoming
-        changes&nbsp;
-        <a
-          href="https://medium.com/uma-project/uma-announces-developer-mining-6f6fe15d5604"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          here
-        </a>
-        .
-      </Typography>
-    </span>
-  );
-}
 const FarmingCalculator = () => {
   const {
     getTokenPrice,
@@ -47,6 +26,8 @@ const FarmingCalculator = () => {
     poolAddress,
   } = Balancer.useContainer();
   const { symbol: tokenSymbol, address } = Token.useContainer();
+  const { empAddress } = EmpAddress.useContainer();
+  const { devMiningRewards } = DevMining.useContainer();
 
   // Set a default token address
   const [tokenAddress, setTokenAddress] = useState<string>(
@@ -206,9 +187,16 @@ const FarmingCalculator = () => {
     if (address) {
       setTokenAddress(address.toLowerCase());
     }
-    if (Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress)) {
+    if (devMiningRewards == null || empAddress == null) return;
+    if (
+      Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress) &&
+      devMiningRewards.has(empAddress)
+    ) {
       // Strip out rewards that have expired or have not started yet.
       const allRewards = WEEKLY_UMA_REWARDS[tokenAddress];
+      // hardcoding LM rewards to half dev rewards. Probably should be parameterized
+      const liquidityRewards =
+        parseFloat(devMiningRewards.get(empAddress) || "0") / 2;
       const filteredRewards = [];
       for (let i = 0; i < allRewards.length; i++) {
         const reward = allRewards[i];
@@ -225,6 +213,9 @@ const FarmingCalculator = () => {
           // Reward has not started.
           continue;
         } else {
+          if (reward.token == "UMA") {
+            reward.count = liquidityRewards;
+          }
           filteredRewards.push(reward);
         }
       }
@@ -255,7 +246,13 @@ const FarmingCalculator = () => {
         setIsRollToToken(false);
       }
     }
-  }, [address, tokenAddress, rollFromTokenObj, rollFromTokenAddress]);
+  }, [
+    address,
+    tokenAddress,
+    rollFromTokenObj,
+    rollFromTokenAddress,
+    devMiningRewards,
+  ]);
 
   // Update default pool information
   useEffect(() => {
@@ -314,7 +311,207 @@ const FarmingCalculator = () => {
       </Box>
     );
   } else {
-    return <LiquidityMiningV2 />;
+    return (
+      <span>
+        <Typography variant="h5">UMA Liquidity Mining</Typography>
+
+        <br></br>
+        <Typography>
+          During the liquidity mining program UMA and potentially other token
+          rewards will be paid out to LP providers in certain yield token
+          balancer pools. Rewards are calculated as a pro-rata contribution to
+          the liquidity pool. To learn more about the liquidity mining program
+          see UMA Medium post{" "}
+          <a
+            href="https://medium.com/uma-project/liquidity-mining-on-uma-is-now-live-5f6cb0bd53ee"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            here
+          </a>
+          .
+        </Typography>
+        {timeUntilRoll && timeUntilRoll > 0 && (
+          <>
+            <br></br>
+            <br></br>
+            <Typography>
+              <strong>Liquidity mining rewards during the roll:</strong> Before{" "}
+              {getDateReadable(rollDate)} UTC, LP contributions to either the{" "}
+              {rollFromTokenName} or the {rollToTokenName} are considered
+              equally. What this means is that rewards are granted pro-rata as:
+              (your USD contribution) / (total {rollFromTokenName} liquidity +
+              total {rollToTokenName} liquidity). After{" "}
+              {getDateReadable(rollDate)} UTC, only LP contributions in the{" "}
+              {rollToTokenName} pool will count towards liquidity mining
+              rewards.
+            </Typography>
+          </>
+        )}
+        <br></br>
+        <br></br>
+        {rewardToken.length > 0 ? (
+          <Typography>
+            <strong>Tokens eligible for liquidity mining:</strong>{" "}
+            {timeUntilRoll
+              ? isRolled
+                ? rollToTokenName
+                : `${rollFromTokenName} + ${rollToTokenName}`
+              : rollFromTokenName}
+            <br></br>
+            {hoursRemainingToFarmingRoll && hoursRemainingToFarmingRoll > 0 && (
+              <>
+                <strong>Hours remaining until liquidity mining rolls:</strong>{" "}
+                {hoursRemainingToFarmingRoll.toFixed(2)}
+                <br></br>
+              </>
+            )}
+            <strong>Total liquidity eligible for mining rewards:</strong> $
+            {Number(poolLiquidity).toLocaleString()}
+            <br></br>
+            {rewardToken &&
+              rewardToken.map((rewardObj) => {
+                return (
+                  rewardYieldAmounts[rewardObj.token] &&
+                  rewardTokenPrices[rewardObj.token] && (
+                    <span key={rewardObj.token}>
+                      <br></br>
+                      <strong>
+                        {rewardObj.token === "UMA" && (
+                          <Tooltip
+                            placement="top"
+                            title="This is a rough estimation which changes based on relative value locked vs all eligible contracts. Actual payout may differ significantly. Click to learn more."
+                          >
+                            <span>
+                              <u>
+                                <i>
+                                  <a
+                                    href="https://twitter.com/UMAprotocol/status/1324199135080148993"
+                                    target="_blank"
+                                  >
+                                    Estimated
+                                  </a>
+                                </i>
+                              </u>{" "}
+                            </span>
+                          </Tooltip>
+                        )}
+                        Weekly {rewardObj.token} distributed to pool:
+                      </strong>
+                      {" " + rewardObj.count.toLocaleString()} ($
+                      {rewardYieldAmounts[rewardObj.token].toLocaleString()})
+                      <br></br>
+                      {`- 1 ${rewardObj.token} = $${rewardTokenPrices[
+                        rewardObj.token
+                      ].toLocaleString()}`}
+                    </span>
+                  )
+                );
+              })}
+          </Typography>
+        ) : (
+          <Typography>
+            <strong>This token is not currently eligible for rewards</strong>
+          </Typography>
+        )}
+        <Box pt={2}>
+          <form noValidate autoComplete="off">
+            <Grid container spacing={2}>
+              <Grid item md={4} sm={6} xs={12}>
+                <FormInput>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label={`${tokenSymbol} added to pool`}
+                    value={yUSDAdded}
+                    onChange={(e) => setyUSDAdded(e.target.value)}
+                    variant="outlined"
+                    inputProps={{ min: "0", step: "1" }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </FormInput>
+              </Grid>
+              <Grid item md={4} sm={6} xs={12}>
+                <FormInput>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label="USDC added to pool"
+                    value={USDCAdded}
+                    onChange={(e) => setUSDCAdded(e.target.value)}
+                    inputProps={{ min: "0" }}
+                    variant="outlined"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </FormInput>
+              </Grid>
+              <Grid item md={4} sm={6} xs={12}>
+                <Box pt={1} textAlign="center">
+                  <Typography variant="h6">
+                    Liquidity provision share: <strong>{fracLiquidity}%</strong>
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item md={6} sm={6} xs={12}>
+                <Box textAlign="center">
+                  <Typography variant="h6">
+                    Projected weekly rewards:
+                  </Typography>
+                  {fracLiquidity &&
+                    rewardToken &&
+                    rewardToken.map((rewardObj) => {
+                      if (rewardTokenPrices[rewardObj.token]) {
+                        const userReward =
+                          (Number(fracLiquidity) * rewardObj.count) / 100;
+                        const userRewardUsd =
+                          userReward * rewardTokenPrices[rewardObj.token];
+                        return (
+                          <Typography key={rewardObj.token}>
+                            {"- "}
+                            <strong>
+                              {userReward.toLocaleString() +
+                                ` ${rewardObj.token}`}
+                            </strong>
+                            {` ($${userRewardUsd.toLocaleString()})`}
+                          </Typography>
+                        );
+                      }
+                    })}
+                </Box>
+              </Grid>
+              <Grid item md={6} sm={6} xs={12}>
+                <Box textAlign="center">
+                  <Typography variant="h6">
+                    Yearly APR in USD <strong>{apr}%</strong>
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </form>
+          <Box pt={4}>
+            <Typography>
+              <strong>Note: </strong>Providing liquidity on Balancer will also
+              yield BAL rewards over and above liquidity mining rewards. To
+              calculate your BAL rewards use{" "}
+              <a
+                href={`https://pools.vision/pool/${
+                  poolAddress ? poolAddress : ""
+                }`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                this
+              </a>{" "}
+              calculator.
+            </Typography>
+          </Box>
+        </Box>
+      </span>
+    );
   }
 };
 
