@@ -1,4 +1,3 @@
-// const { ethers } = require('ethers')
 // https://www.calculatorsoup.com/calculators/financial/compound-interest-calculator.php
 // Calculates a compounding interest, leaving this in as potential useful function
 export const calcInterest = (
@@ -33,8 +32,6 @@ export const calcApr = (
   return ((endPrice - startPrice) / startPrice / periodsRemaining) * periods;
 };
 
-// export async function DevMiningEstimate(){
-// }
 type DevMiningCalculatorParams = {
   ethers: any;
   getPrice: any;
