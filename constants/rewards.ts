@@ -50,19 +50,19 @@ export const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
   "0x90f802c7e8fb5d40b0de583e34c065a3bd2020d8": [
     {
       token: "UMA",
-      count: 15000,
+      count: 15000, // This is an approximation based on expected dev mining allocation
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 12, 25, 23, 0, 0, 0),
     },
-  ],
+  ], // YD-ETH-MAR21
   "0x002f0b1a71c5730cf2f4da1970a889207bdb6d0d": [
     {
       token: "UMA",
-      count: 10000,
+      count: 10000, // This is an approximation based on expected dev mining allocation
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 12, 25, 23, 0, 0, 0),
     },
-  ],
+  ], // YD-BTC-MAR21
 };
 
 // Key is roll from token address.
