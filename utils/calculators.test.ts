@@ -73,6 +73,8 @@ test("DevMiningCalculator", async () => {
     "0x3605Ec11BA7bD208501cbb24cd890bC58D2dbA56", // uUSDrWETH-DEC
     "0x306B19502c833C1522Fbc36C9dd7531Eda35862B", // pxUSD-OCT2020
     "0x3a93E863cb3adc5910E6cea4d51f132E8666654F", // pxUSD-DEC2020
+    "0xE4256C47a3b27a969F25de8BEf44eCA5F2552bD5", // YD-ETH-MAR21
+    "0x1c3f1A342c8D9591D9759220d114C685FD1cF6b8", // YD-BTC-MAR21
   ];
   const provider = ethers.getDefaultProvider();
   const dmc = DevMiningCalculator({

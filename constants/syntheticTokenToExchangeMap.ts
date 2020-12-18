@@ -48,6 +48,8 @@ export const getExchangeTypeFromTokenSymbol = (symbol: string | null) => {
       return TOKEN_TO_EXCHANGE_MAP.yusd;
     case symbol?.includes("uUSD"):
       return TOKEN_TO_EXCHANGE_MAP.yusd;
+    case symbol?.includes("YD"):
+      return TOKEN_TO_EXCHANGE_MAP.yusd;
     default:
       return null;
   }
