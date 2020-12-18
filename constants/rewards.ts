@@ -27,7 +27,7 @@ export const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
   "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9": [
     {
       token: "UMA",
-      count: 15000,
+      count: 25000,
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
     },
@@ -50,7 +50,7 @@ export const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
   "0x90f802c7e8fb5d40b0de583e34c065a3bd2020d8": [
     {
       token: "UMA",
-      count: 25000,
+      count: 15000,
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 12, 25, 23, 0, 0, 0),
     },
