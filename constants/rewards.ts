@@ -47,22 +47,38 @@ export const WEEKLY_UMA_REWARDS: { [key: string]: any[] } = {
       endDate: Date.UTC(2020, 9, 1, 0, 0, 0),
     },
   ], // uUSDrBTC-DEC
+  "0x90f802c7e8fb5d40b0de583e34c065a3bd2020d8": [
+    {
+      token: "UMA",
+      count: 15000, // This is an approximation based on expected dev mining allocation
+      getPrice: getUmaPrice,
+      startDate: Date.UTC(2020, 12, 25, 23, 0, 0, 0),
+    },
+  ], // YD-ETH-MAR21
+  "0x002f0b1a71c5730cf2f4da1970a889207bdb6d0d": [
+    {
+      token: "UMA",
+      count: 10000, // This is an approximation based on expected dev mining allocation
+      getPrice: getUmaPrice,
+      startDate: Date.UTC(2020, 12, 25, 23, 0, 0, 0),
+    },
+  ], // YD-BTC-MAR21
 };
 
 // Key is roll from token address.
 export const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
-  "0xb2fdd60ad80ca7ba89b9bab3b5336c2601c020b4": {
-    rollFromTokenName: "yUSD-OCT20",
-    rollToTokenName: "uUSDwETH-DEC",
-    rollToToken: "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9",
-    rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
-    rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
-  }, // yUSDETH-Oct20 --> uUSDwETH-DEC
-  "0x208d174775dc39fe18b1b374972f77ddec6c0f73": {
-    rollFromTokenName: "uUSDrBTC-OCT",
-    rollToTokenName: "uUSDrBTC-DEC",
-    rollToToken: "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce",
-    rollStartDate: Date.UTC(2020, 8, 23, 23, 0, 0, 0),
-    rollDate: Date.UTC(2020, 8, 27, 23, 0, 0, 0),
-  }, // uUSDrBTC-OCT --> uUSDrBTC-DEC
+  "0xd16c79c8a39d44b2f3eb45d2019cd6a42b03e2a9": {
+    rollFromTokenName: "uUSDwETH-DEC",
+    rollToTokenName: "YD-ETH-MAR21",
+    rollToToken: "0x90f802c7e8fb5d40b0de583e34c065a3bd2020d8",
+    rollStartDate: Date.UTC(2020, 12, 25, 23, 0, 0, 0),
+    rollDate: Date.UTC(2020, 12, 28, 23, 0, 0, 0),
+  }, // uUSDwETH-DEC --> YD-ETH-MAR21
+  "0xf06ddacf71e2992e2122a1a0168c6967afdf63ce": {
+    rollFromTokenName: "uUSDrBTC-DEC",
+    rollToTokenName: "YD-BTC-MAR21",
+    rollToToken: "0x002f0b1a71c5730cf2f4da1970a889207bdb6d0d",
+    rollStartDate: Date.UTC(2020, 12, 25, 23, 0, 0, 0),
+    rollDate: Date.UTC(2020, 12, 28, 23, 0, 0, 0),
+  }, // uUSDrBTC-DEC --> YD-BTC-MAR21
 };

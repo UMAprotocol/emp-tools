@@ -115,10 +115,12 @@ const useBalancer = () => {
     if (!tokenPriceLoading && tokenPriceData) {
       const data = tokenPriceData.tokenPrices[0];
 
-      setUsdPrice(Number(data.price));
-      const _poolAddress = data.poolTokenId.split("-")[0];
-      // const _tokenAddress = data.poolTokenId.split("-")[1];
-      setPoolAddress(_poolAddress);
+      // The tokenPrices field might not exist if the pool has not had any trades executed.
+      if (data) {
+        setUsdPrice(Number(data.price));
+        const _poolAddress = data.poolTokenId.split("-")[0];
+        setPoolAddress(_poolAddress);
+      }
     }
   };
 
@@ -185,8 +187,11 @@ const useBalancer = () => {
     if (!loading && data) {
       const tokenData = data.tokenPrices[0];
 
-      const usdPrice = Number(tokenData.price);
-      return usdPrice;
+      // The tokenPrices field might not exist if the pool has not had any trades executed.
+      if (tokenData) {
+        const usdPrice = Number(tokenData.price);
+        return usdPrice;
+      }
     }
   };
 
