@@ -189,14 +189,24 @@ const FarmingCalculator = () => {
     }
     if (devMiningRewards == null || empAddress == null) return;
     if (
+      rollFromTokenObj &&
       Object.keys(WEEKLY_UMA_REWARDS).includes(tokenAddress) &&
       devMiningRewards.has(empAddress)
     ) {
       // Strip out rewards that have expired or have not started yet.
       const allRewards = WEEKLY_UMA_REWARDS[tokenAddress];
-      // hardcoding LM rewards to half dev rewards. Probably should be parameterized
-      const liquidityRewards =
-        parseFloat(devMiningRewards.get(empAddress) || "0") / 2;
+      // First, determine which EMP address is receiving dev rewards. If roll has concluded,
+      // then use the current EMP address, other use the rollFromToken's EMP address.
+      let liquidityRewards;
+      if (isRolled) {
+        liquidityRewards = parseFloat(devMiningRewards.get(empAddress) || "0");
+      } else {
+        liquidityRewards = parseFloat(
+          devMiningRewards.get(rollFromTokenObj.rollFromEmpAddress) || "0"
+        );
+      }
+      // Hardcoding LM rewards to half of dev rewards; this should ideally be parameterized.
+      liquidityRewards /= 2;
       const filteredRewards = [];
       for (let i = 0; i < allRewards.length; i++) {
         const reward = allRewards[i];
