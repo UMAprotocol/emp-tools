@@ -50,16 +50,23 @@ export function DevMiningCalculator({
   const { parseEther } = utils;
   async function getEmpInfo(address: string, toCurrency = "usd") {
     const emp = new ethers.Contract(address, empAbi, provider);
-    const collateralAddress = await emp.collateralCurrency();
-    const erc20 = new ethers.Contract(collateralAddress, erc20Abi, provider);
-    const size = (await emp.rawTotalPositionCollateral()).toString();
-    const price = await getPrice(collateralAddress, toCurrency);
+    const tokenAddress = await emp.tokenCurrency();
+    const erc20 = new ethers.Contract(tokenAddress, erc20Abi, provider);
+    const size = (await emp.totalTokensOutstanding()).toString();
+    let price = 1;
+    try {
+      // we try to get a price, or fallback to 1 dollar. this will not work in all situations.
+      // better APR calculator coming soon.
+      price = await getPrice(tokenAddress, toCurrency);
+    } catch (err) {
+      console.error("Unable to get a price, falling back to $1", err);
+    }
     const decimals = await erc20.decimals();
 
     return {
       address,
       toCurrency,
-      collateralAddress,
+      tokenAddress,
       size,
       price,
       decimals,

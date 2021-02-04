@@ -9,26 +9,34 @@ import uma from "@studydefi/money-legos/uma";
 
 import Connection from "./Connection";
 
-export const defaultEmpWhitelist = [
-  "0xaBBee9fC7a882499162323EEB7BF6614193312e3",
-  "0x3605Ec11BA7bD208501cbb24cd890bC58D2dbA56",
-  "0x3a93E863cb3adc5910E6cea4d51f132E8666654F",
-  "0xE4256C47a3b27a969F25de8BEf44eCA5F2552bD5",
-  "0x1c3f1A342c8D9591D9759220d114C685FD1cF6b8",
-];
-
 export const defaultTotalRewards = 50000;
+const empStatusUrl =
+  "https://raw.githubusercontent.com/UMAprotocol/protocol/master/packages/affiliates/payouts/devmining-status.json";
 
-const useDevMiningCalculator = ({
-  totalRewards = defaultTotalRewards,
-  empWhitelist = defaultEmpWhitelist,
-} = {}) => {
+const useDevMiningCalculator = () => {
   const { provider } = Connection.useContainer();
   const [devMiningRewards, setRewards] = useState<Map<string, string> | null>();
   const [devMiningCalculator, setCalculator] = useState<any | null>();
+  const [empWhitelist, setEmpWhitelist] = useState<string[]>();
+  const [totalRewards, setTotalRewards] = useState<number>(defaultTotalRewards);
+
+  // pull latest whitelist
+  useEffect(() => {
+    fetch(empStatusUrl)
+      .then((response) => response.json())
+      .then((result) => {
+        setEmpWhitelist(result.empWhitelist);
+        setTotalRewards(result.totalReward);
+      })
+      .catch((err) => {
+        console.error("Error fetching Affiliates status", err);
+      });
+  }, []);
 
   useEffect(() => {
     if (provider == null) return;
+    if (empWhitelist == null) return;
+    if (totalRewards == null) return;
     const devMiningCalculator = DevMiningCalculator({
       ethers,
       getPrice: getSimplePriceByContract,
