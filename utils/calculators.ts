@@ -59,7 +59,8 @@ export function DevMiningCalculator({
       // better APR calculator coming soon.
       price = await getPrice(tokenAddress, toCurrency);
     } catch (err) {
-      console.error("Unable to get a price, falling back to $1", err);
+      // Dont show error for now
+      // console.error("Unable to get a price, falling back to $1", err);
     }
     const decimals = await erc20.decimals();
 
