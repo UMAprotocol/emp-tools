@@ -3,17 +3,18 @@
 
 // so this can be tested outside browser
 import fetch from "isomorphic-fetch";
+const fetchOptions = {
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+};
 
 export async function getUmaPrice() {
   const query =
     "https://api.coingecko.com/api/v3/simple/price?ids=uma&vs_currencies=usd";
 
-  const response = await fetch(query, {
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetch(query, fetchOptions);
 
   let priceResponse = await response.json();
   return priceResponse.uma.usd;
@@ -23,12 +24,7 @@ export async function getRenPrice() {
   const query =
     "https://api.coingecko.com/api/v3/simple/price?ids=republic-protocol&vs_currencies=usd";
 
-  const response = await fetch(query, {
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetch(query, fetchOptions);
 
   let priceResponse = await response.json();
   return priceResponse["republic-protocol"].usd;
@@ -39,24 +35,14 @@ export async function getSimplePrice(
   toCurrency: string = "usd"
 ) {
   const query = `https://api.coingecko.com/api/v3/simple/price?ids=${fromCurrency}&vs_currencies=${toCurrency}`;
-  const response = await fetch(query, {
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetch(query, fetchOptions);
   let priceResponse = await response.json();
   return priceResponse[fromCurrency][toCurrency];
 }
 
 export async function getContractInfo(address: string) {
   const query = `https://api.coingecko.com/api/v3/coins/ethereum/contract/${address}`;
-  const response = await fetch(query, {
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetch(query, fetchOptions);
   const result = await response.json();
   if (result.error) throw new Error(result.error);
   return result;
