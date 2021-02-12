@@ -36,9 +36,12 @@ function stripProtocol(url: string) {
 }
 
 // Small helper to wrap a url in cors proxy.
-function proxyUrl(
+export function proxyUrl(
   url: string,
-  proxy = "https://us-central1-uma-protocol.cloudfunctions.net/cors-proxy"
+  // This env can be set with a .env file. It has to be prefixed with NEXT_PUBLIC_ to be available in browser
+  // This has a default set for now until we can get prod env var in.
+  proxy = process.env.NEXT_PUBLIC_CORS_PROXY_URL ||
+    "https://us-central1-uma-protocol.cloudfunctions.net/cors-proxy"
 ) {
   return [proxy, stripProtocol(url)].join("/");
 }

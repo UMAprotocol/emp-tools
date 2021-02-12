@@ -51,8 +51,6 @@ export function DevMiningCalculator({
   async function getEmpInfo(address: string, toCurrency = "usd") {
     const emp = new ethers.Contract(address, empAbi, provider);
     const tokenAddress = await emp.tokenCurrency();
-    const erc20 = new ethers.Contract(tokenAddress, erc20Abi, provider);
-    const size = (await emp.totalTokensOutstanding()).toString();
     let price = 1;
     try {
       // we try to get a price, or fallback to 1 dollar. this will not work in all situations.
@@ -62,7 +60,9 @@ export function DevMiningCalculator({
       // Dont show error for now
       // console.error("Unable to get a price, falling back to $1", err);
     }
+    const erc20 = new ethers.Contract(tokenAddress, erc20Abi, provider);
     const decimals = await erc20.decimals();
+    const size = (await emp.totalTokensOutstanding()).toString();
 
     return {
       address,

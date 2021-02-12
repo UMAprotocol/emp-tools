@@ -4,7 +4,10 @@
 // so this can be tested outside browser
 import fetch from "isomorphic-fetch";
 const fetchOptions = {
-  // currently no options needed, previously we were setting content type and accept.
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
 };
 
 export async function getUmaPrice() {
