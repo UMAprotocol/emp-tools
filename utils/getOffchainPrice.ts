@@ -30,6 +30,19 @@ function _getBitstampPriceFromJSON(jsonData: any) {
   return Number(jsonData.last);
 }
 
+// This is needed because our new cors proxy wont forward http or https. We really only use https.
+function stripProtocol(url: string) {
+  return url.replace("https://", "");
+}
+
+// Small helper to wrap a url in cors proxy.
+function proxyUrl(
+  url: string,
+  proxy = "https://us-central1-uma-protocol.cloudfunctions.net/cors-proxy"
+) {
+  return [proxy, stripProtocol(url)].join("/");
+}
+
 // This function returns a type predicate that we can use to filter prices from a (number | null)[] into a number[],
 // source: https://www.typescriptlang.org/docs/handbook/advanced-types.html#user-defined-type-guards
 function isValidPrice<Price>(value: Price | null): value is Price {
@@ -59,9 +72,9 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
   usdbtc: {
     invertedPrice: true,
     source: [
+      proxyUrl("https://www.bitstamp.net/api/v2/ticker/btcusd"),
       "https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT",
       "https://api.pro.coinbase.com/products/BTC-USD/trades?limit=1",
-      "https://cors-anywhere.herokuapp.com/https://www.bitstamp.net/api/v2/ticker/btcusd",
     ],
   },
 };
