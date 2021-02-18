@@ -51,41 +51,81 @@ export function DevMiningCalculator({
   async function getEmpInfo(address: string, toCurrency = "usd") {
     const emp = new ethers.Contract(address, empAbi, provider);
     const tokenAddress = await emp.tokenCurrency();
-    let price = 1;
-    try {
-      // we try to get a price, or fallback to 1 dollar. this will not work in all situations.
-      // better APR calculator coming soon.
-      price = await getPrice(tokenAddress, toCurrency);
-    } catch (err) {
-      // Dont show error for now
-      // console.error("Unable to get a price, falling back to $1", err);
-    }
-    const erc20 = new ethers.Contract(tokenAddress, erc20Abi, provider);
-    const decimals = await erc20.decimals();
-    const size = (await emp.totalTokensOutstanding()).toString();
+    const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, provider);
+    const tokenPrice = await getPrice(tokenAddress, toCurrency).catch(
+      () => null
+    );
+    const tokenCount = (await emp.totalTokensOutstanding()).toString();
+    const tokenDecimals = (await tokenContract.decimals()).toString();
+
+    const collateralAddress = await emp.collateralCurrency();
+    const collateralContract = new ethers.Contract(
+      collateralAddress,
+      erc20Abi,
+      provider
+    );
+    const collateralPrice = await getPrice(collateralAddress, toCurrency).catch(
+      () => null
+    );
+    const collateralCount = (await emp.totalPositionCollateral()).toString();
+    const collateralDecimals = (await collateralContract.decimals()).toString();
+    const collateralRequirement = (
+      await emp.collateralRequirement()
+    ).toString();
 
     return {
       address,
       toCurrency,
       tokenAddress,
-      size,
-      price,
-      decimals,
+      tokenPrice,
+      tokenCount,
+      tokenDecimals,
+      collateralAddress,
+      collateralPrice,
+      collateralCount,
+      collateralDecimals,
+      collateralRequirement,
     };
   }
   // returns a fixed number
   function calculateEmpValue({
-    price,
-    size,
-    decimals,
+    tokenPrice,
+    tokenDecimals,
+    collateralPrice,
+    collateralDecimals,
+    tokenCount,
+    collateralCount,
+    collateralRequirement,
   }: {
-    price: number;
-    size: string;
-    decimals: number;
+    tokenPrice: number;
+    tokenDecimals: number;
+    collateralPrice: number;
+    collateralDecimals: number;
+    tokenCount: number;
+    collateralCount: number;
+    collateralRequirement: number;
   }) {
-    const fixedPrice = FixedNumber.from(price.toString());
-    const fixedSize = FixedNumber.fromValue(size, decimals);
-    return fixedPrice.mulUnsafe(fixedSize);
+    // if we have a token price, use this first to estimate EMP value
+    if (tokenPrice) {
+      const fixedPrice = FixedNumber.from(tokenPrice.toString());
+      const fixedSize = FixedNumber.fromValue(tokenCount, tokenDecimals);
+      return fixedPrice.mulUnsafe(fixedSize);
+    }
+    // if theres no token price then fallback to collateral price divided by the collateralization requirement (usually 1.2)
+    // this should give a ballpack of what the total token value will be. Its still an over estimate though.
+    if (collateralPrice) {
+      const fixedPrice = FixedNumber.from(collateralPrice.toString());
+      const collFixedSize = FixedNumber.fromValue(
+        collateralCount,
+        collateralDecimals
+      );
+      return fixedPrice
+        .mulUnsafe(collFixedSize)
+        .divUnsafe(FixedNumber.fromValue(collateralRequirement, 18));
+    }
+    throw new Error(
+      "Unable to calculate emp value, no token price or collateral price"
+    );
   }
 
   async function estimateDevMiningRewards({
