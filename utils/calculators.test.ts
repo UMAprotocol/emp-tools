@@ -86,9 +86,12 @@ test("DevMiningCalculator", async () => {
   });
   for (let contract of empWhitelist) {
     const result = await dmc.utils.getEmpInfo(contract);
-    expect(result.size).toBeTruthy();
-    expect(result.price).toBeTruthy();
-    expect(result.decimals).toBeTruthy();
+    expect(result.tokenCount).toBeTruthy();
+    expect(result.tokenPrice).toBeTruthy();
+    expect(result.collateralCount).toBeTruthy();
+    expect(result.collateralPrice).toBeTruthy();
+    expect(result.tokenDecimals).toBeTruthy();
+    expect(result.collateralDecimals).toBeTruthy();
     const value = dmc.utils.calculateEmpValue(result);
     expect(value).toBeTruthy();
   }
