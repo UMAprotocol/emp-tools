@@ -11,6 +11,8 @@
     "watch-test": "jest -c jest.config.js --watch"
   },
   "dependencies": {
+    "@uma/core-2-0": "npm:@uma/core@^2.0.0",
+    "@uma/core-1-2": "npm:@uma/core@^1.2.0",
     "@apollo/client": "^3.0.1",
     "@material-ui/core": "^4.10.2",
     "@material-ui/icons": "^4.9.1",

@@ -18,7 +18,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import Header from "../features/core/Header";
 import ContractState from "../features/contract-state/ContractState";
 import ManagePosition from "../features/manage-position/ManagePosition";
-import EmpSelector from "../features/emp-selector/EmpSelector";
+import ContractSelector from "../features/contract-selector/ContractSelector";
 import AllPositions from "../features/all-positions/AllPositions";
 import Weth from "../features/weth/Weth";
 import Yield from "../features/yield/Yield";
@@ -107,7 +107,7 @@ export default function Index() {
     <Container maxWidth={"md"}>
       <Box py={4}>
         <Header />
-        <EmpSelector />
+        <ContractSelector />
         <Hidden only={["sm", "xs"]}>
           <StyledTabs
             value={options.indexOf(selectedMenuItem)}
