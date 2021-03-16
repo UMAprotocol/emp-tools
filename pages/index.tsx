@@ -50,6 +50,113 @@ const Blurb = styled.div`
   border: 1px solid #434343;
 `;
 
+interface MainPageProps {
+  options: Array<string>;
+  handleClickListItem: (event: React.MouseEvent<HTMLElement>) => void;
+  selectedMenuItem: string;
+  handleClose: (event: React.MouseEvent<HTMLElement>) => void;
+  handleMenuItemClick: (index: number) => void;
+  anchorEl: null | HTMLElement;
+}
+function EmpTabs({
+  options,
+  handleClickListItem,
+  selectedMenuItem,
+  handleClose,
+  handleMenuItemClick,
+  anchorEl,
+}: MainPageProps) {
+  return (
+    <>
+      <Hidden only={["sm", "xs"]}>
+        <StyledTabs
+          value={options.indexOf(selectedMenuItem)}
+          onChange={(_, index) => handleMenuItemClick(index)}
+        >
+          {options.map((option, index) => (
+            <Tab key={index} label={option} disableRipple />
+          ))}
+        </StyledTabs>
+      </Hidden>
+      <Hidden only={["md", "lg", "xl"]}>
+        <div>
+          <Box pt={1} pb={2}>
+            <Grid container spacing={2}>
+              <Grid item>
+                <Button variant="outlined" onClick={handleClickListItem}>
+                  <MenuIcon />
+                </Button>
+              </Grid>
+              <Grid item>
+                <Typography style={{ marginTop: `8px` }}>
+                  <strong>Current page:</strong> {selectedMenuItem}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+          <Menu
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            {options.map((option, index) => (
+              <MenuItem
+                key={index}
+                selected={index === options.indexOf(selectedMenuItem)}
+                onClick={(_) => handleMenuItemClick(index)}
+              >
+                {option}
+              </MenuItem>
+            ))}
+          </Menu>
+        </div>
+      </Hidden>
+      {selectedMenuItem === "General Info" && (
+        <>
+          <Blurb>
+            <Typography>
+              The Expiring Multi Party (EMP) is{" "}
+              <a
+                href="https://umaproject.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                UMA
+              </a>
+              's most current financial smart contract template. This UI is a
+              community-made tool to make interfacing with the protocol easier,
+              please use at your own risk. The source code can be viewed{" "}
+              <a
+                href="https://github.com/UMAprotocol/emp-tools"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                here
+              </a>
+              . UMA's main Github can be viewed{" "}
+              <a
+                href="https://github.com/UMAprotocol/protocol"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                here
+              </a>
+              .
+            </Typography>
+          </Blurb>
+          <ContractState />
+        </>
+      )}
+      {selectedMenuItem === "Manage Position" && <ManagePosition />}
+      {selectedMenuItem === "All Positions" && <AllPositions />}
+      {selectedMenuItem === "yUSD Yield" && <Yield />}
+      {selectedMenuItem === "Wrap/Unwrap WETH" && <Weth />}
+      {selectedMenuItem === "Analytics" && <Analytics />}
+    </>
+  );
+}
+
 export default function Index() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>(
@@ -108,92 +215,14 @@ export default function Index() {
       <Box py={4}>
         <Header />
         <ContractSelector />
-        <Hidden only={["sm", "xs"]}>
-          <StyledTabs
-            value={options.indexOf(selectedMenuItem)}
-            onChange={(_, index) => handleMenuItemClick(index)}
-          >
-            {options.map((option, index) => (
-              <Tab key={index} label={option} disableRipple />
-            ))}
-          </StyledTabs>
-        </Hidden>
-        <Hidden only={["md", "lg", "xl"]}>
-          <div>
-            <Box pt={1} pb={2}>
-              <Grid container spacing={2}>
-                <Grid item>
-                  <Button variant="outlined" onClick={handleClickListItem}>
-                    <MenuIcon />
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Typography style={{ marginTop: `8px` }}>
-                    <strong>Current page:</strong> {selectedMenuItem}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
-            <Menu
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              {options.map((option, index) => (
-                <MenuItem
-                  key={index}
-                  selected={index === options.indexOf(selectedMenuItem)}
-                  onClick={(_) => handleMenuItemClick(index)}
-                >
-                  {option}
-                </MenuItem>
-              ))}
-            </Menu>
-          </div>
-        </Hidden>
-        {selectedMenuItem === "General Info" && (
-          <>
-            <Blurb>
-              <Typography>
-                The Expiring Multi Party (EMP) is{" "}
-                <a
-                  href="https://umaproject.org/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  UMA
-                </a>
-                's most current financial smart contract template. This UI is a
-                community-made tool to make interfacing with the protocol
-                easier, please use at your own risk. The source code can be
-                viewed{" "}
-                <a
-                  href="https://github.com/UMAprotocol/emp-tools"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  here
-                </a>
-                . UMA's main Github can be viewed{" "}
-                <a
-                  href="https://github.com/UMAprotocol/protocol"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  here
-                </a>
-                .
-              </Typography>
-            </Blurb>
-            <ContractState />
-          </>
-        )}
-        {selectedMenuItem === "Manage Position" && <ManagePosition />}
-        {selectedMenuItem === "All Positions" && <AllPositions />}
-        {selectedMenuItem === "yUSD Yield" && <Yield />}
-        {selectedMenuItem === "Wrap/Unwrap WETH" && <Weth />}
-        {selectedMenuItem === "Analytics" && <Analytics />}
+        <EmpTabs
+          anchorEl={anchorEl}
+          options={options}
+          handleClickListItem={handleClickListItem}
+          handleMenuItemClick={handleMenuItemClick}
+          handleClose={handleClose}
+          selectedMenuItem={selectedMenuItem}
+        />
       </Box>
       <Box py={4} textAlign="center">
         <IconButton

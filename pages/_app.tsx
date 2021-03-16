@@ -20,6 +20,7 @@ import Balancer from "../containers/Balancer";
 import DvmContracts from "../containers/DvmContracts";
 import DvmState from "../containers/DvmState";
 import DevMining from "../containers/DevMining";
+import Uniswap from "../containers/Uniswap";
 
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../apollo/client";
