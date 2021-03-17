@@ -7,6 +7,7 @@ import { WithStylingProviders } from "../utils/styling";
 import Connection from "../containers/Connection";
 import EmpContract from "../containers/EmpContract";
 import EmpAddress from "../containers/EmpAddress";
+import SelectedContract from "../containers/SelectedContract";
 import EmpState from "../containers/EmpState";
 import EmpSponsors from "../containers/EmpSponsors";
 import Collateral from "../containers/Collateral";
@@ -21,6 +22,7 @@ import DvmContracts from "../containers/DvmContracts";
 import DvmState from "../containers/DvmState";
 import DevMining from "../containers/DevMining";
 import Uniswap from "../containers/Uniswap";
+import ContractList from "../containers/ContractList";
 
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../apollo/client";
@@ -47,7 +49,11 @@ const WithStateContainerProviders = ({ children }: IProps) => (
                               <DvmContracts.Provider>
                                 <DvmState.Provider>
                                   <DevMining.Provider>
-                                    {children}
+                                    <ContractList.Provider>
+                                      <SelectedContract.Provider>
+                                        {children}
+                                      </SelectedContract.Provider>
+                                    </ContractList.Provider>
                                   </DevMining.Provider>
                                 </DvmState.Provider>
                               </DvmContracts.Provider>

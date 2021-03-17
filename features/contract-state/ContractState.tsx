@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import GeneralInfo from "./GeneralInfo";
 import DisputeParams from "./DisputeParams";
-import Totals from "./Totals";
+import Totals from "../core/Totals";
 
 import Position from "../../containers/Position";
 
