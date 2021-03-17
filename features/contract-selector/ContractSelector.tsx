@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { withStyles, useTheme } from "@material-ui/core/styles";
 
-import useEmpList from "./useEmpList";
+import useContractList from "./useContractList";
 import EmpAddress from "../../containers/EmpAddress";
 import Connection from "../../containers/Connection";
 
@@ -35,14 +35,13 @@ const FormWrapper = styled(FormControl)`
   }
 `;
 
-const EmpSelector = () => {
+const ContractSelector = () => {
   const theme = useTheme();
   const largeScreen = useMediaQuery(theme.breakpoints.up("sm"));
 
   const { signer } = Connection.useContainer();
   const { empAddress, setEmpAddress } = EmpAddress.useContainer();
-  const { emps, loading } = useEmpList();
-
+  const { contracts, loading } = useContractList();
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const value = e.target.value;
     setEmpAddress(value === 0 ? null : (value as string));
@@ -52,15 +51,16 @@ const EmpSelector = () => {
     return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
   };
 
-  const noEmpsOrLoading = emps.length < 1 || loading;
+  const noContractsOrLoading = contracts.length < 1 || loading;
+
   return (
     <Box py={2}>
       <FormWrapper>
         <Select
-          value={noEmpsOrLoading || empAddress === null ? 0 : empAddress}
+          value={noContractsOrLoading || empAddress === null ? 0 : empAddress}
           onChange={handleChange}
           input={<BootstrapInput />}
-          disabled={noEmpsOrLoading}
+          disabled={noContractsOrLoading}
         >
           {!signer ? (
             <MenuItem value={0}>
@@ -72,22 +72,28 @@ const EmpSelector = () => {
           ) : (
             <MenuItem value={0}>
               <ListItemText
-                primary={loading ? "Please wait" : "Select an EMP"}
+                primary={loading ? "Please wait" : "Select an UMA Contract"}
                 secondary={
                   loading
-                    ? "Loading list of EMPs..."
-                    : `${emps.length} EMPs found`
+                    ? "Loading list of UMA Contracts..."
+                    : `${contracts.length} Contracts found`
                 }
               />
             </MenuItem>
           )}
-          {emps.map((emp) => {
+          {contracts.map((contract) => {
             return (
-              <MenuItem value={emp.address} key={emp.address}>
+              <MenuItem value={contract.address} key={contract.address}>
                 <ListItemText
-                  primary={largeScreen ? emp.name : emp.symbol}
+                  primary={
+                    largeScreen
+                      ? `(${contract.type}) ${contract.name}`
+                      : `(${contract.type}) ${contract.symbol}`
+                  }
                   secondary={
-                    largeScreen ? emp.address : prettyAddress(emp.address)
+                    largeScreen
+                      ? contract.address
+                      : prettyAddress(contract.address)
                   }
                 />
               </MenuItem>
@@ -99,4 +105,4 @@ const EmpSelector = () => {
   );
 };
 
-export default EmpSelector;
+export default ContractSelector;
