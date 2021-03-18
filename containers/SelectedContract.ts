@@ -23,7 +23,7 @@ function useSelectedContract() {
     if (queryAddress && isNewAddress && typeof queryAddress === "string") {
       setAddress(queryAddress);
     }
-  }, [router!.query!.address, loading]);
+  }, [router?.query?.address, loading]);
 
   // this will check if the url is already is set to the address, if not, set it as query address=0x...
   function updateUrl(address: string | null) {
