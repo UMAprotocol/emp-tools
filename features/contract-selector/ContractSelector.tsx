@@ -10,9 +10,10 @@ import {
 } from "@material-ui/core";
 import { withStyles, useTheme } from "@material-ui/core/styles";
 
-import useContractList from "./useContractList";
-import EmpAddress from "../../containers/EmpAddress";
+import ContractList from "../../containers/ContractList";
+import SelectedContract from "../../containers/SelectedContract";
 import Connection from "../../containers/Connection";
+import Uniswap from "../../containers/Uniswap";
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
@@ -40,11 +41,11 @@ const ContractSelector = () => {
   const largeScreen = useMediaQuery(theme.breakpoints.up("sm"));
 
   const { signer } = Connection.useContainer();
-  const { empAddress, setEmpAddress } = EmpAddress.useContainer();
-  const { contracts, loading } = useContractList();
+  const { address, setAddress } = SelectedContract.useContainer();
+  const { contracts, loading } = ContractList.useContainer();
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const value = e.target.value;
-    setEmpAddress(value === 0 ? null : (value as string));
+    setAddress(value === 0 ? null : (value as string));
   };
 
   const prettyAddress = (x: string) => {
@@ -57,7 +58,7 @@ const ContractSelector = () => {
     <Box py={2}>
       <FormWrapper>
         <Select
-          value={noContractsOrLoading || empAddress === null ? 0 : empAddress}
+          value={noContractsOrLoading || address === null ? 0 : address}
           onChange={handleChange}
           input={<BootstrapInput />}
           disabled={noContractsOrLoading}

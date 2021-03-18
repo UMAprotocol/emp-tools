@@ -1,10 +1,11 @@
+import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { getAbi } from "./getAbi";
-import { Contracts, ContractArguments } from "./Contracts";
+import { getAbi } from "../utils/getAbi";
+import { Contracts, ContractArguments } from "../utils/Contracts";
 import assert from "assert";
 
-import Connection from "../../containers/Connection";
+import Connection from "./Connection";
 
 type Provider = ethers.providers.Provider | ethers.Signer;
 
@@ -59,7 +60,7 @@ export async function getAllUmaContractInfoByChain(
 const useContractList = () => {
   const { signer, network } = Connection.useContainer();
   const [contracts, setContracts] = useState<ContractInfo[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const getContractInfo = async (chainId: number, provider: Provider) => {
     const info = await getAllUmaContractInfoByChain(chainId, provider);
@@ -74,6 +75,13 @@ const useContractList = () => {
       };
     });
   };
+
+  const getByAddress = (address: string) => {
+    return contracts.find((info) => {
+      return info.address.toLowerCase() === address.toLowerCase();
+    });
+  };
+
   useEffect(() => {
     if (!signer || !network) return;
     setLoading(true);
@@ -85,8 +93,10 @@ const useContractList = () => {
 
   return {
     contracts,
+    getByAddress,
     loading,
   };
 };
 
-export default useContractList;
+const ContractList = createContainer(useContractList);
+export default ContractList;

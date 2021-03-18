@@ -1,10 +1,7 @@
 import { Box, Grid, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import GeneralInfo from "./GeneralInfo";
-import DisputeParams from "./DisputeParams";
-import Totals from "../core/Totals";
-
-import Position from "../../containers/Position";
+import Totals from "../../core/Totals";
 
 const Important = styled(Typography)`
   color: red;
@@ -14,16 +11,8 @@ const Important = styled(Typography)`
 `;
 
 const ContractState = () => {
-  const { liquidations } = Position.useContainer();
-
   return (
     <Box pt={4}>
-      {liquidations !== null && liquidations.length > 0 && (
-        <Important>
-          IMPORTANT! You have one or more active liquidations against your
-          position, see more details by clicking "Manage Position"
-        </Important>
-      )}
       <Grid container spacing={4}>
         <Totals />
       </Grid>
@@ -31,9 +20,6 @@ const ContractState = () => {
         <Grid container spacing={3}>
           <Grid item md={6} xs={12}>
             <GeneralInfo />
-          </Grid>
-          <Grid item md={6} xs={12}>
-            <DisputeParams />
           </Grid>
         </Grid>
       </Box>

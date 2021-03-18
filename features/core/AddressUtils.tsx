@@ -4,15 +4,15 @@ import LaunchIcon from "@material-ui/icons/Launch";
 import CopyIcon from "@material-ui/icons/FileCopy";
 import MuiAlert from "@material-ui/lab/Alert";
 
-import EmpAddress from "../../containers/EmpAddress";
+import SelectedContract from "../../containers/SelectedContract";
 import Etherscan from "../../containers/Etherscan";
 
 const AddressUtils = () => {
   const { getEtherscanUrl } = Etherscan.useContainer();
-  const { empAddress, setEmpAddress } = EmpAddress.useContainer();
+  const { address, isValid } = SelectedContract.useContainer();
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
 
-  const etherscanLink = getEtherscanUrl(empAddress) || "/";
+  const etherscanLink = getEtherscanUrl(address) || "/";
   const handleCloseSnackbar = (
     event: React.SyntheticEvent | React.MouseEvent,
     reason?: string
@@ -60,11 +60,11 @@ const AddressUtils = () => {
 
   return (
     <Box>
-      {empAddress && (
+      {address && (
         <>
           <IconButton
             size="small"
-            onClick={() => copyStringToClipboard(empAddress)}
+            onClick={() => copyStringToClipboard(address)}
           >
             <CopyIcon fontSize="inherit" />
           </IconButton>

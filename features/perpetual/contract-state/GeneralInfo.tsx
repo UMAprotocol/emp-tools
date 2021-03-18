@@ -2,17 +2,17 @@ import styled from "styled-components";
 import { utils } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
-import AddressUtils from "../core/AddressUtils";
+import AddressUtils from "../../core/AddressUtils";
 
-import EmpState from "../../containers/EmpState";
-import Token from "../../containers/Token";
-import EmpContract from "../../containers/EmpContract";
-import EmpSponsors from "../../containers/EmpSponsors";
-import Totals from "../../containers/Totals";
-import PriceFeed from "../../containers/PriceFeed";
-import Etherscan from "../../containers/Etherscan";
+import EmpState from "../../../containers/EmpState";
+import Token from "../../../containers/Token";
+import EmpContract from "../../../containers/EmpContract";
+import EmpSponsors from "../../../containers/EmpSponsors";
+import Totals from "../../../containers/Totals";
+import PriceFeed from "../../../containers/PriceFeed";
+import Etherscan from "../../../containers/Etherscan";
 
-import { DOCS_MAP } from "../../constants/docLinks";
+import { DOCS_MAP } from "../../../constants/docLinks";
 
 const Label = styled.span`
   color: #999999;
@@ -32,6 +32,7 @@ const Status = styled(Typography)`
 const fromWei = utils.formatUnits;
 const parseBytes32String = utils.parseBytes32String;
 
+// TODO: price feed will need to be updated to use uniswap and also be able to calculate funding rate
 const GeneralInfo = () => {
   const { contract } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
