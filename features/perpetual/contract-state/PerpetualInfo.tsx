@@ -1,9 +1,12 @@
+import { useCallback } from "react";
 import { Box, Grid, Typography } from "@material-ui/core";
 import styled from "styled-components";
-import PriceFeed from "../../../containers/PriceFeed";
-import EmpState from "../../../containers/EmpState";
+import { UniswapGetPair } from "../../../containers/Uniswap";
+import { findInfoByName } from "../../../constants/perpetuals";
+import PerpetualState from "../../../containers/PerpetualState";
 import { utils } from "ethers";
-const parseBytes32String = utils.parseBytes32String;
+import { calculateFairValue } from "../../../utils/calculators";
+const { parseEther, formatUnits: fromWei, parseBytes32String } = utils;
 
 const Label = styled.div`
   color: #999999;
@@ -24,6 +27,10 @@ export type PerpetualInfoViewType = {
   marketPrice: [string, string];
   fundingRate: [string, string];
 };
+
+// marketPrice: This is what the synth is currently trading at on an AMM
+// fundingRate: This is the current funding rate pulled from perp contract
+// fairValue: This is the funding rate times market price
 export function PerpetualInfoView({
   fairValue,
   marketPrice,
@@ -62,27 +69,48 @@ export function PerpetualInfoView({
   );
 }
 
-// TODO: calculate fair market value and funding rate from Uni/Bal/Sushi
-export function PerpetualInfo() {
-  const { latestPrice } = PriceFeed.useContainer();
-  const { empState } = EmpState.useContainer();
-
-  // Show loading when we dont have all our info yet
-  if (!empState?.priceIdentifier || !latestPrice) {
-    return (
-      <PerpetualInfoView
-        fairValue={["Loading...", ""]}
-        marketPrice={["Loading...", ""]}
-        fundingRate={["Loading...", ""]}
-      />
-    );
-  }
-  const priceIdentifier = parseBytes32String(empState.priceIdentifier);
+function PerpetualInfoLoading() {
   return (
     <PerpetualInfoView
-      fairValue={["$123", priceIdentifier]}
-      marketPrice={["$" + latestPrice.toFixed(5), priceIdentifier]}
-      fundingRate={[".0140%", priceIdentifier]}
+      fairValue={["Loading...", ""]}
+      marketPrice={["Loading...", ""]}
+      fundingRate={["Loading...", ""]}
+    />
+  );
+}
+
+export function PerpetualInfo() {
+  const { data, error } = PerpetualState.useContainer();
+  const {
+    loading: uniLoading,
+    error: uniError,
+    data: uniData,
+  } = UniswapGetPair.useContainer();
+
+  console.log({ data, error, uniData, uniLoading, uniError });
+
+  // Show loading when we dont have all our info yet
+  if (error || !data || uniLoading || uniError) {
+    return <PerpetualInfoLoading />;
+  }
+  const priceIdentifier = parseBytes32String(data.priceIdentifier);
+  const fairValue = calculateFairValue(
+    data?.fundingRate?.rate,
+    uniData?.pair?.token0Price
+  ).toString();
+
+  console.log({ priceIdentifier, fairValue });
+  return (
+    <PerpetualInfoView
+      marketPrice={[
+        (uniData?.pair?.token0Price || "").slice(0, 8),
+        priceIdentifier,
+      ]}
+      fundingRate={[
+        fromWei(data?.fundingRate?.rate.toString()) + "%",
+        priceIdentifier,
+      ]}
+      fairValue={[fairValue, priceIdentifier]}
     />
   );
 }

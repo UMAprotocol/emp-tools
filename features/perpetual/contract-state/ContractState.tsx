@@ -1,7 +1,6 @@
 import { Box, Grid, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import GeneralInfo from "./GeneralInfo";
-import Totals from "../../core/Totals";
 import { PerpetualInfo } from "./PerpetualInfo";
 
 const Important = styled(Typography)`
@@ -48,9 +47,6 @@ const White = styled.span`
 const ContractState = () => {
   return (
     <Box pt={4}>
-      <Grid container spacing={4}>
-        <Totals />
-      </Grid>
       <Grid container spacing={4}>
         <PerpetualInfo />
       </Grid>
