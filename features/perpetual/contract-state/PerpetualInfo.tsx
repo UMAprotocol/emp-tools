@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import { Box, Grid, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import { UniswapGetPair } from "../../../containers/Uniswap";
-import { findInfoByName } from "../../../constants/perpetuals";
 import PerpetualState from "../../../containers/PerpetualState";
 import { utils } from "ethers";
 import { calculateFairValue } from "../../../utils/calculators";
@@ -87,8 +86,6 @@ export function PerpetualInfo() {
     data: uniData,
   } = UniswapGetPair.useContainer();
 
-  console.log({ data, error, uniData, uniLoading, uniError });
-
   // Show loading when we dont have all our info yet
   if (error || !data || uniLoading || uniError) {
     return <PerpetualInfoLoading />;
@@ -99,7 +96,6 @@ export function PerpetualInfo() {
     uniData?.pair?.token0Price
   ).toString();
 
-  console.log({ priceIdentifier, fairValue });
   return (
     <PerpetualInfoView
       marketPrice={[

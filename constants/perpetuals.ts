@@ -5,6 +5,7 @@ export const perpetuals = [
     // this is a perp kovan contract
     name: "New Perpetual Contract Test",
     symbol: "NEW-PERP-TEST",
+    address: "0x24d15f2607ee56dF752375a63e646cbF8E652aF3",
     // this is hardcoded to a mainnet uniswap eth usdc pair for now. But in the future we should be able
     // to derive the market or markets where the synthetic is being traded...
     market: {
@@ -22,5 +23,14 @@ export function findInfoByName(name: string | undefined) {
     (perp) => perp.name.toLowerCase() == name.toLowerCase()
   );
   assert(result, `Unable to find perp info by name: ${name}`);
+  return result;
+}
+
+export function findInfoByAddress(address: string | undefined) {
+  assert(address, "requires perpetual address");
+  const result = perpetuals.find(
+    (perp) => perp.address.toLowerCase() == address.toLowerCase()
+  );
+  assert(result, `Unable to find perp info by address: ${address}`);
   return result;
 }

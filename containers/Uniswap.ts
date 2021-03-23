@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useApolloClient, ApolloClient } from "@apollo/client";
 import { GetPair } from "../apollo/uniswap/queries";
 
-import { findInfoByName } from "../constants/perpetuals";
+import { findInfoByAddress } from "../constants/perpetuals";
 import SelectedContract from "../containers/SelectedContract";
 
 function call(client: any, query: any, variables: any) {
@@ -17,17 +17,16 @@ function call(client: any, query: any, variables: any) {
 
 function getPair() {
   const client = useApolloClient();
-  const { contract, isValid } = SelectedContract.useContainer();
+  const { address, isValid } = SelectedContract.useContainer();
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<any | null>(null);
   const [error, setError] = useState<Error | null>(null);
-
   useEffect(() => {
-    if (!contract?.name) return;
+    if (!address) return;
     if (!isValid) return;
     if (!client) return;
     try {
-      const info = findInfoByName(contract.name);
+      const info = findInfoByAddress(address);
       call(client, GetPair, { id: info.market.id })
         .then((result: any) => setData(result.data))
         .catch(setError)
@@ -36,7 +35,7 @@ function getPair() {
       setError(err);
       setLoading(false);
     }
-  }, [contract, client]);
+  }, [address, client]);
 
   return {
     loading,

@@ -35,9 +35,7 @@ const useContractState = () => {
   }>({ data: null, error: null });
   const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
-    if (!isValid) return;
-    if (!address) return;
-    if (!signer) return;
+    if (!isValid || !address || !signer) return;
     getPerpetualState(address, signer)
       .then((data) => {
         setState({ ...state, data });

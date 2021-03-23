@@ -169,10 +169,13 @@ export function DevMiningCalculator({
 }
 
 export function calculateFairValue(
+  // Funding rate is expected to be returned from perp contract in Wei
   fundingRate: BigNumber,
+  // Market price is expected to be returned in normal decimals. Future adjustment to handling decimals may be needed.
   marketPrice: string
 ) {
   // convert market price to wei from a numerical string in eth
   const marketPriceWei = parseEther(parseFloat(marketPrice).toFixed(18));
+  // Convert back to normal decimal number after multiplication
   return fromWei(marketPriceWei.mul(fundingRate));
 }
