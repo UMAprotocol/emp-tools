@@ -23,6 +23,7 @@ import DvmState from "../containers/DvmState";
 import DevMining from "../containers/DevMining";
 import Uniswap from "../containers/Uniswap";
 import ContractList from "../containers/ContractList";
+import ContractState from "../containers/ContractState";
 
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../apollo/client";
@@ -35,39 +36,41 @@ const WithStateContainerProviders = ({ children }: IProps) => (
   <ApolloProvider client={client}>
     <Connection.Provider>
       <EmpAddress.Provider>
-        <EmpContract.Provider>
-          <WethContract.Provider>
-            <EmpState.Provider>
-              <Token.Provider>
-                <Collateral.Provider>
-                  <PriceFeed.Provider>
-                    <EmpSponsors.Provider>
-                      <Totals.Provider>
-                        <Etherscan.Provider>
-                          <Position.Provider>
-                            <Balancer.Provider>
-                              <DvmContracts.Provider>
-                                <DvmState.Provider>
-                                  <DevMining.Provider>
-                                    <ContractList.Provider>
-                                      <SelectedContract.Provider>
-                                        {children}
-                                      </SelectedContract.Provider>
-                                    </ContractList.Provider>
-                                  </DevMining.Provider>
-                                </DvmState.Provider>
-                              </DvmContracts.Provider>
-                            </Balancer.Provider>
-                          </Position.Provider>
-                        </Etherscan.Provider>
-                      </Totals.Provider>
-                    </EmpSponsors.Provider>
-                  </PriceFeed.Provider>
-                </Collateral.Provider>
-              </Token.Provider>
-            </EmpState.Provider>
-          </WethContract.Provider>
-        </EmpContract.Provider>
+        <ContractList.Provider>
+          <SelectedContract.Provider>
+            <EmpContract.Provider>
+              <WethContract.Provider>
+                <ContractState.Provider>
+                  <EmpState.Provider>
+                    <Token.Provider>
+                      <Collateral.Provider>
+                        <PriceFeed.Provider>
+                          <EmpSponsors.Provider>
+                            <Totals.Provider>
+                              <Etherscan.Provider>
+                                <Position.Provider>
+                                  <Balancer.Provider>
+                                    <DvmContracts.Provider>
+                                      <DvmState.Provider>
+                                        <DevMining.Provider>
+                                          {children}
+                                        </DevMining.Provider>
+                                      </DvmState.Provider>
+                                    </DvmContracts.Provider>
+                                  </Balancer.Provider>
+                                </Position.Provider>
+                              </Etherscan.Provider>
+                            </Totals.Provider>
+                          </EmpSponsors.Provider>
+                        </PriceFeed.Provider>
+                      </Collateral.Provider>
+                    </Token.Provider>
+                  </EmpState.Provider>
+                </ContractState.Provider>
+              </WethContract.Provider>
+            </EmpContract.Provider>
+          </SelectedContract.Provider>
+        </ContractList.Provider>
       </EmpAddress.Provider>
     </Connection.Provider>
   </ApolloProvider>
