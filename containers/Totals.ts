@@ -8,7 +8,6 @@ import Token from "./Token";
 
 const fromWei = ethers.utils.formatUnits;
 const weiToNum = (x: BigNumberish, u = 18) => parseFloat(fromWei(x, u));
-import { ConvertDecimals } from "../utils/calculators";
 
 function useTotals() {
   const { empState } = EmpState.useContainer();

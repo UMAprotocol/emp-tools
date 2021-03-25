@@ -44,7 +44,6 @@ export async function getErc20Info(address: string, provider: Provider) {
     address,
     name: await contract.name(),
     symbol: await contract.symbol(),
-    decimals: await contract.decimals(),
   };
 }
 export async function getAllUmaContractInfoByChain(

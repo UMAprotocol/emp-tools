@@ -6,11 +6,9 @@ import AddressUtils from "../core/AddressUtils";
 
 import EmpState from "../../containers/EmpState";
 import Token from "../../containers/Token";
-import EmpContract from "../../containers/EmpContract";
 import EmpSponsors from "../../containers/EmpSponsors";
 import Totals from "../../containers/Totals";
 import PriceFeed from "../../containers/PriceFeed";
-import Etherscan from "../../containers/Etherscan";
 
 import { DOCS_MAP } from "../../constants/docLinks";
 
@@ -33,12 +31,10 @@ const fromWei = utils.formatUnits;
 const parseBytes32String = utils.parseBytes32String;
 
 const GeneralInfo = () => {
-  const { contract } = EmpContract.useContainer();
-  const { empState, error } = EmpState.useContainer();
+  const { empState } = EmpState.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { gcr } = Totals.useContainer();
   const { latestPrice, sourceUrls } = PriceFeed.useContainer();
-  const { getEtherscanUrl } = Etherscan.useContainer();
   const {
     expirationTimestamp: expiry,
     priceIdentifier: priceId,

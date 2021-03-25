@@ -47,7 +47,7 @@ const GeneralInfo = () => {
     minSponsorTokens,
     isExpired,
   } = empState;
-  const { symbol: tokenSymbol } = Token.useContainer();
+  const { symbol: tokenSymbol, decimals: tokenDec } = Token.useContainer();
 
   const defaultMissingDataDisplay = "N/A";
 
@@ -61,7 +61,8 @@ const GeneralInfo = () => {
     minSponsorTokens !== null &&
     tokenSymbol !== null &&
     isExpired !== null &&
-    sourceUrls !== undefined
+    sourceUrls !== undefined &&
+    tokenDec !== null
   ) {
     const expiryTimestamp = expiry.toString();
     const expiryDate = new Date(
@@ -73,7 +74,8 @@ const GeneralInfo = () => {
     const priceIdUtf8 = parseBytes32String(priceId);
     const collReqPct = parseFloat(fromWei(collReq)).toString();
     const minSponsorTokensSymbol = `${fromWei(
-      minSponsorTokens
+      minSponsorTokens,
+      tokenDec
     )} ${tokenSymbol}`;
 
     const sponsorCount = Object.keys(activeSponsors).length.toString();
