@@ -98,5 +98,4 @@ const useContractList = () => {
   };
 };
 
-const ContractList = createContainer(useContractList);
-export default ContractList;
+export default createContainer(useContractList);

@@ -1,29 +1,30 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import uma from "@studydefi/money-legos/uma";
+import { getAbi } from "../utils/getAbi";
 
-import EmpAddress from "./EmpAddress";
+import SelectedContract from "./SelectedContract";
 import Connection from "./Connection";
 
 function useContract() {
   const { signer } = Connection.useContainer();
-  const { empAddress, isValid } = EmpAddress.useContainer();
+  const {
+    contract: selectedContract,
+    isValid,
+  } = SelectedContract.useContainer();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
 
   useEffect(() => {
-    if (empAddress === null) {
+    if (!selectedContract || !isValid) {
       setContract(null);
+      return;
     }
-    if (empAddress && isValid && signer) {
-      const instance = new ethers.Contract(
-        empAddress,
-        uma.expiringMultiParty.abi,
-        signer
-      );
-      setContract(instance);
-    }
-  }, [empAddress, isValid, signer]);
+    if (!signer) return;
+    const { type, version, address } = selectedContract;
+    const abi = getAbi(type, version);
+    const instance = new ethers.Contract(address, abi, signer);
+    setContract(instance);
+  }, [selectedContract, isValid, signer]);
 
   return { contract };
 }

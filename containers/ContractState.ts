@@ -1,0 +1,65 @@
+import { createContainer } from "unstated-next";
+import { useState, useEffect } from "react";
+import { BigNumber, Bytes, Contract } from "ethers";
+
+import Connection from "./Connection";
+import EmpContract from "./EmpContract";
+import SelectedContract from "./SelectedContract";
+import { ContractInfo } from "./ContractList";
+import { getState } from "../utils/getAbi";
+
+const initState = {
+  expirationTimestamp: null,
+  collateralCurrency: null,
+  priceIdentifier: null,
+  tokenCurrency: null,
+  collateralRequirement: null,
+  disputeBondPct: null,
+  disputerDisputeRewardPct: null,
+  sponsorDisputeRewardPct: null,
+  minSponsorTokens: null,
+  timerAddress: null,
+  cumulativeFeeMultiplier: null,
+  rawTotalPositionCollateral: null,
+  totalTokensOutstanding: null,
+  liquidationLiveness: null,
+  withdrawalLiveness: null,
+  currentTime: null,
+  isExpired: null,
+  contractState: null,
+  finderAddress: null,
+  expiryPrice: null,
+};
+
+const useContractState = () => {
+  const { block$, signer } = Connection.useContainer();
+  const { contract } = SelectedContract.useContainer();
+
+  const [data, setData] = useState<any>(initState);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  function updateState() {
+    if (!contract || !signer) return;
+    setLoading(true);
+    getState(contract, signer)
+      .then(setData)
+      .catch(setError)
+      .finally(() => setLoading(false));
+  }
+  // get state on setting of contract
+  useEffect(() => {
+    updateState();
+  }, [contract, signer]);
+
+  // get state on each block
+  useEffect(() => {
+    if (!block$) return;
+    const sub = block$.subscribe(() => updateState());
+    return () => sub.unsubscribe();
+  }, [block$, signer, contract]);
+
+  return { data, error, loading };
+};
+
+export default createContainer(useContractState);

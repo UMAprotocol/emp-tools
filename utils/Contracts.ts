@@ -1,3 +1,4 @@
+import assert from "assert";
 // Export contracts in the form [address, type, version]
 // See getAbi file for full list of versions and types available
 export type ContractArguments = [string, string, string];
@@ -12,6 +13,7 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0x3605Ec11BA7bD208501cbb24cd890bC58D2dbA56", "EMP", "1"], // uUSDwETH-DEC
     ["0xE4256C47a3b27a969F25de8BEf44eCA5F2552bD5", "EMP", "1"], // YD-ETH-MAR21
     ["0x1c3f1A342c8D9591D9759220d114C685FD1cF6b8", "EMP", "1"], // YD-BTC-MAR21
+    ["0xd9af2d7E4cF86aAfBCf688a47Bd6b95Da9F7c838", "EMP", "2"], // YD-BTC-JUNE21
   ],
   42: [
     ["0x3366b8549047C66E985EcC43026ceD3E831e46A9", "EMP", "1"], // uUSDrBTC Kovan Sep20
@@ -20,4 +22,16 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0x10E3866b5F52d847F24aaAA14BcAd22b74CC14e2", "EMP", "1"], // uUSDrBTC Kovan Nov20
     ["0x3d7d563F4679C750e462Eae4271d2bd84dF66060", "EMP", "1"], // uUSDrETH Kovan Nov20
   ],
+};
+
+export const getByAddress = (address: string, network: number) => {
+  assert(Contracts[network], "Invalid Network: " + network);
+  const found = Contracts[network].find((info: ContractArguments) => {
+    return info[0].toLowerCase() === address.toLowerCase();
+  });
+  assert(
+    found,
+    `No contract found by network ${network} and address ${address}`
+  );
+  return found;
 };
