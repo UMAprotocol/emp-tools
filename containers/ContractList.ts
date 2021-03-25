@@ -33,6 +33,7 @@ export async function getUmaContractInfo(
     version,
   };
 }
+
 export async function getErc20Info(address: string, provider: Provider) {
   const abi = getAbi("erc20");
   const contract = new ethers.Contract(address, abi, provider);

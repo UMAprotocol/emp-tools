@@ -1,11 +1,8 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { BigNumber, Bytes, Contract } from "ethers";
 
 import Connection from "./Connection";
-import EmpContract from "./EmpContract";
 import SelectedContract from "./SelectedContract";
-import { ContractInfo } from "./ContractList";
 import { getState } from "../utils/getAbi";
 
 const initState = {
