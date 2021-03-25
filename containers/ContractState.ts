@@ -1,12 +1,13 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { BigNumber, Bytes, Contract } from "ethers";
+import { ethers, BigNumber, Bytes, Contract } from "ethers";
 
 import Connection from "./Connection";
 import EmpContract from "./EmpContract";
 import SelectedContract from "./SelectedContract";
 import { ContractInfo } from "./ContractList";
-import { getState } from "../utils/getAbi";
+import { getState, getAbi } from "../utils/getAbi";
+import { ConvertDecimals } from "../utils/calculators";
 
 const initState = {
   expirationTimestamp: null,
@@ -31,6 +32,25 @@ const initState = {
   expiryPrice: null,
 };
 
+type Provider = ethers.providers.Provider | ethers.Signer;
+const fixDecimals = (provider: Provider) => async (state: any) => {
+  const ercAbi = getAbi("erc20");
+  const tokenContract = new ethers.Contract(
+    state.tokenCurrency,
+    ercAbi,
+    provider
+  );
+  const tokenDecimals = await tokenContract.decimals();
+  const minSponsorTokens = ConvertDecimals(
+    tokenDecimals,
+    18
+  )(state.minSponsorTokens);
+  return {
+    ...state,
+    minSponsorTokens,
+  };
+};
+
 const useContractState = () => {
   const { block$, signer } = Connection.useContainer();
   const { contract } = SelectedContract.useContainer();
@@ -43,6 +63,7 @@ const useContractState = () => {
     if (!contract || !signer) return;
     setLoading(true);
     getState(contract, signer)
+      .then(fixDecimals(signer))
       .then(setData)
       .catch(setError)
       .finally(() => setLoading(false));

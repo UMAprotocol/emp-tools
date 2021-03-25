@@ -34,7 +34,7 @@ const parseBytes32String = utils.parseBytes32String;
 
 const GeneralInfo = () => {
   const { contract } = EmpContract.useContainer();
-  const { empState } = EmpState.useContainer();
+  const { empState, error } = EmpState.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { gcr } = Totals.useContainer();
   const { latestPrice, sourceUrls } = PriceFeed.useContainer();

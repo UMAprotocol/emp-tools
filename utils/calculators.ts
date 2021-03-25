@@ -1,3 +1,5 @@
+import assert from "assert";
+import { BigNumber } from "ethers";
 // https://www.calculatorsoup.com/calculators/financial/compound-interest-calculator.php
 // Calculates a compounding interest, leaving this in as potential useful function
 export const calcInterest = (
@@ -165,3 +167,22 @@ export function DevMiningCalculator({
     },
   };
 }
+export const ConvertDecimals = (fromDecimals: number, toDecimals: number) => {
+  assert(fromDecimals >= 0, "requires fromDecimals as an integer >= 0");
+  assert(toDecimals >= 0, "requires toDecimals as an integer >= 0");
+  // amount: string, BN, number - integer amount in fromDecimals smallest unit that want to convert toDecimals
+  // returns: BN with toDecimals in smallest unit
+  return (amount: String | number | BigNumber) => {
+    amount = BigNumber.from(amount);
+    if (amount.isZero()) return amount;
+    const diff = fromDecimals - toDecimals;
+    if (diff == 0) return amount;
+    if (diff > 0)
+      return amount.div(
+        BigNumber.from("10").pow(BigNumber.from(diff.toString()))
+      );
+    return amount.mul(
+      BigNumber.from("10").pow(BigNumber.from((-1 * diff).toString()))
+    );
+  };
+};
