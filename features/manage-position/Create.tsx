@@ -248,7 +248,7 @@ const Create = () => {
         setError(null);
         try {
           const collateralWei = toWeiSafe(collateral, collDec);
-          const tokensWei = toWeiSafe(tokens);
+          const tokensWei = toWeiSafe(tokens, tokenDec);
           const tx = await emp.create([collateralWei], [tokensWei]);
           setHash(tx.hash as string);
           await tx.wait();
