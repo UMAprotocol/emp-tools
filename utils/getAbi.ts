@@ -18,6 +18,7 @@ type ContractType = {
   abi: any[];
   getState?: (instance: Contract) => Promise<any>;
 };
+
 export const Contracts: ContractType[] = [
   {
     // we could include semver to do compatibilty checks for version strings, but it would add to bundle and this is good enough
@@ -25,30 +26,12 @@ export const Contracts: ContractType[] = [
     types: ["EMP", "ExpiringMultiParty"],
     abi: emp1.abi,
     async getState(instance: Contract) {
-      const state = {
-        expirationTimestamp: (await instance.expirationTimestamp()) as BigNumber,
-        collateralCurrency: (await instance.collateralCurrency()) as string, // address
-        priceIdentifier: (await instance.priceIdentifier()) as Bytes,
-        tokenCurrency: (await instance.tokenCurrency()) as string, // address
-        collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
+      return {
+        ...(await commonEmpState(instance)),
         disputeBondPct: (await instance.disputeBondPct()) as BigNumber,
         disputerDisputeRewardPct: (await instance.disputerDisputeRewardPct()) as BigNumber,
         sponsorDisputeRewardPct: (await instance.sponsorDisputeRewardPct()) as BigNumber,
-        minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
-        timerAddress: (await instance.timerAddress()) as string, // address
-        cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
-        rawTotalPositionCollateral: (await instance.rawTotalPositionCollateral()) as BigNumber,
-        totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
-        liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
-        withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
-        currentTime: (await instance.getCurrentTime()) as BigNumber,
-        contractState: Number(await instance.contractState()) as number,
-        finderAddress: (await instance.finder()) as string, // address
-        expiryPrice: (await instance.expiryPrice) as BigNumber,
-        isExpired: false,
       };
-      state.isExpired = state.currentTime.gte(state.expirationTimestamp);
-      return state;
     },
   },
   {
@@ -56,30 +39,12 @@ export const Contracts: ContractType[] = [
     types: ["EMP", "ExpiringMultiParty"],
     abi: emp2.abi,
     async getState(instance: Contract) {
-      const state = {
-        expirationTimestamp: (await instance.expirationTimestamp()) as BigNumber,
-        collateralCurrency: (await instance.collateralCurrency()) as string, // address
-        priceIdentifier: (await instance.priceIdentifier()) as Bytes,
-        tokenCurrency: (await instance.tokenCurrency()) as string, // address
-        collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
+      return {
+        ...(await commonEmpState(instance)),
         disputeBondPct: (await instance.disputeBondPercentage()) as BigNumber,
         disputerDisputeRewardPct: (await instance.disputerDisputeRewardPercentage()) as BigNumber,
         sponsorDisputeRewardPct: (await instance.sponsorDisputeRewardPercentage()) as BigNumber,
-        minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
-        timerAddress: (await instance.timerAddress()) as string, // address
-        cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
-        rawTotalPositionCollateral: (await instance.rawTotalPositionCollateral()) as BigNumber,
-        totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
-        liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
-        withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
-        currentTime: (await instance.getCurrentTime()) as BigNumber,
-        contractState: Number(await instance.contractState()) as number,
-        finderAddress: (await instance.finder()) as string, // address
-        expiryPrice: (await instance.expiryPrice) as BigNumber,
-        isExpired: false,
       };
-      state.isExpired = state.currentTime.gte(state.expirationTimestamp);
-      return state;
     },
   },
   {
@@ -93,6 +58,31 @@ export const Contracts: ContractType[] = [
     abi: erc20.abi,
   },
 ];
+
+// This helper function for the getState calls for each contract abi version of emp tools
+async function commonEmpState(instance: Contract) {
+  const state = {
+    expirationTimestamp: (await instance.expirationTimestamp()) as BigNumber,
+    collateralCurrency: (await instance.collateralCurrency()) as string, // address
+    priceIdentifier: (await instance.priceIdentifier()) as Bytes,
+    tokenCurrency: (await instance.tokenCurrency()) as string, // address
+    collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
+    minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
+    timerAddress: (await instance.timerAddress()) as string, // address
+    cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
+    rawTotalPositionCollateral: (await instance.rawTotalPositionCollateral()) as BigNumber,
+    totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
+    liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
+    withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
+    currentTime: (await instance.getCurrentTime()) as BigNumber,
+    contractState: Number(await instance.contractState()) as number,
+    finderAddress: (await instance.finder()) as string, // address
+    expiryPrice: (await instance.expiryPrice) as BigNumber,
+    isExpired: false,
+  };
+  state.isExpired = state.currentTime.gte(state.expirationTimestamp);
+  return state;
+}
 
 // case insensitive include
 function includes(list: string[], str: string) {
