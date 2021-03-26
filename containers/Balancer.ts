@@ -139,7 +139,6 @@ const useBalancer = () => {
         }
       });
       setShares(shareHolders);
-
       setPool({
         exitsCount: Number(data.exitsCount),
         joinsCount: Number(data.joinsCount),
@@ -231,6 +230,7 @@ const useBalancer = () => {
       });
 
       const pool = {
+        id: poolData.id,
         exitsCount: Number(poolData.exitsCount),
         joinsCount: Number(poolData.joinsCount),
         swapsCount: Number(poolData.swapsCount),

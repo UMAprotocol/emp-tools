@@ -13,6 +13,7 @@ export const TOKENS = gql`
 export const POOL = (stringifiedTokenList: String) => gql`
   query poolOverview {
     pools(where: {tokensList: ${stringifiedTokenList}}) {
+      id
       swapFee
       liquidity
       totalSwapVolume
