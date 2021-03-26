@@ -350,7 +350,7 @@ const Create = () => {
                             )
                           }
                         >
-                          <MinLink>Max</MinLink>
+                          <MinLink>GCR</MinLink>
                         </Button>
                       </Tooltip>
                     </InputAdornment>
@@ -394,7 +394,7 @@ const Create = () => {
                             )
                           }
                         >
-                          <MinLink>Min</MinLink>
+                          <MinLink>GCR</MinLink>
                         </Button>
                       </Tooltip>
                     </InputAdornment>
