@@ -22,7 +22,6 @@ const BalancerData = () => {
   const { poolAddress, usdPrice, pool, shares } = Balancer.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
 
-  console.log({ poolAddress, usdPrice, pool, shares, tokenSymbol });
   if (
     poolAddress !== null &&
     usdPrice !== null &&

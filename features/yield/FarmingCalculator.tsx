@@ -27,7 +27,8 @@ const FarmingCalculator = () => {
   } = Balancer.useContainer();
   const { symbol: tokenSymbol, address } = Token.useContainer();
   const { empAddress } = EmpAddress.useContainer();
-  const { devMiningRewards } = DevMining.useContainer();
+  const { devMiningRewards, error: devMiningError } = DevMining.useContainer();
+  const [rewardPriceError, setRewardPriceError] = useState<Error | null>(null);
 
   // Set a default token address
   const [tokenAddress, setTokenAddress] = useState<string>(
@@ -271,8 +272,19 @@ const FarmingCalculator = () => {
 
   // Update APR
   useEffect(() => {
-    calculateApr();
-  }, [tokenAddress, poolLiquidity, rewardToken, rewardTokenPrices]);
+    calculateApr()
+      .then(() => setRewardPriceError(null))
+      .catch((err) => {
+        console.error(err);
+        setRewardPriceError(err);
+      });
+  }, [
+    tokenAddress,
+    poolLiquidity,
+    rewardToken,
+    rewardTokenPrices,
+    setRewardPriceError,
+  ]);
 
   // Update pool ownership
   useEffect(() => {
@@ -312,6 +324,32 @@ const FarmingCalculator = () => {
 
   // Render page once all data is loaded
   // Only display farming calculator for tokens eligible for LM rewards
+  if (rewardPriceError) {
+    return (
+      <Box>
+        <Typography>
+          <i>
+            There was an error getting pricing for reward:{" "}
+            {rewardPriceError.message}. Select a different contract or refresh
+            page.
+          </i>
+        </Typography>
+      </Box>
+    );
+  }
+  if (devMiningError) {
+    return (
+      <Box>
+        <Typography>
+          <i>
+            There was an error calculating EMP Values for Developer Mining:{" "}
+            {devMiningError.message}. Select a different contract or refresh
+            page.
+          </i>
+        </Typography>
+      </Box>
+    );
+  }
   if (!rewardToken) {
     return (
       <Box>

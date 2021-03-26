@@ -123,12 +123,9 @@ export function DevMiningCalculator({
         .mulUnsafe(collFixedSize)
         .divUnsafe(FixedNumber.fromValue(collateralRequirement, 18));
     }
-    console.error(
-      new Error(
-        "Unable to calculate emp value, no token price or collateral price"
-      )
+    throw new Error(
+      "Unable to calculate emp value, no token price or collateral price"
     );
-    return FixedNumber.from("0");
   }
 
   async function estimateDevMiningRewards({
