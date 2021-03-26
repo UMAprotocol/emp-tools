@@ -55,7 +55,7 @@ export const WEEKLY_UMA_REWARDS: { [tokenAddress: string]: any[] } = {
       count: 25000,
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 11, 25, 23, 0, 0, 0),
-      endDate: Date.UTC(2021, 2, 25, 23, 0, 0, 0),
+      endDate: Date.UTC(2021, 2, 31, 23, 0, 0, 0),
     },
   ], // YD-ETH-MAR21
   "0x002f0b1a71c5730cf2f4da1970a889207bdb6d0d": [
@@ -64,7 +64,7 @@ export const WEEKLY_UMA_REWARDS: { [tokenAddress: string]: any[] } = {
       count: 10000,
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 11, 25, 23, 0, 0, 0),
-      endDate: Date.UTC(2021, 2, 25, 23, 0, 0, 0),
+      endDate: Date.UTC(2021, 2, 31, 23, 0, 0, 0),
     },
   ], // YD-BTC-MAR21
   "0xcbe430927370e95b4b10cfc702c6017ec7abefc3": [
@@ -108,14 +108,14 @@ export const ROLL_REWARDS_SCHEDULE: { [key: string]: any } = {
     rollToToken: "0xcbe430927370e95b4b10cfc702c6017ec7abefc3",
     // utc months are 0 indexed, so subtract one from normal month number
     rollStartDate: Date.UTC(2021, 2, 25, 23, 0, 0, 0),
-    rollDate: Date.UTC(2021, 2, 25, 23, 0, 0, 1),
+    rollDate: Date.UTC(2021, 2, 31, 23, 0, 0, 1),
   }, // YD-ETH-MAR21 => YD-ETH-JUN21
-  "0xcbe430927370e95b4b10cfc702c6017ec7abefc3": {
+  "0x002f0b1a71c5730cf2f4da1970a889207bdb6d0d": {
+    rollFromEmpAddress: "0x1c3f1A342c8D9591D9759220d114C685FD1cF6b8",
     rollFromTokenName: "YD-BTC-MAR21",
     rollToTokenName: "YD-BTC-JUN21",
-    rollFromEmpAddress: "0x1c3f1A342c8D9591D9759220d114C685FD1cF6b8",
     rollToToken: "0x4b7fb448df91c8ed973494f8c8c4f12daf3a8521",
     rollStartDate: Date.UTC(2021, 2, 25, 23, 0, 0, 0),
-    rollDate: Date.UTC(2021, 2, 25, 23, 0, 0, 1),
+    rollDate: Date.UTC(2021, 2, 31, 23, 0, 0, 1),
   }, // YD-BTC-MAR21 => YD-BTC_JUN21
 };
