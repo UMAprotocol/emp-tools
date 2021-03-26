@@ -4,8 +4,7 @@ import { DevMiningCalculator } from "../utils/calculators";
 import { getSimplePriceByContract } from "../utils/getCoinGeckoTokenPrice";
 
 import { ethers } from "ethers";
-import erc20 from "@studydefi/money-legos/erc20";
-import uma from "@studydefi/money-legos/uma";
+import { getAbi } from "../utils/getAbi";
 
 import Connection from "./Connection";
 
@@ -40,8 +39,8 @@ const useDevMiningCalculator = () => {
     const devMiningCalculator = DevMiningCalculator({
       ethers,
       getPrice: getSimplePriceByContract,
-      erc20Abi: erc20.abi,
-      empAbi: uma.expiringMultiParty.abi,
+      erc20Abi: getAbi("erc20"),
+      empAbi: getAbi("emp"),
       provider,
     });
     setCalculator(devMiningCalculator);

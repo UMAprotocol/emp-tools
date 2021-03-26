@@ -40,4 +40,12 @@ export const YIELD_TOKENS: yieldToken = {
     token0: "0x002f0b1a71c5730cf2f4da1970a889207bdb6d0d",
     token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   }, // YD-BTC-MAR21
+  "0xcbe430927370e95b4b10cfc702c6017ec7abefc3": {
+    token0: "0xcbe430927370e95b4b10cfc702c6017ec7abefc3",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // YD-ETH-MAR21
+  "0x4b7fb448df91c8ed973494f8c8c4f12daf3a8521": {
+    token0: "0x4b7fb448df91c8ed973494f8c8c4f12daf3a8521",
+    token1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  }, // YD-BTC-JUN21
 };
