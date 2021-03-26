@@ -118,8 +118,6 @@ const useBalancer = () => {
       // The tokenPrices field might not exist if the pool has not had any trades executed.
       if (data) {
         setUsdPrice(Number(data.price));
-        const _poolAddress = data.poolTokenId.split("-")[0];
-        setPoolAddress(_poolAddress);
       }
     }
   };
@@ -129,7 +127,9 @@ const useBalancer = () => {
       console.error(`Apollo client failed to fetch graph data:`, poolError);
     }
     if (!poolLoading && poolData) {
-      const data = poolData.pools[0];
+      const data = poolData.pools.reduce((biggest: any, pool: any) => {
+        return biggest.liquidity > pool.liquidity ? biggest : pool;
+      }, poolData.pools[0]);
       if (!data) return null;
 
       const shareHolders: SharesState = {};
@@ -138,6 +138,7 @@ const useBalancer = () => {
           shareHolders[share.userAddress.id] = share.balance;
         }
       });
+      setPoolAddress(data.id);
       setShares(shareHolders);
       setPool({
         exitsCount: Number(data.exitsCount),
@@ -220,7 +221,9 @@ const useBalancer = () => {
       console.error(`Apollo client failed to fetch graph data:`, error);
     }
     if (!loading && data && _tokenAddress && _swapTokenAddress) {
-      const poolData = data.pools[0];
+      const poolData = data.pools.reduce((biggest: any, pool: any) => {
+        return biggest.liquidity > pool.liquidity ? biggest : pool;
+      }, data.pools[0]);
 
       const shareHolders: SharesState = {};
       poolData.shares.forEach((share: SharesQuery) => {

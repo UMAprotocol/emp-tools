@@ -55,7 +55,7 @@ export const WEEKLY_UMA_REWARDS: { [tokenAddress: string]: any[] } = {
       count: 25000,
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 11, 25, 23, 0, 0, 0),
-      endDate: Date.UTC(2021, 3, 25, 23, 0, 0, 0),
+      endDate: Date.UTC(2021, 2, 25, 23, 0, 0, 0),
     },
   ], // YD-ETH-MAR21
   "0x002f0b1a71c5730cf2f4da1970a889207bdb6d0d": [
@@ -64,7 +64,7 @@ export const WEEKLY_UMA_REWARDS: { [tokenAddress: string]: any[] } = {
       count: 10000,
       getPrice: getUmaPrice,
       startDate: Date.UTC(2020, 11, 25, 23, 0, 0, 0),
-      endDate: Date.UTC(2021, 3, 25, 23, 0, 0, 0),
+      endDate: Date.UTC(2021, 2, 25, 23, 0, 0, 0),
     },
   ], // YD-BTC-MAR21
   "0xcbe430927370e95b4b10cfc702c6017ec7abefc3": [
