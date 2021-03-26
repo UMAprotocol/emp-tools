@@ -13,6 +13,7 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0x3605Ec11BA7bD208501cbb24cd890bC58D2dbA56", "EMP", "1"], // uUSDwETH-DEC
     ["0xE4256C47a3b27a969F25de8BEf44eCA5F2552bD5", "EMP", "1"], // YD-ETH-MAR21
     ["0x1c3f1A342c8D9591D9759220d114C685FD1cF6b8", "EMP", "1"], // YD-BTC-MAR21
+    ["0x0f4e2a456aAfc0068a0718E3107B88d2e8f2bfEF", "EMP", "2"], // YD-ETH-JUNE21
     ["0xd9af2d7E4cF86aAfBCf688a47Bd6b95Da9F7c838", "EMP", "2"], // YD-BTC-JUNE21
   ],
   42: [
