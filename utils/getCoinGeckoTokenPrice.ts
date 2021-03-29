@@ -7,6 +7,8 @@ const fetchOptions = {
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
+    // sets a 10 minute cache, should prevent too many requests to CG
+    "Cache-Control": "max-age=600",
   },
 };
 
