@@ -4,12 +4,12 @@ import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import AddressUtils from "../../core/AddressUtils";
 
-import EmpState from "../../../containers/EmpState";
-import Token from "../../../containers/Token";
-import EmpContract from "../../../containers/EmpContract";
 import EmpSponsors from "../../../containers/EmpSponsors";
+import Token from "../../../containers/Token";
+import ContractState from "../../../containers/ContractState";
 import PriceFeed from "../../../containers/PriceFeed";
 import Etherscan from "../../../containers/Etherscan";
+import Totals from "../../../containers/Totals";
 
 import { DOCS_MAP } from "../../../constants/docLinks";
 
@@ -34,26 +34,20 @@ const parseBytes32String = utils.parseBytes32String;
 const defaultMissingDataDisplay = "N/A";
 
 type GeneralInfoViewType = {
-  expiryTimestamp: string;
-  expiryDate: string;
   prettyLatestPrice: string;
   pricedGcr: string;
   priceIdUtf8: string;
   collReqPct: string;
   minSponsorTokensSymbol: string;
-  isExpired: string;
   sourceUrls: string[];
   sponsorCount: string;
 };
 function GeneralInfoView({
-  expiryTimestamp = defaultMissingDataDisplay,
-  expiryDate = defaultMissingDataDisplay,
   prettyLatestPrice = defaultMissingDataDisplay,
   pricedGcr = defaultMissingDataDisplay,
   priceIdUtf8 = defaultMissingDataDisplay,
   collReqPct = defaultMissingDataDisplay,
   minSponsorTokensSymbol = defaultMissingDataDisplay,
-  isExpired = defaultMissingDataDisplay,
   sourceUrls = [],
   sponsorCount = defaultMissingDataDisplay,
 }: GeneralInfoViewType) {
@@ -61,28 +55,6 @@ function GeneralInfoView({
     <Box>
       <Typography variant="h5">{`General Info `}</Typography>
       <AddressUtils />
-
-      <Status>
-        <Label>Expiry date: </Label>
-        <Tooltip title={`Timestamp: ${expiryTimestamp}`} interactive>
-          <span>{expiryDate} UTC</span>
-        </Tooltip>
-      </Status>
-
-      <Status>
-        <Label>
-          Is expired (
-          <Link
-            href={DOCS_MAP.EXPIRY_SETTLEMENT}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Docs
-          </Link>
-          ){`: `}
-        </Label>
-        {isExpired}
-      </Status>
 
       <Status>
         <Label>Price identifier: </Label>
@@ -139,19 +111,59 @@ function GeneralInfoView({
   );
 }
 
-// TODO: price feed will need to be updated to use uniswap and also be able to calculate funding rate
 const GeneralInfo = () => {
+  const { latestPrice, sourceUrls = [] } = PriceFeed.useContainer();
+  const { loading, error, data } = ContractState.useContainer();
+  const { activeSponsors = [] } = EmpSponsors.useContainer();
+  const { symbol: tokenSymbol, decimals: tokenDecimals } = Token.useContainer();
+  const { gcr } = Totals.useContainer();
+
+  if (
+    loading ||
+    error ||
+    !gcr ||
+    !tokenSymbol ||
+    !tokenDecimals ||
+    latestPrice === null
+  ) {
+    return GeneralInfoView({
+      prettyLatestPrice: defaultMissingDataDisplay,
+      pricedGcr: defaultMissingDataDisplay,
+      priceIdUtf8: defaultMissingDataDisplay,
+      collReqPct: defaultMissingDataDisplay,
+      minSponsorTokensSymbol: defaultMissingDataDisplay,
+      sourceUrls: [],
+      sponsorCount: defaultMissingDataDisplay,
+    });
+  }
+
+  const {
+    priceIdentifier,
+    collateralRequirement,
+    minSponsorTokens,
+    isExpired,
+  } = data;
+
+  const prettyLatestPrice = Number(latestPrice).toFixed(8);
+  const pricedGcr = (gcr / latestPrice).toFixed(8);
+
+  const priceIdUtf8 = parseBytes32String(priceIdentifier);
+  const collReqPct = parseFloat(fromWei(collateralRequirement)).toString();
+  const minSponsorTokensSymbol = `${fromWei(
+    minSponsorTokens,
+    tokenDecimals
+  )} ${tokenSymbol}`;
+
+  const sponsorCount = Object.keys(activeSponsors).length.toString();
+
   return GeneralInfoView({
-    expiryTimestamp: defaultMissingDataDisplay,
-    expiryDate: defaultMissingDataDisplay,
-    prettyLatestPrice: defaultMissingDataDisplay,
-    pricedGcr: defaultMissingDataDisplay,
-    priceIdUtf8: defaultMissingDataDisplay,
-    collReqPct: defaultMissingDataDisplay,
-    minSponsorTokensSymbol: defaultMissingDataDisplay,
-    isExpired: defaultMissingDataDisplay,
-    sourceUrls: [],
-    sponsorCount: defaultMissingDataDisplay,
+    prettyLatestPrice,
+    pricedGcr,
+    priceIdUtf8,
+    collReqPct,
+    minSponsorTokensSymbol,
+    sourceUrls,
+    sponsorCount,
   });
 };
 

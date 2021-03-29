@@ -51,6 +51,25 @@ export const Contracts: ContractType[] = [
     versions: ["2", "2.0.0", "2.0.1", "latest"],
     types: ["Perp", "Perpetual"],
     abi: perp2.abi,
+    async getState(instance: Contract) {
+      return {
+        collateralCurrency: (await instance.collateralCurrency()) as string, // address
+        priceIdentifier: (await instance.priceIdentifier()) as Bytes,
+        tokenCurrency: (await instance.tokenCurrency()) as string, // address
+        collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
+        minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
+        timerAddress: (await instance.timerAddress()) as string, // address
+        cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
+        rawTotalPositionCollateral: (await instance.rawTotalPositionCollateral()) as BigNumber,
+        totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
+        liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
+        withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
+        currentTime: (await instance.getCurrentTime()) as BigNumber,
+        finderAddress: (await instance.finder()) as string, // address
+        // new
+        fundingRate: (await instance.fundingRate()) as BigNumber,
+      };
+    },
   },
   {
     versions: ["latest"],

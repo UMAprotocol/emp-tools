@@ -103,6 +103,8 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.usdbtc;
     case symbol?.includes("YD-ETH"):
       return PRICEFEED_PARAMS.usdeth;
+    case symbol?.includes("NEW-PERP-TEST"):
+      return PRICEFEED_PARAMS.ethbtc;
     default:
       return null;
   }

@@ -38,7 +38,6 @@ const useContractState = () => {
 
   function updateState() {
     if (!contract || !signer) return;
-    setLoading(true);
     getState(contract, signer)
       .then(setData)
       .catch(setError)

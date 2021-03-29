@@ -24,7 +24,6 @@ import DevMining from "../containers/DevMining";
 import { UniswapGetPair } from "../containers/Uniswap";
 import ContractList from "../containers/ContractList";
 import ContractState from "../containers/ContractState";
-import PerpetualState from "../containers/PerpetualState";
 
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../apollo/client";
@@ -54,11 +53,9 @@ const WithStateContainerProviders = ({ children }: IProps) => (
                                     <DvmContracts.Provider>
                                       <DvmState.Provider>
                                         <DevMining.Provider>
-                                          <PerpetualState.Provider>
-                                            <UniswapGetPair.Provider>
-                                              {children}
-                                            </UniswapGetPair.Provider>
-                                          </PerpetualState.Provider>
+                                          <UniswapGetPair.Provider>
+                                            {children}
+                                          </UniswapGetPair.Provider>
                                         </DevMining.Provider>
                                       </DvmState.Provider>
                                     </DvmContracts.Provider>

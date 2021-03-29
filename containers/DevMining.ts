@@ -40,6 +40,9 @@ const useDevMiningCalculator = () => {
     if (empWhitelist == null) return;
     if (totalRewards == null) return;
     if (error) setError(null);
+    // we dont want to run this if a perp is selected, at least for now
+    if (contract && ["perp", "perpetual"].includes(contract.type.toLowerCase()))
+      return;
     // only run this once. allow user to retry by switching contracts
     if (devMiningRewards) return;
     const devMiningCalculator = DevMiningCalculator({

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { Box, Grid, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import { UniswapGetPair } from "../../../containers/Uniswap";
-import PerpetualState from "../../../containers/PerpetualState";
+import ContractState from "../../../containers/ContractState";
 import { utils } from "ethers";
 import { calculateFairValue } from "../../../utils/calculators";
 const { parseEther, formatUnits: fromWei, parseBytes32String } = utils;
@@ -79,7 +79,7 @@ function PerpetualInfoLoading() {
 }
 
 export function PerpetualInfo() {
-  const { data, error } = PerpetualState.useContainer();
+  const { data, error, loading } = ContractState.useContainer();
   const {
     loading: uniLoading,
     error: uniError,
@@ -87,7 +87,7 @@ export function PerpetualInfo() {
   } = UniswapGetPair.useContainer();
 
   // Show loading when we dont have all our info yet
-  if (error || !data || uniLoading || uniError) {
+  if (loading || error || !data || uniLoading || uniError) {
     return <PerpetualInfoLoading />;
   }
   const priceIdentifier = parseBytes32String(data.priceIdentifier);
