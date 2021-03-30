@@ -13,7 +13,6 @@ import { withStyles, useTheme } from "@material-ui/core/styles";
 import ContractList from "../../containers/ContractList";
 import SelectedContract from "../../containers/SelectedContract";
 import Connection from "../../containers/Connection";
-import Uniswap from "../../containers/Uniswap";
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
