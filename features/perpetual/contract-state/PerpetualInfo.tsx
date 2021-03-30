@@ -90,6 +90,10 @@ export function PerpetualInfo() {
   if (loading || error || !data || uniLoading || uniError) {
     return <PerpetualInfoLoading />;
   }
+  // this is not a perp
+  if (!data.fundingRate) {
+    return <PerpetualInfoLoading />;
+  }
   const priceIdentifier = parseBytes32String(data.priceIdentifier);
   const fairValue = calculateFairValue(
     data?.fundingRate?.rate,

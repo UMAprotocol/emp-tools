@@ -68,6 +68,10 @@ export const Contracts: ContractType[] = [
         finderAddress: (await instance.finder()) as string, // address
         // new
         fundingRate: (await instance.fundingRate()) as BigNumber,
+        // explicitly set null for missing fields
+        expirationTimestamp: null,
+        expiryPrice: null,
+        isExpired: false,
       };
     },
   },

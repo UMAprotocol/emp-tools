@@ -31,7 +31,7 @@ const fromWei = utils.formatUnits;
 const parseBytes32String = utils.parseBytes32String;
 
 const GeneralInfo = () => {
-  const { empState } = EmpState.useContainer();
+  const { empState, loading } = EmpState.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { gcr } = Totals.useContainer();
   const { latestPrice, sourceUrls } = PriceFeed.useContainer();
@@ -47,6 +47,7 @@ const GeneralInfo = () => {
   const defaultMissingDataDisplay = "N/A";
 
   if (
+    !loading &&
     activeSponsors !== null &&
     expiry !== null &&
     gcr !== null &&

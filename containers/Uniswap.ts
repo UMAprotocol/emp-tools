@@ -27,6 +27,7 @@ function getPair() {
     if (!client) return;
     try {
       const info = findInfoByAddress(address);
+      setError(null);
       call(client, GetPair, { id: info.market.id })
         .then((result: any) => setData(result.data))
         .catch(setError)
