@@ -21,17 +21,19 @@ const Manager = () => {
   const { empState } = EmpState.useContainer();
   const { isExpired } = empState;
   const [method, setMethod] = useState<Method>(DEFAULT_METHOD);
+
   const handleChange = (e: React.ChangeEvent<{ value: unknown }>) =>
     setMethod(e.target.value as Method);
 
+  useEffect(() => {
+    setMethod(DEFAULT_METHOD);
+    if (isExpired) {
+      setMethod("settle");
+    }
+  }, [isExpired]);
+
   if (signer !== null && isExpired !== null) {
     // Whenever the expiry state changes, check if we should change the default method.
-    useEffect(() => {
-      setMethod(DEFAULT_METHOD);
-      if (isExpired) {
-        setMethod("settle");
-      }
-    }, [isExpired]);
 
     return (
       <Box my={0}>

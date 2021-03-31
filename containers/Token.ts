@@ -24,7 +24,7 @@ function useToken() {
   const [balanceBN, setBalanceBN] = useState<BigNumber | null>(null);
 
   const getTokenInfo = async () => {
-    if (contract) {
+    if (contract && address) {
       const symbol: string = await contract.symbol();
       const name: string = await contract.name();
       const decimals: number = await contract.decimals();

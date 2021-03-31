@@ -77,7 +77,7 @@ async function commonEmpState(instance: Contract) {
     currentTime: (await instance.getCurrentTime()) as BigNumber,
     contractState: Number(await instance.contractState()) as number,
     finderAddress: (await instance.finder()) as string, // address
-    expiryPrice: (await instance.expiryPrice) as BigNumber,
+    expiryPrice: (await instance.expiryPrice()) as BigNumber,
     isExpired: false,
   };
   state.isExpired = state.currentTime.gte(state.expirationTimestamp);
