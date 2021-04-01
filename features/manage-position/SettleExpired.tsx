@@ -29,13 +29,13 @@ enum CONTRACT_STATE {
   PRICE_RECEIVED,
 }
 
-const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
+const { formatUnits: fromWei } = utils;
 
 const SettleExpired = () => {
   const { contract: emp } = EmpContract.useContainer();
   const { empState } = EmpState.useContainer();
   const {
-    priceIdentifier,
+    priceIdentifierUtf8,
     expirationTimestamp,
     contractState,
     isExpired,
@@ -69,7 +69,7 @@ const SettleExpired = () => {
     tokenSymbol !== null &&
     tokenAllowance !== null &&
     emp !== null &&
-    priceIdentifier !== null &&
+    priceIdentifierUtf8 !== null &&
     expirationTimestamp !== null &&
     contractState !== null &&
     collDec !== null &&
@@ -77,7 +77,6 @@ const SettleExpired = () => {
     isExpired !== null &&
     isExpired // If contract has not expired, then do not render this component
   ) {
-    const priceIdUtf8 = hexToUtf8(priceIdentifier);
     const expiryDate = new Date(
       Number(expirationTimestamp) * 1000
     ).toLocaleString("en-GB", { timeZone: "UTC" });
@@ -164,8 +163,8 @@ const SettleExpired = () => {
             <strong>{tokenSymbol}</strong> tokens for{" "}
             <strong>{collSymbol}</strong>. The amount of{" "}
             <strong>{collSymbol}</strong> returned is determined by the
-            settlement price of {priceIdUtf8} for the expiration timestamp (
-            {expiryDate}).
+            settlement price of {priceIdentifierUtf8} for the expiration
+            timestamp ({expiryDate}).
             <br></br>
             <br></br>
             You will receive the settlement value of your tokens (
@@ -251,7 +250,7 @@ const SettleExpired = () => {
           balanceTRV !== null &&
           collateralToReceive !== null && (
             <Box py={4}>
-              <Typography>{`Resolved price (${priceIdUtf8} @ ${expiryDate}): ${resolvedPrice}`}</Typography>
+              <Typography>{`Resolved price (${priceIdentifierUtf8} @ ${expiryDate}): ${resolvedPrice}`}</Typography>
               <Typography>{`Collateral in position: ${posColl}`}</Typography>
               <Typography>{`Redemption value of outstanding tokens in position: ${positionTRV}`}</Typography>
               <Typography>

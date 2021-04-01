@@ -80,7 +80,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
 
   const {
     disputeBondPct,
-    priceIdentifier: priceId,
+    priceIdentifierUtf8,
     liquidationLiveness,
     withdrawalLiveness,
     currentTime,
@@ -103,7 +103,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
     liquidations[props.sponsorPlusId] &&
     liquidations[props.sponsorPlusId] !== null &&
     isExpired !== null &&
-    priceId !== null &&
+    priceIdentifierUtf8 !== null &&
     disputeBondPct !== null &&
     collAllowance !== null &&
     collBalance !== null &&
@@ -118,8 +118,6 @@ const LiquidationActionDialog = (props: DialogProps) => {
     const invertDisputablePrice = isPricefeedInvertedFromTokenSymbol(
       tokenSymbol
     );
-    const priceIdUtf8 = utils.parseBytes32String(priceId);
-
     const needCollateralAllowance = () => {
       if (collAllowance === "Infinity") return false;
       return collAllowance < finalFee;
@@ -400,7 +398,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                           This liquidation is currently in it's liveness period
                           and can be disputed if you think it was invalid. In
                           order for this liquidation to be invalid, the
-                          identifier {priceIdUtf8} would need to be{" "}
+                          identifier {priceIdentifierUtf8} would need to be{" "}
                           {invertDisputablePrice ? "less" : "greater"} than{" "}
                           {prettyBalance(
                             Number(liquidatedPosition.maxDisputablePrice)

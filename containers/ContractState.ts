@@ -9,6 +9,7 @@ const initState = {
   expirationTimestamp: null,
   collateralCurrency: null,
   priceIdentifier: null,
+  priceIdentifierUtf8: null,
   tokenCurrency: null,
   collateralRequirement: null,
   disputeBondPct: null,

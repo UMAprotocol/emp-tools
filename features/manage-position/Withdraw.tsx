@@ -36,7 +36,7 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
-const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
+const { formatUnits: fromWei } = utils;
 
 const Withdraw = () => {
   const { empState } = EmpState.useContainer();
@@ -44,7 +44,7 @@ const Withdraw = () => {
     collateralRequirement: collReq,
     withdrawalLiveness,
     currentTime,
-    priceIdentifier,
+    priceIdentifierUtf8,
     isExpired,
   } = empState;
 
@@ -83,14 +83,13 @@ const Withdraw = () => {
     pendingWithdraw !== null &&
     currentTime !== null &&
     latestPrice !== null &&
-    priceIdentifier !== null &&
+    priceIdentifierUtf8 !== null &&
     collSymbol !== null &&
     tokenSymbol !== null &&
     Number(posCollString) > 0 // If position has no collateral, then don't render withdraw component.
   ) {
     const collateralToWithdraw = Number(collateral) || 0;
     const collReqFromWei = parseFloat(fromWei(collReq));
-    const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const posTokens = Number(posTokensString);
     const posColl = Number(posCollString);

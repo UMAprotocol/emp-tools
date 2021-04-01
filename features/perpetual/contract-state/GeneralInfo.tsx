@@ -4,7 +4,6 @@ import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import AddressUtils from "../../core/AddressUtils";
 
-import EmpSponsors from "../../../containers/EmpSponsors";
 import Token from "../../../containers/Token";
 import ContractState from "../../../containers/ContractState";
 import PriceFeed from "../../../containers/PriceFeed";
@@ -29,14 +28,13 @@ const Status = styled(Typography)`
 `;
 
 const fromWei = utils.formatUnits;
-const parseBytes32String = utils.parseBytes32String;
 
 const defaultMissingDataDisplay = "N/A";
 
 type GeneralInfoViewType = {
   prettyLatestPrice: string;
   pricedGcr: string;
-  priceIdUtf8: string;
+  priceIdentifierUtf8: string;
   collReqPct: string;
   minSponsorTokensSymbol: string;
   sourceUrls: string[];
@@ -45,7 +43,7 @@ type GeneralInfoViewType = {
 function GeneralInfoView({
   prettyLatestPrice = defaultMissingDataDisplay,
   pricedGcr = defaultMissingDataDisplay,
-  priceIdUtf8 = defaultMissingDataDisplay,
+  priceIdentifierUtf8 = defaultMissingDataDisplay,
   collReqPct = defaultMissingDataDisplay,
   minSponsorTokensSymbol = defaultMissingDataDisplay,
   sourceUrls = [],
@@ -58,7 +56,7 @@ function GeneralInfoView({
 
       <Status>
         <Label>Price identifier: </Label>
-        {priceIdUtf8}
+        {priceIdentifierUtf8}
       </Status>
 
       <Status>
@@ -114,9 +112,10 @@ function GeneralInfoView({
 const GeneralInfo = () => {
   const { latestPrice, sourceUrls = [] } = PriceFeed.useContainer();
   const { loading, error, data } = ContractState.useContainer();
-  const { activeSponsors = [] } = EmpSponsors.useContainer();
   const { symbol: tokenSymbol, decimals: tokenDecimals } = Token.useContainer();
   const { gcr } = Totals.useContainer();
+  // TODO: get proper active sponsor fetching from either subgraph or state reconstruction from contract events
+  const activeSponsors = {};
 
   if (
     loading ||
@@ -129,7 +128,7 @@ const GeneralInfo = () => {
     return GeneralInfoView({
       prettyLatestPrice: defaultMissingDataDisplay,
       pricedGcr: defaultMissingDataDisplay,
-      priceIdUtf8: defaultMissingDataDisplay,
+      priceIdentifierUtf8: defaultMissingDataDisplay,
       collReqPct: defaultMissingDataDisplay,
       minSponsorTokensSymbol: defaultMissingDataDisplay,
       sourceUrls: [],
@@ -138,7 +137,7 @@ const GeneralInfo = () => {
   }
 
   const {
-    priceIdentifier,
+    priceIdentifierUtf8,
     collateralRequirement,
     minSponsorTokens,
     isExpired,
@@ -147,7 +146,6 @@ const GeneralInfo = () => {
   const prettyLatestPrice = Number(latestPrice).toFixed(8);
   const pricedGcr = (gcr / latestPrice).toFixed(8);
 
-  const priceIdUtf8 = parseBytes32String(priceIdentifier);
   const collReqPct = parseFloat(fromWei(collateralRequirement)).toString();
   const minSponsorTokensSymbol = `${fromWei(
     minSponsorTokens,
@@ -159,7 +157,7 @@ const GeneralInfo = () => {
   return GeneralInfoView({
     prettyLatestPrice,
     pricedGcr,
-    priceIdUtf8,
+    priceIdentifierUtf8,
     collReqPct,
     minSponsorTokensSymbol,
     sourceUrls,
