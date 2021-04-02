@@ -9,6 +9,8 @@ import perp2 from "@uma/core-2-0/build/contracts/Perpetual.json";
 import erc20 from "@uma/core-2-0/build/contracts/ExpandedERC20.json";
 import { ContractInfo } from "../containers/ContractList";
 
+const { parseBytes32String } = ethers.utils;
+
 type Provider = ethers.providers.Web3Provider;
 type Signer = ethers.Signer;
 
@@ -49,8 +51,34 @@ export const Contracts: ContractType[] = [
   },
   {
     versions: ["2", "2.0.0", "2.0.1", "latest"],
-    types: ["Perp", "Perpetual"],
+    types: ["Perpetual"],
     abi: perp2.abi,
+    async getState(instance: Contract) {
+      const state = {
+        collateralCurrency: (await instance.collateralCurrency()) as string, // address
+        priceIdentifier: (await instance.priceIdentifier()) as Bytes,
+        priceIdentifierUtf8: "",
+        tokenCurrency: (await instance.tokenCurrency()) as string, // address
+        collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
+        minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
+        timerAddress: (await instance.timerAddress()) as string, // address
+        cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
+        rawTotalPositionCollateral: (await instance.rawTotalPositionCollateral()) as BigNumber,
+        totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
+        liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
+        withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
+        currentTime: (await instance.getCurrentTime()) as BigNumber,
+        finderAddress: (await instance.finder()) as string, // address
+        // new
+        fundingRate: (await instance.fundingRate()) as BigNumber,
+        // explicitly set null for missing fields
+        expirationTimestamp: null,
+        expiryPrice: null,
+        isExpired: false,
+      };
+      state.priceIdentifierUtf8 = parseBytes32String(state.priceIdentifier);
+      return state;
+    },
   },
   {
     versions: ["latest"],
@@ -65,6 +93,7 @@ async function commonEmpState(instance: Contract) {
     expirationTimestamp: (await instance.expirationTimestamp()) as BigNumber,
     collateralCurrency: (await instance.collateralCurrency()) as string, // address
     priceIdentifier: (await instance.priceIdentifier()) as Bytes,
+    priceIdentifierUtf8: "",
     tokenCurrency: (await instance.tokenCurrency()) as string, // address
     collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
     minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
@@ -80,6 +109,9 @@ async function commonEmpState(instance: Contract) {
     expiryPrice: (await instance.expiryPrice()) as BigNumber,
     isExpired: false,
   };
+  // This decodes the price identifier so views have a string representation vs bytes.
+  // This variable is named based on how its widely named in other parts of codebase
+  state.priceIdentifierUtf8 = parseBytes32String(state.priceIdentifier);
   state.isExpired = state.currentTime.gte(state.expirationTimestamp);
   return state;
 }

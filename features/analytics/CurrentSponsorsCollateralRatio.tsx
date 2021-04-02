@@ -18,7 +18,7 @@ const prettyAddress = (x: string) => {
 
 const CurrentSponsorsCollateralRatio = () => {
   const { empState } = EmpState.useContainer();
-  const { priceIdentifier: priceId } = empState;
+  const { priceIdentifierUtf8 } = empState;
   const { symbol: collSymbol } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
@@ -28,10 +28,9 @@ const CurrentSponsorsCollateralRatio = () => {
     activeSponsors !== null &&
     activeSponsors !== {} &&
     latestPrice !== null &&
-    priceId !== null &&
+    priceIdentifierUtf8 !== null &&
     symbol !== null
   ) {
-    const priceIdUtf8 = utils.parseBytes32String(priceId);
     const reformattedSponsorKeys = Object.keys(activeSponsors)
       .filter((sponsor: string) => {
         return (
@@ -116,7 +115,7 @@ const CurrentSponsorsCollateralRatio = () => {
                 style: {
                   color: "#434343",
                 },
-                text: `Current ${priceIdUtf8} Price`,
+                text: `Current ${priceIdentifierUtf8} Price`,
               },
             },
           ],

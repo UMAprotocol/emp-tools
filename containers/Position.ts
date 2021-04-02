@@ -66,7 +66,9 @@ function usePosition() {
       const withdrawReqAmt: BigNumber = position.withdrawalRequestAmount[0];
       const withdrawReqPassTime: BigNumber =
         position.withdrawalRequestPassTimestamp;
-      const xferTime: BigNumber = position.transferPositionRequestPassTimestamp;
+      // Perpetual position does not have this data
+      const xferTime: BigNumber =
+        position.transferPositionRequestPassTimestamp || BigNumber.from(0);
 
       const collateral: string = weiToNum(collRaw, collDec);
       const backingCollateral: string = weiToNum(

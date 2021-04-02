@@ -12,7 +12,7 @@ import EmpState from "../../containers/EmpState";
 import { getLiquidationPrice } from "../../utils/getLiquidationPrice";
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
-const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
+const { formatUnits: fromWei } = utils;
 
 const Label = styled.span`
   color: #999999;
@@ -49,7 +49,7 @@ const YourPosition = () => {
   const { symbol: collSymbol, decimals: collDec } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
-  const { collateralRequirement: collReq, priceIdentifier } = empState;
+  const { collateralRequirement: collReq, priceIdentifierUtf8 } = empState;
   const defaultMissingDataDisplay = "N/A";
 
   if (
@@ -63,7 +63,7 @@ const YourPosition = () => {
     tokenSymbol !== null &&
     latestPrice !== null &&
     collReq !== null &&
-    priceIdentifier !== null &&
+    priceIdentifierUtf8 !== null &&
     withdrawAmtString !== null &&
     pendingWithdraw !== null &&
     pendingTransfer !== null
@@ -82,7 +82,6 @@ const YourPosition = () => {
       collReqFromWei,
       isPricefeedInvertedFromTokenSymbol(tokenSymbol)
     ).toFixed(4);
-    const priceIdUtf8 = hexToUtf8(priceIdentifier);
     const prettyLatestPrice = Number(latestPrice).toFixed(6);
 
     return renderComponent(
@@ -96,7 +95,7 @@ const YourPosition = () => {
       tokens.toFixed(4),
       tokenSymbol,
       prettyLatestPrice,
-      priceIdUtf8,
+      priceIdentifierUtf8,
       withdrawAmt.toFixed(4),
       pendingWithdraw,
       pendingTransfer

@@ -9,6 +9,7 @@ const initState = {
   expirationTimestamp: null,
   collateralCurrency: null,
   priceIdentifier: null,
+  priceIdentifierUtf8: null,
   tokenCurrency: null,
   collateralRequirement: null,
   disputeBondPct: null,
@@ -38,7 +39,6 @@ const useContractState = () => {
 
   function updateState() {
     if (!contract || !signer) return;
-    setLoading(true);
     getState(contract, signer)
       .then(setData)
       .catch(setError)

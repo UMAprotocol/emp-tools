@@ -17,7 +17,7 @@ import Etherscan from "../../containers/Etherscan";
 
 import { isPricefeedInvertedFromTokenSymbol } from "../../utils/getOffchainPrice";
 
-const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
+const { formatUnits: fromWei } = utils;
 
 const Container = styled.div`
   margin-top: 20px;
@@ -32,7 +32,7 @@ const YourLiquidations = () => {
   const { getEtherscanUrl } = Etherscan.useContainer();
   const {
     collateralRequirement: collReq,
-    priceIdentifier,
+    priceIdentifierUtf8,
     liquidationLiveness,
   } = empState;
   const defaultMissingDataDisplay = "N/A";
@@ -40,12 +40,11 @@ const YourLiquidations = () => {
   if (
     tokenSymbol !== null &&
     collReq !== null &&
-    priceIdentifier !== null &&
+    priceIdentifierUtf8 !== null &&
     liquidationLiveness !== null &&
     liquidations !== null
   ) {
     const collReqFromWei = parseFloat(fromWei(collReq));
-    const priceIdUtf8 = hexToUtf8(priceIdentifier);
     const invertedDisputablePrice = isPricefeedInvertedFromTokenSymbol(
       tokenSymbol
     );
@@ -78,7 +77,7 @@ const YourLiquidations = () => {
 
     return renderComponent(
       liquidationPretty,
-      priceIdUtf8,
+      priceIdentifierUtf8,
       invertedDisputablePrice
     );
   } else {
@@ -87,7 +86,7 @@ const YourLiquidations = () => {
 
   function renderComponent(
     liquidations: LiquidationState[] = [],
-    priceIdUtf8: string = defaultMissingDataDisplay,
+    priceIdentifierUtf8: string = defaultMissingDataDisplay,
     invertedDisputablePrice: boolean = false
   ) {
     const prettyAddress = (x: string) => {
@@ -155,7 +154,7 @@ const YourLiquidations = () => {
                       <ListItem>
                         <ListItemText
                           inset
-                          primary={`Disputable at a historical ${priceIdUtf8} price (@  ${
+                          primary={`Disputable at a historical ${priceIdentifierUtf8} price (@  ${
                             liq.prettyLiqTimestamp
                           }) ${invertedDisputablePrice ? `above` : `below`}:`}
                           secondary={`- ${liq.maxDisputablePrice}`}

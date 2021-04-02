@@ -42,7 +42,7 @@ const MinLink = styled.div`
   text-decoration-line: underline;
 `;
 
-const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
+const { formatUnits: fromWei } = utils;
 
 const Create = () => {
   const { network } = Connection.useContainer();
@@ -77,7 +77,7 @@ const Create = () => {
   const {
     collateralRequirement: collReq,
     minSponsorTokens,
-    priceIdentifier,
+    priceIdentifierUtf8,
   } = empState;
   const liquidationPriceWarningThreshold = 0.1;
 
@@ -186,7 +186,7 @@ const Create = () => {
     pendingWithdraw !== null &&
     tokenSymbol !== null &&
     collSymbol !== null &&
-    priceIdentifier !== null
+    priceIdentifierUtf8 !== null
   ) {
     const collReqFromWei = parseFloat(fromWei(collReq));
     const collateralToDeposit = Number(collateral) || 0;
@@ -195,7 +195,6 @@ const Create = () => {
       fromWei(minSponsorTokens, tokenDec)
     );
     const hasPendingWithdraw = pendingWithdraw === "Yes";
-    const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const prettyLatestPrice = Number(latestPrice).toFixed(4);
     const posTokens = Number(posTokensString);
     const posCollateral = Number(posCollateralString);

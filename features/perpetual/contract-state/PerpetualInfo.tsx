@@ -2,10 +2,10 @@ import { useCallback } from "react";
 import { Box, Grid, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import { UniswapGetPair } from "../../../containers/Uniswap";
-import PerpetualState from "../../../containers/PerpetualState";
+import ContractState from "../../../containers/ContractState";
 import { utils } from "ethers";
 import { calculateFairValue } from "../../../utils/calculators";
-const { parseEther, formatUnits: fromWei, parseBytes32String } = utils;
+const { parseEther, formatUnits: fromWei } = utils;
 
 const Label = styled.div`
   color: #999999;
@@ -79,7 +79,7 @@ function PerpetualInfoLoading() {
 }
 
 export function PerpetualInfo() {
-  const { data, error } = PerpetualState.useContainer();
+  const { data, error, loading } = ContractState.useContainer();
   const {
     loading: uniLoading,
     error: uniError,
@@ -87,10 +87,14 @@ export function PerpetualInfo() {
   } = UniswapGetPair.useContainer();
 
   // Show loading when we dont have all our info yet
-  if (error || !data || uniLoading || uniError) {
+  if (loading || error || !data || uniLoading || uniError) {
     return <PerpetualInfoLoading />;
   }
-  const priceIdentifier = parseBytes32String(data.priceIdentifier);
+  // this is not a perp
+  if (!data.fundingRate) {
+    return <PerpetualInfoLoading />;
+  }
+  const { priceIdentifierUtf8 } = data;
   const fairValue = calculateFairValue(
     data?.fundingRate?.rate,
     uniData?.pair?.token0Price
@@ -100,13 +104,13 @@ export function PerpetualInfo() {
     <PerpetualInfoView
       marketPrice={[
         (uniData?.pair?.token0Price || "").slice(0, 8),
-        priceIdentifier,
+        priceIdentifierUtf8,
       ]}
       fundingRate={[
         fromWei(data?.fundingRate?.rate.toString()) + "%",
-        priceIdentifier,
+        priceIdentifierUtf8,
       ]}
-      fairValue={[fairValue, priceIdentifier]}
+      fairValue={[fairValue, priceIdentifierUtf8]}
     />
   );
 }

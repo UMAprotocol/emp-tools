@@ -97,7 +97,7 @@ const ITEMS_PER_PAGE = 10;
 
 const AllSponsors = () => {
   const { empState } = EmpState.useContainer();
-  const { priceIdentifier: priceId } = empState;
+  const { priceIdentifierUtf8 } = empState;
   const { symbol: tokenSymbol } = Token.useContainer();
   const { symbol: collSymbol } = Collateral.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
@@ -135,12 +135,10 @@ const AllSponsors = () => {
   if (
     tokenSymbol !== null &&
     collSymbol !== null &&
-    priceId !== null &&
+    priceIdentifierUtf8 !== null &&
     activeSponsors &&
     Object.keys(activeSponsors).length > 0
   ) {
-    const priceIdUtf8 = utils.parseBytes32String(priceId);
-
     const prettyBalance = (x: number) => {
       const x_string = x.toFixed(4);
       return utils.commify(x_string);
@@ -236,7 +234,7 @@ const AllSponsors = () => {
                   </strong>
                 </TableCell>
                 <Tooltip
-                  title={`This is the price that the identifier (${priceIdUtf8}) must ${
+                  title={`This is the price that the identifier (${priceIdentifierUtf8}) must ${
                     invertedPrice ? "decrease" : "increase"
                   } to in order for the position be liquidatable`}
                   placement="top"

@@ -73,7 +73,7 @@ interface DialogProps {
 const PositionActionsDialog = (props: DialogProps) => {
   const { empState } = EmpState.useContainer();
   const {
-    priceIdentifier: priceId,
+    priceIdentifierUtf8,
     collateralRequirement: collReq,
     currentTime,
     isExpired,
@@ -210,7 +210,7 @@ const PositionActionsDialog = (props: DialogProps) => {
     collDecs !== null &&
     collBalance !== null &&
     collAllowance !== null &&
-    priceId !== null
+    priceIdentifierUtf8 !== null
   ) {
     const minCollPerTokenNum = Number(minCollPerToken) || 0;
     const maxCollPerTokenNum = Number(maxCollPerToken) || 0;
@@ -552,7 +552,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                         <Typography component={"span"}>
                           <strong>Liquidate this sponsor</strong>
                           <br></br>For the position to be under collateralized{" "}
-                          {utils.parseBytes32String(priceId)} would need to{" "}
+                          {priceIdentifierUtf8} would need to{" "}
                           {underCollateralizedPrice > latestPrice
                             ? "increase"
                             : "decrease"}{" "}
@@ -560,8 +560,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                           from {latestPrice.toFixed(8)} to{" "}
                           {underCollateralizedPrice.toFixed(8)}. You can still
                           liquidate this position if you have a different
-                          opinion on the {utils.parseBytes32String(priceId)}{" "}
-                          price.
+                          opinion on the {priceIdentifierUtf8} price.
                           <br></br>
                           <br></br>
                           <Tooltip
@@ -579,9 +578,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                             title={`Liquidating a position whose collateral ratio is
                               below ${minCollPerTokenToBeProfitable} would not be
                               profitable using the estimated 
-                              ${utils.parseBytes32String(
-                                priceId
-                              )} price. This is
+                              ${priceIdentifierUtf8} price. This is
                               because you must burn synthetic tokens in order to
                               liquidate underlying collateral, and we estimate
                               that each ${tokenSymbol} is worth
@@ -598,7 +595,7 @@ const PositionActionsDialog = (props: DialogProps) => {
                             title={`Liquidating a position whose collateral ratio is
                               greater than ${maxCollPerTokenToBeValid} would get
                               disputed using the estimated
-                              ${utils.parseBytes32String(priceId)} price of 
+                              ${priceIdentifierUtf8} price of 
                               ${latestPrice.toFixed(4)} and the collateral
                               requirement of ${parseFloat(fromWei(collReq))}.`}
                           >
@@ -617,12 +614,11 @@ const PositionActionsDialog = (props: DialogProps) => {
                               Liquidating a position whose collateral ratio is
                               below {minCollPerTokenToBeProfitable} would not be
                               profitable using the estimated{" "}
-                              {utils.parseBytes32String(priceId)} price. This is
-                              because you must burn synthetic tokens in order to
-                              liquidate underlying collateral, and we estimate
-                              that each {tokenSymbol} is worth{" "}
-                              {latestPrice.toFixed(4)} of the collateral{" "}
-                              {collSymbol}. See the{" "}
+                              {priceIdentifierUtf8} price. This is because you
+                              must burn synthetic tokens in order to liquidate
+                              underlying collateral, and we estimate that each{" "}
+                              {tokenSymbol} is worth {latestPrice.toFixed(4)} of
+                              the collateral {collSymbol}. See the{" "}
                               <a
                                 href={DOCS_MAP.FINAL_FEE}
                                 target="_blank"
@@ -641,11 +637,10 @@ const PositionActionsDialog = (props: DialogProps) => {
                             <Important>
                               Liquidating a position whose collateral ratio is
                               greater than {maxCollPerTokenToBeValid} would get
-                              disputed using the estimated{" "}
-                              {utils.parseBytes32String(priceId)} price of{" "}
-                              {latestPrice.toFixed(4)} and the collateral
-                              requirement of {parseFloat(fromWei(collReq))}. See
-                              the{" "}
+                              disputed using the estimated {priceIdentifierUtf8}{" "}
+                              price of {latestPrice.toFixed(4)} and the
+                              collateral requirement of{" "}
+                              {parseFloat(fromWei(collReq))}. See the{" "}
                               <a
                                 href={DOCS_MAP.FINAL_FEE}
                                 target="_blank"

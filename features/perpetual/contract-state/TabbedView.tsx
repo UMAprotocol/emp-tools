@@ -17,6 +17,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 
 import { ContractInfo } from "../../../containers/ContractList";
 import ContractState from "./ContractState";
+import ManagePosition from "../../../features/manage-position/ManagePosition";
 
 const StyledTabs = styled(Tabs)`
   & .MuiTabs-flexContainer {
@@ -35,7 +36,7 @@ const Blurb = styled.div`
 `;
 
 export default function ({ contract }: { contract: ContractInfo }) {
-  let options = ["General Info"];
+  let options = ["General Info", "Manage Position"];
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>(
     "General Info"
@@ -132,6 +133,7 @@ export default function ({ contract }: { contract: ContractInfo }) {
           <ContractState />
         </>
       )}
+      {selectedMenuItem === "Manage Position" && <ManagePosition />}
     </>
   );
 }

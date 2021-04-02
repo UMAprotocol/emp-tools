@@ -12,7 +12,7 @@ import AllSponsors from "./AllSponsors";
 
 const AllPositions = () => {
   const { empState } = EmpState.useContainer();
-  const { priceIdentifier: priceId } = empState;
+  const { priceIdentifierUtf8 } = empState;
   const { latestPrice } = PriceFeed.useContainer();
   const { symbol } = Token.useContainer();
 
@@ -21,8 +21,7 @@ const AllPositions = () => {
     setShowLiquidations(e.target.checked);
   };
 
-  if (latestPrice !== null && priceId !== null && symbol !== null) {
-    const priceIdUtf8 = utils.parseBytes32String(priceId);
+  if (latestPrice !== null && priceIdentifierUtf8 !== null && symbol !== null) {
     const invertedPrice = isPricefeedInvertedFromTokenSymbol(symbol);
     const prettyLatestPrice =
       invertedPrice && latestPrice > 0
@@ -33,7 +32,7 @@ const AllPositions = () => {
       <Box>
         <Box>
           <Typography>
-            {`Estimated price of ${prettyLatestPrice} for ${priceIdUtf8}.`}
+            {`Estimated price of ${prettyLatestPrice} for ${priceIdentifierUtf8}.`}
           </Typography>
         </Box>
         <Box pt={4}>

@@ -28,16 +28,15 @@ const Status = styled(Typography)`
 `;
 
 const fromWei = utils.formatUnits;
-const parseBytes32String = utils.parseBytes32String;
 
 const GeneralInfo = () => {
-  const { empState } = EmpState.useContainer();
+  const { empState, loading } = EmpState.useContainer();
   const { activeSponsors } = EmpSponsors.useContainer();
   const { gcr } = Totals.useContainer();
   const { latestPrice, sourceUrls } = PriceFeed.useContainer();
   const {
     expirationTimestamp: expiry,
-    priceIdentifier: priceId,
+    priceIdentifierUtf8,
     collateralRequirement: collReq,
     minSponsorTokens,
     isExpired,
@@ -47,11 +46,12 @@ const GeneralInfo = () => {
   const defaultMissingDataDisplay = "N/A";
 
   if (
+    !loading &&
     activeSponsors !== null &&
     expiry !== null &&
     gcr !== null &&
     latestPrice !== null &&
-    priceId !== null &&
+    priceIdentifierUtf8 !== null &&
     collReq !== null &&
     minSponsorTokens !== null &&
     tokenSymbol !== null &&
@@ -66,7 +66,6 @@ const GeneralInfo = () => {
     const prettyLatestPrice = Number(latestPrice).toFixed(8);
     const pricedGcr = (gcr / latestPrice).toFixed(8);
 
-    const priceIdUtf8 = parseBytes32String(priceId);
     const collReqPct = parseFloat(fromWei(collReq)).toString();
     const minSponsorTokensSymbol = `${fromWei(
       minSponsorTokens,
@@ -79,7 +78,7 @@ const GeneralInfo = () => {
       expiryDate,
       prettyLatestPrice,
       pricedGcr,
-      priceIdUtf8,
+      priceIdentifierUtf8,
       collReqPct,
       minSponsorTokensSymbol,
       isExpired ? "YES" : "NO",
@@ -95,7 +94,7 @@ const GeneralInfo = () => {
     expiryDate: string = defaultMissingDataDisplay,
     prettyLatestPrice: string = defaultMissingDataDisplay,
     pricedGcr: string = defaultMissingDataDisplay,
-    priceIdUtf8: string = defaultMissingDataDisplay,
+    priceIdentifierUtf8: string = defaultMissingDataDisplay,
     collReqPct: string = defaultMissingDataDisplay,
     minSponsorTokensSymbol: string = defaultMissingDataDisplay,
     isExpired: string = defaultMissingDataDisplay,
@@ -131,7 +130,7 @@ const GeneralInfo = () => {
 
         <Status>
           <Label>Price identifier: </Label>
-          {priceIdUtf8}
+          {priceIdentifierUtf8}
         </Status>
 
         <Status>

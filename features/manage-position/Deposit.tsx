@@ -20,7 +20,7 @@ const Link = styled.a`
   font-size: 14px;
 `;
 
-const { formatUnits: fromWei, parseBytes32String: hexToUtf8 } = utils;
+const { formatUnits: fromWei } = utils;
 
 const Deposit = () => {
   const { contract: emp } = EmpContract.useContainer();
@@ -40,7 +40,7 @@ const Deposit = () => {
   } = Position.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
-  const { collateralRequirement: collReq, priceIdentifier } = empState;
+  const { collateralRequirement: collReq, priceIdentifierUtf8 } = empState;
 
   const [collateral, setCollateral] = useState<string>("0");
   const [hash, setHash] = useState<string | null>(null);
@@ -57,13 +57,12 @@ const Deposit = () => {
     emp !== null &&
     collReq !== null &&
     collDec !== null &&
-    priceIdentifier !== null &&
+    priceIdentifierUtf8 !== null &&
     tokenSymbol !== null &&
     collSymbol !== null &&
     Number(posCollString) > 0 // If position has no collateral, then don't render deposit component.
   ) {
     const collateralToDeposit = Number(collateral) || 0;
-    const priceIdentifierUtf8 = hexToUtf8(priceIdentifier);
     const hasPendingWithdraw = pendingWithdraw === "Yes";
     const collReqFromWei = parseFloat(fromWei(collReq));
     const posTokens = Number(posTokensString);
