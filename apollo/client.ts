@@ -4,13 +4,14 @@ import {
   ApolloLink,
   HttpLink,
 } from "@apollo/client";
-import { request } from "http";
 
 const umaLinkKovan = new HttpLink({
-  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/uma-kovan",
+  uri:
+    "https://api.thegraph.com/subgraphs/name/nicholaspai/kovan-contracts-staging",
 });
 const umaLinkMainnet = new HttpLink({
-  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/uma",
+  uri:
+    "https://api.thegraph.com/subgraphs/name/nicholaspai/mainnet-contracts-staging",
 });
 const balancerLink = new HttpLink({
   uri: "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer",
