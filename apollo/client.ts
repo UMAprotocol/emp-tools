@@ -8,7 +8,7 @@ import { request } from "http";
 
 // this has the latest subgraph for now, may need to be updated later
 const umaLinkKovan = new HttpLink({
-  uri: "https://api.thegraph.com/subgraphs/name/nicholaspai/kovan-staging",
+  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/kovan-contracts",
 });
 const umaLinkMainnet = new HttpLink({
   uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/uma",
