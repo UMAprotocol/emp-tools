@@ -6,11 +6,12 @@ import {
 } from "@apollo/client";
 import { request } from "http";
 
+// this has the latest subgraph for now, may need to be updated later
 const umaLinkKovan = new HttpLink({
-  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/uma-kovan",
+  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/kovan-contracts",
 });
 const umaLinkMainnet = new HttpLink({
-  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/uma",
+  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/mainnet-contracts",
 });
 const balancerLink = new HttpLink({
   uri: "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer",

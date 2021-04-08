@@ -21,12 +21,8 @@ export const EMP_DATA = gql`
           id
         }
         liquidationId
-        liquidator {
-          address
-        }
-        disputer {
-          address
-        }
+        liquidator
+        disputer
         tokensLiquidated
         lockedCollateral
         liquidatedCollateral
