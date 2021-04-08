@@ -11,7 +11,7 @@ const umaLinkKovan = new HttpLink({
   uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/kovan-contracts",
 });
 const umaLinkMainnet = new HttpLink({
-  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/uma",
+  uri: "https://api.thegraph.com/subgraphs/name/umaprotocol/mainnet-contracts",
 });
 const balancerLink = new HttpLink({
   uri: "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer",
