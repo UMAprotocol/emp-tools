@@ -80,6 +80,10 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
       "https://api.pro.coinbase.com/products/BTC-USD/trades?limit=1",
     ],
   },
+  bchnbtc: {
+    invertedPrice: false,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=BCHBTC"],
+  },
 };
 
 export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
@@ -103,6 +107,8 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.usdbtc;
     case symbol?.includes("YD-ETH"):
       return PRICEFEED_PARAMS.usdeth;
+    case symbol?.includes("Mario"):
+      return PRICEFEED_PARAMS.bchnbtc;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
     default:

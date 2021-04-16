@@ -15,6 +15,8 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0x1c3f1A342c8D9591D9759220d114C685FD1cF6b8", "EMP", "1"], // YD-BTC-MAR21
     ["0x0f4e2a456aAfc0068a0718E3107B88d2e8f2bfEF", "EMP", "2"], // YD-ETH-JUNE21
     ["0xd9af2d7E4cF86aAfBCf688a47Bd6b95Da9F7c838", "EMP", "2"], // YD-BTC-JUNE21
+    ["0x56BaBEcb3dCaC063697fE38AB745c10181c56fA6", "EMP", "2"], // Mario Winter Cash
+    ["0x7c4090170aeADD54B1a0DbAC2C8D08719220A435", "EMP", "2"], // Mario Summer Cash
   ].reverse() as ContractArguments[],
   42: [
     ["0x3366b8549047C66E985EcC43026ceD3E831e46A9", "EMP", "1"], // uUSDrBTC Kovan Sep20
