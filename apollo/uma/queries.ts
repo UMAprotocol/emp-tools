@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const EMP_DATA = gql`
   query activePositions {
-    financialContracts {
+    financialContracts(first: 1000) {
       id
       positions(first: 1000, where: { collateral_gt: 0 }) {
         collateral
