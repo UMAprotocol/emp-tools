@@ -17,6 +17,18 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0xd9af2d7E4cF86aAfBCf688a47Bd6b95Da9F7c838", "EMP", "2"], // YD-BTC-JUNE21
     ["0x56BaBEcb3dCaC063697fE38AB745c10181c56fA6", "EMP", "2"], // Mario Winter Cash
     ["0x7c4090170aeADD54B1a0DbAC2C8D08719220A435", "EMP", "1"], // Mario Summer Cash
+    ["0xD50fbace72352C2e15E0986b8Ad2599627B5c340", "EMP", "1"], // pxGOLD
+    ["0x46f5E363e69798a74c8422BFb9EDB63e3FB0f08a", "EMP", "2"], // pxGOLD
+    ["0xb40BA94747c59d076B3c189E3A031547492013da", "EMP", "2"], // pxUSD
+    ["0x312Ecf2854f73a3Ff616e3CDBC05E2Ff6A98d1f0", "EMP", "2"], // OPEN Dollar
+    ["0xC9E6C106C65eDD67C83CC6e3bCd18bf8d2Ebf182", "EMP", "2"], // STABLESPREAD_USDT
+    ["0x0759883acF042A54fAb083378b0395F773A79767", "EMP", "2"], // BTCDOM
+    ["0x02bD62088A02668F29102B06E4925791Cd0fe4C5", "EMP", "2"], // UMA Call Options
+    ["0x0759883acF042A54fAb083378b0395F773A79767", "EMP", "2"], // UMA Call Options
+    ["0x10E018C01792705BefB7A757628C2947E38B9426", "EMP", "2"], // Chickflock btc
+    ["0x45788a369f3083c02b942aEa02DBa25C466a773F", "EMP", "2"], // Chickflock eth
+    ["0xDB2E7F6655de37822c3020a8988351CC76caDAD5", "EMP", "2"], // yuma eth
+    ["0x964Be01cCe200e168c4ba960a764cBEBa8C01200", "EMP", "2"], // opendao yd
   ].reverse() as ContractArguments[],
   42: [
     ["0x3366b8549047C66E985EcC43026ceD3E831e46A9", "EMP", "1"], // uUSDrBTC Kovan Sep20

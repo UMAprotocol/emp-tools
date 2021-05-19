@@ -22,8 +22,9 @@ function _getBinancePriceFromJSON(jsonData: any) {
 
 function _getKrakenPriceFromJSON(jsonData: any) {
   // Kraken sends all data within a special ticker name key, for example the ETHUSD data is within a XETHZUSD key.
-  const tickerName = Object.keys(jsonData.result)[0];
-  return Number(jsonData.result[tickerName].c[0]);
+  // const tickerName = Object.keys(jsonData.result)[0];
+
+  return Number(1);
 }
 
 function _getBitstampPriceFromJSON(jsonData: any) {
@@ -69,7 +70,6 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
     source: [
       "https://api.binance.com/api/v3/avgPrice?symbol=ETHUSDT",
       "https://api.pro.coinbase.com/products/ETH-USD/trades?limit=1",
-      "https://api.kraken.com/0/public/Ticker?pair=ETHUSD",
     ],
   },
   usdbtc: {
@@ -83,6 +83,45 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
   bchnbtc: {
     invertedPrice: false,
     source: ["https://api.binance.com/api/v3/avgPrice?symbol=BCHBTC"],
+  },
+  xauperl: {
+    invertedPrice: true,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=PERLUSDT"],
+  },
+  usdperl: {
+    invertedPrice: true,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=PERLUSDT"],
+  },
+  usdopen: {
+    invertedPrice: true,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=OCEANUSDT"],
+  },
+  stablespread: {
+    invertedPrice: false,
+    source: ["https://api.kraken.com/0/public/Ticker?pair=ETHUSD"],
+  },
+  btcdom: {
+    invertedPrice: false,
+    source: ["https://api.kraken.com/0/public/Ticker?pair=ETHUSD"],
+  },
+  calloptions: {
+    invertedPrice: false,
+    source: ["https://api.kraken.com/0/public/Ticker?pair=ETHUSD"],
+  },
+  yuma: {
+    invertedPrice: true,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=UMAUSDT"],
+  },
+  opendao: {
+    invertedPrice: true,
+    source: [
+      "https://api.binance.com/api/v3/avgPrice?symbol=ETHUSDT",
+      "https://api.pro.coinbase.com/products/ETH-USD/trades?limit=1",
+    ],
+  },
+  apeuni: {
+    invertedPrice: true,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=UNIUSDT"],
   },
 };
 
@@ -109,6 +148,22 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.usdeth;
     case symbol?.includes("Mario"):
       return PRICEFEED_PARAMS.bchnbtc;
+    case symbol?.includes("pxGOLD"):
+      return PRICEFEED_PARAMS.xauperl;
+    case symbol?.includes("pxUSD"):
+      return PRICEFEED_PARAMS.usdperl;
+    case symbol?.includes("OCEAN"):
+      return PRICEFEED_PARAMS.usdopen;
+    case symbol?.includes("USDT"):
+      return PRICEFEED_PARAMS.stablespread;
+    case symbol?.includes("BTCDOM"):
+      return PRICEFEED_PARAMS.btcdom;
+    case symbol?.includes("UMAx"):
+      return PRICEFEED_PARAMS.calloptions;
+    case symbol?.includes("yUMA"):
+      return PRICEFEED_PARAMS.yuma;
+    case symbol?.includes("O-ETH"):
+      return PRICEFEED_PARAMS.opendao;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
     default:
