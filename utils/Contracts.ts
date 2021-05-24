@@ -24,11 +24,13 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0xC9E6C106C65eDD67C83CC6e3bCd18bf8d2Ebf182", "EMP", "2"], // STABLESPREAD_USDT
     ["0x0759883acF042A54fAb083378b0395F773A79767", "EMP", "2"], // BTCDOM
     ["0x02bD62088A02668F29102B06E4925791Cd0fe4C5", "EMP", "2"], // UMA Call Options
-    ["0x0759883acF042A54fAb083378b0395F773A79767", "EMP", "2"], // UMA Call Options
     ["0x10E018C01792705BefB7A757628C2947E38B9426", "EMP", "2"], // Chickflock btc
     ["0x45788a369f3083c02b942aEa02DBa25C466a773F", "EMP", "2"], // Chickflock eth
     ["0xDB2E7F6655de37822c3020a8988351CC76caDAD5", "EMP", "2"], // yuma eth
     ["0x964Be01cCe200e168c4ba960a764cBEBa8C01200", "EMP", "2"], // opendao yd
+    ["0xC843538d70ee5d28C5A80A75bb94C28925bB1cf2", "EMP", "1"], // altdom-mar
+    ["0xeFA41F506EAA5c24666d4eE40888bA18FA60a1c7", "EMP", "1"], // btcdom-mar
+    ["0xaB3Aa2768Ba6c5876B2552a6F9b70E54aa256175", "EMP", "1"], // mAMPL
   ].reverse() as ContractArguments[],
   42: [
     ["0x3366b8549047C66E985EcC43026ceD3E831e46A9", "EMP", "1"], // uUSDrBTC Kovan Sep20

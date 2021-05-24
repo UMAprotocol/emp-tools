@@ -104,6 +104,10 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
     invertedPrice: false,
     source: ["https://api.kraken.com/0/public/Ticker?pair=ETHUSD"],
   },
+  altdom: {
+    invertedPrice: false,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=UNIUSDT"],
+  },
   calloptions: {
     invertedPrice: false,
     source: ["https://api.kraken.com/0/public/Ticker?pair=ETHUSD"],
@@ -122,6 +126,10 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
   apeuni: {
     invertedPrice: true,
     source: ["https://api.binance.com/api/v3/avgPrice?symbol=UNIUSDT"],
+  },
+  mampl: {
+    invertedPrice: true,
+    source: ["https://api.kraken.com/0/public/Ticker?pair=ETHUSD"],
   },
 };
 
@@ -164,6 +172,10 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.yuma;
     case symbol?.includes("O-ETH"):
       return PRICEFEED_PARAMS.opendao;
+    case symbol?.includes("mAMPL"):
+      return PRICEFEED_PARAMS.mampl;
+    case symbol?.includes("ALTDOM"):
+      return PRICEFEED_PARAMS.altdom;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
     default:
