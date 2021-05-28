@@ -43,8 +43,8 @@ interface LiquidationQuery {
   id: string;
   sponsor: { id: string };
   liquidationId: string;
-  liquidator: { address: string };
-  disputer: { address: string };
+  liquidator: string;
+  disputer: string;
   tokensLiquidated: string;
   lockedCollateral: string;
   liquidatedCollateral: string;
@@ -197,8 +197,8 @@ const useEmpSponsors = () => {
                 const sponsorAddressPlusId = liquidation.id;
                 newLiquidations[sponsorAddressPlusId] = {
                   sponsor: utils.getAddress(liquidation.sponsor.id),
-                  liquidator: liquidation.liquidator?.address,
-                  disputer: liquidation.disputer?.address,
+                  liquidator: liquidation.liquidator,
+                  disputer: liquidation.disputer,
                   liquidationId: liquidation.liquidationId,
                   liquidatedCR: liquidatedCR.toString(),
                   maxDisputablePrice: maxDisputablePrice.toString(),
