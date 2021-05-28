@@ -92,7 +92,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
     return utils.commify(x_string);
   };
 
-  const prettyAddress = (x: String) => {
+  const prettyAddress = (x: String = "") => {
     return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
   };
 
@@ -289,7 +289,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                     )}
                     target="_blank"
                   >
-                    {prettyAddress(liquidatedPosition.liquidationReceipt)}
+                    {prettyAddress(liquidatedPosition.liquidationReceipt || "")}
                   </a>
                 </Status>
                 <Status>
@@ -298,7 +298,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                     href={getEtherscanUrl(liquidatedPosition.sponsor)}
                     target="_blank"
                   >
-                    {prettyAddress(liquidatedPosition.sponsor)}
+                    {prettyAddress(liquidatedPosition.sponsor || "")}
                   </a>
                 </Status>
                 <Status>
@@ -307,7 +307,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                     href={getEtherscanUrl(liquidatedPosition.liquidator)}
                     target="_blank"
                   >
-                    {prettyAddress(liquidatedPosition.liquidator)}
+                    {prettyAddress(liquidatedPosition.liquidator || "")}
                   </a>
                 </Status>
                 <Status>
@@ -317,7 +317,7 @@ const LiquidationActionDialog = (props: DialogProps) => {
                       href={getEtherscanUrl(liquidatedPosition.disputer)}
                       target="_blank"
                     >
-                      {prettyAddress(liquidatedPosition.disputer)}
+                      {prettyAddress(liquidatedPosition.disputer || "")}
                     </a>
                   )}
                   {!liquidatedPosition.disputer && (
