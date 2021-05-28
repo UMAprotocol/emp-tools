@@ -22,8 +22,7 @@ function _getBinancePriceFromJSON(jsonData: any) {
 
 function _getKrakenPriceFromJSON(jsonData: any) {
   // Kraken sends all data within a special ticker name key, for example the ETHUSD data is within a XETHZUSD key.
-  const tickerName = Object.keys(jsonData.result)[0];
-  return Number(jsonData.result[tickerName].c[0]);
+  return Number(1);
 }
 
 function _getBitstampPriceFromJSON(jsonData: any) {
@@ -69,7 +68,6 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
     source: [
       "https://api.binance.com/api/v3/avgPrice?symbol=ETHUSDT",
       "https://api.pro.coinbase.com/products/ETH-USD/trades?limit=1",
-      "https://api.kraken.com/0/public/Ticker?pair=ETHUSD",
     ],
   },
   usdbtc: {
@@ -79,6 +77,10 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
       "https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT",
       "https://api.pro.coinbase.com/products/BTC-USD/trades?limit=1",
     ],
+  },
+  calloptions: {
+    invertedPrice: true,
+    source: ["https://api.kraken.com/0/public/Ticker?pair=ETHUSD"],
   },
 };
 
@@ -103,6 +105,8 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.usdbtc;
     case symbol?.includes("YD-ETH"):
       return PRICEFEED_PARAMS.usdeth;
+    case symbol?.includes("0621"):
+      return PRICEFEED_PARAMS.calloptions;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
     default:
