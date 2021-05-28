@@ -13,6 +13,14 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0x3605Ec11BA7bD208501cbb24cd890bC58D2dbA56", "EMP", "1"], // uUSDwETH-DEC
     ["0xE4256C47a3b27a969F25de8BEf44eCA5F2552bD5", "EMP", "1"], // YD-ETH-MAR21
     ["0x1c3f1A342c8D9591D9759220d114C685FD1cF6b8", "EMP", "1"], // YD-BTC-MAR21
+    ["0x7c4090170aeADD54B1a0DbAC2C8D08719220A435", "EMP", "1"], // Mario Summer Cash
+    ["0x56BaBEcb3dCaC063697fE38AB745c10181c56fA6", "EMP", "2"], // Mario Winter Cash
+    ["0xb40BA94747c59d076B3c189E3A031547492013da", "EMP", "2"], // pxUSD
+    ["0x312Ecf2854f73a3Ff616e3CDBC05E2Ff6A98d1f0", "EMP", "2"], // O-OCEAN
+    ["0x964Be01cCe200e168c4ba960a764cBEBa8C01200", "EMP", "2"], // O-ETH
+    ["0x10E018C01792705BefB7A757628C2947E38B9426", "EMP", "2"], // Chickflock btc
+    ["0x45788a369f3083c02b942aEa02DBa25C466a773F", "EMP", "2"], // Chickflock eth
+    ["0xDB2E7F6655de37822c3020a8988351CC76caDAD5", "EMP", "2"], // yUMA-DEC21
     ["0x0f4e2a456aAfc0068a0718E3107B88d2e8f2bfEF", "EMP", "2"], // YD-ETH-JUNE21
     ["0xd9af2d7E4cF86aAfBCf688a47Bd6b95Da9F7c838", "EMP", "2"], // YD-BTC-JUNE21
   ].reverse() as ContractArguments[],

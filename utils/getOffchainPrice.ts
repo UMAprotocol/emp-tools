@@ -22,6 +22,8 @@ function _getBinancePriceFromJSON(jsonData: any) {
 
 function _getKrakenPriceFromJSON(jsonData: any) {
   // Kraken sends all data within a special ticker name key, for example the ETHUSD data is within a XETHZUSD key.
+  // const tickerName = Object.keys(jsonData.result)[0];
+
   const tickerName = Object.keys(jsonData.result)[0];
   return Number(jsonData.result[tickerName].c[0]);
 }
@@ -80,6 +82,22 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
       "https://api.pro.coinbase.com/products/BTC-USD/trades?limit=1",
     ],
   },
+  bchnbtc: {
+    invertedPrice: false,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=BCHBTC"],
+  },
+  usdperl: {
+    invertedPrice: true,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=PERLUSDT"],
+  },
+  usdocean: {
+    invertedPrice: true,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=OCEANUSDT"],
+  },
+  usduma: {
+    invertedPrice: true,
+    source: ["https://api.binance.com/api/v3/avgPrice?symbol=UMAUSDT"],
+  },
 };
 
 export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
@@ -102,6 +120,16 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
     case symbol?.includes("YD-BTC"):
       return PRICEFEED_PARAMS.usdbtc;
     case symbol?.includes("YD-ETH"):
+      return PRICEFEED_PARAMS.usdeth;
+    case symbol?.includes("Mario"):
+      return PRICEFEED_PARAMS.bchnbtc;
+    case symbol?.includes("pxUSD"):
+      return PRICEFEED_PARAMS.usdperl;
+    case symbol?.includes("OCEAN"):
+      return PRICEFEED_PARAMS.usdocean;
+    case symbol?.includes("yUMA"):
+      return PRICEFEED_PARAMS.usduma;
+    case symbol?.includes("O-ETH"):
       return PRICEFEED_PARAMS.usdeth;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
