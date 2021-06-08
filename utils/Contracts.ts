@@ -25,6 +25,7 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0xd9af2d7E4cF86aAfBCf688a47Bd6b95Da9F7c838", "EMP", "2"], // YD-BTC-JUNE21
   ].reverse() as ContractArguments[],
   42: [
+    ["0xb59B686DA5B59D54D319B99e292879CB495569d1", "EMP", "2"], // DEXTF Yield Dollar
     ["0x3366b8549047C66E985EcC43026ceD3E831e46A9", "EMP", "1"], // uUSDrBTC Kovan Sep20
     ["0xFb70A4CBD537B36e647553C279a93E969b041DF0", "EMP", "1"], // yUSDETH Kovan oct 2030
     ["0x24d15f2607ee56dF752375a63e646cbF8E652aF3", "Perpetual", "2"], //"Perpetual", Test Contract

@@ -32,6 +32,10 @@ function _getBitstampPriceFromJSON(jsonData: any) {
   return Number(jsonData.last);
 }
 
+function _getCoingeckoPriceFromJSON(jsonData: any) {
+  return Number(jsonData.dextf.usd);
+}
+
 // This is needed because our new cors proxy wont forward http or https. We really only use https.
 function stripProtocol(url: string) {
   return url.replace("https://", "");
@@ -98,6 +102,12 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
     invertedPrice: true,
     source: ["https://api.binance.com/api/v3/avgPrice?symbol=UMAUSDT"],
   },
+  usddextf: {
+    invertedPrice: true,
+    source: [
+      "https://api.coingecko.com/api/v3/simple/price?ids=dextf&vs_currencies=usd",
+    ],
+  },
 };
 
 export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
@@ -131,6 +141,8 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.usduma;
     case symbol?.includes("O-ETH"):
       return PRICEFEED_PARAMS.usdeth;
+    case symbol?.includes("DEXTF"):
+      return PRICEFEED_PARAMS.usddextf;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
     default:
@@ -171,6 +183,8 @@ export const getOffchainPriceFromTokenSymbol = async (symbol: string) => {
               return _getKrakenPriceFromJSON(json);
             case url.includes("bitstamp"):
               return _getBitstampPriceFromJSON(json);
+            case url.includes("coingecko"):
+              return _getCoingeckoPriceFromJSON(json);
             default:
               return null;
           }
