@@ -20,6 +20,7 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0x964Be01cCe200e168c4ba960a764cBEBa8C01200", "EMP", "2"], // O-ETH
     ["0x10E018C01792705BefB7A757628C2947E38B9426", "EMP", "2"], // Chickflock btc
     ["0x45788a369f3083c02b942aEa02DBa25C466a773F", "EMP", "2"], // Chickflock eth
+    ["0x7bc1476eeD521c083Ec84D2894a7B7f738c93b3b", "EMP", "2"], // DEXTF Yield Dollar
     ["0xDB2E7F6655de37822c3020a8988351CC76caDAD5", "EMP", "2"], // yUMA-DEC21
     ["0x0f4e2a456aAfc0068a0718E3107B88d2e8f2bfEF", "EMP", "2"], // YD-ETH-JUNE21
     ["0xd9af2d7E4cF86aAfBCf688a47Bd6b95Da9F7c838", "EMP", "2"], // YD-BTC-JUNE21
