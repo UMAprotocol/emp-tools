@@ -32,6 +32,7 @@ function _getBitstampPriceFromJSON(jsonData: any) {
   return Number(jsonData.last);
 }
 
+// TODO: This should be generalized and not DEXTF specific.
 function _getCoingeckoPriceFromJSON(jsonData: any) {
   return Number(jsonData.dextf.usd);
 }
