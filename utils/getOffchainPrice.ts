@@ -32,9 +32,15 @@ function _getBitstampPriceFromJSON(jsonData: any) {
   return Number(jsonData.last);
 }
 
-// TODO: This should be generalized and not DEXTF specific.
+// TODO: This should be generalized and not DEXTF/iFARM specific.
 function _getCoingeckoPriceFromJSON(jsonData: any) {
-  return Number(jsonData.dextf.usd);
+  if (jsonData.ifarm) {
+    return Number(jsonData.ifarm.usd);
+  } else if (jsonData.dextf) {
+    return Number(jsonData.dextf.usd);
+  } else {
+    return Number(1);
+  }
 }
 
 // This is needed because our new cors proxy wont forward http or https. We really only use https.
@@ -109,6 +115,12 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
       "https://api.coingecko.com/api/v3/simple/price?ids=dextf&vs_currencies=usd",
     ],
   },
+  fcash: {
+    invertedPrice: true,
+    source: [
+      "https://api.coingecko.com/api/v3/simple/price?ids=ifarm&vs_currencies=usd",
+    ],
+  },
 };
 
 export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
@@ -146,6 +158,8 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.usddextf;
     case symbol?.includes("YDDEXTF"):
       return PRICEFEED_PARAMS.usddextf;
+    case symbol?.includes("fCASH"):
+      return PRICEFEED_PARAMS.fcash;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
     default:
