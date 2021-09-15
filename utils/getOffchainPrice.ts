@@ -38,7 +38,7 @@ function _getCoingeckoPriceFromJSON(jsonData: any) {
     return Number(jsonData.ifarm.usd);
   } else if (jsonData.dextf) {
     return Number(jsonData.dextf.usd);
-  } else if (jsonData.eth) {
+  } else if (jsonData.ethereum) {
     return Number(100);
   } else {
     return Number(1);
@@ -126,7 +126,7 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
   basis: {
     invertedPrice: false,
     source: [
-      "https://api.coingecko.com/api/v3/simple/price?ids=eth&vs_currencies=usd",
+      "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
     ],
   },
   zelda: {
