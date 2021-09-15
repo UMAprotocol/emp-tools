@@ -16,6 +16,11 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0x7c4090170aeADD54B1a0DbAC2C8D08719220A435", "EMP", "1"], // Mario Summer Cash
     ["0x56BaBEcb3dCaC063697fE38AB745c10181c56fA6", "EMP", "2"], // Mario Winter Cash
     ["0x52B21a720D5eBeFc7EFA802c7DEAB7c08Eb10F39", "EMP", "2"], // Mario Fall Cash
+    ["0x2dE7A5157693a895ae8E55b1e935e23451a77cB3", "EMP", "2"], // BTC Fall Basis
+    ["0x772665dce7b347A867F42bcA93587b5400Ae2576", "EMP", "2"], // ETH Fall Basis
+    ["0xeE44aE0cff6E9E62F26add74784E573bD671F144", "EMP", "2"], // Zelda Fall Nuts
+    ["0xee7f8088d2e67C5b10EB94732F4bB6E26968AC82", "EMP", "2"], // Zelda Candice Cash
+    ["0xCef85b352CCD7a446d94AEeeA02dD11622289954", "EMP", "2"], // Zelda Winter Nuts Cash
     ["0x5917C41a355D16D3950FE12299Ce6DFc1b54cD54", "EMP", "2"], // fCASH iFARM
     ["0x7bc1476eeD521c083Ec84D2894a7B7f738c93b3b", "EMP", "2"], // DEXTF Yield Dollar
     ["0xb40BA94747c59d076B3c189E3A031547492013da", "EMP", "2"], // pxUSD

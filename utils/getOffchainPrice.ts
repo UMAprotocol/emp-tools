@@ -38,6 +38,8 @@ function _getCoingeckoPriceFromJSON(jsonData: any) {
     return Number(jsonData.ifarm.usd);
   } else if (jsonData.dextf) {
     return Number(jsonData.dextf.usd);
+  } else if (jsonData.ethereum) {
+    return Number(100);
   } else {
     return Number(1);
   }
@@ -121,6 +123,18 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
       "https://api.coingecko.com/api/v3/simple/price?ids=ifarm&vs_currencies=usd",
     ],
   },
+  basis: {
+    invertedPrice: false,
+    source: [
+      "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
+    ],
+  },
+  zelda: {
+    invertedPrice: false,
+    source: [
+      "https://api.coingecko.com/api/v3/simple/price?ids=btc&vs_currencies=usd",
+    ],
+  },
 };
 
 export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
@@ -160,6 +174,10 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.usddextf;
     case symbol?.includes("fCASH"):
       return PRICEFEED_PARAMS.fcash;
+    case symbol?.includes("Basis"):
+      return PRICEFEED_PARAMS.basis;
+    case symbol?.includes("Zelda"):
+      return PRICEFEED_PARAMS.zelda;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
     default:
