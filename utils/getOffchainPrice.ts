@@ -90,7 +90,7 @@ export const PRICEFEED_PARAMS: PricefeedParamsMap = {
   usdbtc: {
     invertedPrice: true,
     source: [
-      proxyUrl("https://www.bitstamp.net/api/v2/ticker/btcusd"),
+      // proxyUrl("https://www.bitstamp.net/api/v2/ticker/btcusd"),
       "https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT",
       "https://api.pro.coinbase.com/products/BTC-USD/trades?limit=1",
     ],
@@ -180,6 +180,8 @@ export function getPricefeedParamsFromTokenSymbol(symbol: string | null) {
       return PRICEFEED_PARAMS.zelda;
     case symbol?.includes("NEW-PERP-TEST"):
       return PRICEFEED_PARAMS.ethbtc;
+    case symbol?.includes("BTC"):
+      return PRICEFEED_PARAMS.usdbtc;
     default:
       return null;
   }
@@ -203,6 +205,7 @@ export const getOffchainPriceFromTokenSymbol = async (symbol: string) => {
     );
     return null;
   } else {
+    console.log("else part", identifierParams);
     const prices: (number | null)[] = await Promise.all(
       identifierParams.source.map(async (url: string) => {
         try {

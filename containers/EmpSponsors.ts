@@ -107,6 +107,8 @@ const useEmpSponsors = () => {
         console.error(`Apollo client failed to fetch graph data:`, error);
       }
       if (!loading && data) {
+        // Code breaks here
+        // The subgraph query doesn't have data of sumero emp contracts
         const empData = data.financialContracts.find(
           (contract: FinancialContractQuery) =>
             utils.getAddress(contract.id).toLowerCase() ===

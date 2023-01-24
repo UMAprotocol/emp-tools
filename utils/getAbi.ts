@@ -95,14 +95,14 @@ export const Contracts: ContractType[] = [
         minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
         timerAddress: (await instance.timerAddress()) as string, // address
         // cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
-        rawTotalPositionCollateral: (await instance.rawTotalPositionCollateral()) as BigNumber,
+        rawTotalPositionCollateral: (await instance.totalPositionCollateral()) as BigNumber,
         totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
         liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
         withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
         currentTime: (await instance.getCurrentTime()) as BigNumber,
-        finderAddress: (await instance.finder()) as string, // address
+        // finderAddress: (await instance.finder()) as string, // address
         // new
-        fundingRate: (await instance.fundingRate()) as BigNumber,
+        // fundingRate: (await instance.fundingRate()) as BigNumber,
         // explicitly set null for missing fields
         expirationTimestamp: null,
         expiryPrice: null,
