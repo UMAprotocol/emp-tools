@@ -94,7 +94,8 @@ export const Contracts: ContractType[] = [
         collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
         minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
         timerAddress: (await instance.timerAddress()) as string, // address
-        // cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
+        // ToDo comment to add
+        cumulativeFeeMultiplier: ethers.utils.parseEther("1"),
         rawTotalPositionCollateral: (await instance.totalPositionCollateral()) as BigNumber,
         totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
         liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
@@ -104,8 +105,8 @@ export const Contracts: ContractType[] = [
         // new
         // fundingRate: (await instance.fundingRate()) as BigNumber,
         // explicitly set null for missing fields
-        expirationTimestamp: null,
-        expiryPrice: null,
+        expirationTimestamp: (await instance.expirationTimestamp()) as BigNumber,
+        expiryPrice: (await instance.expiryPrice()) as BigNumber,
         isExpired: false,
       };
       state.priceIdentifierUtf8 = parseBytes32String(state.priceIdentifier);
@@ -179,7 +180,6 @@ export async function getState(
   { address, type, version }: ContractInfo,
   provider: Provider | Signer
 ) {
-  console.log("DEBUG 4");
   const { abi, getState } = get(type, version);
   assert(abi, "requires abi");
   assert(getState, "requires getState function");
