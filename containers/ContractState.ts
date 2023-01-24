@@ -56,6 +56,7 @@ const useContractState = () => {
     const sub = block$.subscribe(() => updateState());
     return () => sub.unsubscribe();
   }, [block$, signer, contract]);
+  // expiration timestamp & expiry price are "null"
 
   return { data, error, loading };
 };

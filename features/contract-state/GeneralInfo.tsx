@@ -46,6 +46,19 @@ const GeneralInfo = () => {
   const { symbol: tokenSymbol, decimals: tokenDecimals } = Token.useContainer();
 
   const defaultMissingDataDisplay = "N/A";
+  console.log("---------------------------------");
+  console.log("active sponsors: ", activeSponsors);
+  console.log("expiry: ", expiry);
+  console.log("gcr: ", gcr);
+  console.log("latestPrice: ", latestPrice);
+  console.log("priceIdentifierUtf8: ", priceIdentifierUtf8);
+  console.log("collReq: ", collReq);
+  console.log("minSponsorTokens: ", minSponsorTokens);
+  console.log("tokenSymbol: ", tokenSymbol);
+  console.log("isExpired: ", isExpired);
+  console.log("sourceUrls: ", sourceUrls);
+  console.log("tokenDecimals: ", tokenDecimals);
+  console.log("---------------------------------");
 
   if (
     !loading &&
