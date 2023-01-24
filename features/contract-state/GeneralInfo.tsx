@@ -31,6 +31,8 @@ const fromWei = utils.formatUnits;
 
 const GeneralInfo = () => {
   const { empState, loading } = EmpState.useContainer();
+  console.log("DEBUG 2");
+  console.log(empState);
   const { activeSponsors } = EmpSponsors.useContainer();
   const { gcr } = Totals.useContainer();
   const { latestPrice, sourceUrls } = PriceFeed.useContainer();

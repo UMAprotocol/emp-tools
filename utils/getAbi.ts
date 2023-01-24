@@ -5,6 +5,7 @@ import { ethers, BigNumber, Bytes, Contract } from "ethers";
 // inelegant imports, but this is the only way afaik to work in browser
 import emp1 from "@uma/core-1-2/build/contracts/ExpiringMultiParty.json";
 import emp2 from "@uma/core-2-0/build/contracts/ExpiringMultiParty.json";
+import emp3 from "../blockchain/build/contracts/ExpiringMultiParty.json";
 import perp2 from "@uma/core-2-0/build/contracts/Perpetual.json";
 import erc20 from "@uma/core-2-0/build/contracts/ExpandedERC20.json";
 import { ContractInfo } from "../containers/ContractList";
@@ -63,6 +64,37 @@ export const Contracts: ContractType[] = [
         minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
         timerAddress: (await instance.timerAddress()) as string, // address
         cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
+        rawTotalPositionCollateral: (await instance.rawTotalPositionCollateral()) as BigNumber,
+        totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
+        liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
+        withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
+        currentTime: (await instance.getCurrentTime()) as BigNumber,
+        finderAddress: (await instance.finder()) as string, // address
+        // new
+        fundingRate: (await instance.fundingRate()) as BigNumber,
+        // explicitly set null for missing fields
+        expirationTimestamp: null,
+        expiryPrice: null,
+        isExpired: false,
+      };
+      state.priceIdentifierUtf8 = parseBytes32String(state.priceIdentifier);
+      return state;
+    },
+  },
+  {
+    versions: ["3"],
+    types: ["EMP", "ExpiringMultiParty"],
+    abi: emp3.abi,
+    async getState(instance: Contract) {
+      const state = {
+        collateralCurrency: (await instance.collateralCurrency()) as string, // address
+        priceIdentifier: (await instance.priceIdentifier()) as Bytes,
+        priceIdentifierUtf8: "",
+        tokenCurrency: (await instance.tokenCurrency()) as string, // address
+        collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
+        minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
+        timerAddress: (await instance.timerAddress()) as string, // address
+        // cumulativeFeeMultiplier: (await instance.cumulativeFeeMultiplier()) as BigNumber,
         rawTotalPositionCollateral: (await instance.rawTotalPositionCollateral()) as BigNumber,
         totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
         liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
@@ -147,6 +179,7 @@ export async function getState(
   { address, type, version }: ContractInfo,
   provider: Provider | Signer
 ) {
+  console.log("DEBUG 4");
   const { abi, getState } = get(type, version);
   assert(abi, "requires abi");
   assert(getState, "requires getState function");

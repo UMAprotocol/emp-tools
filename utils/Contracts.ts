@@ -44,6 +44,10 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
     ["0x3d7d563F4679C750e462Eae4271d2bd84dF66060", "EMP", "1"], // uUSDrETH Kovan Nov20
     ["0x95b597b6fa71f9f42a93b83149b4d835a6176596", "EMP", "2"], // uUSDrETHname Kovan
   ],
+  5: [
+    ["0xe478461458a6846279005c9416256e230376069f", "EMP", "3"], // sumero emp
+    // ["0x4Aad7B81dCc4f765E6F57510e34A1bD00aFCb316", "EMP", "1"],
+  ].reverse() as ContractArguments[],
 };
 
 export const getByAddress = (address: string, network: number) => {

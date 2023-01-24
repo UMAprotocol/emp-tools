@@ -13,7 +13,7 @@ type Block = ethers.providers.Block;
 type Network = ethers.providers.Network;
 type Signer = ethers.Signer;
 
-const SUPPORTED_NETWORK_IDS: number[] = [1, 42];
+const SUPPORTED_NETWORK_IDS: number[] = [1, 5, 42];
 
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);

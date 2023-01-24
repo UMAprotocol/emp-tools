@@ -38,6 +38,7 @@ const useContractState = () => {
   const [error, setError] = useState<Error | null>(null);
 
   function updateState() {
+    console.log("DEBUG 3");
     if (!contract || !signer) return;
     getState(contract, signer)
       .then(setData)
