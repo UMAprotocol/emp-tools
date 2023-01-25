@@ -43,7 +43,16 @@ export async function getSimplePrice(
 }
 
 export async function getContractInfo(address: string) {
-  const query = `https://api.coingecko.com/api/v3/coins/ethereum/contract/${address}`;
+  let query = `https://api.coingecko.com/api/v3/coins/ethereum/contract/${address}`;
+  // check for cBTC
+  if (address == "0x6f2E5fF0932EDbba8239A99Cf68c246448683b24") {
+    query = `https://api.coingecko.com/api/v3/coins/ethereum/contract/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599`;
+  }
+  // check for USDC
+  if (address == "0x07865c6E87B9F70255377e024ace6630C1Eaa37F") {
+    query = `https://api.coingecko.com/api/v3/coins/ethereum/contract/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`;
+  }
+
   const response = await fetch(query, fetchOptions);
   const result = await response.json();
   if (result.error) throw new Error(result.error);

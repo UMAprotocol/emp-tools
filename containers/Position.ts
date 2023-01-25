@@ -53,13 +53,18 @@ function usePosition() {
       tokenDec &&
       liquidationLiveness
     ) {
+      /* SUMERO FIX
+       nonexistent collRawFixedPoint = contract.getCollateral() removed, instead (await contract.positions(address)).collateral used
+      */
       // Make contract calls in parallel
-      const [collRawFixedPoint, position, liquidations] = await Promise.all([
-        contract.getCollateral(address),
+      const [position, liquidations] = await Promise.all([
         contract.positions(address),
         contract.getLiquidations(address),
       ]);
+      const collRawFixedPoint = (await contract.positions(address)).collateral;
       const collRaw: BigNumber = collRawFixedPoint[0];
+      console.log("debugg collRawFixedPoint:  ", collRawFixedPoint);
+      console.log("debugg collRaw:  ", collRaw);
 
       // Reformat data
       const tokensOutstanding: BigNumber = position.tokensOutstanding[0];

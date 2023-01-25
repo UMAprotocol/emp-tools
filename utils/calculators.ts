@@ -109,6 +109,7 @@ export function DevMiningCalculator({
   }) {
     // if we have a token price, use this first to estimate EMP value
     if (tokenPrice) {
+      console.log("there is tokenPrice");
       const fixedPrice = FixedNumber.from(tokenPrice.toString());
       const fixedSize = FixedNumber.fromValue(tokenCount, tokenDecimals);
       return fixedPrice.mulUnsafe(fixedSize);
@@ -116,6 +117,8 @@ export function DevMiningCalculator({
     // if theres no token price then fallback to collateral price divided by the collateralization requirement (usually 1.2)
     // this should give a ballpack of what the total token value will be. Its still an over estimate though.
     if (collateralPrice) {
+      console.log("there is collateralPrice");
+
       const fixedPrice = FixedNumber.from(collateralPrice.toString());
       const collFixedSize = FixedNumber.fromValue(
         collateralCount,

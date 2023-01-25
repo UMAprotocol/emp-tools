@@ -10,8 +10,10 @@ import { getAbi } from "../utils/getAbi";
 import Connection from "./Connection";
 
 export const defaultTotalRewards = 50000;
-const empStatusUrl =
-  "https://raw.githubusercontent.com/UMAprotocol/protocol/master/packages/affiliates/payouts/devmining-status.json";
+const sumeroEMPs = {
+  empWhitelist: ["0xe478461458A6846279005c9416256E230376069f"],
+  totalReward: 35000,
+};
 
 const useDevMiningCalculator = () => {
   const { provider } = Connection.useContainer();
@@ -23,16 +25,10 @@ const useDevMiningCalculator = () => {
   const [error, setError] = useState<Error | null>(null);
 
   // pull latest whitelist
+  // pull latest whitelist
   useEffect(() => {
-    fetch(empStatusUrl)
-      .then((response) => response.json())
-      .then((result) => {
-        setEmpWhitelist(result.empWhitelist);
-        setTotalRewards(result.totalReward);
-      })
-      .catch((err) => {
-        console.error("Error fetching Affiliates status", err);
-      });
+    setEmpWhitelist(sumeroEMPs.empWhitelist);
+    setTotalRewards(sumeroEMPs.totalReward);
   }, []);
 
   useEffect(() => {
@@ -52,7 +48,6 @@ const useDevMiningCalculator = () => {
       provider,
     });
     setCalculator(devMiningCalculator);
-
     devMiningCalculator
       .estimateDevMiningRewards({
         totalRewards,

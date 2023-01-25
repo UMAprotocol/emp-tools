@@ -308,7 +308,6 @@ const useEmpSponsors = () => {
 
   // Change state when emp changes or when the graphQL data changes due to polling.
   useEffect(() => {
-    console.log("useEffectttt");
     querySponsors();
   }, [emp, latestPrice]);
 
