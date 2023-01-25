@@ -108,6 +108,9 @@ export const Contracts: ContractType[] = [
         expirationTimestamp: (await instance.expirationTimestamp()) as BigNumber,
         expiryPrice: (await instance.expiryPrice()) as BigNumber,
         isExpired: false,
+        disputeBondPct: (await instance.disputeBondPercentage()) as BigNumber,
+        disputerDisputeRewardPct: (await instance.disputerDisputeRewardPercentage()) as BigNumber,
+        sponsorDisputeRewardPct: (await instance.sponsorDisputeRewardPercentage()) as BigNumber,
       };
       state.priceIdentifierUtf8 = parseBytes32String(state.priceIdentifier);
       return state;

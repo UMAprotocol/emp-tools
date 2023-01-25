@@ -149,6 +149,7 @@ const AllSponsors = () => {
     };
 
     const handleOpenActionsDialog = (address: string) => {
+      console.log("DEBUG:: more info clicked ");
       setSelectedSponsor(address);
       setIsDialogShowing(true);
     };

@@ -205,7 +205,6 @@ export const getOffchainPriceFromTokenSymbol = async (symbol: string) => {
     );
     return null;
   } else {
-    console.log("else part", identifierParams);
     const prices: (number | null)[] = await Promise.all(
       identifierParams.source.map(async (url: string) => {
         try {

@@ -63,8 +63,6 @@ function usePosition() {
       ]);
       const collRawFixedPoint = (await contract.positions(address)).collateral;
       const collRaw: BigNumber = collRawFixedPoint[0];
-      console.log("debugg collRawFixedPoint:  ", collRawFixedPoint);
-      console.log("debugg collRaw:  ", collRaw);
 
       // Reformat data
       const tokensOutstanding: BigNumber = position.tokensOutstanding[0];

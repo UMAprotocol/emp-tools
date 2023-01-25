@@ -13,4 +13,9 @@ export const legacyEMPs: { [networkId: number]: string[] } = {
     "0xFb70A4CBD537B36e647553C279a93E969b041DF0", //"Perpetual", yUSD Kovan Oct30
     "0xA000Dfe84A1852865d5231e0F6CBF0De08888abE", // uUSDrBTC Kovan Oct20
   ],
+  5: [
+    "0xe478461458A6846279005c9416256E230376069f",
+    "0xeb5c6dD4Ba0Bc93cbf9A5fDf8d6B1153a238f1CD", //"Perpetual", yUSD Kovan Oct30
+    "0x60d6c8E5Ca5D4A2aa1D0D4a4c72944A066008F75",
+  ],
 };

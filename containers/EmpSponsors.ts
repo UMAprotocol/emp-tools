@@ -183,16 +183,12 @@ const useEmpSponsors = () => {
         console.error(`Apollo client failed to fetch graph data:`, error);
       }
       if (!loading && data) {
-        // Code breaks here
-        console.log("debug data -------------", data);
-
         // The subgraph query doesn't have data of sumero emp contracts
         const empData = data.financialContracts.find(
           (contract: any) =>
             utils.getAddress(contract.id).toLowerCase() ===
             emp.address.toLowerCase()
         );
-        console.log("debug empdata:  ", empData);
         if (empData) {
           let newPositions: SponsorMap = {};
           let newLiquidations: LiquidationMap = {};
@@ -229,7 +225,6 @@ const useEmpSponsors = () => {
               position.tokensOutstanding !== "0" &&
               position.collateral !== "0"
             ) {
-              console.log("inside if 1.1");
               newPositions[sponsor] = {
                 tokensOutstanding: position.tokensOutstanding,
                 collateral: position.collateral,
@@ -255,8 +250,6 @@ const useEmpSponsors = () => {
             // There should always be a LiquidationCreatedEvent associated with each liquidation object, but if not then
             // we will just ignore this strange edge case.
             if (liquidationCreatedEvent) {
-              console.log("inside if 1.2");
-
               const liquidatedCR =
                 parseFloat(liquidation.tokensLiquidated) > 0
                   ? parseFloat(liquidation.liquidatedCollateral) /
@@ -273,8 +266,6 @@ const useEmpSponsors = () => {
                 liquidation.tokensLiquidated !== "0" &&
                 liquidation.lockedCollateral !== "0"
               ) {
-                console.log("inside if 1.3");
-
                 // The UMA subgraph uniquely identifies each liquidation with an "id" that concatenates
                 // the liquidated sponsor's address with the liquidation ID, for example:
                 // "0x1e17a75616cd74f5846b1b71622aa8e10ea26cc0-0"
@@ -296,9 +287,6 @@ const useEmpSponsors = () => {
               }
             }
           });
-          console.log("debug result newPositions: ", newPositions);
-          console.log("debug result newLiquidations: ", newLiquidations);
-
           setActivePositions(newPositions);
           setLiquidations(newLiquidations);
         }

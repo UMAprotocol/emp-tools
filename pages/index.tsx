@@ -52,8 +52,6 @@ export default function Index() {
   const { contract, isValid } = SelectedContract.useContainer();
   // Use callback here will prevent re mounting components unless contract changes
   const selectPage = useCallback(() => {
-    console.log("DEBUG!");
-    console.log(contract);
     if (!isValid) return <NoContractPage />;
     if (contract == null) return <NoContractPage />;
     switch (contract.type) {

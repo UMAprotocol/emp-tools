@@ -31,8 +31,6 @@ const fromWei = utils.formatUnits;
 
 const GeneralInfo = () => {
   const { empState, loading } = EmpState.useContainer();
-  console.log("DEBUG 2");
-  console.log(empState);
   const { activeSponsors } = EmpSponsors.useContainer();
   const { gcr } = Totals.useContainer();
   const { latestPrice, sourceUrls } = PriceFeed.useContainer();
@@ -46,7 +44,7 @@ const GeneralInfo = () => {
   const { symbol: tokenSymbol, decimals: tokenDecimals } = Token.useContainer();
 
   const defaultMissingDataDisplay = "N/A";
-  console.log("---------------------------------");
+  /*   console.log("---------------------------------");
   console.log("active sponsors: ", activeSponsors);
   console.log("expiry: ", expiry);
   console.log("gcr: ", gcr);
@@ -58,7 +56,7 @@ const GeneralInfo = () => {
   console.log("isExpired: ", isExpired);
   console.log("sourceUrls: ", sourceUrls);
   console.log("tokenDecimals: ", tokenDecimals);
-  console.log("---------------------------------");
+  console.log("---------------------------------"); */
 
   if (
     !loading &&

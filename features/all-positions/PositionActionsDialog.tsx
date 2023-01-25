@@ -71,6 +71,7 @@ interface DialogProps {
 }
 
 const PositionActionsDialog = (props: DialogProps) => {
+  console.log("DEBUGG 1:::");
   const { empState } = EmpState.useContainer();
   const {
     priceIdentifierUtf8,
