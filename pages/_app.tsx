@@ -19,7 +19,7 @@ import WethContract from "../containers/WethContract";
 import Etherscan from "../containers/Etherscan";
 import Balancer from "../containers/Balancer";
 import DvmContracts from "../containers/DvmContracts";
-import DvmState from "../containers/DvmState";
+import OoState from "../containers/OoState";
 import DevMining from "../containers/DevMining";
 import { UniswapGetPair } from "../containers/Uniswap";
 import ContractList from "../containers/ContractList";
@@ -51,13 +51,13 @@ const WithStateContainerProviders = ({ children }: IProps) => (
                                 <Position.Provider>
                                   <Balancer.Provider>
                                     <DvmContracts.Provider>
-                                      <DvmState.Provider>
+                                      <OoState.Provider>
                                         <DevMining.Provider>
                                           <UniswapGetPair.Provider>
                                             {children}
                                           </UniswapGetPair.Provider>
                                         </DevMining.Provider>
-                                      </DvmState.Provider>
+                                      </OoState.Provider>
                                     </DvmContracts.Provider>
                                   </Balancer.Provider>
                                 </Position.Provider>

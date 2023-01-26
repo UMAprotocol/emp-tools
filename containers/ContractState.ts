@@ -27,6 +27,7 @@ const initState = {
   contractState: null,
   finderAddress: null,
   expiryPrice: null,
+  ancillaryData: null,
 };
 
 const useContractState = () => {

@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { Typography, Box, Tooltip } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
-import DvmState from "../../containers/DvmState";
+import OoState from "../../containers/OoState";
 import Collateral from "../../containers/Collateral";
 
 import { DOCS_MAP } from "../../constants/docLinks";
@@ -35,8 +35,8 @@ const DisputeParams = () => {
     liquidationLiveness,
   } = empState;
 
-  const { dvmState } = DvmState.useContainer();
-  const { finalFee } = dvmState;
+  const { ooState } = OoState.useContainer();
+  const { finalFee } = ooState;
   const { symbol: collSymbol } = Collateral.useContainer();
 
   const withdrawalLivenessInMinutes = (Number(withdrawalLiveness) / 60).toFixed(

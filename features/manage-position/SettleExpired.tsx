@@ -7,7 +7,7 @@ import EmpContract from "../../containers/EmpContract";
 import EmpState from "../../containers/EmpState";
 import Collateral from "../../containers/Collateral";
 import Position from "../../containers/Position";
-import DvmState from "../../containers/DvmState";
+import OoState from "../../containers/OoState";
 import Token from "../../containers/Token";
 import Etherscan from "../../containers/Etherscan";
 import { DOCS_MAP } from "../../constants/docLinks";
@@ -54,8 +54,8 @@ const SettleExpired = () => {
     balance: tokenBalance,
   } = Token.useContainer();
   const { getEtherscanUrl } = Etherscan.useContainer();
-  const { dvmState } = DvmState.useContainer();
-  const { resolvedPrice: dvmResolvedPrice } = dvmState;
+  const { ooState } = OoState.useContainer();
+  const { resolvedPrice: dvmResolvedPrice } = ooState;
 
   const [hash, setHash] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);

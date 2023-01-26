@@ -111,6 +111,7 @@ export const Contracts: ContractType[] = [
         disputeBondPct: (await instance.disputeBondPercentage()) as BigNumber,
         disputerDisputeRewardPct: (await instance.disputerDisputeRewardPercentage()) as BigNumber,
         sponsorDisputeRewardPct: (await instance.sponsorDisputeRewardPercentage()) as BigNumber,
+        ancillaryData: (await instance.ancillaryData()) as Bytes,
       };
       state.priceIdentifierUtf8 = parseBytes32String(state.priceIdentifier);
       return state;

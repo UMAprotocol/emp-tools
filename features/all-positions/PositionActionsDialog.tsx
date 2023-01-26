@@ -23,7 +23,7 @@ import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 
 import EmpState from "../../containers/EmpState";
-import DvmState from "../../containers/DvmState";
+import OoState from "../../containers/OoState";
 import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import EmpContract from "../../containers/EmpContract";
@@ -71,7 +71,6 @@ interface DialogProps {
 }
 
 const PositionActionsDialog = (props: DialogProps) => {
-  console.log("DEBUGG 1:::");
   const { empState } = EmpState.useContainer();
   const {
     priceIdentifierUtf8,
@@ -79,11 +78,8 @@ const PositionActionsDialog = (props: DialogProps) => {
     currentTime,
     isExpired,
   } = empState;
-  const { dvmState } = DvmState.useContainer();
-  /*
-  Sumero Fix: final fee hardcoded
-  */
-  const finalFee = 1;
+  const { ooState } = OoState.useContainer();
+  const { finalFee } = ooState;
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice } = PriceFeed.useContainer();

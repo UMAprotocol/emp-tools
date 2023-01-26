@@ -54,17 +54,6 @@ const Totals = () => {
   const { getEtherscanUrl } = Etherscan.useContainer();
   const exchangeInfo = getExchangeInfo(tokenSymbol);
   const defaultMissingDataDisplay = "N/A";
-  console.log("--------------getting totals......");
-  console.log("totalCollateral: ", totalCollateral);
-  console.log("totalTokens: ", totalTokens);
-  console.log("collSymbol: ", collSymbol);
-  console.log("tokenSymbol: ", tokenSymbol);
-  console.log("exchangeInfo: ", exchangeInfo);
-  console.log("collAddress: ", collAddress);
-  console.log("tokenAddress: ", tokenAddress);
-  console.log("provider: ", provider);
-  console.log("--------------.");
-
   if (
     totalCollateral !== null &&
     totalTokens !== null &&
