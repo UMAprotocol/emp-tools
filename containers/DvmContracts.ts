@@ -21,6 +21,7 @@ function useContracts() {
 
   const setDvmContracts = async () => {
     if (finderAddress !== null && provider !== null) {
+      // Need to debug why finderAddress is undefined
       const finder = new ethers.Contract(
         finderAddress,
         uma.finder.abi,

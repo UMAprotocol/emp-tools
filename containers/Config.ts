@@ -36,7 +36,10 @@ export const config = (network: Network | null) => {
           { walletName: "dapper" },
           {
             walletName: "walletConnect",
-            rpc: { [network?.chainId || 1]: infuraRpc },
+            rpc: {
+              [network?.chainId || 1]: infuraRpc,
+              5: "https://eth-goerli.public.blastapi.io",
+            },
           },
           { walletName: "walletLink", rpcUrl: infuraRpc },
           { walletName: "opera" },

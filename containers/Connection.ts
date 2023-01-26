@@ -28,7 +28,7 @@ function useConnection() {
     const onboardInstance = Onboard({
       dappId: config(network).onboardConfig.apiKey,
       hideBranding: true,
-      networkId: 1, // Default to main net. If on a different network will change with the subscription.
+      networkId: 5, // Default to main net. If on a different network will change with the subscription.
       subscriptions: {
         address: (address: string | null) => {
           setAddress(address);
