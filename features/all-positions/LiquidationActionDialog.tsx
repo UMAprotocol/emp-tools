@@ -61,7 +61,10 @@ interface DialogProps {
 const LiquidationActionDialog = (props: DialogProps) => {
   const { empState } = EmpState.useContainer();
   const { dvmState } = DvmState.useContainer();
-  const { finalFee } = dvmState;
+  /*
+  SUMERO FIX: final fee hardcoded
+  */
+  const finalFee = 1;
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { contract: emp } = EmpContract.useContainer();
 

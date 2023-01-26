@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { utils } from "ethers";
+import { ethers, utils } from "ethers";
 const { formatUnits: fromWei } = utils;
 import { useState, MouseEvent, useEffect } from "react";
 import Alert from "@material-ui/lab/Alert";
@@ -80,7 +80,10 @@ const PositionActionsDialog = (props: DialogProps) => {
     isExpired,
   } = empState;
   const { dvmState } = DvmState.useContainer();
-  const { finalFee } = dvmState;
+  /*
+  Sumero Fix: final fee hardcoded
+  */
+  const finalFee = 1;
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
@@ -192,6 +195,7 @@ const PositionActionsDialog = (props: DialogProps) => {
   const prettyAddress = (x: String) => {
     return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
   };
+
   if (
     activeSponsors !== null &&
     props.selectedSponsor !== null &&

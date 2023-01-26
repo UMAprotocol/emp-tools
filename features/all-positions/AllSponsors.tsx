@@ -148,8 +148,8 @@ const AllSponsors = () => {
       return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
     };
 
+    // checkbox for positions
     const handleOpenActionsDialog = (address: string) => {
-      console.log("DEBUG:: more info clicked ");
       setSelectedSponsor(address);
       setIsDialogShowing(true);
     };

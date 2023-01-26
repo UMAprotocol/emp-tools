@@ -159,6 +159,7 @@ const AllLiquidations = () => {
       return x.substr(0, 5) + "..." + x.substr(x.length - 5, x.length);
     };
 
+    // Checkbox for liquidated positions
     const handleOpenActionsDialog = (id: string) => {
       setSponsorPlusId(id);
       setIsDialogShowing(true);
